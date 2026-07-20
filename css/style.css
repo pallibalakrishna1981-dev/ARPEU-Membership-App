@@ -535,15 +535,15 @@ height:24px;
 .form-card{
     background:#fff;
     border-radius:16px;
-    padding:12px;
+    padding:15px;
     box-shadow:0 3px 10px rgba(0,0,0,.08);
 }
 
 .card-header{
     display:flex;
     align-items:center;
-    gap:8px;
-    margin-bottom:8px;
+    gap:10px;
+    margin-bottom:15px;
     font-weight:700;
     color:#0B4EA2;
 }
@@ -551,19 +551,23 @@ height:24px;
 .card-body{
     display:flex;
     flex-direction:column;
-    gap:10px;
+    gap:15px;
 }
 
 .form-group{
     display:flex;
     flex-direction:column;
-    gap:3px;
+    gap:6px;
 }
 
 .form-group input,
 .form-group select{
     width:100%;
-    padding:10px 12px;
+    padding:12px;
+    border:1px solid #ddd;
+    border-radius:10px;
+    font-size:14px;
+}
 
 .submit-btn{
     width:100%;
@@ -719,8 +723,13 @@ margin-top:15px;
 }
 
 .member-title-box{
-    text-align:center;
     margin-bottom:18px;
+}
+
+.membership-toggle-card,
+.member-title,
+.member-subtitle{
+    text-align:center;
 }
 
 .member-title{
@@ -748,32 +757,4 @@ margin-top:15px;
         max-width:270px;
     }
 
-}
-
-
-/* =========================================================
-   MEMBERSHIP PAGE HEADER
-========================================================= */
-
-.member-title-box{
-    text-align:center;
-    margin-bottom:20px;
-}
-
-.member-title{
-    display:block;
-    margin:0 0 6px;
-    font-size:24px;
-    font-weight:700;
-    letter-spacing:.8px;
-    text-transform:uppercase;
-    color:#0b4ea2;
-}
-
-.member-subtitle{
-    margin:0;
-    font-size:15px;
-    font-weight:500;
-    line-height:1.6;
-    color:#6b7280;
 }

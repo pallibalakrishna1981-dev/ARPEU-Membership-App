@@ -182,7 +182,7 @@ function initializeNavigation(){
 }
 
 /* =========================================================
-   MEMBERSHIP MODE
+   HOME PAGE MEMBERSHIP BUTTONS
 ========================================================= */
 
 function initializeMembershipMode(){
@@ -212,53 +212,6 @@ function initializeMembershipMode(){
             showPage("membership");
 
         });
-
-    }
-
-}
-
-/* =========================================================
-   MEMBERSHIP MODE
-========================================================= */
-
-function setMembershipMode(mode){
-
-    membershipMode=mode;
-
-    if(!membershipTitle || !submitMembershipBtn){
-        return;
-    }
-
-    const membershipDescription=document.getElementById("membershipDescription");
-    const membershipToggle=document.querySelector(".membership-toggle");
-    const toggleNewMember=document.getElementById("toggleNewMember");
-    const toggleRenewal=document.getElementById("toggleRenewal");
-
-    if(mode==="renewal"){
-
-        membershipTitle.textContent="MEMBERSHIP RENEWAL";
-
-        membershipDescription.textContent="Renew your existing ARPEU membership.";
-
-        submitMembershipBtn.textContent="SUBMIT RENEWAL";
-
-        membershipToggle?.classList.add("renewal");
-
-        toggleRenewal?.classList.add("active");
-        toggleNewMember?.classList.remove("active");
-
-    }else{
-
-        membershipTitle.textContent="NEW MEMBER";
-
-        membershipDescription.textContent="Join ARPEU and become a registered member.";
-
-        submitMembershipBtn.textContent="SUBMIT MEMBERSHIP";
-
-        membershipToggle?.classList.remove("renewal");
-
-        toggleNewMember?.classList.add("active");
-        toggleRenewal?.classList.remove("active");
 
     }
 
