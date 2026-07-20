@@ -47,6 +47,8 @@ document.addEventListener("DOMContentLoaded",function(){
     initializeNavigation();
 
     initializeMembershipMode();
+    
+    initializeDistrictDropdown();
 
     initializePhotoPreview();
 
@@ -57,6 +59,65 @@ document.addEventListener("DOMContentLoaded",function(){
     showPage("home");
 
 });
+
+
+/* =========================================================
+   DISTRICT DROPDOWN
+========================================================= */
+
+const districtSelect=document.getElementById("district");
+
+const districts=[
+    "Alluri Sitarama Raju",
+    "Anakapalli",
+    "Anantapur",
+    "Annamayya",
+    "Bapatla",
+    "Chittoor",
+    "Dr. B. R. Ambedkar Konaseema",
+    "East Godavari",
+    "Eluru",
+    "Guntur",
+    "Kakinada",
+    "Krishna",
+    "Kurnool",
+    "Nandyal",
+    "NTR",
+    "Palnadu",
+    "Parvathipuram Manyam",
+    "Prakasam",
+    "Sri Potti Sriramulu Nellore",
+    "Sri Sathya Sai",
+    "Srikakulam",
+    "Tirupati",
+    "Visakhapatnam",
+    "Vizianagaram",
+    "West Godavari",
+    "YSR Kadapa"
+];
+
+function initializeDistrictDropdown(){
+
+    if(!districtSelect){
+        return;
+    }
+
+    districts.forEach(function(district){
+
+        const option=document.createElement("option");
+
+        option.value=district;
+
+        option.textContent=district;
+
+        districtSelect.appendChild(option);
+
+    });
+
+}
+
+
+
 
 /* =========================================================
    NAVIGATION ENGINE
