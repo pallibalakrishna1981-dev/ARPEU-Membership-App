@@ -196,29 +196,86 @@ Fast • Secure • Digital Membership System
 </div>
 </section>
 </section>
+
+
 <!-- =========================================================
      MEMBERSHIP PAGE START
-     HTML PART - 1A
 ========================================================= -->
 
 <section id="membershipPage" class="membership-page" style="display:none;">
 
     <!-- Membership Header -->
-    <div class="member-page-header">
+<div class="member-page-header">
 
-        <div class="member-title-box">
-            <span id="membershipTitle" class="member-title">
-                NEW MEMBER
-            </span>
+    <div class="member-title-box">
 
-            <p class="member-subtitle">
-                Join ARPEU and become a registered member.
-            </p>
+        <!-- =========================================================
+             MEMBERSHIP MODE TOGGLE
+        ========================================================== -->
+
+        <div class="membership-toggle-card">
+
+            <div
+                id="membershipToggle"
+                class="membership-toggle">
+
+                <div class="toggle-slider"></div>
+
+                <button
+                    type="button"
+                    id="toggleNewMember"
+                    class="toggle-btn active">
+
+                    <i class="fas fa-user"></i>
+
+                    <span>
+                        New Member
+                    </span>
+
+                </button>
+
+                <button
+                    type="button"
+                    id="toggleRenewal"
+                    class="toggle-btn">
+
+                    <i class="fas fa-sync-alt"></i>
+
+                    <span>
+                        Renewal
+                    </span>
+
+                </button>
+
+            </div>
+
         </div>
+
+        <!-- =========================================================
+             MEMBERSHIP TITLE
+        ========================================================== -->
+
+        <span
+            id="membershipTitle"
+            class="member-title">
+
+            NEW MEMBER
+
+        </span>
+
+        <p
+            id="membershipDescription"
+            class="member-subtitle">
+
+            Join ARPEU and become a registered member.
+
+        </p>
 
     </div>
 
-    <!-- Personal Information Card -->
+</div>
+
+<!-- Personal Information Card -->
 
     <div class="form-card">
 
