@@ -1,0 +1,643 @@
+/*=========================================
+ARPEU DIGITAL MEMBERSHIP PORTAL
+STYLE.CSS - PART 1
+=========================================*/
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+:root{
+--primary:#0B4EA2;
+--secondary:#F57C00;
+--white:#FFFFFF;
+--bg:#F3F7FC;
+--text:#333333;
+--border:#E5E7EB;
+--shadow:0 6px 18px rgba(0,0,0,.12);
+--radius:18px;
+--transition:.30s;
+}
+
+html{
+width:100%;
+height:100%;
+overflow:hidden;
+}
+
+body{
+width:100%;
+height:100%;
+overflow:hidden;
+background:var(--bg);
+font-family:'Poppins',sans-serif;
+color:var(--text);
+}
+
+img{
+display:block;
+max-width:100%;
+}
+
+a{
+text-decoration:none;
+color:inherit;
+}
+
+.app-container{
+width:100%;
+max-width:480px;
+height:100vh;
+margin:auto;
+display:flex;
+flex-direction:column;
+background:#FFFFFF;
+overflow:hidden;
+}
+
+/*=========================================
+HEADER
+=========================================*/
+
+.header{
+background:#FFFFFF;
+box-shadow:0 2px 8px rgba(0,0,0,.05);
+z-index:10;
+}
+
+.header-top{
+height:64px;
+display:flex;
+align-items:center;
+justify-content:space-between;
+padding:8px 12px;
+}
+
+.logo{
+width:56px;
+display:flex;
+justify-content:center;
+align-items:center;
+}
+
+.logo img{
+width:48px;
+height:48px;
+object-fit:contain;
+}
+
+.title{
+flex:1;
+text-align:center;
+padding:0 8px;
+}
+
+.title h2{
+font-size:18px;
+font-weight:800;
+color:var(--primary);
+line-height:1;
+margin:0;
+padding:0;
+}
+
+.title h1{
+margin:2px 0 0;
+font-size:16px;
+font-weight:800;
+color:var(--secondary);
+line-height:1;
+white-space:nowrap;
+padding:0;
+}
+
+/*=========================================
+INFO BAR
+=========================================*/
+
+.info-bar{
+height:28px;
+display:flex;
+justify-content:center;
+align-items:center;
+gap:8px;
+background:var(--primary);
+color:#FFFFFF;
+font-size:11px;
+font-weight:600;
+}
+
+/*=========================================
+NAVIGATION
+=========================================*/
+
+.navbar{
+height:48px;
+display:flex;
+background:#FFFFFF;
+border-bottom:1px solid var(--border);
+}
+
+.nav-item{
+flex:1;
+display:flex;
+justify-content:center;
+align-items:center;
+gap:5px;
+font-size:13px;
+font-weight:600;
+transition:var(--transition);
+}
+
+.nav-item.active{
+color:var(--primary);
+border-bottom:3px solid var(--primary);
+}
+
+.nav-item:hover{
+background:#EEF5FF;
+}
+
+/*=========================================
+MAIN CONTENT
+=========================================*/
+
+.main-content{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    padding:12px;
+    overflow-y:auto;
+    overflow-x:hidden;
+}
+
+.welcome-section{
+margin-bottom:14px;
+}
+
+.welcome-card{
+background:linear-gradient(135deg,#0B4EA2,#1565C0);
+border-radius:18px;
+padding:16px;
+text-align:center;
+color:#FFFFFF;
+box-shadow:var(--shadow);
+}
+
+.welcome-tag{
+display:inline-block;
+padding:5px 14px;
+border-radius:20px;
+background:rgba(255,255,255,.18);
+font-size:11px;
+font-weight:700;
+letter-spacing:1px;
+}
+
+.welcome-card h2{
+margin-top:10px;
+font-size:21px;
+font-weight:800;
+line-height:1.3;
+}
+
+.welcome-card p{
+margin-top:8px;
+font-size:12px;
+opacity:.95;
+}
+/*=========================================
+MEMBERSHIP SERVICES
+=========================================*/
+.service-section{
+flex:1;
+display:flex;
+flex-direction:column;
+}
+.section-title{
+text-align:center;
+font-size:18px;
+font-weight:700;
+color:var(--primary);
+margin-bottom:14px;
+}
+.service-grid{
+display:flex;
+gap:10px;
+}
+.service-card{
+flex:1;
+display:flex;
+justify-content:center;
+align-items:center;
+height:46px;
+border-radius:30px;
+text-decoration:none;
+color:#FFFFFF;
+font-size:15px;
+font-weight:700;
+box-shadow:0 4px 10px rgba(0,0,0,.12);
+transition:var(--transition);
+}
+
+.new-card{
+background:linear-gradient(135deg,#1565C0,#0D47A1);
+}
+.renewal-card{
+background:linear-gradient(135deg,#FB8C00,#EF6C00);
+}
+.service-card:hover{
+transform:translateY(-2px);
+}
+.service-card:active{
+transform:scale(.98);
+}
+
+
+
+/*=========================================
+CONTACT SECTION
+=========================================*/
+
+.contact-section{
+margin:8px 4px;
+}
+
+.contact-card{
+background:#fff;
+border:1px solid #e5e5e5;
+border-radius:16px;
+padding:12px 14px;
+box-shadow:0 4px 12px rgba(0,0,0,.08);
+display:flex;
+justify-content:space-between;
+align-items:flex-start;
+gap:12px;
+}
+
+/* Contact Information */
+.contact-left{
+flex:1.6;
+}
+
+/* Follow Us */
+.contact-right{
+flex:1;
+display:flex;
+flex-direction:column;
+align-items:center;
+}
+
+/* Section Titles */
+.contact-left h4,
+.contact-right h4{
+font-size:14px;
+font-weight:700;
+color:#0B4EA2;
+margin-bottom:8px;
+white-space:nowrap;
+}
+
+/* Vertical Divider */
+.contact-divider{
+width:1px;
+background:#d9d9d9;
+align-self:stretch;
+margin:0 4px;
+}
+
+/* Contact Links */
+.contact-link{
+display:flex;
+align-items:center;
+gap:8px;
+margin-bottom:6px;
+font-size:13px;
+font-weight:500;
+line-height:1.2;
+color:#333;
+text-decoration:none;
+}
+
+.contact-link i{
+width:18px;
+font-size:16px;
+text-align:center;
+color:#0B4EA2;
+}
+
+/* Social Icons */
+.social-icons{
+display:flex;
+justify-content:center;
+align-items:center;
+gap:10px;
+margin-top:4px;
+flex-wrap:wrap;
+}
+
+.social-icons a{
+font-size:26px;
+transition:.3s;
+}
+
+.social-icons a:hover{
+transform:scale(1.12);
+}
+
+/*=========================================
+SOCIAL MEDIA COLORS
+=========================================*/
+
+.facebook{
+color:#1877F2;
+}
+
+.twitter{
+color:#000000;
+}
+
+.instagram{
+color:#E4405F;
+}
+
+.youtube{
+color:#FF0000;
+}
+
+.whatsapp{
+color:#25D366;
+}
+
+.telegram{
+color:#229ED9;
+}
+
+/* =========================================
+   MOBILE RESPONSIVE
+========================================= */
+
+.contact-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:nowrap;
+}
+
+.contact-link{
+    font-size:12px;
+}
+
+.social-icons{
+    gap:8px;
+}
+
+.social-icons a{
+    font-size:20px;
+}
+
+/*=========================================
+FOOTER
+=========================================*/
+.footer{
+padding:8px 10px;
+background:var(--primary);
+color:#FFFFFF;
+flex-shrink:0;
+}
+.footer-content{
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+gap:2px;
+text-align:center;
+}
+.footer-content p{
+margin:0;
+font-size:10px;
+font-weight:500;
+line-height:1.3;
+white-space:nowrap;
+}
+
+/*=========================================
+RESPONSIVE
+=========================================*/
+
+@media (max-width:480px){
+
+.header-top{
+height:64px;
+}
+
+.logo{
+width:50px;
+}
+
+.logo img{
+width:42px;
+height:42px;
+}
+
+.title h2{
+font-size:18px;
+}
+
+.title h1{
+font-size:17px;
+}
+
+.info-bar{
+font-size:10px;
+gap:5px;
+}
+
+.nav-item{
+font-size:12px;
+}
+
+.welcome-card{
+padding:14px;
+}
+
+.welcome-card h2{
+font-size:18px;
+}
+
+.section-title{
+font-size:17px;
+}
+
+.service-card{
+padding:14px;
+}
+
+.service-icon{
+width:54px;
+height:54px;
+font-size:24px;
+}
+
+.service-content h4{
+font-size:16px;
+}
+
+.service-content p{
+font-size:11px;
+}
+
+.service-arrow{
+width:38px;
+height:38px;
+font-size:18px;
+}
+
+.contact-strip{
+padding:8px;
+gap:5px;
+}
+
+.contact-item{
+font-size:10px;
+}
+
+.contact-icon{
+font-size:14px;
+}
+
+.footer{
+height:44px;
+}
+
+.footer-content{
+font-size:10px;
+gap:4px;
+}
+
+.footer-logo img{
+width:24px;
+height:24px;
+}
+
+}
+
+
+.membership-page{
+    display:flex;
+    flex-direction:column;
+    gap:15px;
+    padding-bottom:20px;
+}
+
+.form-card{
+    background:#fff;
+    border-radius:16px;
+    padding:15px;
+    box-shadow:0 3px 10px rgba(0,0,0,.08);
+}
+
+.card-header{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:15px;
+    font-weight:700;
+    color:#0B4EA2;
+}
+
+.card-body{
+    display:flex;
+    flex-direction:column;
+    gap:15px;
+}
+
+.form-group{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+}
+
+.form-group input,
+.form-group select{
+    width:100%;
+    padding:12px;
+    border:1px solid #ddd;
+    border-radius:10px;
+    font-size:14px;
+}
+
+.submit-btn{
+    width:100%;
+    padding:14px;
+    border:none;
+    border-radius:12px;
+    background:#0B4EA2;
+    color:#fff;
+    font-size:16px;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+
+/*=========================================
+PHOTO PREVIEW
+=========================================*/
+.photo-preview{
+display:flex;
+justify-content:center;
+align-items:center;
+margin-top:10px;
+}
+.photo-preview img{
+width:130px;
+height:160px;
+object-fit:cover;
+border-radius:10px;
+border:2px solid #ddd;
+display:none;
+}
+
+/*=========================================
+RADIO BUTTONS
+=========================================*/
+.radio-group{
+display:flex;
+flex-direction:column;
+gap:10px;
+}
+.radio-item{
+display:flex;
+align-items:center;
+gap:8px;
+font-size:14px;
+font-weight:500;
+}
+.radio-item input{
+width:auto;
+}
+
+
+/*=========================================
+CHECKBOX
+=========================================*/
+.checkbox-item{
+display:flex;
+align-items:flex-start;
+gap:10px;
+font-size:14px;
+line-height:1.6;
+}
+.checkbox-item input{
+margin-top:4px;
+}
+
+
+/*=========================================
+SUBMIT SECTION
+=========================================*/
+.submit-section{
+margin-top:15px;
+}

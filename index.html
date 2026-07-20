@@ -1,0 +1,1070 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0B4EA2">
+<meta name="description" content="ARPEU Digital Membership Portal">
+<title>ARPEU Digital Membership Portal</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+</head>
+
+<body>
+
+<div class="app-container">
+
+<header class="header">
+
+<div class="header-top">
+
+<div class="logo">
+
+<img src="images/arpeu-logo.png" alt="ARPEU Logo">
+
+</div>
+
+<div class="title">
+
+<h2>ANDHRA RASTRA</h2>
+
+<h1>POWER EMPLOYEES UNION</h1>
+
+</div>
+
+<div class="logo">
+
+<img src="images/bms-logo.png" alt="BMS Logo">
+
+</div>
+
+</div>
+
+<div class="info-bar">
+
+<span>Regd. No. G-445</span>
+
+<span>|</span>
+
+<span>Estd. 1982</span>
+
+<span>|</span>
+
+<span>Affiliated to BMS</span>
+
+</div>
+
+</header>
+
+<nav class="navbar">
+
+<a href="#" class="nav-item active" id="navHome">
+    <i class="fa-solid fa-house"></i>
+    <span>Home</span>
+</a>
+
+<a href="#" class="nav-item" id="navMembership">
+    <i class="fa-solid fa-id-card"></i>
+    <span>Membership</span>
+</a>
+
+<a href="#" class="nav-item" id="navStatistics">
+    <i class="fa-solid fa-chart-column"></i>
+    <span>Statistics</span>
+</a>
+
+</nav>
+
+<main class="main-content">
+<section id="homePage">
+<section class="welcome-section">
+
+<div class="welcome-card">
+
+<span class="welcome-tag">
+
+WELCOME TO
+
+</span>
+
+<h2>
+
+ARPEU DIGITAL<br>
+
+MEMBERSHIP PORTAL
+
+</h2>
+
+<p>
+
+Fast • Secure • Digital Membership System
+
+</p>
+
+</div>
+
+</section>
+
+<section class="service-section">
+<h3 class="section-title">Membership Services</h3>
+<div class="service-grid">
+<a href="#" id="newMemberBtn" class="service-card new-card">
+    <span>New Member</span>
+</a>
+<a href="#" id="renewalBtn" class="service-card renewal-card">
+    <span>Renewal</span>
+</a>
+</div>
+</section>
+
+
+
+<!-- =========================================
+     CONTACT SECTION
+========================================= -->
+
+<section class="contact-section">
+
+<div class="contact-card">
+
+    <!-- Contact Information -->
+    <div class="contact-left">
+
+        <h4>Contact Information</h4>
+
+        <a href="tel:+919642788786" class="contact-link">
+            <i class="fa-solid fa-phone"></i>
+            +91 9642788786
+        </a>
+
+        <a href="mailto:info@arpeu.org.in" class="contact-link">
+            <i class="fa-solid fa-envelope"></i>
+            info@arpeu.org.in
+        </a>
+
+        <a href="https://www.arpeu.org.in" class="contact-link" target="_blank">
+            <i class="fa-solid fa-globe"></i>
+            www.arpeu.org.in
+        </a>
+
+    </div>
+
+    <!-- Divider -->
+    <div class="contact-divider"></div>
+
+    <!-- Social Media -->
+    <div class="contact-right">
+
+        <h4>Follow Us On</h4>
+
+        <div class="social-icons">
+
+            <a href="#" class="facebook">
+                <i class="fab fa-facebook"></i>
+            </a>
+
+            <a href="#" class="twitter">
+                <i class="fab fa-x-twitter"></i>
+            </a>
+
+            <a href="#" class="instagram">
+                <i class="fab fa-instagram"></i>
+            </a>
+
+            <a href="#" class="youtube">
+                <i class="fab fa-youtube"></i>
+            </a>
+
+            <a href="#" class="whatsapp">
+                <i class="fab fa-whatsapp"></i>
+            </a>
+            <a href="#" class="telegram">
+                 <i class="fab fa-telegram"></i>
+            </a>
+
+        </div>
+
+    </div>
+
+
+</div>
+</section>
+</section>
+<!-- =========================================================
+     MEMBERSHIP PAGE START
+     HTML PART - 1A
+========================================================= -->
+
+<section id="membershipPage" class="membership-page" style="display:none;">
+
+    <!-- Membership Header -->
+    <div class="member-page-header">
+
+        <div class="member-title-box">
+            <span id="membershipTitle" class="member-title">
+                NEW MEMBER
+            </span>
+
+            <p class="member-subtitle">
+                Join ARPEU and become a registered member.
+            </p>
+        </div>
+
+    </div>
+
+    <!-- Personal Information Card -->
+
+    <div class="form-card">
+
+        <div class="card-header">
+            <span class="card-icon">👤</span>
+            <span class="card-title">
+                Personal Information
+            </span>
+        </div>
+
+        <div class="card-body">
+
+            <!-- Full Name -->
+
+            <div class="form-group">
+
+                <label for="fullName">
+                    Full Name
+                    <span class="required">*</span>
+                </label>
+
+                <input
+                    type="text"
+                    id="fullName"
+                    name="fullName"
+                    placeholder="Enter Full Name"
+                    autocomplete="off">
+
+            </div>
+
+            <!-- Father / Husband Name -->
+
+            <div class="form-group">
+
+                <label for="fatherName">
+                    Father / Husband Name
+                    <span class="required">*</span>
+                </label>
+
+                <input
+                    type="text"
+                    id="fatherName"
+                    name="fatherName"
+                    placeholder="Enter Father / Husband Name"
+                    autocomplete="off">
+
+            </div>
+
+            <!-- Gender -->
+
+            <div class="form-group">
+
+                <label for="gender">
+                    Gender
+                    <span class="required">*</span>
+                </label>
+
+                <select
+                    id="gender"
+                    name="gender">
+
+                    <option value="">
+                        Select Gender
+                    </option>
+
+                    <option value="Male">
+                        Male
+                    </option>
+
+                    <option value="Female">
+                        Female
+                    </option>
+
+                    <option value="Other">
+                        Other
+                    </option>
+
+                </select>
+
+            </div>
+
+            <!-- Date of Birth -->
+
+            <div class="form-group">
+
+                <label for="dob">
+                    Date of Birth
+                    <span class="required">*</span>
+                </label>
+
+                <input
+                    type="date"
+                    id="dob"
+                    name="dob">
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Address Details Card -->
+
+    <div class="form-card">
+
+        <div class="card-header">
+            <span class="card-icon">🏠</span>
+            <span class="card-title">
+                Address Details
+            </span>
+        </div>
+
+        <div class="card-body">
+
+            <!-- Door No -->
+
+            <div class="form-group">
+
+                <label for="doorNo">
+                    Door / House No.
+                </label>
+
+                <input
+                    type="text"
+                    id="doorNo"
+                    name="doorNo"
+                    placeholder="Enter Door / House No.">
+
+            </div>
+
+            <!-- Street -->
+
+            <div class="form-group">
+
+                <label for="street">
+                    Street / Area
+                </label>
+
+                <input
+                    type="text"
+                    id="street"
+                    name="street"
+                    placeholder="Enter Street / Area">
+
+            </div>
+
+            <!-- Village -->
+
+            <div class="form-group">
+
+                <label for="village">
+                    Village / Town / City
+                    <span class="required">*</span>
+                </label>
+
+                <input
+                    type="text"
+                    id="village"
+                    name="village"
+                    placeholder="Enter Village / Town / City">
+
+            </div>
+            
+            
+                        <!-- Mandal -->
+
+            <div class="form-group">
+
+                <label for="mandal">
+                    Mandal
+                    <span class="required">*</span>
+                </label>
+
+                <input
+                    type="text"
+                    id="mandal"
+                    name="mandal"
+                    placeholder="Enter Mandal">
+
+            </div>
+
+            <!-- District -->
+
+            <div class="form-group">
+
+                <label for="district">
+                    District
+                    <span class="required">*</span>
+                </label>
+
+                <select
+                    id="district"
+                    name="district">
+
+                    <option value="">
+                        Select District
+                    </option>
+
+                </select>
+
+            </div>
+
+            <!-- State -->
+
+            <div class="form-group">
+
+                <label for="state">
+                    State
+                    <span class="required">*</span>
+                </label>
+
+                <input
+                    type="text"
+                    id="state"
+                    name="state"
+                    value="Andhra Pradesh"
+                    readonly>
+
+            </div>
+
+            <!-- PIN Code -->
+
+            <div class="form-group">
+
+                <label for="pincode">
+                    PIN Code
+                    <span class="required">*</span>
+                </label>
+
+                <input
+                    type="number"
+                    id="pincode"
+                    name="pincode"
+                    placeholder="Enter PIN Code">
+
+            </div>
+
+            <!-- Post Office -->
+
+            <div class="form-group">
+
+                <label for="postOffice">
+                    Post Office
+                </label>
+
+                <input
+                    type="text"
+                    id="postOffice"
+                    name="postOffice"
+                    placeholder="Enter Post Office">
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Contact Details Card -->
+
+    <div class="form-card">
+
+        <div class="card-header">
+
+            <span class="card-icon">📞</span>
+
+            <span class="card-title">
+                Contact Details
+            </span>
+
+        </div>
+
+        <div class="card-body">
+
+            <!-- Mobile Number -->
+
+            <div class="form-group">
+
+                <label for="mobile">
+                    Mobile Number
+                    <span class="required">*</span>
+                </label>
+
+                <input
+                    type="tel"
+                    id="mobile"
+                    name="mobile"
+                    maxlength="10"
+                    placeholder="Enter Mobile Number">
+
+            </div>
+
+            <!-- Email -->
+
+            <div class="form-group">
+
+                <label for="email">
+                    Email ID
+                </label>
+
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    placeholder="Enter Email ID">
+
+            </div>
+
+            <!-- Aadhaar Number -->
+
+            <div class="form-group">
+
+                <label for="aadhaar">
+                    Aadhaar Number
+                    <span class="required">*</span>
+                </label>
+
+                <input
+                    type="text"
+                    id="aadhaar"
+                    name="aadhaar"
+                    maxlength="12"
+                    placeholder="Enter Aadhaar Number">
+
+            </div>
+
+        </div>
+
+    </div>
+
+<!-- =========================================================
+     HTML PART - 1B END
+========================================================= -->
+
+
+<!-- =========================================================
+     MEMBERSHIP PAGE CONTINUE
+     HTML PART - 2
+========================================================= -->
+
+    <!-- Employment Details Card -->
+
+    <div class="form-card">
+
+        <div class="card-header">
+
+            <span class="card-icon">🏢</span>
+
+            <span class="card-title">
+                Employment Details
+            </span>
+
+        </div>
+
+        <div class="card-body">
+
+            <!-- Company -->
+
+            <div class="form-group">
+
+                <label for="company">
+                    Company
+                    <span class="required">*</span>
+                </label>
+
+                <select
+                    id="company"
+                    name="company">
+
+                    <option value="">Select Company</option>
+                    <option value="APGENCO">APGENCO</option>
+                    <option value="APTRANSCO">APTRANSCO</option>
+                    <option value="APCPDCL">APCPDCL</option>
+                    <option value="APSPDCL">APSPDCL</option>
+                    <option value="APEPDCL">APEPDCL</option>
+
+                </select>
+
+            </div>
+
+            <!-- Circle -->
+
+            <div class="form-group">
+
+                <label for="circle">
+                    Circle
+                    <span class="required">*</span>
+                </label>
+
+                <select
+                    id="circle"
+                    name="circle">
+
+                    <option value="">Select Circle</option>
+
+                </select>
+
+            </div>
+
+            <!-- Division -->
+
+            <div class="form-group">
+
+                <label for="division">
+                    Division
+                    <span class="required">*</span>
+                </label>
+
+                <select
+                    id="division"
+                    name="division">
+
+                    <option value="">Select Division</option>
+
+                </select>
+
+            </div>
+
+            <!-- Sub Division -->
+
+            <div class="form-group">
+
+                <label for="subDivision">
+                    Sub Division
+                    <span class="required">*</span>
+                </label>
+
+                <select
+                    id="subDivision"
+                    name="subDivision">
+
+                    <option value="">Select Sub Division</option>
+
+                </select>
+
+            </div>
+
+            <!-- Section -->
+
+            <div class="form-group">
+
+                <label for="section">
+                    Section
+                    <span class="required">*</span>
+                </label>
+
+                <input
+                    type="text"
+                    id="section"
+                    name="section"
+                    placeholder="Enter Section">
+
+            </div>
+
+            <!-- Employee ID -->
+
+            <div class="form-group">
+
+                <label for="employeeId">
+                    Employee ID
+                    <span class="required">*</span>
+                </label>
+
+                <input
+                    type="text"
+                    id="employeeId"
+                    name="employeeId"
+                    placeholder="Enter Employee ID">
+
+            </div>
+
+            <!-- Designation -->
+
+            <div class="form-group">
+
+                <label for="designation">
+                    Designation
+                    <span class="required">*</span>
+                </label>
+
+                <input
+                    type="text"
+                    id="designation"
+                    name="designation"
+                    placeholder="Enter Designation">
+
+            </div>
+
+            <!-- Date of Joining -->
+
+            <div class="form-group">
+
+                <label for="joiningDate">
+                    Date of Joining
+                    <span class="required">*</span>
+                </label>
+
+                <input
+                    type="date"
+                    id="joiningDate"
+                    name="joiningDate">
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Union Details Card -->
+
+    <div class="form-card">
+
+        <div class="card-header">
+
+            <span class="card-icon">👥</span>
+
+            <span class="card-title">
+                Union Details
+            </span>
+
+        </div>
+
+        <div class="card-body">
+
+            <!-- Regional Unit -->
+
+            <div class="form-group">
+
+                <label for="regionalUnit">
+                    Regional Unit
+                    <span class="required">*</span>
+                </label>
+
+                <select
+                    id="regionalUnit"
+                    name="regionalUnit">
+
+                    <option value="">Select Regional Unit</option>
+
+                </select>
+
+            </div>
+
+            <!-- Membership Type -->
+
+            <div class="form-group">
+
+                <label for="membershipType">
+                    Membership Type
+                    <span class="required">*</span>
+                </label>
+
+                <select
+                    id="membershipType"
+                    name="membershipType">
+
+                    <option value="">Select Membership Type</option>
+                    <option value="New Membership">New Membership</option>
+                    <option value="Life Membership">Life Membership</option>
+
+                </select>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Upload Photo Card -->
+
+    <div class="form-card">
+
+        <div class="card-header">
+
+            <span class="card-icon">📷</span>
+
+            <span class="card-title">
+                Upload Photo
+            </span>
+
+        </div>
+
+        <div class="card-body">
+
+            <!-- Passport Size Photo -->
+
+            <div class="form-group">
+
+                <label for="memberPhoto">
+                    Passport Size Photo
+                    <span class="required">*</span>
+                </label>
+
+                <input
+                    type="file"
+                    id="memberPhoto"
+                    name="memberPhoto"
+                    accept="image/*">
+
+            </div>
+
+            <!-- Photo Preview -->
+
+            <div class="photo-preview">
+
+                <img
+                    id="photoPreview"
+                    src=""
+                    alt="Photo Preview">
+
+            </div>
+
+        </div>
+
+    </div>
+
+<!-- =========================================================
+     HTML PART - 2 END
+========================================================= -->
+
+<!-- =========================================================
+     MEMBERSHIP PAGE CONTINUE
+     HTML PART - 3
+========================================================= -->
+
+    <!-- Payment Details Card -->
+
+    <div class="form-card">
+
+        <div class="card-header">
+
+            <span class="card-icon">💳</span>
+
+            <span class="card-title">
+                Payment Details
+            </span>
+
+        </div>
+
+        <div class="card-body">
+
+            <!-- Membership Fee -->
+
+            <div class="form-group">
+
+                <label>
+                    Membership Fee
+                </label>
+
+                <input
+                    type="text"
+                    value="₹360.00"
+                    readonly>
+
+            </div>
+
+            <!-- Payment Option -->
+
+            <div class="form-group">
+
+                <label>
+                    Payment Option
+                    <span class="required">*</span>
+                </label>
+
+                <div class="radio-group">
+
+                    <label class="radio-item">
+
+                        <input
+                            type="radio"
+                            name="paymentOption"
+                            value="payNow">
+
+                        Pay Now (UPI)
+
+                    </label>
+
+                    <label class="radio-item">
+
+                        <input
+                            type="radio"
+                            name="paymentOption"
+                            value="alreadyPaid">
+
+                        Already Paid
+
+                    </label>
+
+                </div>
+
+            </div>
+
+            <!-- UPI Payment Area -->
+
+            <div
+                id="upiPaymentSection"
+                style="display:none;">
+
+                <div class="payment-box">
+
+                    <h4>Scan QR Code</h4>
+
+                    <img
+                        id="upiQrImage"
+                        src="images/payment-qr.png"
+                        alt="UPI QR Code">
+
+                    <p>
+
+                        UPI ID :
+                        <strong>arpeu@upi</strong>
+
+                    </p>
+
+                    <button
+                        type="button"
+                        class="pay-button">
+
+                        Pay ₹360
+
+                    </button>
+
+                </div>
+
+            </div>
+
+            <!-- Already Paid Area -->
+
+            <div
+                id="alreadyPaidSection"
+                style="display:none;">
+
+                <!-- Transaction ID -->
+
+                <div class="form-group">
+
+                    <label for="transactionId">
+
+                        Transaction ID
+                        <span class="required">*</span>
+
+                    </label>
+
+                    <input
+                        type="text"
+                        id="transactionId"
+                        name="transactionId"
+                        placeholder="Enter Transaction ID">
+
+                </div>
+
+                <!-- Upload Receipt -->
+
+                <div class="form-group">
+
+                    <label for="paymentReceipt">
+
+                        Upload Payment Receipt
+                        <span class="required">*</span>
+
+                    </label>
+
+                    <input
+                        type="file"
+                        id="paymentReceipt"
+                        name="paymentReceipt"
+                        accept="image/*,.pdf">
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Declaration -->
+
+    <div class="form-card">
+
+        <div class="card-body">
+
+            <label class="checkbox-item">
+
+                <input
+                    type="checkbox"
+                    id="declaration">
+
+                I hereby declare that the information
+                furnished above is true and correct to
+                the best of my knowledge.
+
+            </label>
+
+        </div>
+
+    </div>
+
+    <!-- Submit Button -->
+
+    <div class="submit-section">
+
+        <button
+            type="submit"
+            id="submitMembershipBtn"
+            class="submit-btn">
+
+            SUBMIT MEMBERSHIP
+
+        </button>
+
+    </div>
+
+</section>
+
+<!-- =========================================================
+     MEMBERSHIP PAGE END
+========================================================= -->
+
+
+<section id="statisticsPage" style="display:none;">
+    <div class="form-card">
+        <div class="card-header">
+            <span class="card-icon">📊</span>
+            <span class="card-title">Statistics</span>
+        </div>
+        <div class="card-body">
+            Statistics Module Coming Soon...
+        </div>
+    </div>
+</section>
+
+
+
+</main>
+
+<footer class="footer">
+<div class="footer-content">
+<p>Copyright © 2026 ARPEU | All Rights Reserved | v1.0</p>
+<p>Developed by P. Balakrishna | State Treasurer</p>
+</div>
+</footer>
+<script src="js/script.js"></script>
+</body>
+
+</html>
+
+
+
