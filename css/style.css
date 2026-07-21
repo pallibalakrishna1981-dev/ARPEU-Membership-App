@@ -758,3 +758,72 @@ margin-top:15px;
     }
 
 }
+
+/* =========================================================
+   OTP STATUS
+========================================================= */
+
+.otp-status{
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    margin-top:20px;
+
+    padding:12px;
+
+    border-radius:10px;
+
+    background:#e8f5e9;
+
+    color:#2e7d32;
+
+    font-weight:600;
+
+    font-size:15px;
+
+}
+
+/* =========================================================
+   OTP TIMER
+========================================================= */
+
+.otp-timer{
+
+    margin-top:15px;
+
+    text-align:center;
+
+    font-size:14px;
+
+    color:#666;
+
+}
+
+#countdown{
+
+    color:#ff6a00;
+
+    font-weight:700;
+
+}
+
+/* =========================================================
+   RESEND BUTTON
+========================================================= */
+
+#resendOtpBtn{
+
+    margin-top:20px;
+
+    background:#ff6a00;
+
+}
+
+#resendOtpBtn:hover{
+
+    background:#e65c00;
+
+}
+

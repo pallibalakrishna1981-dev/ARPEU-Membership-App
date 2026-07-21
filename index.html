@@ -278,7 +278,7 @@ Fast • Secure • Digital Membership System
 
     </p>
 
-
+<section id="newMemberSection">
 <!-- =========================================================
         PERSONAL INFORMATION CARD
 ========================================================= -->
@@ -985,12 +985,12 @@ Fast • Secure • Digital Membership System
                 <div class="payment-box">
 
                     <h4>Scan QR Code</h4>
-
+                    <!--
                     <img
                         id="upiQrImage"
                         src="images/payment-qr.png"
                         alt="UPI QR Code">
-
+                    -->
                     <p>
 
                         UPI ID :
@@ -1098,6 +1098,156 @@ Fast • Secure • Digital Membership System
     </div>
 
 </section>
+<!-- =========================================================
+     RENEWAL SECTION
+     HTML PART - 1A
+========================================================= -->
+
+<section
+    id="renewalSection"
+    style="display:none;">
+
+    <!-- Renewal Search -->
+
+    <div class="form-card">
+
+        <div class="card-header">
+
+            <span class="card-icon">🔄</span>
+
+            <span class="card-title">
+                Membership Renewal
+            </span>
+
+        </div>
+
+        <div class="card-body">
+
+            <div class="form-group">
+
+                <label for="renewalSearch">
+
+                    Member ID / Registered Mobile Number
+
+                    <span class="required">*</span>
+
+                </label>
+
+                <input
+                    type="text"
+                    id="renewalSearch"
+                    placeholder="Enter Member ID or Mobile Number"
+                    autocomplete="off">
+
+            </div>
+
+            <button
+                type="button"
+                id="sendOtpBtn"
+                class="submit-btn">
+
+                SEND OTP
+
+            </button>
+
+        </div>
+
+    </div>
+
+    <!-- OTP Verification -->
+
+    <div
+        id="otpCard"
+        class="form-card"
+        style="display:none;">
+
+        <div class="card-header">
+
+            <span class="card-icon">🔐</span>
+
+            <span class="card-title">
+
+                OTP Verification
+
+            </span>
+
+        </div>
+
+        <div class="card-body">
+
+            <div class="form-group">
+
+                <label for="renewalOtp">
+
+                    Enter OTP
+
+                </label>
+
+                <input
+                    type="text"
+                    id="renewalOtp"
+                    maxlength="6"
+                    placeholder="Enter 6 Digit OTP">
+
+            </div>
+
+            <button
+                type="button"
+                id="verifyOtpBtn"
+                class="submit-btn">
+
+                VERIFY OTP
+
+            </button>
+
+            <!-- OTP Status -->
+
+            <div
+                id="otpStatus"
+                class="otp-status"
+                style="display:none;">
+
+                OTP Sent Successfully.
+
+            </div>
+
+            <!-- OTP Timer -->
+
+            <div
+                id="otpTimer"
+                class="otp-timer"
+                style="display:none;">
+
+                OTP Expires In
+                <span id="countdown">01:00</span>
+
+            </div>
+
+            <!-- Resend OTP -->
+
+            <button
+                type="button"
+                id="resendOtpBtn"
+                class="submit-btn"
+                style="display:none;">
+
+                RESEND OTP
+
+            </button>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- =========================================================
+     RENEWAL SECTION END
+========================================================= -->
+
+
+
+</section>
 
 <!-- =========================================================
      MEMBERSHIP PAGE END
@@ -1115,7 +1265,6 @@ Fast • Secure • Digital Membership System
         </div>
     </div>
 </section>
-
 
 
 </main>
