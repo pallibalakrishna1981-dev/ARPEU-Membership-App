@@ -19,9 +19,9 @@ const navHome = document.getElementById("navHome");
 const navMembership = document.getElementById("navMembership");
 const navStatistics = document.getElementById("navStatistics");
 
-const homePage = document.getElementById("homePage");
+const homeSection = document.getElementById("homeSection");
 const membershipPage = document.getElementById("membershipPage");
-const statisticsPage = document.getElementById("statisticsPage");
+const statisticsSection = document.getElementById("statisticsSection");
 
 const newMemberBtn = document.getElementById("newMemberBtn");
 const renewalBtn = document.getElementById("renewalBtn");
@@ -34,6 +34,7 @@ const photoPreview = document.getElementById("photoPreview");
 
 const mobile = document.getElementById("mobile");
 const aadhaar = document.getElementById("aadhaar");
+const age = document.getElementById("age");
 
 const paymentOptions = document.querySelectorAll('input[name="paymentOption"]');
 const upiPaymentSection = document.getElementById("upiPaymentSection");
@@ -67,6 +68,61 @@ let otpCountdown = 60;
 
 let otpTimerInterval = null;
 
+
+/* =========================================================
+   AGE CALCULATION
+========================================================= */
+
+function initializeAgeCalculation(){
+
+    const dob = document.getElementById("dob");
+
+    const age = document.getElementById("age");
+
+    if(!dob || !age){
+        return;
+    }
+
+    dob.max = new Date().toISOString().split("T")[0];
+
+    dob.addEventListener("change", function(){
+
+        if(this.value === ""){
+
+            age.value = "";
+
+            return;
+
+        }
+
+        const birthDate = new Date(this.value);
+
+        const today = new Date();
+
+        let years = today.getFullYear() - birthDate.getFullYear();
+
+        const monthDifference = today.getMonth() - birthDate.getMonth();
+
+        if(
+            monthDifference < 0 ||
+            (
+                monthDifference === 0 &&
+                today.getDate() < birthDate.getDate()
+            )
+        ){
+
+            years--;
+
+        }
+
+        age.value = years;
+
+    });
+
+}
+
+
+
 /* =========================================================
    INITIALIZE APPLICATION
 ========================================================= */
@@ -86,6 +142,8 @@ document.addEventListener("DOMContentLoaded", function () {
     initializeValidations();
 
     initializeRenewalOtp();
+
+    initializeAgeCalculation();
 
     showPage("home");
 
@@ -232,16 +290,16 @@ function initializeDistrictDropdown() {
 
 function showPage(page) {
 
-    if (homePage) {
-        homePage.style.display = "none";
+    if (homeSection) {
+    homeSection.style.display = "none";
     }
 
     if (membershipPage) {
         membershipPage.style.display = "none";
     }
 
-    if (statisticsPage) {
-        statisticsPage.style.display = "none";
+    if (statisticsSection) {
+    statisticsSection.style.display = "none";
     }
 
     if (navHome) {
@@ -260,8 +318,8 @@ function showPage(page) {
 
         case "home":
 
-            if (homePage) {
-                homePage.style.display = "block";
+            if (homeSection) {
+                homeSection.style.display = "block";
             }
 
             if (navHome) {
@@ -284,8 +342,8 @@ function showPage(page) {
 
         case "statistics":
 
-            if (statisticsPage) {
-                statisticsPage.style.display = "block";
+            if (statisticsSection) {
+                statisticsSection.style.display = "block";
             }
 
             if (navStatistics) {
@@ -626,65 +684,108 @@ function initializePaymentOptions() {
     ========================================================= */
 
 
+/* =========================================================
+   FORM VALIDATION
+========================================================= */
 
-    /* =========================================================
-       FORM VALIDATION
-    ========================================================= */
-    function validateMembershipForm() {
-        const fullName = document.getElementById("fullName");
-        const fatherName = document.getElementById("fatherName");
-        const gender = document.getElementById("gender");
-        const dob = document.getElementById("dob");
-        const company = document.getElementById("company");
-        const employeeId = document.getElementById("employeeId");
-        const declaration = document.getElementById("declaration");
-        if (fullName && getValue(fullName) === "") {
-            showError("Please Enter Full Name");
-            fullName.focus();
-            return false;
-        }
-        if (fatherName && getValue(fatherName) === "") {
-            showError("Please Enter Father / Husband Name");
-            fatherName.focus();
-            return false;
-        }
-        if (gender && getValue(gender) === "") {
-            showError("Please Select Gender");
-            gender.focus();
-            return false;
-        }
-        if (dob && getValue(dob) === "") {
-            showError("Please Select Date Of Birth");
-            dob.focus();
-            return false;
-        }
-        if (mobile && mobile.value.length !== 10) {
-            showError("Please Enter Valid Mobile Number");
-            mobile.focus();
-            return false;
-        }
-        if (aadhaar && aadhaar.value.length !== 12) {
-            showError("Please Enter Valid Aadhaar Number");
-            aadhaar.focus();
-            return false;
-        }
-        if (company && getValue(company) === "") {
-            showError("Please Select Company");
-            company.focus();
-            return false;
-        }
-        if (employeeId && getValue(employeeId) === "") {
-            showError("Please Enter Employee ID");
-            employeeId.focus();
-            return false;
-        }
-        if (declaration && !declaration.checked) {
-            showError("Please Accept Declaration");
-            declaration.focus();
-            return false;
-        }
-        return true;
+function validateMembershipForm(){
+
+    const employeeName = document.getElementById("employeeName");
+    const gender = document.getElementById("gender");
+    const dob = document.getElementById("dob");
+
+    const village = document.getElementById("village");
+    const mandal = document.getElementById("mandal");
+    const district = document.getElementById("district");
+    const pincode = document.getElementById("pincode");
+    const postOffice = document.getElementById("postOffice");
+
+    const company = document.getElementById("company");
+    const employeeId = document.getElementById("employeeId");
+
+    const declaration = document.getElementById("declaration");
+
+    if(employeeName && getValue(employeeName) === ""){
+        showError("Please Enter Employee Name");
+        employeeName.focus();
+        return false;
     }
+
+    if(gender && getValue(gender) === ""){
+        showError("Please Select Gender");
+        gender.focus();
+        return false;
+    }
+
+    if(dob && getValue(dob) === ""){
+        showError("Please Select Date Of Birth");
+        dob.focus();
+        return false;
+    }
+
+    if(village && getValue(village) === ""){
+        showError("Please Enter Village / Town / City");
+        village.focus();
+        return false;
+    }
+
+    if(mandal && getValue(mandal) === ""){
+        showError("Please Enter Mandal");
+        mandal.focus();
+        return false;
+    }
+
+    if(district && getValue(district) === ""){
+        showError("Please Select District");
+        district.focus();
+        return false;
+    }
+
+    if(pincode && getValue(pincode) === ""){
+        showError("Please Enter PIN Code");
+        pincode.focus();
+        return false;
+    }
+
+    if(postOffice && getValue(postOffice) === ""){
+        showError("Please Enter Post Office");
+        postOffice.focus();
+        return false;
+    }
+
+    if(mobile && mobile.value.length !== 10){
+        showError("Please Enter Valid Mobile Number");
+        mobile.focus();
+        return false;
+    }
+
+    if(aadhaar && aadhaar.value.length !== 12){
+        showError("Please Enter Valid Aadhaar Number");
+        aadhaar.focus();
+        return false;
+    }
+
+    if(company && getValue(company) === ""){
+        showError("Please Select Company");
+        company.focus();
+        return false;
+    }
+
+    if(employeeId && getValue(employeeId) === ""){
+        showError("Please Enter Employee ID");
+        employeeId.focus();
+        return false;
+    }
+
+    if(declaration && !declaration.checked){
+        showError("Please Accept Declaration");
+        declaration.focus();
+        return false;
+    }
+
+    return true;
+
+}
     /* =========================================================
        MEMBER DATA
     ========================================================= */

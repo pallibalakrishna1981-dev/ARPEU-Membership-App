@@ -82,7 +82,7 @@
 </nav>
 
 <main class="main-content">
-<section id="homePage">
+<section id="homeSection">
 <section class="welcome-section">
 
 <div class="welcome-card">
@@ -280,108 +280,111 @@ Fast • Secure • Digital Membership System
 
 <section id="newMemberSection">
 <!-- =========================================================
-        PERSONAL INFORMATION CARD
+     PERSONAL INFORMATION CARD
 ========================================================= -->
 
-        <div class="form-card">
+<div class="form-card">
 
-        <div class="card-header">
-            <span class="card-icon">👤</span>
-            <span class="card-title">
-                Personal Information
-            </span>
+    <div class="card-header">
+
+        <span class="card-icon">👤</span>
+
+        <span class="card-title">
+            Personal Information
+        </span>
+
+    </div>
+
+    <div class="card-body">
+
+        <!-- Employee Name -->
+
+        <div class="form-group">
+
+            <label for="employeeName">
+                Employee Name
+                <span class="required">*</span>
+            </label>
+
+            <input
+                type="text"
+                id="employeeName"
+                name="employeeName"
+                placeholder="Enter Employee Name"
+                autocomplete="off">
+
         </div>
 
-        <div class="card-body">
+        <!-- Gender -->
 
-            <!-- Full Name -->
+        <div class="form-group">
 
-            <div class="form-group">
+            <label for="gender">
+                Gender
+                <span class="required">*</span>
+            </label>
 
-                <label for="fullName">
-                    Full Name
-                    <span class="required">*</span>
-                </label>
+            <select
+                id="gender"
+                name="gender">
 
-                <input
-                    type="text"
-                    id="fullName"
-                    name="fullName"
-                    placeholder="Enter Full Name"
-                    autocomplete="off">
+                <option value="">
+                    Select Gender
+                </option>
 
-            </div>
+                <option value="Male">
+                    Male
+                </option>
 
-            <!-- Father / Husband Name -->
+                <option value="Female">
+                    Female
+                </option>
 
-            <div class="form-group">
+                <option value="Other">
+                    Other
+                </option>
 
-                <label for="fatherName">
-                    Father / Husband Name
-                    <span class="required">*</span>
-                </label>
+            </select>
 
-                <input
-                    type="text"
-                    id="fatherName"
-                    name="fatherName"
-                    placeholder="Enter Father / Husband Name"
-                    autocomplete="off">
+        </div>
 
-            </div>
+        <!-- Date of Birth -->
 
-            <!-- Gender -->
+        <div class="form-group">
 
-            <div class="form-group">
+            <label for="dob">
+                Date of Birth
+                <span class="required">*</span>
+            </label>
 
-                <label for="gender">
-                    Gender
-                    <span class="required">*</span>
-                </label>
+            <input
+                type="date"
+                id="dob"
+                name="dob"
+                max="2026-12-31">
 
-                <select
-                    id="gender"
-                    name="gender">
+        </div>
 
-                    <option value="">
-                        Select Gender
-                    </option>
+        <!-- Age -->
 
-                    <option value="Male">
-                        Male
-                    </option>
+        <div class="form-group">
 
-                    <option value="Female">
-                        Female
-                    </option>
+            <label for="age">
+                Age
+            </label>
 
-                    <option value="Other">
-                        Other
-                    </option>
-
-                </select>
-
-            </div>
-
-            <!-- Date of Birth -->
-
-            <div class="form-group">
-
-                <label for="dob">
-                    Date of Birth
-                    <span class="required">*</span>
-                </label>
-
-                <input
-                    type="date"
-                    id="dob"
-                    name="dob">
-
-            </div>
+            <input
+                type="text"
+                id="age"
+                name="age"
+                placeholder="Auto Calculated"
+                readonly>
 
         </div>
 
     </div>
+
+</div>
 
     <!-- =========================================================
      ADDRESS DETAILS CARD
@@ -523,19 +526,16 @@ Fast • Secure • Digital Membership System
 
             <!-- Post Office -->
 
-            <div class="form-group">
+            <label for="postOffice">
+                Post Office
+                <span class="required">*</span>
+            </label>
 
-                <label for="postOffice">
-                    Post Office
-                </label>
-
-                <input
-                    type="text"
-                    id="postOffice"
-                    name="postOffice"
-                    placeholder="Enter Post Office">
-
-            </div>
+            <input
+                type="text"
+                id="postOffice"
+                name="postOffice"
+            placeholder="Enter Post Office">
 
         </div>
 
@@ -1254,18 +1254,203 @@ Fast • Secure • Digital Membership System
 ========================================================= -->
 
 
-<section id="statisticsPage" style="display:none;">
-    <div class="form-card">
-        <div class="card-header">
-            <span class="card-icon">📊</span>
-            <span class="card-title">Statistics</span>
-        </div>
-        <div class="card-body">
-            Statistics Module Coming Soon...
-        </div>
-    </div>
-</section>
 
+
+
+<!-- =========================================
+     STATISTICS SECTION
+========================================= -->
+
+<section id="statisticsSection" class="statistics-page" style="display:none;">
+
+    <div class="page-header">
+
+        <h2 class="dashboard-title">
+            <i class="fas fa-chart-line"></i>
+            Live Statistics Dashboard
+        </h2>
+
+        <small class="dashboard-subtitle">
+            Statewide Live Membership Statistics
+        </small>
+
+    </div>
+
+    <div class="stats-list">
+
+        <div class="stats-row total-row">
+
+            <div class="stats-info">
+                <i class="fas fa-users"></i>
+                <span>Total Members</span>
+            </div>
+
+            <div class="stats-count" id="totalMembers">
+                0
+            </div>
+
+        </div>
+
+        <div class="stats-row today-row">
+
+            <div class="stats-info">
+                <i class="fas fa-user-plus"></i>
+                <span>Today's Registrations</span>
+            </div>
+
+            <div class="stats-count" id="todayMembers">
+                0
+            </div>
+
+        </div>
+
+        <div class="stats-row month-row">
+
+            <div class="stats-info">
+                <i class="fas fa-calendar-alt"></i>
+                <span>This Month</span>
+            </div>
+
+            <div class="stats-count" id="monthMembers">
+                0
+            </div>
+
+        </div>
+
+        <div class="stats-row year-row">
+
+            <div class="stats-info">
+                <i class="fas fa-chart-line"></i>
+                <span>This Year</span>
+            </div>
+
+            <div class="stats-count" id="yearMembers">
+                0
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ===========================================
+     COMPANY WISE MEMBERSHIP
+=========================================== -->
+
+<div class="company-section">
+
+    <div class="company-title">
+        <i class="fas fa-building"></i>
+        <span>Company Wise Membership</span>
+    </div>
+
+    <div class="company-grid top-grid">
+
+        <div class="company-card horizontal-card" onclick="showCompany('aptransco')">
+
+            <img src="images/aptransco.png" alt="APTRANSCO">
+
+            <div class="company-info">
+
+                <div class="company-count" id="aptranscoCount">
+                    0
+                </div>
+
+                <div class="company-arrow">
+                    <span class="view-text">Details</span>
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="company-card horizontal-card" onclick="showCompany('apgenco')">
+
+            <img src="images/apgenco.png" alt="APGENCO">
+
+            <div class="company-info">
+
+                <div class="company-count" id="apgencoCount">
+                    0
+                </div>
+
+                <div class="company-arrow">
+                    <span class="view-text">Details</span>
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="company-grid bottom-grid">
+
+        <div class="company-card compact-card" onclick="showCompany('apspdcl')">
+
+            <img src="images/apspdcl.png" alt="APSPDCL">
+
+            <div class="company-info">
+
+                <div class="company-count" id="apspdclCount">
+                    0
+                </div>
+
+                <div class="company-arrow">
+                    <span class="view-text">Details</span>
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="company-card compact-card" onclick="showCompany('apcpdcl')">
+
+            <img src="images/apcpdcl.png" alt="APCPDCL">
+
+            <div class="company-info">
+
+                <div class="company-count" id="apcpdclCount">
+                    0
+                </div>
+
+                <div class="company-arrow">
+                    <span class="view-text">Details</span>
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="company-card compact-card" onclick="showCompany('apepdcl')">
+
+            <img src="images/apepdcl.png" alt="APEPDCL">
+
+            <div class="company-info">
+
+                <div class="company-count" id="apepdclCount">
+                    0
+                </div>
+
+                <div class="company-arrow">
+                    <span class="view-text">Details</span>
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div id="companyDetails" class="company-details" style="display:none;"></div>
+
+</div>
+
+</section>
 
 </main>
 
