@@ -40,6 +40,150 @@ const paymentOptions = document.querySelectorAll('input[name="paymentOption"]');
 const upiPaymentSection = document.getElementById("upiPaymentSection");
 const alreadyPaidSection = document.getElementById("alreadyPaidSection");
 
+
+
+/* =========================================================
+   EMPLOYMENT MASTER DATA
+   Version : 3.0.0
+   Status  : LOCKED
+========================================================= */
+
+/* ==========================================================
+   HELPER FUNCTIONS
+========================================================== */
+
+function clone(data) {
+    return JSON.parse(JSON.stringify(data));
+}
+
+
+/* =========================================================
+   UNIVERSAL DROPDOWN ENGINE v2.0
+========================================================= */
+
+const DropdownEngine = {
+
+    clear(element, placeholder = "Select") {
+        if (!element) {
+            return;
+        }
+
+        element.innerHTML = "";
+
+        const option = document.createElement("option");
+        option.value = "";
+        option.textContent = placeholder;
+
+        element.appendChild(option);
+    },
+
+    populate(element, values = [], placeholder = "Select") {
+        this.clear(element, placeholder);
+
+        if (!element || !Array.isArray(values)) {
+            return;
+        }
+
+        values.forEach((value) => {
+            const option = document.createElement("option");
+            option.value = value;
+            option.textContent = value;
+
+            element.appendChild(option);
+        });
+    },
+
+    reset(items = []) {
+        items.forEach((item) => {
+            this.clear(item.element, item.placeholder);
+        });
+    },
+
+    enable(element) {
+        if (element) {
+            element.disabled = false;
+        }
+    },
+
+    disable(element) {
+        if (element) {
+            element.disabled = true;
+        }
+    },
+
+    show(element) {
+        if (element) {
+            element.style.display = "";
+        }
+    },
+
+    hide(element) {
+        if (element) {
+            element.style.display = "none";
+        }
+    },
+
+    value(element) {
+        return element ? element.value : "";
+    },
+
+    setValue(element, value = "") {
+        if (element) {
+            element.value = value;
+        }
+    },
+
+    keys(object) {
+        return object ? Object.keys(object) : [];
+    },
+
+    get(object, path = []) {
+
+        let node = object;
+
+        for (const key of path) {
+
+            if (!node || !(key in node)) {
+                return null;
+            }
+
+            node = node[key];
+
+        }
+
+        return node;
+
+    },
+
+    bind(config) {
+
+        const node = this.get(config.data, config.path);
+
+        if (!node) {
+
+            this.populate(
+                config.target,
+                [],
+                config.placeholder
+            );
+
+            return;
+
+        }
+
+        this.populate(
+            config.target,
+            this.keys(node),
+            config.placeholder
+        );
+
+    }
+
+};
+
+
+
+
 /* =========================================================
    RENEWAL OTP
 ========================================================= */
@@ -69,56 +213,85 @@ let otpCountdown = 60;
 let otpTimerInterval = null;
 
 
+
 /* =========================================================
    AGE CALCULATION
 ========================================================= */
 
 function initializeAgeCalculation(){
-
-    const dob = document.getElementById("dob");
-
-    const age = document.getElementById("age");
-
-    if(!dob || !age){
+    const dob=document.getElementById("dob");
+    const age=document.getElementById("age");
+    if(!dob||!age){
         return;
     }
-
-    dob.max = new Date().toISOString().split("T")[0];
-
-    dob.addEventListener("change", function(){
-
-        if(this.value === ""){
-
-            age.value = "";
-
+    dob.max=new Date().toISOString().split("T")[0];
+    dob.addEventListener("change",function(){
+        if(this.value===""){
+            age.value="";
             return;
-
         }
-
-        const birthDate = new Date(this.value);
-
-        const today = new Date();
-
-        let years = today.getFullYear() - birthDate.getFullYear();
-
-        const monthDifference = today.getMonth() - birthDate.getMonth();
-
-        if(
-            monthDifference < 0 ||
-            (
-                monthDifference === 0 &&
-                today.getDate() < birthDate.getDate()
-            )
-        ){
-
+        const birthDate=new Date(this.value);
+        const today=new Date();
+        let years=today.getFullYear()-birthDate.getFullYear();
+        const monthDifference=today.getMonth()-birthDate.getMonth();
+        if(monthDifference<0||(monthDifference===0&&today.getDate()<birthDate.getDate())){
             years--;
-
         }
-
-        age.value = years;
-
+        if(years<15){
+            age.value="";
+            dob.value="";
+            showError("As per the Bharatiya Mazdoor Sangh (BMS) Bye-Laws and the Trade Unions Act, 1926, only persons who have completed 15 years of age are eligible for membership.");
+            dob.focus();
+        }
     });
+}
 
+function initializeJoiningDateValidation(){
+    const dob=document.getElementById("dob");
+    const joiningDate=document.getElementById("joiningDate");
+    if(!dob||!joiningDate){
+        return;
+    }
+    joiningDate.addEventListener("change",function(){
+        if(dob.value===""||joiningDate.value===""){
+            return;
+        }
+        const birthDate=new Date(dob.value);
+        const joinDate=new Date(joiningDate.value);
+        const eligibleDate=new Date(birthDate);
+        eligibleDate.setFullYear(eligibleDate.getFullYear()+15);
+        if(joinDate<eligibleDate){
+            showError("As per the Bharatiya Mazdoor Sangh (BMS) Bye-Laws and the Trade Unions Act, 1926, only persons who have completed 15 years of age are eligible for membership.");
+            joiningDate.value="";
+            joiningDate.focus();
+        }
+    });
+}
+
+
+/* =========================================================
+   AADHAAR FORMATTING
+========================================================= */
+
+function initializeAadhaarFormatting(){
+    const aadhaar=document.getElementById("aadhaar");
+    if(!aadhaar){
+        return;
+    }
+    aadhaar.addEventListener("input",function(){
+        let digits=this.value.replace(/\D/g,"");
+        if(digits.length>12){
+            digits=digits.substring(0,12);
+        }
+        let formatted="";
+        for(let i=0;i<digits.length;i++){
+            if(i>0&&i%4===0){
+                formatted+=" ";
+            }
+            formatted+=digits[i];
+        }
+        this.value=formatted;
+    });
 }
 
 
@@ -133,6 +306,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
     initializeMembershipMode();
 
+    initializeEmploymentModule();
+
     initializeDistrictDropdown();
 
     initializePhotoPreview();
@@ -143,7 +318,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
     initializeRenewalOtp();
 
+    initializeDistrictDropdown();
+
     initializeAgeCalculation();
+    initializeJoiningDateValidation();
+    initializeAadhaarFormatting();
 
     showPage("home");
 
@@ -554,6 +733,443 @@ function initializePhotoPreview() {
 
 
 /* =========================================================
+   EMPLOYMENT MASTER DATA
+   Version : 3.0.0
+   Status  : LOCKED
+========================================================= */
+
+/* ==========================================================
+   HELPER FUNCTIONS
+========================================================== */
+
+function clone(data) {
+    return JSON.parse(JSON.stringify(data));
+}
+
+/* ==========================================================
+   APGENCO STAGE TEMPLATE
+========================================================== */
+
+const apgencoStageTemplate = {
+
+    divisions: {
+
+        "Boiler Maintenance": {
+            subDivisions: [
+                "Sub Division-I",
+                "Sub Division-II",
+                "Sub Division-III",
+                "Sub Division-IV"
+            ],
+            designationGroups: ["Technical"]
+        },
+
+        "Turbine Maintenance": {
+            subDivisions: [
+                "Sub Division-I",
+                "Sub Division-II",
+                "Sub Division-III"
+            ],
+            designationGroups: ["Technical"]
+        },
+
+        "Electrical Maintenance": {
+            subDivisions: [
+                "Switch Yard",
+                "HT Maintenance",
+                "LT Maintenance",
+                "Transformer Maintenance",
+                "Protection"
+            ],
+            designationGroups: ["Technical"]
+        },
+
+        "Control & Instrumentation (C&I)": {
+            subDivisions: [],
+            designationGroups: ["Technical"]
+        },
+
+        "Coal Handling Plant (CHP)": {
+            subDivisions: [
+                "Operation",
+                "Maintenance",
+                "Dozer Operators",
+                "Loco Pilots"
+            ],
+            designationGroups: ["Technical"]
+        },
+
+        "Ash Handling Plant (AHP)": {
+            subDivisions: [],
+            designationGroups: ["Technical"]
+        },
+
+        "Efficiency & Planning (E&P)": {
+            subDivisions: [],
+            designationGroups: ["Technical"]
+        },
+
+        "MRT": {
+            subDivisions: [],
+            designationGroups: ["Technical"]
+        }
+
+    }
+
+};
+
+/* ==========================================================
+   APGENCO COMMON SERVICES TEMPLATE
+========================================================== */
+
+const apgencoCommonServicesTemplate = {
+
+    divisions: {
+
+        "Accounts": {
+            subDivisions: [],
+            designationGroups: ["Accounts"]
+        },
+
+        "Administration": {
+            subDivisions: [],
+            designationGroups: ["Administration"]
+        },
+
+        "Stores": {
+            subDivisions: [],
+            designationGroups: ["Administration"]
+        },
+
+        "Hospital": {
+            subDivisions: [],
+            designationGroups: ["Hospital"]
+        },
+
+        "Water Treatment Plant": {
+            subDivisions: [],
+            designationGroups: ["Technical"]
+        },
+
+        "Colony Maintenance": {
+            subDivisions: [],
+            designationGroups: ["Technical"]
+        },
+
+        "Colony Security Guards": {
+            subDivisions: [],
+            designationGroups: ["Security"]
+        },
+
+        "Safety Department": {
+            subDivisions: [],
+            designationGroups: ["Technical"]
+        }
+
+    }
+
+};
+
+const employmentMaster = {
+
+    APGENCO: {
+
+        stations: {
+
+            "Dr. NTTPS": {
+
+                type: "THERMAL",
+
+                stages: {
+
+                    "Stage-I": clone(apgencoStageTemplate),
+                    "Stage-II": clone(apgencoStageTemplate),
+                    "Stage-III": clone(apgencoStageTemplate),
+                    "Stage-IV": clone(apgencoStageTemplate),
+                    "Stage-V": clone(apgencoStageTemplate),
+
+                    "Common Services": clone(apgencoCommonServicesTemplate)
+
+                }
+
+            },
+
+            "Dr. MVR RTPP": {
+
+                type: "THERMAL",
+
+                stages: {
+
+                    "Stage-I": clone(apgencoStageTemplate),
+                    "Stage-II": clone(apgencoStageTemplate),
+
+                    "Common Services": clone(apgencoCommonServicesTemplate)
+
+                }
+
+            },
+
+            "SDSTPS": {
+
+                type: "THERMAL",
+
+                stages: {
+
+                    "Stage-I": clone(apgencoStageTemplate),
+
+                    "Common Services": clone(apgencoCommonServicesTemplate)
+
+                }
+
+            },
+
+            "Hydel": {
+
+                type: "HYDEL",
+
+                stages: {
+
+                    "Common Services": clone(apgencoCommonServicesTemplate)
+
+                }
+
+            }
+
+        },
+
+        designationGroups: {
+
+            Technical: [
+
+                "JPA (Junior Plant Attendant)",
+                "PA (Plant Attendant)",
+                "JE (Junior Engineer)",
+                "AE (Assistant Engineer)",
+                "AEE (Assistant Executive Engineer)",
+                "Dy.EE (Deputy Executive Engineer)",
+                "Foreman Gr.-IV",
+                "Foreman Gr.-II",
+                "Foreman Gr.-I",
+                "Chemist",
+                "Lab Assistant",
+                "Sr. Chemist (Senior Chemist)",
+                "Contract Labour",
+                "Casual Labour",
+                "Others"
+
+            ],
+
+            Accounts: [
+
+                "Jr. Assistant (Junior Assistant)",
+                "Sr. Assistant (Senior Assistant)",
+                "JAO (Junior Accounts Officer)",
+                "AAO (Assistant Accounts Officer)",
+                "AO (Accounts Officer)",
+                "Others"
+
+            ],
+
+            Administration: [
+
+                "Jr. Assistant (Junior Assistant)",
+                "Sr. Assistant (Senior Assistant)",
+                "Drivers",
+                "Contract Labour",
+                "Casual Labour",
+                "Others"
+
+            ],
+
+            Hospital: [
+
+                "Medical Officer",
+                "Staff Nurse",
+                "Pharmacist",
+                "Lab Technician",
+                "ANM",
+                "Hospital Attendant",
+                "Contract Labour",
+                "Others"
+
+            ],
+
+            Security: [
+
+                "Security Guard",
+                "Head Security Guard",
+                "Security Supervisor",
+                "Contract Labour",
+                "Others"
+
+            ]
+
+        }
+
+    },
+
+    APTRANSCO: {
+
+        circles: {},
+        designations: []
+
+    },
+
+    APSPDCL: {
+
+        circles: {},
+        designations: []
+
+    },
+
+    APCPDCL: {
+
+        circles: {},
+        designations: []
+
+    },
+
+    APEPDCL: {
+
+        circles: {},
+        designations: []
+
+    }
+
+};
+
+/* =========================================================
+   EMPLOYMENT MODULE v4.0
+========================================================= */
+
+const company = document.getElementById("company");
+const station = document.getElementById("station");
+const stage = document.getElementById("stage");
+const division = document.getElementById("division");
+const subDivision = document.getElementById("subDivision");
+const designation = document.getElementById("designation");
+
+const stationGroup = document.getElementById("stationGroup");
+const stageGroup = document.getElementById("stageGroup");
+const divisionGroup = document.getElementById("divisionGroup");
+const subDivisionGroup = document.getElementById("subDivisionGroup");
+const designationGroup = document.getElementById("designationGroup");
+
+function initializeEmploymentModule() {
+
+    if (!company) return;
+
+    company.addEventListener("change", onCompanyChange);
+    station.addEventListener("change", onStationChange);
+    stage.addEventListener("change", onStageChange);
+    division.addEventListener("change", onDivisionChange);
+
+}
+
+function onCompanyChange() {
+
+    // Hide all employment groups first
+    hideElement(stationGroup);
+    hideElement(stageGroup);
+    hideElement(circleGroup);
+    hideElement(divisionGroup);
+    hideElement(subDivisionGroup);
+    hideElement(sectionGroup);
+    hideElement(designationGroup);
+
+    // Clear dropdowns
+    DropdownEngine.clear(station, "Select Station");
+    DropdownEngine.clear(stage, "Select Stage");
+    DropdownEngine.clear(circle, "Select Circle");
+    DropdownEngine.clear(division, "Select Division");
+    DropdownEngine.clear(subDivision, "Select Sub Division");
+    DropdownEngine.clear(section, "Select Section");
+    DropdownEngine.clear(designation, "Select Designation");
+
+    // APGENCO
+    if (company.value === "APGENCO") {
+
+        showElement(stationGroup);
+        showElement(stageGroup);
+        showElement(divisionGroup);
+        showElement(subDivisionGroup);
+        showElement(designationGroup);
+
+        DropdownEngine.populate(
+            station,
+            Object.keys(employmentMaster.APGENCO.stations),
+            "Select Station"
+        );
+
+    }
+
+}
+
+function onStationChange() {
+
+    const stages =
+        employmentMaster.APGENCO
+        .stations[station.value]
+        .stages;
+
+    DropdownEngine.populate(
+        stage,
+        Object.keys(stages),
+        "Select Stage"
+    );
+
+}
+
+function onStageChange() {
+
+    const divisions =
+        employmentMaster.APGENCO
+        .stations[station.value]
+        .stages[stage.value]
+        .divisions;
+
+    DropdownEngine.populate(
+        division,
+        Object.keys(divisions),
+        "Select Division"
+    );
+
+}
+
+function onDivisionChange() {
+
+    const divisionData =
+        employmentMaster.APGENCO
+        .stations[station.value]
+        .stages[stage.value]
+        .divisions[division.value];
+
+    DropdownEngine.populate(
+        subDivision,
+        divisionData.subDivisions,
+        "Select Sub Division"
+    );
+
+    let designationList = [];
+
+    divisionData.designationGroups.forEach(group => {
+
+        designationList.push(
+            ...employmentMaster.APGENCO.designationGroups[group]
+        );
+
+    });
+
+    DropdownEngine.populate(
+        designation,
+        designationList,
+        "Select Designation"
+    );
+
+}
+
+
+/* =========================================================
    PAYMENT OPTION
 ========================================================= */
 function initializePaymentOptions() {
@@ -717,11 +1333,11 @@ function validateMembershipForm(){
         return false;
     }
 
-    if(dob && getValue(dob) === ""){
-        showError("Please Select Date Of Birth");
-        dob.focus();
-        return false;
-    }
+    if(age && Number(age.value) < 15){
+    showError("Membership is not allowed for members below 15 years of age.");
+    dob.focus();
+    return false;
+}
 
     if(village && getValue(village) === ""){
         showError("Please Enter Village / Town / City");
