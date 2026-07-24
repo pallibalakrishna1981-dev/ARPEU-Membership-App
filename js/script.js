@@ -1017,10 +1017,63 @@ const employmentMaster = {
 
     APSPDCL: {
 
-        circles: {},
-        designations: []
+    circles: {
 
-    },
+        "Nellore Circle": {
+            divisions: {
+                "Nellore Town": { subDivisions: ["Nellore Town"] },
+                "Kavali": { subDivisions: ["Kavali"] },
+                "Atmakur": { subDivisions: ["Atmakur"] }
+            }
+        },
+
+        "Anantapur Circle": {
+            divisions: {
+                "Anantapur": { subDivisions: ["Anantapur"] },
+                "Dharmavaram": { subDivisions: ["Dharmavaram"] },
+                "Tadipatri": { subDivisions: ["Tadipatri"] },
+                "Kadiri": { subDivisions: ["Kadiri"] },
+                "Kalyandurgam": { subDivisions: ["Kalyandurgam"] },
+                "Penukonda": { subDivisions: ["Penukonda"] },
+                "Puttaparthi": { subDivisions: ["Puttaparthi"] }
+            }
+        },
+
+        "Kurnool Circle": {
+            divisions: {
+                "Kurnool": { subDivisions: ["Kurnool"] },
+                "Nandyal": { subDivisions: ["Nandyal"] },
+                "Adoni": { subDivisions: ["Adoni"] },
+                "Dhone": { subDivisions: ["Dhone"] },
+                "Atmakur": { subDivisions: ["Atmakur"] }
+            }
+        },
+
+        "Kadapa Circle": {
+            divisions: {
+                "Kadapa": { subDivisions: ["Kadapa"] },
+                "Proddatur": { subDivisions: ["Proddatur"] },
+                "Rayachoti": { subDivisions: ["Rayachoti"] },
+                "Rajampeta": { subDivisions: ["Rajampeta"] },
+                "Madanapalle": { subDivisions: ["Madanapalle"] }
+            }
+        },
+
+        "Tirupati Circle": {
+            divisions: {
+                "Chittoor": { subDivisions: ["Chittoor"] },
+                "Palamaner": { subDivisions: ["Palamaner"] },
+                "Nagari": { subDivisions: ["Nagari"] },
+                "Kuppam": { subDivisions: ["Kuppam"] },
+                "Tirupati": { subDivisions: ["Tirupati"] },
+                "Srikalahasti": { subDivisions: ["Srikalahasti"] },
+                "Satyavedu": { subDivisions: ["Satyavedu"] }
+            }
+        }
+
+    }
+
+},
 
     APCPDCL: {
 
@@ -1043,56 +1096,101 @@ const employmentMaster = {
 ========================================================= */
 
 const company = document.getElementById("company");
+
 const station = document.getElementById("station");
 const stage = document.getElementById("stage");
+
+const circle = document.getElementById("circle");
 const division = document.getElementById("division");
 const subDivision = document.getElementById("subDivision");
+
+const subStation = document.getElementById("subStation");
+const section = document.getElementById("section");
+
 const designation = document.getElementById("designation");
 
 const stationGroup = document.getElementById("stationGroup");
 const stageGroup = document.getElementById("stageGroup");
+
+const circleGroup = document.getElementById("circleGroup");
 const divisionGroup = document.getElementById("divisionGroup");
 const subDivisionGroup = document.getElementById("subDivisionGroup");
+
+const subStationGroup = document.getElementById("subStationGroup");
+const sectionGroup = document.getElementById("sectionGroup");
+
 const designationGroup = document.getElementById("designationGroup");
+
+
+/* =========================================================
+   INITIALIZE EMPLOYMENT MODULE
+========================================================= */
 
 function initializeEmploymentModule() {
 
     if (!company) return;
 
     company.addEventListener("change", onCompanyChange);
+
     station.addEventListener("change", onStationChange);
     stage.addEventListener("change", onStageChange);
+
+    circle.addEventListener("change", onCircleChange);
     division.addEventListener("change", onDivisionChange);
+
+    subDivision.addEventListener("change", onSubDivisionChange);
+
+    onCompanyChange();
 
 }
 
+
+/* =========================================================
+   COMPANY CHANGE
+========================================================= */
+
 function onCompanyChange() {
 
-    // Hide all employment groups first
+    // Hide All Groups
+
     hideElement(stationGroup);
     hideElement(stageGroup);
+
     hideElement(circleGroup);
     hideElement(divisionGroup);
     hideElement(subDivisionGroup);
+
+    hideElement(subStationGroup);
     hideElement(sectionGroup);
+
     hideElement(designationGroup);
 
-    // Clear dropdowns
+    // Clear Dropdowns
+
     DropdownEngine.clear(station, "Select Station");
     DropdownEngine.clear(stage, "Select Stage");
+
     DropdownEngine.clear(circle, "Select Circle");
     DropdownEngine.clear(division, "Select Division");
     DropdownEngine.clear(subDivision, "Select Sub Division");
-    DropdownEngine.clear(section, "Select Section");
+
     DropdownEngine.clear(designation, "Select Designation");
 
-    // APGENCO
+    clearInput(subStation);
+    clearInput(section);
+
+    /* ==========================================
+       APGENCO
+    ========================================== */
+
     if (company.value === "APGENCO") {
 
         showElement(stationGroup);
         showElement(stageGroup);
+
         showElement(divisionGroup);
         showElement(subDivisionGroup);
+
         showElement(designationGroup);
 
         DropdownEngine.populate(
@@ -1101,48 +1199,265 @@ function onCompanyChange() {
             "Select Station"
         );
 
+        return;
+
+    }
+
+    /* ==========================================
+       APTRANSCO
+    ========================================== */
+
+    if (company.value === "APTRANSCO") {
+
+        showElement(circleGroup);
+        showElement(divisionGroup);
+        showElement(subDivisionGroup);
+
+        showElement(subStationGroup);
+        showElement(sectionGroup);
+
+        showElement(designationGroup);
+
+        DropdownEngine.populate(
+            circle,
+            Object.keys(employmentMaster.APTRANSCO.circles),
+            "Select Circle"
+        );
+
+        return;
+
+    }
+
+    /* ==========================================
+       DISCOMS
+    ========================================== */
+
+    if (
+        company.value === "APSPDCL" ||
+        company.value === "APCPDCL" ||
+        company.value === "APEPDCL"
+    ) {
+
+        showElement(circleGroup);
+        showElement(divisionGroup);
+        showElement(subDivisionGroup);
+
+        showElement(subStationGroup);
+        showElement(sectionGroup);
+
+        showElement(designationGroup);
+
+        DropdownEngine.populate(
+            circle,
+            Object.keys(
+                employmentMaster[company.value].circles
+            ),
+            "Select Circle"
+        );
+
+        return;
+
     }
 
 }
 
-function onStationChange() {
+/* =========================================================
+   CIRCLE CHANGE
+========================================================= */
 
-    const stages =
-        employmentMaster.APGENCO
-        .stations[station.value]
-        .stages;
+function onCircleChange() {
 
-    DropdownEngine.populate(
-        stage,
-        Object.keys(stages),
-        "Select Stage"
+    // APGENCO uses Station -> Stage Flow
+    if (company.value === "APGENCO") {
+        return;
+    }
+
+    DropdownEngine.clear(
+        division,
+        "Select Division"
     );
 
-}
+    DropdownEngine.clear(
+        subDivision,
+        "Select Sub Division"
+    );
 
-function onStageChange() {
+    DropdownEngine.clear(
+        designation,
+        "Select Designation"
+    );
 
-    const divisions =
-        employmentMaster.APGENCO
-        .stations[station.value]
-        .stages[stage.value]
-        .divisions;
+    clearInput(subStation);
+    clearInput(section);
+
+    const companyData =
+        employmentMaster[company.value];
+
+    if (!companyData) return;
+
+    const circleData =
+        companyData.circles[circle.value];
+
+    if (!circleData) return;
 
     DropdownEngine.populate(
         division,
-        Object.keys(divisions),
+        Object.keys(circleData.divisions),
         "Select Division"
     );
 
 }
 
-function onDivisionChange() {
 
-    const divisionData =
+/* =========================================================
+   STATION CHANGE
+========================================================= */
+
+function onStationChange() {
+
+    if (!station.value) {
+
+        DropdownEngine.clear(
+            stage,
+            "Select Stage"
+        );
+
+        return;
+
+    }
+
+    const stationData =
+        employmentMaster.APGENCO
+        .stations[station.value];
+
+    if (!stationData) return;
+
+    DropdownEngine.populate(
+        stage,
+        Object.keys(stationData.stages),
+        "Select Stage"
+    );
+
+}
+
+
+/* =========================================================
+   STAGE CHANGE
+========================================================= */
+
+function onStageChange() {
+
+    if (!stage.value) {
+
+        DropdownEngine.clear(
+            division,
+            "Select Division"
+        );
+
+        DropdownEngine.clear(
+            subDivision,
+            "Select Sub Division"
+        );
+
+        DropdownEngine.clear(
+            designation,
+            "Select Designation"
+        );
+
+        return;
+
+    }
+
+    const stageData =
         employmentMaster.APGENCO
         .stations[station.value]
-        .stages[stage.value]
-        .divisions[division.value];
+        .stages[stage.value];
+
+    if (!stageData) return;
+
+    DropdownEngine.populate(
+        division,
+        Object.keys(stageData.divisions),
+        "Select Division"
+    );
+
+}
+
+
+/* =========================================================
+   DIVISION CHANGE
+========================================================= */
+
+function onDivisionChange() {
+
+    /* ==========================================
+       APGENCO
+    ========================================== */
+
+    if (company.value === "APGENCO") {
+
+        const divisionData =
+            employmentMaster.APGENCO
+            .stations[station.value]
+            .stages[stage.value]
+            .divisions[division.value];
+
+        if (!divisionData) return;
+
+        DropdownEngine.populate(
+            subDivision,
+            divisionData.subDivisions,
+            "Select Sub Division"
+        );
+
+        let designationList = [];
+
+        divisionData.designationGroups.forEach(group => {
+
+            designationList.push(
+                ...employmentMaster.APGENCO.designationGroups[group]
+            );
+
+        });
+
+        DropdownEngine.populate(
+            designation,
+            designationList,
+            "Select Designation"
+        );
+
+        return;
+
+    }
+
+    /* ==========================================
+       DISCOMS
+    ========================================== */
+
+    DropdownEngine.clear(
+        subDivision,
+        "Select Sub Division"
+    );
+
+    DropdownEngine.clear(
+        designation,
+        "Select Designation"
+    );
+
+    const companyData =
+        employmentMaster[company.value];
+
+    if (!companyData) return;
+
+    const circleData =
+        companyData.circles[circle.value];
+
+    if (!circleData) return;
+
+    const divisionData =
+        circleData.divisions[division.value];
+
+    if (!divisionData) return;
 
     DropdownEngine.populate(
         subDivision,
@@ -1150,19 +1465,39 @@ function onDivisionChange() {
         "Select Sub Division"
     );
 
-    let designationList = [];
+}
 
-    divisionData.designationGroups.forEach(group => {
+/* =========================================================
+   SUB DIVISION CHANGE
+========================================================= */
 
-        designationList.push(
-            ...employmentMaster.APGENCO.designationGroups[group]
-        );
+function onSubDivisionChange() {
 
-    });
+    // APGENCO loads designation in Division Change
+    if (company.value === "APGENCO") {
+        return;
+    }
 
     DropdownEngine.populate(
         designation,
-        designationList,
+        [
+            "JLM",
+            "ALM",
+            "Line Inspector",
+            "AE",
+            "ADE",
+            "AEE",
+            "DEE",
+            "JE",
+            "AAO",
+            "AO",
+            "JAO",
+            "Accountant",
+            "Junior Assistant",
+            "Senior Assistant",
+            "Office Superintendent",
+            "Others"
+        ],
         "Select Designation"
     );
 
