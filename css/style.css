@@ -566,40 +566,172 @@ height:24px;
 
 
 /*=========================================
-PHOTO PREVIEW
+PHOTO UPLOAD SECTION
 =========================================*/
+.photo-upload-container{
+display:flex;
+justify-content:space-between;
+align-items:flex-start;
+gap:30px;
+margin-top:15px;
+flex-wrap:wrap;
+}
+.photo-upload-section{
+flex:1;
+min-width:280px;
+}
+.photo-upload-section label{
+display:block;
+margin-bottom:12px;
+font-weight:600;
+}
+.upload-row{
+display:flex;
+align-items:center;
+gap:12px;
+margin-bottom:15px;
+}
+.photo-btn{
+padding:10px 18px;
+background:#f2f2f2;
+border:1px solid #cfcfcf;
+border-radius:12px;
+cursor:pointer;
+font-size:14px;
+font-weight:500;
+white-space:nowrap;
+transition:.3s;
+}
+.photo-btn:hover{
+background:#e8e8e8;
+}
+.photo-file-name{
+flex:1;
+height:42px;
+padding:0 12px;
+border:1px solid #d5d5d5;
+border-radius:12px;
+background:#fff;
+font-size:14px;
+color:#555;
+}
+.photo-info{
+margin-top:8px;
+font-size:13px;
+line-height:1.6;
+color:#666;
+}
+.take-photo-btn{
+margin-top:18px;
+padding:11px 20px;
+background:#f2f2f2;
+border:1px solid #cfcfcf;
+border-radius:12px;
+cursor:pointer;
+font-size:15px;
+font-weight:500;
+display:flex;
+align-items:center;
+justify-content:center;
+gap:8px;
+transition:.3s;
+}
+.take-photo-btn:hover{
+background:#e8e8e8;
+}
 .photo-preview{
+width:120px;
+height:150px;
+border:2px dashed #d8d8d8;
+border-radius:12px;
 display:flex;
 justify-content:center;
 align-items:center;
-margin-top:10px;
+flex-direction:column;
+background:#fafafa;
+overflow:hidden;
+flex-shrink:0;
 }
 .photo-preview img{
-width:130px;
-height:160px;
+width:100%;
+height:100%;
 object-fit:cover;
-border-radius:10px;
-border:2px solid #ddd;
 display:none;
 }
+.preview-text{
+font-size:14px;
+text-align:center;
+line-height:1.5;
+color:#888;
+padding:10px;
+}
+@media(max-width:768px){
+.photo-upload-container{
+flex-direction:column;
+}
+.upload-row{
+flex-direction:column;
+align-items:stretch;
+}
+.photo-file-name{
+width:100%;
+}
+.photo-btn{
+width:100%;
+}
+.take-photo-btn{
+width:100%;
+}
+.photo-preview{
+margin:20px auto 0;
+}
+}
+
+/*=========================================
+MOBILE
+=========================================*/
+
+@media(max-width:768px){
+
+.photo-upload-container{
+flex-direction:column;
+align-items:center;
+}
+
+.photo-upload-section{
+width:100%;
+}
+
+.photo-preview{
+margin-top:15px;
+}
+
+}
+
 
 /*=========================================
 RADIO BUTTONS
 =========================================*/
 .radio-group{
 display:flex;
-flex-direction:column;
-gap:10px;
+align-items:center;
+gap:20px;
+flex-wrap:wrap;
+margin-top:8px;
 }
 .radio-item{
 display:flex;
 align-items:center;
-gap:8px;
+gap:6px;
 font-size:14px;
 font-weight:500;
+cursor:pointer;
+margin:0;
+white-space:nowrap;
 }
 .radio-item input{
 width:auto;
+margin:0;
 }
 
 
@@ -1248,3 +1380,1213 @@ margin-top:15px;
     }
 
 }
+
+
+
+/*=========================================================
+  PAYMENT MODULE V3
+  CSS PART-1
+=========================================================*/
+
+/*---------------------------------------------------------
+  CARD
+---------------------------------------------------------*/
+
+.form-card{
+background:#FFFFFF;
+border:1px solid #E5E7EB;
+border-radius:14px;
+overflow:hidden;
+margin-bottom:16px;
+box-shadow:0 3px 10px rgba(0,0,0,.05);
+}
+
+.card-header{
+display:flex;
+align-items:center;
+gap:10px;
+padding:14px 18px;
+background:#F8FAFC;
+border-bottom:1px solid #E5E7EB;
+}
+
+.card-icon{
+font-size:22px;
+line-height:1;
+}
+
+.card-title{
+font-size:20px;
+font-weight:700;
+color:#1F2937;
+}
+
+.card-body{
+padding:16px 18px;
+}
+
+/*---------------------------------------------------------
+  FORM
+---------------------------------------------------------*/
+
+.form-group{
+margin-bottom:14px;
+}
+
+.form-group label{
+display:block;
+margin-bottom:8px;
+font-size:15px;
+font-weight:600;
+color:#374151;
+}
+
+.required{
+color:#DC2626;
+margin-left:2px;
+}
+
+/*---------------------------------------------------------
+  INPUTS
+---------------------------------------------------------*/
+
+.form-group input[type=text],
+.form-group input[type=number],
+.form-group input[type=date],
+.form-group input[type=file],
+.form-group textarea,
+.form-group select{
+
+width:100%;
+padding:13px 14px;
+font-size:15px;
+border:1px solid #D1D5DB;
+border-radius:10px;
+background:#FFFFFF;
+outline:none;
+transition:.25s;
+box-sizing:border-box;
+
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus{
+
+border-color:#0B4EA2;
+box-shadow:0 0 0 3px rgba(11,78,162,.12);
+
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder{
+
+color:#9CA3AF;
+
+}
+
+/*---------------------------------------------------------
+  RADIO GROUP
+---------------------------------------------------------*/
+
+.radio-group{
+
+display:flex;
+flex-wrap:wrap;
+gap:15px;
+margin-top:8px;
+
+}
+
+.radio-item{
+
+display:flex !important;
+align-items:center;
+gap:8px;
+padding:12px 16px;
+border:1px solid #D1D5DB;
+border-radius:10px;
+cursor:pointer;
+transition:.25s;
+background:#FFFFFF;
+font-weight:500 !important;
+margin-bottom:0 !important;
+
+}
+
+.radio-item:hover{
+
+border-color:#0B4EA2;
+background:#F8FBFF;
+
+}
+
+.radio-item input{
+
+width:18px;
+height:18px;
+margin:0;
+
+}
+
+/*---------------------------------------------------------
+  CHECKBOX
+---------------------------------------------------------*/
+
+.checkbox-item{
+
+display:flex !important;
+align-items:center;
+gap:10px;
+cursor:pointer;
+font-weight:500 !important;
+margin-bottom:0 !important;
+
+}
+
+.checkbox-item input{
+
+width:18px;
+height:18px;
+margin:0;
+
+}
+
+/*---------------------------------------------------------
+  BUTTON
+---------------------------------------------------------*/
+
+.pay-button{
+
+width:100%;
+padding:14px;
+margin-top:16px;
+border:none;
+border-radius:10px;
+background:#0B4EA2;
+color:#FFFFFF;
+font-size:16px;
+font-weight:700;
+cursor:pointer;
+transition:.25s;
+
+}
+
+.pay-button:hover{
+
+background:#083C7C;
+
+}
+
+.pay-button:active{
+
+transform:scale(.98);
+
+}
+
+.pay-button:disabled{
+
+background:#9CA3AF;
+cursor:not-allowed;
+
+}
+
+/*---------------------------------------------------------
+  HIDDEN SECTIONS
+---------------------------------------------------------*/
+
+#membershipFeeSection,
+#upiPaymentSection,
+#paymentCompletedSection,
+#alreadyPaidSection,
+#balancePaymentSection,
+#partialPaymentSummary,
+#finalPaymentSummary,
+#paymentValidationMessage,
+#balanceWarningMessage,
+#completePaymentButton{
+
+display:none;
+
+}
+
+/*=========================================================
+  PAYMENT MODULE V3
+  CSS PART-2
+=========================================================*/
+
+/*---------------------------------------------------------
+  PAYMENT INFO BOX
+---------------------------------------------------------*/
+
+.payment-info-box{
+margin-top:15px;
+padding:18px;
+background:#F8FAFC;
+border:1px solid #D9E6F5;
+border-radius:12px;
+display:flex;
+flex-direction:column;
+gap:12px;
+}
+
+.payment-info-row{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:4px 0;
+font-size:15px;
+}
+
+.payment-info-row span{
+color:#4B5563;
+font-weight:500;
+}
+
+.payment-info-row strong{
+color:#0B4EA2;
+font-size:15px;
+font-weight:700;
+}
+
+.payment-total{
+margin-top:6px;
+padding-top:12px;
+border-top:1px dashed #CBD5E1;
+}
+
+.payment-total span{
+font-size:16px;
+font-weight:700;
+color:#111827;
+}
+
+.payment-total strong{
+font-size:18px;
+font-weight:700;
+color:#F57C00;
+}
+
+/*---------------------------------------------------------
+  PAYMENT BOX
+---------------------------------------------------------*/
+
+.payment-box{
+margin-top:18px;
+padding:22px;
+background:#FFFFFF;
+border:2px dashed #0B4EA2;
+border-radius:14px;
+text-align:center;
+}
+
+.payment-box h4{
+margin:0 0 14px;
+font-size:20px;
+font-weight:700;
+color:#0B4EA2;
+}
+
+.payment-box p{
+margin:8px 0;
+font-size:14px;
+line-height:1.7;
+color:#4B5563;
+}
+
+.payment-box strong{
+color:#0B4EA2;
+font-size:16px;
+font-weight:700;
+}
+
+/*---------------------------------------------------------
+  QR IMAGE
+---------------------------------------------------------*/
+
+#upiQrImage{
+display:block;
+width:180px;
+height:180px;
+margin:18px auto;
+padding:8px;
+background:#FFFFFF;
+border:1px solid #E5E7EB;
+border-radius:12px;
+object-fit:contain;
+}
+
+/*---------------------------------------------------------
+  PAYMENT SUMMARY
+---------------------------------------------------------*/
+
+.payment-summary-box{
+margin-top:18px;
+padding:18px;
+background:#F9FAFB;
+border:1px solid #E5E7EB;
+border-radius:12px;
+display:flex;
+flex-direction:column;
+gap:12px;
+}
+
+.payment-summary-row{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:6px 0;
+font-size:15px;
+}
+
+.payment-summary-row span{
+font-weight:500;
+color:#374151;
+}
+
+.payment-summary-row strong{
+font-weight:700;
+color:#0B4EA2;
+font-size:15px;
+}
+
+/*---------------------------------------------------------
+  FINAL SUMMARY TOTAL ROW
+---------------------------------------------------------*/
+
+.payment-summary-row.payment-total{
+margin-top:6px;
+padding-top:12px;
+border-top:1px dashed #CBD5E1;
+}
+
+.payment-summary-row.payment-total span{
+font-size:16px;
+font-weight:700;
+color:#111827;
+}
+
+.payment-summary-row.payment-total strong{
+font-size:17px;
+font-weight:700;
+color:#F57C00;
+}
+
+/*---------------------------------------------------------
+  PAYMENT STATUS MESSAGE
+---------------------------------------------------------*/
+
+.payment-message{
+margin-top:10px;
+padding:14px 16px;
+border-radius:12px;
+font-size:14px;
+font-weight:600;
+line-height:1.7;
+display:none;
+}
+
+.payment-success{
+background:#ECFDF5;
+border:1px solid #A7F3D0;
+color:#047857;
+}
+
+.payment-warning{
+background:#FFF7ED;
+border:1px solid #FDBA74;
+color:#C2410C;
+}
+
+.payment-error{
+background:#FEF2F2;
+border:1px solid #FCA5A5;
+color:#B91C1C;
+}
+
+/*=========================================================
+  PAYMENT MODULE V3
+  CSS PART-3
+=========================================================*/
+
+/*---------------------------------------------------------
+  PAYMENT COMPLETED SECTION
+---------------------------------------------------------*/
+
+#paymentCompletedSection{
+margin-top:20px;
+padding-top:20px;
+border-top:1px dashed #D1D5DB;
+}
+
+/*---------------------------------------------------------
+  ALREADY PAID SECTION
+---------------------------------------------------------*/
+
+#alreadyPaidSection{
+
+    margin-top:10px;
+    padding:0;
+
+    background:transparent;
+    border:none;
+    border-radius:0;
+
+}
+
+#alreadyPaidSection .form-group{
+margin-bottom:14px;
+}
+
+/*---------------------------------------------------------
+  BALANCE PAYMENT SECTION
+---------------------------------------------------------*/
+
+#balancePaymentSection{
+margin-top:10px;
+padding:16px;
+background:#F8FAFC;
+border:1px solid #D9E6F5;
+border-radius:12px;
+}
+
+#balancePaymentSection .payment-box{
+margin-top:0;
+margin-bottom:20px;
+}
+
+#balancePaymentSection .form-group{
+margin-bottom:14px;
+}
+
+/*---------------------------------------------------------
+  FILE UPLOAD
+---------------------------------------------------------*/
+
+input[type=file]{
+width:100%;
+padding:12px;
+border:1px solid #D1D5DB;
+border-radius:10px;
+background:#FFFFFF;
+cursor:pointer;
+box-sizing:border-box;
+transition:.25s;
+}
+
+input[type=file]:hover{
+border-color:#0B4EA2;
+background:#F8FBFF;
+}
+
+input[type=file]::file-selector-button{
+padding:10px 16px;
+margin-right:15px;
+border:none;
+border-radius:8px;
+background:#0B4EA2;
+color:#FFFFFF;
+font-weight:600;
+cursor:pointer;
+transition:.25s;
+}
+
+input[type=file]::file-selector-button:hover{
+background:#083C7C;
+}
+
+/*---------------------------------------------------------
+  SECTION SPACING
+---------------------------------------------------------*/
+
+#membershipFeeSection{
+margin-top:10px;
+}
+
+#upiPaymentSection{
+margin-top:10px;
+}
+
+#partialPaymentSummary{
+margin-top:10px;
+}
+
+#finalPaymentSummary{
+margin-top:10px;
+}
+
+#balanceWarningMessage{
+margin-top:10px;
+}
+
+#completePaymentButton{
+margin-top:12px;
+}
+
+/*---------------------------------------------------------
+  HORIZONTAL DIVIDER
+---------------------------------------------------------*/
+
+.payment-divider{
+margin:24px 0;
+border:none;
+border-top:1px dashed #D1D5DB;
+}
+
+/*---------------------------------------------------------
+  READONLY INPUT
+---------------------------------------------------------*/
+
+input[readonly]{
+background:#F3F4F6;
+cursor:not-allowed;
+color:#6B7280;
+}
+
+/*---------------------------------------------------------
+  DISABLED INPUT
+---------------------------------------------------------*/
+
+input:disabled,
+select:disabled,
+textarea:disabled{
+background:#F3F4F6;
+cursor:not-allowed;
+opacity:.8;
+}
+
+/*---------------------------------------------------------
+  INPUT VALIDATION
+---------------------------------------------------------*/
+
+.input-success{
+border-color:#16A34A !important;
+box-shadow:0 0 0 3px rgba(22,163,74,.12);
+}
+
+.input-warning{
+border-color:#F59E0B !important;
+box-shadow:0 0 0 3px rgba(245,158,11,.12);
+}
+
+.input-error{
+border-color:#DC2626 !important;
+box-shadow:0 0 0 3px rgba(220,38,38,.12);
+}
+
+/*---------------------------------------------------------
+  SMOOTH SHOW/HIDE
+---------------------------------------------------------*/
+
+.fade-in{
+animation:fadeIn .35s ease;
+}
+
+@keyframes fadeIn{
+
+from{
+opacity:0;
+transform:translateY(8px);
+}
+
+to{
+opacity:1;
+transform:translateY(0);
+}
+
+}
+
+/*=========================================================
+  PAYMENT MODULE V3
+  CSS PART-4
+=========================================================*/
+
+/*---------------------------------------------------------
+  TABLET RESPONSIVE
+---------------------------------------------------------*/
+
+@media (max-width:992px){
+
+.card-body{
+padding:20px;
+}
+
+.payment-box{
+padding:20px;
+}
+
+.payment-summary-box{
+padding:16px;
+}
+
+.payment-info-box{
+padding:16px;
+}
+
+}
+
+/*---------------------------------------------------------
+  MOBILE RESPONSIVE
+---------------------------------------------------------*/
+
+@media (max-width:768px){
+
+.card-header{
+padding:16px;
+}
+
+.card-title{
+font-size:18px;
+}
+
+.card-icon{
+font-size:22px;
+}
+
+.card-body{
+padding:16px;
+}
+
+.form-group{
+margin-bottom:14px;
+}
+
+.form-group label{
+font-size:14px;
+}
+
+.form-group input[type=text],
+.form-group input[type=number],
+.form-group input[type=date],
+.form-group input[type=file],
+.form-group textarea,
+.form-group select{
+
+font-size:14px;
+padding:12px;
+
+}
+
+.radio-group{
+flex-direction:column;
+gap:10px;
+}
+
+.radio-item{
+width:100%;
+padding:12px;
+}
+
+.checkbox-item{
+font-size:14px;
+}
+
+.payment-box{
+padding:18px;
+}
+
+.payment-box h4{
+font-size:18px;
+}
+
+.payment-box p{
+font-size:13px;
+}
+
+#upiQrImage{
+width:160px;
+height:160px;
+}
+
+.payment-info-row,
+.payment-summary-row{
+
+font-size:14px;
+
+}
+
+.payment-total span,
+.payment-summary-row.payment-total span{
+
+font-size:15px;
+
+}
+
+.payment-total strong,
+.payment-summary-row.payment-total strong{
+
+font-size:16px;
+
+}
+
+.pay-button{
+
+font-size:15px;
+padding:13px;
+
+}
+
+.payment-message{
+
+font-size:13px;
+padding:12px;
+
+}
+
+}
+
+/*---------------------------------------------------------
+  SMALL MOBILE
+---------------------------------------------------------*/
+
+@media (max-width:480px){
+
+.card-header{
+
+padding:14px;
+
+}
+
+.card-title{
+
+font-size:17px;
+
+}
+
+.card-body{
+
+padding:14px;
+
+}
+
+.payment-box{
+
+padding:15px;
+
+}
+
+#upiQrImage{
+
+width:140px;
+height:140px;
+
+}
+
+.payment-info-row,
+.payment-summary-row{
+
+flex-direction:column;
+align-items:flex-start;
+gap:5px;
+
+}
+
+.payment-info-row strong,
+.payment-summary-row strong{
+
+margin-left:0;
+
+}
+
+.pay-button{
+
+font-size:14px;
+
+}
+
+input[type=file]::file-selector-button{
+
+display:block;
+margin-bottom:10px;
+margin-right:0;
+
+}
+
+}
+
+/*---------------------------------------------------------
+  SECTION TRANSITIONS
+---------------------------------------------------------*/
+
+#membershipFeeSection,
+#upiPaymentSection,
+#paymentCompletedSection,
+#alreadyPaidSection,
+#balancePaymentSection,
+#partialPaymentSummary,
+#finalPaymentSummary{
+
+transition:all .30s ease;
+
+}
+
+/*---------------------------------------------------------
+  SCROLL OFFSET
+---------------------------------------------------------*/
+
+.form-card{
+
+scroll-margin-top:80px;
+
+}
+
+/*---------------------------------------------------------
+  PREVENT OVERFLOW
+---------------------------------------------------------*/
+
+.payment-box,
+.payment-summary-box,
+.payment-info-box{
+
+overflow:hidden;
+
+}
+
+/*=========================================================
+  PAYMENT MODULE V3
+  CSS PART-5 (FINAL)
+=========================================================*/
+
+/*---------------------------------------------------------
+  UTILITY CLASSES
+---------------------------------------------------------*/
+
+.text-center{
+text-align:center;
+}
+
+.text-right{
+text-align:right;
+}
+
+.text-left{
+text-align:left;
+}
+
+.w-100{
+width:100%;
+}
+
+.mt-10{
+margin-top:10px;
+}
+
+.mt-15{
+margin-top:15px;
+}
+
+.mt-20{
+margin-top:20px;
+}
+
+.mt-25{
+margin-top:25px;
+}
+
+.mb-10{
+margin-bottom:10px;
+}
+
+.mb-15{
+margin-bottom:15px;
+}
+
+.mb-20{
+margin-bottom:20px;
+}
+
+.hidden{
+display:none !important;
+}
+
+.visible{
+display:block !important;
+}
+
+.flex{
+display:flex;
+}
+
+.flex-column{
+flex-direction:column;
+}
+
+.justify-between{
+justify-content:space-between;
+}
+
+.align-center{
+align-items:center;
+}
+
+/*---------------------------------------------------------
+  LOADING BUTTON
+---------------------------------------------------------*/
+
+.pay-button.loading{
+pointer-events:none;
+opacity:.75;
+position:relative;
+}
+
+.pay-button.loading::after{
+content:"";
+width:18px;
+height:18px;
+margin-left:10px;
+border:2px solid rgba(255,255,255,.35);
+border-top:2px solid #FFFFFF;
+border-radius:50%;
+display:inline-block;
+animation:paymentSpin .8s linear infinite;
+vertical-align:middle;
+}
+
+@keyframes paymentSpin{
+
+0%{
+transform:rotate(0deg);
+}
+
+100%{
+transform:rotate(360deg);
+}
+
+}
+
+/*---------------------------------------------------------
+  ACCESSIBILITY
+---------------------------------------------------------*/
+
+input:focus-visible,
+button:focus-visible,
+select:focus-visible,
+textarea:focus-visible{
+
+outline:3px solid rgba(11,78,162,.20);
+outline-offset:2px;
+
+}
+
+/*---------------------------------------------------------
+  SELECTION
+---------------------------------------------------------*/
+
+::selection{
+
+background:#0B4EA2;
+color:#FFFFFF;
+
+}
+
+/*---------------------------------------------------------
+  SCROLLBAR
+---------------------------------------------------------*/
+
+::-webkit-scrollbar{
+
+width:8px;
+height:8px;
+
+}
+
+::-webkit-scrollbar-track{
+
+background:#F3F4F6;
+
+}
+
+::-webkit-scrollbar-thumb{
+
+background:#C7CDD6;
+border-radius:10px;
+
+}
+
+::-webkit-scrollbar-thumb:hover{
+
+background:#9CA3AF;
+
+}
+
+/*---------------------------------------------------------
+  PRINT
+---------------------------------------------------------*/
+
+@media print{
+
+.pay-button{
+display:none !important;
+}
+
+input[type=file]{
+display:none !important;
+}
+
+.payment-box{
+border:1px solid #999999;
+}
+
+}
+
+/*---------------------------------------------------------
+  FUTURE PAYMENT GATEWAY
+---------------------------------------------------------*/
+
+.gateway-loading{
+
+opacity:.60;
+pointer-events:none;
+
+}
+
+.gateway-success{
+
+border-color:#16A34A !important;
+
+}
+
+.gateway-failed{
+
+border-color:#DC2626 !important;
+
+}
+
+/*---------------------------------------------------------
+  FINAL SAFETY
+---------------------------------------------------------*/
+
+*{
+box-sizing:border-box;
+}
+
+img{
+max-width:100%;
+height:auto;
+}
+
+button{
+font-family:inherit;
+}
+
+input,
+select,
+textarea{
+font-family:inherit;
+}
+
+
+/*---------------------------------------------------------
+  DOB + AGE ROW
+---------------------------------------------------------*/
+
+.dob-age-row{
+
+    display:flex;
+    align-items:flex-start;
+    gap:14px;
+
+}
+
+.dob-field{
+
+    flex:1.7;
+
+}
+
+.age-field{
+
+    flex:0.9;
+    display:flex;
+    flex-direction:column;
+
+}
+
+.age-field label{
+
+    padding-left:8px;
+
+}
+
+.age-field input{
+
+    text-align:center;
+    font-weight:600;
+
+}
+
+@media (max-width:768px){
+
+    .dob-age-row{
+
+        flex-direction:column;
+        gap:12px;
+
+    }
+
+    .dob-field,
+    .age-field{
+
+        width:100%;
+
+    }
+
+    .age-field label{
+
+        padding-left:0;
+
+    }
+
+}
+
+/*---------------------------------------------------------
+  TRANSACTION DATE + AMOUNT
+---------------------------------------------------------*/
+
+.transaction-row{
+
+    display:flex;
+    gap:12px;
+    align-items:flex-end;
+
+}
+
+.transaction-date{
+
+    flex:1.1;
+
+}
+
+.transaction-amount{
+
+    flex:1;
+
+}
+
+@media (max-width:768px){
+
+    .transaction-row{
+
+        display:flex;
+        flex-direction:row;
+        gap:12px;
+
+    }
+
+    .transaction-date{
+
+        flex:1.6;
+
+    }
+
+    .transaction-amount{
+
+        flex:1;
+
+    }
+
+}
+
+/*=========================================================
+  END OF PAYMENT MODULE V3 CSS
+=========================================================*/
