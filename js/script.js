@@ -1010,10 +1010,35 @@ const employmentMaster = {
 
     APTRANSCO: {
 
-        circles: {},
-        designations: []
+    circles: {
 
-    },
+        "Kadapa Circle": {
+            divisions: {
+
+                "Kadapa Division": {
+                    subDivisions: [
+                        "Rajampeta",
+                        "Porumamilla",
+                        "C.K. Dinne",
+                        "MRT",
+                        "O&M"
+                    ]
+                },
+
+                "Yerraguntla Division": {
+                    subDivisions: [
+                        "Pulivendula",
+                        "Proddatur",
+                        "Jammalamadugu"
+                    ]
+                }
+
+            }
+        }
+
+    }
+
+},
 
     APSPDCL: {
 
@@ -1077,17 +1102,109 @@ const employmentMaster = {
 
     APCPDCL: {
 
-        circles: {},
-        designations: []
+    circles: {
 
-    },
+        "CRDA Circle": {
+            divisions: {
+                "Amaravati Division": { subDivisions: ["Mangalagiri"] },
+                "Chilakaluripeta Division": { subDivisions: ["Krishna Nagar"] }
+            }
+        },
+
+        "Guntur Circle": {
+            divisions: {
+                "Guntur Town Division": { subDivisions: ["Guntur-I", "Guntur-II", "Guntur-III"] },
+                "Tenali Division": { subDivisions: ["Tenali Town", "Tenali Rural", "Ponnur"] }
+            }
+        },
+
+        "Palnadu Circle": {
+            divisions: {
+                "Narasaraopeta Division": { subDivisions: ["Narasaraopeta Town", "Narasaraopeta Rural"] },
+                "Macherla Division": { subDivisions: ["Macherla Town", "Macherla Rural"] }
+            }
+        },
+
+        "Bapatla Circle": {
+            divisions: {
+                "Bapatla Division": { subDivisions: ["Bapatla Town", "Cherukupalli", "Tsundur", "Repalle"] },
+                "Chirala Division": { subDivisions: ["Chirala Town", "Chirala Rural"] }
+            }
+        },
+
+        "Ongole Circle": {
+            divisions: {
+                "Ongole Town Division": { subDivisions: ["Ongole Town", "Ongole Rural"] },
+                "Kandukur Division": { subDivisions: ["Kandukur Town", "Kandukur Rural"] }
+            }
+        },
+
+        "Markapuram Circle": {
+            divisions: {
+                "Markapuram Division": { subDivisions: ["Markapuram Town", "Markapuram Rural"] },
+                "Kanigiri Division": { subDivisions: ["Kanigiri Town", "Kanigiri Rural"] }
+            }
+        }
+
+    }
+
+},
 
     APEPDCL: {
 
-        circles: {},
-        designations: []
+    circles: {
+
+        "Eluru Circle": {
+            divisions: {
+                "Jangareddygudem Division": {
+                    subDivisions: [
+                        "Jeelugumilli",
+                        "Chintalapudi",
+                        "Polavaram",
+                        "Jangareddygudem",
+                        "Kamavarapukota"
+                    ]
+                },
+                "Eluru Division": {
+                    subDivisions: [
+                        "Unguturu",
+                        "Denduluru",
+                        "Eluru",
+                        "Pedavegi",
+                        "Bhimadolu"
+                    ]
+                }
+            }
+        },
+
+        "Anakapalli Circle": {
+            divisions: {
+                "Narsipatnam Division": {
+                    subDivisions: [
+                        "Narsipatnam",
+                        "Vaddadi",
+                        "Chodavaram"
+                    ]
+                },
+                "Anakapalli Division": {
+                    subDivisions: [
+                        "Anakapalli",
+                        "Payakaraopeta",
+                        "Achyutapuram",
+                        "Yelamanchili"
+                    ]
+                },
+                "Kasimkota Division": {
+                    subDivisions: [
+                        "Kasimkota"
+                    ]
+                }
+            }
+        }
 
     }
+
+},
 
 };
 
@@ -1481,22 +1598,26 @@ function onSubDivisionChange() {
     DropdownEngine.populate(
         designation,
         [
-            "JLM",
-            "ALM",
-            "Line Inspector",
-            "AE",
-            "ADE",
-            "AEE",
-            "DEE",
-            "JE",
-            "AAO",
-            "AO",
-            "JAO",
-            "Accountant",
-            "Junior Assistant",
-            "Senior Assistant",
-            "Office Superintendent",
-            "Others"
+        "AAO",
+        "AE",
+        "AO",
+        "Computer Operator",
+        "Dy. EE",
+        "EE",
+        "Foreman",
+        "Foreman Grade-I",
+        "Foreman Grade-II",
+        "JAO",
+        "JE",
+        "JLM",
+        "JLM Grade-II",
+        "Junior Assistant",
+        "LI",
+        "Senior Assistant",
+        "Senior LI",
+        "Shift Operator",
+        "Watchman",
+        "Others"
         ],
         "Select Designation"
     );
