@@ -1978,5 +1978,131 @@ document.addEventListener("DOMContentLoaded", function () {
         PaymentModuleV25.restrictDates();
     }
 
+
+    if (submitMembershipBtn) {
+
+    submitMembershipBtn.addEventListener("click", submitMembership);
+
+    }
+
     showPage("home");
 });
+
+
+
+
+/* ============================================
+   ARPEU Backend Configuration
+============================================ */
+
+const BACKEND_URL = "https://script.google.com/macros/s/AKfycbz1zye0KwFFPnKELex9ZYK7796oopR6iF_R2nyNsLdxrUJ7EZAlJONyYsDBzWwTZ1aK/exec";
+
+async function testBackendConnection() {
+
+    try {
+
+        const response = await fetch(BACKEND_URL);
+
+        const result = await response.json();
+
+        console.log(result);
+
+        if (result.success) {
+            alert("✅ Backend Connected Successfully");
+        } else {
+            alert("❌ Backend Connection Failed");
+        }
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert("❌ Unable to connect to Backend");
+
+    }
+
+}
+
+/* =========================================================
+   SUBMIT MEMBERSHIP
+========================================================= */
+
+async function submitMembership() {
+
+    const data = {
+
+        fullName: document.getElementById("employeeName").value.trim(),
+
+        mobile: document.getElementById("mobile").value.trim(),
+
+        company: document.getElementById("company").value,
+
+        stationCircle:
+            document.getElementById("station").value ||
+            document.getElementById("circle").value,
+
+        divisionRegion:
+            document.getElementById("division").value,
+
+        subDivision:
+            document.getElementById("subDivision").value,
+
+        admissionFee: 100,
+
+        annualSubscription: 360,
+
+        donation: 0,
+
+        paymentStatus: "Paid"
+
+    };
+
+    console.log("Sending Data :", data);
+
+    try {
+
+        const response = await fetch(BACKEND_URL, {
+
+            method: "POST",
+
+            headers: {
+                "Content-Type": "text/plain;charset=utf-8"
+            },
+
+            body: JSON.stringify({
+                action: "saveMember",
+                data: data
+            })
+
+        });
+
+        const raw = await response.text();
+
+        console.log("RAW RESPONSE:", raw);
+
+        const result = JSON.parse(raw);
+
+        console.log("PARSED RESPONSE:", result);
+
+        if (result.success) {
+
+            alert(
+                "✅ Member Saved Successfully\n\nMembership ID : " +
+                result.membershipId
+            );
+
+        } else {
+
+            alert(result.message);
+
+        }
+
+    } catch (error) {
+
+        console.error("FULL ERROR:", error);
+
+        alert("❌ " + error);
+
+    }
+
+}
