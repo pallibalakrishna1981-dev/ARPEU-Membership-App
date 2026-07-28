@@ -1,7 +1,7 @@
 /* =========================================================
    ARPEU DIGITAL MEMBERSHIP PORTAL
    FILE        : script.js
-   VERSION     : 1.0
+   VERSION     : 1.1 (Bug-Fix Pass)
    DEVELOPER   : P. Balakrishna
    DESCRIPTION : Core JavaScript Engine
 ========================================================= */
@@ -9,6 +9,44 @@
 "use strict";
 
 console.log("SCRIPT LOADED");
+
+
+
+/* =========================================================
+   FLATPICKR PRODUCTION HELPERS
+========================================================= */
+
+function ParseDate(str) {
+    const invalid = new Date(NaN);
+    if (!str || typeof str !== 'string' || str.trim() === "") return invalid;
+    const match = str.match(/^(\d{1,2})-(\d{1,2})-(\d{4})$/);
+    if (!match) return invalid;
+    const d = parseInt(match[1], 10), m = parseInt(match[2], 10), y = parseInt(match[3], 10);
+    if (m < 1 || m > 12 || d < 1 || d > 31 || y < 1900) return invalid;
+    const date = new Date(y, m - 1, d);
+    return (date.getMonth() === m - 1 && date.getDate() === d) ? date : invalid;
+}
+
+function showError(message) {
+    alert(message);
+}
+
+function PortalSync(selector, value, eventTypes = []) {
+    const el = (typeof selector === 'string') ? document.querySelector(selector) : selector;
+    if (!el) return;
+    if (!value) {
+        if (el._flatpickr) el._flatpickr.clear();
+        else el.value = "";
+    } else {
+        if (el._flatpickr) {
+            el._flatpickr.setDate(value, false);
+        } else {
+            el.value = value;
+        }
+    }
+    const events = Array.isArray(eventTypes) ? eventTypes : [eventTypes];
+    events.forEach(type => el.dispatchEvent(new Event(type, { bubbles: true })));
+}
 
 
 /* =========================================================
@@ -35,11 +73,6 @@ const photoPreview = document.getElementById("photoPreview");
 const mobile = document.getElementById("mobile");
 const aadhaar = document.getElementById("aadhaar");
 const age = document.getElementById("age");
-
-const paymentOptions = document.querySelectorAll('input[name="paymentOption"]');
-const upiPaymentSection = document.getElementById("upiPaymentSection");
-const alreadyPaidSection = document.getElementById("alreadyPaidSection");
-
 
 
 /* =========================================================
@@ -225,24 +258,37 @@ function initializeAgeCalculation(){
         return;
     }
     dob.max=new Date().toISOString().split("T")[0];
-    dob.addEventListener("change",function(){
-        if(this.value===""){
-            age.value="";
+    dob.addEventListener("change", function() {
+        if (this.value === "") {
+            age.value = "";
             return;
         }
-        const birthDate=new Date(this.value);
-        const today=new Date();
-        let years=today.getFullYear()-birthDate.getFullYear();
-        const monthDifference=today.getMonth()-birthDate.getMonth();
-        if(monthDifference<0||(monthDifference===0&&today.getDate()<birthDate.getDate())){
+        const birthDate = ParseDate(this.value);
+        const today = new Date();
+        
+        let years = today.getFullYear() - birthDate.getFullYear();
+        let months = today.getMonth() - birthDate.getMonth();
+        let days = today.getDate() - birthDate.getDate();
+
+        if (days < 0) {
+            months--;
+            const lastMonth = new Date(today.getFullYear(), today.getMonth(), 0);
+            days += lastMonth.getDate();
+        }
+        if (months < 0) {
             years--;
+            months += 12;
         }
-        if(years<15){
-            age.value="";
-            dob.value="";
-            showError("As per the Bharatiya Mazdoor Sangh (BMS) Bye-Laws and the Trade Unions Act, 1926, only persons who have completed 15 years of age are eligible for membership.");
-            dob.focus();
+
+        if (years < 15) {
+            age.value = "";
+            PortalSync(dob, "", "change");
+            showError("Minimum 15 years age required for membership.");
+            return;
         }
+
+        // ఇక్కడ Years, Months, Days ఫార్మాట్ లో చూపిస్తున్నాను
+        age.value = `${years}Y ${months}M ${days}D`;
     });
 }
 
@@ -256,13 +302,13 @@ function initializeJoiningDateValidation(){
         if(dob.value===""||joiningDate.value===""){
             return;
         }
-        const birthDate=new Date(dob.value);
-        const joinDate=new Date(joiningDate.value);
+        const birthDate=ParseDate(dob.value);
+        const joinDate=ParseDate(joiningDate.value);
         const eligibleDate=new Date(birthDate);
         eligibleDate.setFullYear(eligibleDate.getFullYear()+15);
         if(joinDate<eligibleDate){
             showError("As per the Bharatiya Mazdoor Sangh (BMS) Bye-Laws and the Trade Unions Act, 1926, only persons who have completed 15 years of age are eligible for membership.");
-            joiningDate.value="";
+            PortalSync(joiningDate, "", "change");
             joiningDate.focus();
         }
     });
@@ -271,6 +317,11 @@ function initializeJoiningDateValidation(){
 
 /* =========================================================
    AADHAAR FORMATTING
+   NOTE: This single handler owns the aadhaar field's "input"
+   event (digit-only enforcement + 4-digit grouping + 12 digit
+   cap). A second, separate validation handler used to be bound
+   to the same event and fought with this one over the field's
+   value on every keystroke - removed. See initializeValidations().
 ========================================================= */
 
 function initializeAadhaarFormatting(){
@@ -312,16 +363,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
     initializePhotoPreview();
 
-    initializeValidations();
+    // initializeValidations();
 
     initializeRenewalOtp();
 
     initializeAgeCalculation();
     initializeJoiningDateValidation();
     initializeAadhaarFormatting();
-    initializePhotoModule();
-
-    showPage("home");
+    initializePhotoPreview(); // ఇక్కడ పేరు సరిచేశాను
+    initializeDatePickers();
 
 });
 
@@ -396,11 +446,6 @@ function startOtpTimer() {
         }
     }, 1000);
 }
-
-/* =========================================================
-   DISTRICT DROPDOWN
-========================================================= */
-
 
 /* =========================================================
    DISTRICT DROPDOWN
@@ -650,11 +695,14 @@ function setMembershipMode(mode) {
 
     membershipMode = mode;
 
-    if (typeof PaymentModule !== "undefined") {
+    /* BUG-FIX: the payment engine object is named PaymentModuleV4,
+       not PaymentModule. The old reference to "PaymentModule" was
+       always undefined, so switching New Member <-> Renewal never
+       reset the payment module state. Fixed to call the real
+       object and its real reset method. */
+    if (typeof PaymentModuleV4 !== "undefined") {
 
-    PaymentModule.state.membershipMode = mode;
-
-    PaymentModule.updateMembershipFee();
+        PaymentModuleV4.reset();
 
     }
 
@@ -761,20 +809,6 @@ function initializePhotoPreview() {
 }
 
 
-
-/* =========================================================
-   EMPLOYMENT MASTER DATA
-   Version : 3.0.0
-   Status  : LOCKED
-========================================================= */
-
-/* ==========================================================
-   HELPER FUNCTIONS
-========================================================== */
-
-function clone(data) {
-    return JSON.parse(JSON.stringify(data));
-}
 
 /* ==========================================================
    APGENCO STAGE TEMPLATE
@@ -1238,6 +1272,26 @@ const employmentMaster = {
 
 };
 
+
+/* =========================================================
+   UI HELPERS
+========================================================= */
+
+function showElement(element) {
+    if (!element) return;
+    element.style.display = "";
+}
+
+function hideElement(element) {
+    if (!element) return;
+    element.style.display = "none";
+}
+
+function clearInput(element) {
+    if (!element) return;
+    element.value = "";
+}
+
 /* =========================================================
    EMPLOYMENT MODULE v4.0
 ========================================================= */
@@ -1655,1522 +1709,274 @@ function onSubDivisionChange() {
 }
 
 
-/*=========================================================
-    PAYMENT MODULE V3
-    PART - 1
-=========================================================*/
 
-/*=========================================================
-    MEMBERSHIP CONSTANTS
-=========================================================*/
+/* ==========================================================
+   ARPEU PAYMENT MODULE V25 - Final Robust Logic
+========================================================== */
 
-const ADMISSION_FEE = 100;
-const ANNUAL_SUBSCRIPTION = 360;
+/* ==========================================================
+   ARPEU PAYMENT MODULE V25 - Final Robust Logic
+========================================================== */
 
-const MEMBERSHIP_FEES = {
-    new: ADMISSION_FEE + ANNUAL_SUBSCRIPTION,
-    renewal: ANNUAL_SUBSCRIPTION
-};
-
-/*=========================================================
-    PAYMENT MODULE
-=========================================================*/
-
-const PaymentModule = {
-
-    /*=====================================================
-        DOM
-    =====================================================*/
-
-    elements: {},
-
-    /*=====================================================
-        STATE
-    =====================================================*/
-
-    state: {
-
-        membershipMode: "renewal",
-
-        paymentOption: "",
-
-        requiredFee: MEMBERSHIP_FEES.renewal,
-
-        alreadyPaid: 0,
-
-        currentPayment: 0,
-
-        balanceAmount: 0,
-
-        totalPaid: 0,
-
-        donation: 0
-
-    },
-
-    /*=====================================================
-        INITIALIZE
-    =====================================================*/
+const PaymentModuleV25 = {
+    currentTime24: { payNow: "", manual: "" },
 
     init() {
-
         this.cacheDOM();
-
+        this.restrictDates();
         this.bindEvents();
-
-        this.initializeDefaults();
-
     },
-
-    /*=====================================================
-        CACHE DOM
-    =====================================================*/
 
     cacheDOM() {
-
-        this.elements.paymentOptions =
-            document.querySelectorAll(
-                "input[name='paymentOption']"
-            );
-
-        this.elements.membershipFeeSection =
-            document.getElementById(
-                "membershipFeeSection"
-            );
-
-        this.elements.membershipFee =
-            document.getElementById(
-                "membershipFee"
-            );
-
-        this.elements.paymentInfoBox =
-            document.getElementById(
-                "paymentInfoBox"
-            );
-
-        this.elements.minimumFeeText =
-            document.getElementById(
-                "minimumFeeText"
-            );
-
-        this.elements.admissionFeeText =
-            document.getElementById(
-                "admissionFeeText"
-            );
-
-        this.elements.paymentValidationMessage =
-            document.getElementById(
-                "paymentValidationMessage"
-            );
-
-        this.elements.upiPaymentSection =
-            document.getElementById(
-                "upiPaymentSection"
-            );
-
-        this.elements.paymentCompleted =
-            document.getElementById(
-                "paymentCompleted"
-            );
-
-        this.elements.paymentCompletedSection =
-            document.getElementById(
-                "paymentCompletedSection"
-            );
-
-        this.elements.transactionId =
-            document.getElementById(
-                "transactionId"
-            );
-
-        this.elements.paymentDate =
-            document.getElementById(
-                "paymentDate"
-            );
-
-        this.elements.alreadyPaidSection =
-            document.getElementById(
-                "alreadyPaidSection"
-            );
-
-        this.elements.alreadyPaymentDate =
-            document.getElementById(
-                "alreadyPaymentDate"
-            );
-
-        this.elements.alreadyPaymentAmount =
-            document.getElementById(
-                "alreadyPaymentAmount"
-            );
-
-        this.elements.alreadyTransactionId =
-            document.getElementById(
-                "alreadyTransactionId"
-            );
-
-        this.elements.paymentReceipt =
-            document.getElementById(
-                "paymentReceipt"
-            );
-
-        this.elements.partialPaymentSummary =
-            document.getElementById(
-                "partialPaymentSummary"
-            );
-
-        this.elements.requiredAmountText =
-            document.getElementById(
-                "requiredAmountText"
-            );
-
-        this.elements.alreadyPaidAmountText =
-            document.getElementById(
-                "alreadyPaidAmountText"
-            );
-
-        this.elements.balanceAmountText =
-            document.getElementById(
-                "balanceAmountText"
-            );
-
-        this.elements.balanceWarningMessage =
-            document.getElementById(
-                "balanceWarningMessage"
-            );
-
-        this.elements.completePaymentButton =
-            document.getElementById(
-                "completePaymentButton"
-            );
-
-        this.elements.balancePaymentSection =
-            document.getElementById(
-                "balancePaymentSection"
-            );
-
-        this.elements.balancePaymentAmount =
-            document.getElementById(
-                "balancePaymentAmount"
-            );
-
-        this.elements.balanceTransactionId =
-            document.getElementById(
-                "balanceTransactionId"
-            );
-
-        this.elements.balancePaymentDate =
-            document.getElementById(
-                "balancePaymentDate"
-            );
-
-        this.elements.balancePaymentReceipt =
-            document.getElementById(
-                "balancePaymentReceipt"
-            );
-
-        this.elements.finalPaymentSummary =
-            document.getElementById(
-                "finalPaymentSummary"
-            );
-
-        this.elements.summaryRequiredFee =
-            document.getElementById(
-                "summaryRequiredFee"
-            );
-
-        this.elements.summaryAlreadyPaid =
-            document.getElementById(
-                "summaryAlreadyPaid"
-            );
-
-        this.elements.summaryAdditionalPayment =
-            document.getElementById(
-                "summaryAdditionalPayment"
-            );
-
-        this.elements.summaryFinalBalanceAmount =
-            document.getElementById(
-                "summaryFinalBalanceAmount"
-            );
-
-        this.elements.summaryTotalPaid =
-            document.getElementById(
-                "summaryTotalPaid"
-            );
-
-        this.elements.summaryMembershipFee =
-            document.getElementById(
-                "summaryMembershipFee"
-            );
-
-        this.elements.summaryDonation =
-            document.getElementById(
-                "summaryDonation"
-            );
-
+        this.dom = {
+            payNowOpt: document.getElementById("payNowOption"),
+            alreadyPaidOpt: document.getElementById("alreadyPaidOption"),
+            payNowSec: document.getElementById("payNowSection"),
+            alreadyPaidSec: document.getElementById("alreadyPaidSection"),
+            finalSec: document.getElementById("finalSubmitSection"),
+            
+            // Time Elements
+            pTimeDisp: document.getElementById("payNowTimeDisplay"),
+            pTimeNative: document.getElementById("payNowTimeNative"),
+            pFormat: document.getElementById("payNowTimeFormat"),
+            mTimeDisp: document.getElementById("manualTimeDisplay"),
+            mTimeNative: document.getElementById("manualTimeNative"),
+            mFormat: document.getElementById("manualTimeFormat"),
+            
+            payNowAmt: document.getElementById("payNowAmount"),
+            contBtn: document.getElementById("continueToPayBtn"),
+            doneBtn: document.getElementById("payNowCompletedBtn"),
+            manualAmt: document.getElementById("manualAmount"),
+            payBalBtn: document.getElementById("payBalanceBtn"),
+            manualFields: document.getElementById("manualFields"),
+            utrFields: document.querySelectorAll(".utr-field"),
+            allInputs: document.querySelectorAll(".final-val")
+        };
     },
 
-    /*=====================================================
-        BIND EVENTS
-    =====================================================*/
+    formatTime(time24, format) {
+        if (!time24) return "";
+        let [hours, mins] = time24.split(':');
+        hours = parseInt(hours);
+        if (format === "24") return `${hours.toString().padStart(2, '0')}:${mins}`;
+        let ampm = hours >= 12 ? 'PM' : 'AM';
+        hours = hours % 12 || 12;
+        return `${hours.toString().padStart(2, '0')}:${mins} ${ampm}`;
+    },
+
+    autoFillPayNowDT() {
+        const now = new Date();
+        const day = String(now.getDate()).padStart(2, '0');
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const year = now.getFullYear();
+        const dStr = `${day}-${month}-${year}`;
+        
+        const t24 = now.toTimeString().split(' ')[0].substring(0, 5);
+        this.currentTime24.payNow = t24;
+        
+        PortalSync(document.getElementById("payNowDate"), dStr, ["input", "change"]);
+        PortalSync(this.dom.pTimeNative, t24, "input");
+        this.dom.pTimeDisp.value = this.formatTime(t24, this.dom.pFormat.value);
+    },
+
+    restrictDates() {
+        const today = new Date();
+        const pDate = document.getElementById("payNowDate");
+        if (pDate) { PortalSync(pDate, today, ["input", "change"]); }
+    },
+
+    evaluateFinalSubmit() {
+        const method = this.dom.payNowOpt.checked ? "payNow" : "alreadyPaid";
+        let isValid = false;
+        if (method === "payNow") {
+            const time = this.dom.pTimeDisp.value;
+            const id = document.getElementById("payNowTransactionId").value.trim();
+            const file = document.getElementById("payNowReceipt").files.length > 0;
+            if (time && id && file && document.getElementById("payNowStep3").style.display === "block") isValid = true;
+        } else if (this.dom.alreadyPaidOpt.checked) {
+            const date = document.getElementById("manualDate").value;
+            const time = this.dom.mTimeDisp.value;
+            const id = document.getElementById("manualTransactionId").value.trim();
+            const file = document.getElementById("manualReceipt").files.length > 0;
+            if (this.dom.manualFields.style.display === "block" && date && time && id && file) isValid = true;
+        }
+        this.dom.finalSec.style.display = isValid ? "block" : "none";
+    },
 
     bindEvents() {
+        this.dom.payNowOpt.addEventListener("click", () => { this.dom.payNowSec.style.display = "block"; this.dom.alreadyPaidSec.style.display = "none"; this.evaluateFinalSubmit(); });
+        this.dom.alreadyPaidOpt.addEventListener("click", () => { this.dom.alreadyPaidSec.style.display = "block"; this.dom.payNowSec.style.display = "none"; this.evaluateFinalSubmit(); });
 
-        this.elements.paymentOptions.forEach(option => {
-
-            option.addEventListener("change", e => {
-
-                this.handlePaymentOption(
-                    e.target.value
-                );
-
-            });
-
+        // Time Picker Event Listeners
+        this.dom.pTimeNative.addEventListener("input", (e) => {
+            this.currentTime24.payNow = e.target.value;
+            this.dom.pTimeDisp.value = this.formatTime(e.target.value, this.dom.pFormat.value);
+            this.evaluateFinalSubmit();
         });
 
-        if (this.elements.membershipFee) {
-
-            this.elements.membershipFee.addEventListener(
-                "input",
-                () => this.validateMembershipFee()
-            );
-
-        }
-
-        if (this.elements.paymentCompleted) {
-
-            this.elements.paymentCompleted.addEventListener(
-                "change",
-                () => this.togglePaymentCompleted()
-            );
-
-        }
-
-    },
-
-    /*=====================================================
-        DEFAULTS
-    =====================================================*/
-
-    initializeDefaults() {
-
-        this.hide(
-            this.elements.membershipFeeSection
-        );
-
-        this.hide(
-            this.elements.upiPaymentSection
-        );
-
-        this.hide(
-            this.elements.paymentCompletedSection
-        );
-
-        this.hide(
-            this.elements.alreadyPaidSection
-        );
-
-        this.hide(
-            this.elements.partialPaymentSummary
-        );
-
-        this.hide(
-            this.elements.balanceWarningMessage
-        );
-
-        this.hide(
-            this.elements.completePaymentButton
-        );
-
-        this.hide(
-            this.elements.balancePaymentSection
-        );
-
-        this.hide(
-            this.elements.finalPaymentSummary
-        );
-
-        if (this.elements.paymentValidationMessage) {
-
-            this.elements.paymentValidationMessage.style.display = "none";
-
-        }
-
-        this.updateMembershipFee();
-
-    },
-
-    /*=====================================================
-        SHOW
-    =====================================================*/
-
-    show(element) {
-
-        if (!element) return;
-
-        element.style.display = "block";
-
-        element.classList.add("fade-in");
-
-    },
-
-    /*=====================================================
-        HIDE
-    =====================================================*/
-
-    hide(element) {
-
-        if (!element) return;
-
-        element.style.display = "none";
-
-        element.classList.remove("fade-in");
-
-    },
-
-    /*=====================================================
-        PART - 2 CONTINUES
-    =====================================================*/
-
-    /*=====================================================
-        HANDLE PAYMENT OPTION
-    =====================================================*/
-
-    handlePaymentOption(option) {
-
-        this.state.paymentOption = option;
-
-        this.hide(this.elements.membershipFeeSection);
-        this.hide(this.elements.upiPaymentSection);
-        this.hide(this.elements.paymentCompletedSection);
-        this.hide(this.elements.alreadyPaidSection);
-        this.hide(this.elements.partialPaymentSummary);
-        this.hide(this.elements.balanceWarningMessage);
-        this.hide(this.elements.completePaymentButton);
-        this.hide(this.elements.balancePaymentSection);
-        this.hide(this.elements.finalPaymentSummary);
-
-        if (option === "payNow") {
-
-            this.show(this.elements.membershipFeeSection);
-            this.show(this.elements.upiPaymentSection);
-
-            this.validateMembershipFee();
-
-        }
-
-        if (option === "alreadyPaid") {
-
-            this.show(this.elements.alreadyPaidSection);
-
-            this.calculateAlreadyPaid();
-
-        }
-
-    },
-
-    /*=====================================================
-        UPDATE MEMBERSHIP FEE
-=====================================================*/
-
-updateMembershipFee() {
-
-    if (this.state.membershipMode === "new") {
-
-        this.state.requiredFee = MEMBERSHIP_FEES.new;
-
-        this.elements.admissionFeeText.textContent =
-            this.formatAmount(ADMISSION_FEE);
-
-    }
-
-    else {
-
-        this.state.requiredFee = MEMBERSHIP_FEES.renewal;
-
-        this.elements.admissionFeeText.textContent =
-            this.formatAmount(0);
-
-    }
-
-    this.elements.minimumFeeText.textContent =
-        this.formatAmount(this.state.requiredFee);
-
-},
-
-    /*=====================================================
-        VALIDATE MEMBERSHIP FEE
-    =====================================================*/
-
-    validateMembershipFee() {
-
-        const amount =
-            Number(this.elements.membershipFee.value) || 0;
-
-        const msg =
-            this.elements.paymentValidationMessage;
-
-        msg.style.display = "block";
-
-        if (amount === 0) {
-
-            msg.className =
-                "payment-message payment-warning";
-
-            msg.innerHTML =
-                "Please enter Membership Fee.";
-
-            return false;
-
-        }
-
-        if (amount < this.state.requiredFee) {
-
-            msg.className =
-                "payment-message payment-error";
-
-            msg.innerHTML =
-                "Minimum payable amount is ₹" +
-                this.state.requiredFee;
-
-            return false;
-
-        }
-
-        msg.className =
-            "payment-message payment-success";
-
-        msg.innerHTML =
-            "Membership Fee is valid.";
-
-        return true;
-
-    },
-
-    /*=====================================================
-        PAYMENT COMPLETED
-    =====================================================*/
-
-    togglePaymentCompleted() {
-
-        if (this.elements.paymentCompleted.checked) {
-
-            this.show(
-                this.elements.paymentCompletedSection
-            );
-
-        }
-
-        else {
-
-            this.hide(
-                this.elements.paymentCompletedSection
-            );
-
-        }
-
-    },
-
-    /*=====================================================
-        CALCULATE ALREADY PAID
-    =====================================================*/
-
-    calculateAlreadyPaid() {
-
-        const paid =
-            Number(
-                this.elements.alreadyPaymentAmount.value
-            ) || 0;
-
-        this.state.alreadyPaid = paid;
-
-        this.state.balanceAmount =
-            this.state.requiredFee - paid;
-
-        if (this.state.balanceAmount < 0) {
-
-            this.state.balanceAmount = 0;
-
-        }
-
-        this.elements.requiredAmountText.textContent =
-            "₹" + this.state.requiredFee;
-
-        this.elements.alreadyPaidAmountText.textContent =
-            "₹" + paid;
-
-        this.elements.balanceAmountText.textContent =
-            "₹" + this.state.balanceAmount;
-
-        this.show(
-            this.elements.partialPaymentSummary
-        );
-
-        if (paid < this.state.requiredFee) {
-
-            this.show(
-                this.elements.balanceWarningMessage
-            );
-
-            this.show(
-                this.elements.completePaymentButton
-            );
-
-        }
-
-        else {
-
-            this.hide(
-                this.elements.balanceWarningMessage
-            );
-
-            this.hide(
-                this.elements.completePaymentButton
-            );
-
-            this.updateFinalSummary();
-
-        }
-
-    },
-
-    /*=====================================================
-        COMPLETE BALANCE PAYMENT
-    =====================================================*/
-
-    openBalancePayment() {
-
-        this.show(
-            this.elements.balancePaymentSection
-        );
-
-        this.elements.balancePaymentAmount.value =
-            this.state.balanceAmount;
-
-    },
-
-    /*=====================================================
-        VALIDATE BALANCE PAYMENT
-    =====================================================*/
-
-    validateBalancePayment() {
-
-        const amount =
-            Number(
-                this.elements.balancePaymentAmount.value
-            ) || 0;
-
-        if (amount < this.state.balanceAmount) {
-
-            alert(
-                "Please pay at least ₹" +
-                this.state.balanceAmount
-            );
-
-            return false;
-
-        }
-
-        return true;
-
-    },
-
-    /*=====================================================
-        CALCULATE FINAL PAYMENT
-    =====================================================*/
-
-    calculateFinalPayment() {
-
-        this.state.currentPayment =
-            Number(
-                this.elements.balancePaymentAmount.value
-            ) || 0;
-
-        this.state.totalPaid =
-            this.state.alreadyPaid +
-            this.state.currentPayment;
-
-        this.calculateDonation();
-
-        this.updateFinalSummary();
-
-    },
-
-    /*=====================================================
-        CALCULATE DONATION
-    =====================================================*/
-
-    calculateDonation() {
-
-        this.state.totalPaid =
-            this.state.alreadyPaid +
-            this.state.currentPayment;
-
-        this.state.membershipFeeUsed =
-            Math.min(
-                this.state.totalPaid,
-                this.state.requiredFee
-            );
-
-        this.state.donation =
-            Math.max(
-                0,
-                this.state.totalPaid -
-                this.state.requiredFee
-            );
-
-        this.state.balanceAmount =
-            Math.max(
-                0,
-                this.state.requiredFee -
-                this.state.totalPaid
-            );
-
-    },
-
-    /*=====================================================
-        UPDATE FINAL SUMMARY
-    =====================================================*/
-
-    updateFinalSummary() {
-
-        this.calculateDonation();
-
-        this.elements.summaryRequiredFee.textContent =
-            "₹" + this.state.requiredFee;
-
-        this.elements.summaryAlreadyPaid.textContent =
-            "₹" + this.state.alreadyPaid;
-
-        this.elements.summaryAdditionalPayment.textContent =
-            "₹" + this.state.currentPayment;
-
-        this.elements.summaryFinalBalanceAmount.textContent =
-            "₹" + this.state.balanceAmount;
-
-        this.elements.summaryTotalPaid.textContent =
-            "₹" + this.state.totalPaid;
-
-        this.elements.summaryMembershipFee.textContent =
-            "₹" + this.state.membershipFeeUsed;
-
-        if (this.state.donation > 0) {
-
-            this.elements.summaryDonation.parentElement.style.display =
-                "flex";
-
-            this.elements.summaryDonation.textContent =
-                "₹" + this.state.donation;
-
-        } else {
-
-            this.elements.summaryDonation.parentElement.style.display =
-                "none";
-
-            this.elements.summaryDonation.textContent =
-                "₹0";
-
-        }
-
-        this.show(
-            this.elements.finalPaymentSummary
-        );
-
-    },
-
-    /*=====================================================
-        PART - 4 CONTINUES
-    =====================================================*/
-
-        /*=====================================================
-        RESET FORM
-    =====================================================*/
-
-    reset() {
-
-        this.state.paymentOption = "";
-
-        this.state.requiredFee =
-            MEMBERSHIP_FEES.renewal;
-
-        this.state.alreadyPaid = 0;
-
-        this.state.currentPayment = 0;
-
-        this.state.balanceAmount = 0;
-
-        this.state.totalPaid = 0;
-
-        this.state.donation = 0;
-
-        this.elements.paymentOptions.forEach(option => {
-            option.checked = false;
+        this.dom.mTimeNative.addEventListener("input", (e) => {
+            this.currentTime24.manual = e.target.value;
+            this.dom.mTimeDisp.value = this.formatTime(e.target.value, this.dom.mFormat.value);
+            this.evaluateFinalSubmit();
         });
 
-        if (this.elements.membershipFee)
-            this.elements.membershipFee.value = "";
+        // Format Switchers
+        this.dom.pFormat.addEventListener("change", () => {
+            if (this.currentTime24.payNow) this.dom.pTimeDisp.value = this.formatTime(this.currentTime24.payNow, this.dom.pFormat.value);
+        });
 
-        if (this.elements.transactionId)
-            this.elements.transactionId.value = "";
+        this.dom.mFormat.addEventListener("change", () => {
+            if (this.currentTime24.manual) this.dom.mTimeDisp.value = this.formatTime(this.currentTime24.manual, this.dom.mFormat.value);
+        });
 
-        if (this.elements.paymentDate)
-            this.elements.paymentDate.value = "";
+        this.dom.doneBtn.addEventListener("click", () => { document.getElementById("payNowStep3").style.display = "block"; this.autoFillPayNowDT(); this.evaluateFinalSubmit(); });
+        this.dom.utrFields.forEach(el => { el.addEventListener("input", () => { el.value = el.value.replace(/[^a-zA-Z0-9]/g, ''); this.evaluateFinalSubmit(); }); });
 
-        if (this.elements.paymentCompleted)
-            this.elements.paymentCompleted.checked = false;
+        this.dom.payNowAmt.addEventListener("input", (e) => {
+            let val = parseInt(e.target.value) || 0;
+            this.updateUI(val, "payNow");
+            document.getElementById("payNowBreakdown").style.display = val > 0 ? "block" : "none";
+            this.dom.contBtn.style.display = (val >= 460) ? "flex" : "none";
+            this.evaluateFinalSubmit();
+        });
 
-        if (this.elements.alreadyPaymentDate)
-            this.elements.alreadyPaymentDate.value = "";
+        this.dom.contBtn.addEventListener("click", () => {
+            document.getElementById("payNowStep2").style.display = "block";
+            document.getElementById("dynamicQR").src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=andhrarastrapowerempunion@sbi%26pn=ARPEU%26am=${this.dom.payNowAmt.value}%26cu=INR`;
+        });
 
-        if (this.elements.alreadyPaymentAmount)
-            this.elements.alreadyPaymentAmount.value = "";
+        this.dom.manualAmt.addEventListener("input", (e) => {
+            let val = parseInt(e.target.value) || 0;
+            this.updateUI(val, "manual");
+            document.getElementById("manualBreakdown").style.display = val > 0 ? "block" : "none";
+            if (val >= 460) { this.dom.payBalBtn.style.display = "none"; this.dom.manualFields.style.display = "block"; } 
+            else if (val > 0) { this.dom.payBalBtn.style.display = "flex"; this.dom.manualFields.style.display = "none"; document.getElementById("balanceAmtDisp").innerText = "₹" + (460 - val); }
+            this.evaluateFinalSubmit();
+        });
 
-        if (this.elements.alreadyTransactionId)
-            this.elements.alreadyTransactionId.value = "";
+        this.dom.payBalBtn.addEventListener("click", () => {
+            let bal = 460 - (parseInt(this.dom.manualAmt.value) || 0);
+            document.getElementById("inlineQR").src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=andhrarastrapowerempunion@sbi%26pn=ARPEU%26am=${bal}%26cu=INR`;
+            document.getElementById("inlineBalanceBox").style.display = "block";
+        });
 
-        if (this.elements.balancePaymentAmount)
-            this.elements.balancePaymentAmount.value = "";
-
-        if (this.elements.balancePaymentDate)
-            this.elements.balancePaymentDate.value = "";
-
-        if (this.elements.balanceTransactionId)
-            this.elements.balanceTransactionId.value = "";
-
-        if (this.elements.paymentReceipt)
-            this.elements.paymentReceipt.value = "";
-
-        if (this.elements.balancePaymentReceipt)
-            this.elements.balancePaymentReceipt.value = "";
-
-        this.initializeDefaults();
-
+        document.getElementById("inlinePaidDoneBtn").addEventListener("click", () => { document.getElementById("inlineBalanceBox").style.display = "none"; this.dom.manualFields.style.display = "block"; this.evaluateFinalSubmit(); });
+        this.dom.allInputs.forEach(el => { el.addEventListener("change", () => this.evaluateFinalSubmit()); el.addEventListener("input", () => this.evaluateFinalSubmit()); });
     },
 
-/*=====================================================
-        FORMAT AMOUNT
-=====================================================*/
-
-formatAmount(amount) {
-
-    amount = Number(amount) || 0;
-
-    return new Intl.NumberFormat(
-        "en-IN",
-        {
-            style: "currency",
-            currency: "INR",
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 0
-        }
-    ).format(amount);
-
-},
-
-    /*=====================================================
-        GET NUMBER
-    =====================================================*/
-
-    getNumber(element) {
-
-        if (!element) return 0;
-
-        return Number(element.value) || 0;
-
-    },
-
-    /*=====================================================
-        SET TEXT
-    =====================================================*/
-
-    setText(element, value) {
-
-        if (!element) return;
-
-        element.textContent = value;
-
-    },
-
-    /*=====================================================
-        ENABLE
-    =====================================================*/
-
-    enable(element) {
-
-        if (!element) return;
-
-        element.disabled = false;
-
-    },
-
-    /*=====================================================
-        DISABLE
-    =====================================================*/
-
-    disable(element) {
-
-        if (!element) return;
-
-        element.disabled = true;
-
-    },
-
-    /*=====================================================
-        TOGGLE
-    =====================================================*/
-
-    toggle(element, status) {
-
-        if (!element) return;
-
-        element.style.display =
-            status ? "block" : "none";
-
-    },
-
-    /*=====================================================
-        PART - 5 CONTINUES
-    =====================================================*/
-
-        /*=====================================================
-        REGISTER EVENTS
-    =====================================================*/
-
-    registerDynamicEvents() {
-
-        if (this.elements.alreadyPaymentAmount) {
-
-            this.elements.alreadyPaymentAmount.addEventListener(
-                "input",
-                () => this.calculateAlreadyPaid()
-            );
-
-        }
-
-        if (this.elements.membershipFee) {
-
-            this.elements.membershipFee.addEventListener(
-                "input",
-                () => this.validateMembershipFee()
-            );
-
-        }
-
-        if (this.elements.balancePaymentAmount) {
-
-            this.elements.balancePaymentAmount.addEventListener(
-                "input",
-                () => this.calculateFinalPayment()
-            );
-
-        }
-
-        if (this.elements.completePaymentButton) {
-
-            this.elements.completePaymentButton.addEventListener(
-                "click",
-                () => this.openBalancePayment()
-            );
-
-        }
-
-    },
-
-    /*=====================================================
-        VALIDATE REQUIRED FIELDS
-    =====================================================*/
-
-    validateRequiredFields() {
-
-        if (this.state.paymentOption === "") {
-
-            alert("Please select Payment Option.");
-
-            return false;
-
-        }
-
-        if (this.state.paymentOption === "payNow") {
-
-            if (!this.validateMembershipFee()) {
-
-                return false;
-
-            }
-
-        }
-
-        if (this.state.paymentOption === "alreadyPaid") {
-
-            if (
-                !this.elements.alreadyPaymentAmount.value
-            ) {
-
-                alert("Enter Already Paid Amount.");
-
-                return false;
-
-            }
-
-        }
-
-        return true;
-
-    },
-
-    /*=====================================================
-        EXPORT PAYMENT DATA
-    =====================================================*/
-
-    getPaymentData() {
-
-        return {
-
-            membershipMode:
-                this.state.membershipMode,
-
-            paymentOption:
-                this.state.paymentOption,
-
-            requiredFee:
-                this.state.requiredFee,
-
-            alreadyPaid:
-                this.state.alreadyPaid,
-
-            currentPayment:
-                this.state.currentPayment,
-
-            totalPaid:
-                this.state.totalPaid,
-
-            membershipFeeUsed:
-                this.state.requiredFee,
-
-            donation:
-                this.state.donation,
-
-            balanceAmount:
-                Math.max(
-                    0,
-                    this.state.requiredFee -
-                    this.state.totalPaid
-                ),
-
-            transactionId:
-                this.elements.transactionId
-                    ? this.elements.transactionId.value
-                    : "",
-
-            paymentDate:
-                this.elements.paymentDate
-                    ? this.elements.paymentDate.value
-                    : "",
-
-            alreadyTransactionId:
-                this.elements.alreadyTransactionId
-                    ? this.elements.alreadyTransactionId.value
-                    : "",
-
-            alreadyPaymentDate:
-                this.elements.alreadyPaymentDate
-                    ? this.elements.alreadyPaymentDate.value
-                    : "",
-
-            balanceTransactionId:
-                this.elements.balanceTransactionId
-                    ? this.elements.balanceTransactionId.value
-                    : "",
-
-            balancePaymentDate:
-                this.elements.balancePaymentDate
-                    ? this.elements.balancePaymentDate.value
-                    : ""
-
-        };
-
-    },
-
-    /*=====================================================
-        PART - 6 CONTINUES
-    =====================================================*/
-
-        /*=====================================================
-        SAVE
-    =====================================================*/
-
-    save() {
-
-        if (!this.validateRequiredFields()) {
-
-            return false;
-
-        }
-
-        return this.getPaymentData();
-
+    updateUI(amt, prefix) {
+        const required = 460;
+        const total = document.getElementById(prefix + "Total");
+        if (total) total.innerText = "₹" + amt;
+        const balRow = document.getElementById(prefix + "BalRow");
+        const donRow = document.getElementById(prefix + "DonRow");
+        if (amt > 0 && amt < required) { if (balRow) balRow.style.display = "flex"; if (document.getElementById(prefix + "BalVal")) document.getElementById(prefix + "BalVal").innerText = "₹" + (required - amt); if (donRow) donRow.style.display = "none"; } 
+        else if (amt > required) { if (balRow) balRow.style.display = "none"; if (donRow) donRow.style.display = "flex"; if (document.getElementById(prefix + "DonVal")) document.getElementById(prefix + "DonVal").innerText = "₹" + (amt - required); } 
+        else { if (balRow) balRow.style.display = "none"; if (donRow) donRow.style.display = "none"; }
     }
-
 };
 
-/*=========================================================
-    INITIALIZE MODULE
-=========================================================*/
-
-document.addEventListener("DOMContentLoaded", () => {
-
-    PaymentModule.init();
-
-    PaymentModule.registerDynamicEvents();
-
-});
-
-/*=========================================================
-    GLOBAL FUNCTIONS
-=========================================================*/
-
-function updateMembershipMode(mode) {
-
-    PaymentModule.state.membershipMode = mode;
-
-    PaymentModule.updateMembershipFee();
-
-}
-
-function resetPaymentModule() {
-
-    PaymentModule.reset();
-
-}
-
-function getPaymentModuleData() {
-
-    return PaymentModule.getPaymentData();
-
-}
-
-function validatePaymentModule() {
-
-    return PaymentModule.validateRequiredFields();
-
-}
-
-function savePaymentModule() {
-
-    return PaymentModule.save();
-
-}
-
-function calculateAlreadyPaid() {
-
-    PaymentModule.calculateAlreadyPaid();
-
-}
-
-function calculateFinalPayment() {
-
-    PaymentModule.calculateFinalPayment();
-
-}
-
-function validateMembershipFee() {
-
-    return PaymentModule.validateMembershipFee();
-
-}
-
-function openBalancePayment() {
-
-    PaymentModule.openBalancePayment();
-
-}
-
-function togglePaymentCompleted() {
-
-    PaymentModule.togglePaymentCompleted();
-
-}
-
-/*=========================================================
-    END OF PAYMENT MODULE V3
-=========================================================*/
+document.addEventListener("DOMContentLoaded", () => PaymentModuleV25.init());
 
 
+function initializeDatePickers() {
+    const base = { disableMobile:true, allowInput:false, clickOpens:true, animate:true, position:"auto", static:false };
 
-
-    function showUpiSection() {
-        if (upiPaymentSection) {
-            upiPaymentSection.style.display = "block";
-        }
-        if (alreadyPaidSection) {
-            alreadyPaidSection.style.display = "none";
-        }
-    }
-    function showAlreadyPaidSection() {
-        if (upiPaymentSection) {
-            upiPaymentSection.style.display = "none";
-        }
-        if (alreadyPaidSection) {
-            alreadyPaidSection.style.display = "block";
-        }
-    }
-    /* =========================================================
-       INPUT VALIDATIONS
-    ========================================================= */
-    function initializeValidations() {
-        initializeMobileValidation();
-        initializeAadhaarValidation();
-    }
-    /* =========================================================
-       MOBILE VALIDATION
-    ========================================================= */
-    function initializeMobileValidation() {
-        if (!mobile) {
-            return;
-        }
-        mobile.addEventListener("input", function () {
-            this.value = this.value.replace(/\D/g, "");
-            if (this.value.length > 10) {
-                this.value = this.value.substring(0, 10);
-            }
+    // 1. Personal & Employment Dates
+  // Personal & Employment Dates (DOB మరియు ఇతర తేదీలు)
+    ["#dob", "#joiningDate"].forEach(id => {
+        const el = document.querySelector(id);
+        if (el) flatpickr(el, { 
+            ...base, 
+            dateFormat: "d-m-Y",
+            position: "above", // ఎప్పుడూ పైకే ఓపెన్ అవుతుంది
+            monthSelectorType: "dropdown", // నెలలు డ్రాప్‌డౌన్ లా వస్తాయి
+            // ఇయర్ సెలెక్షన్ రేంజ్ పెంచుతున్నాను
+            onReady: function(selectedDates, dateStr, instance) {
+                const yearInput = instance.calendarContainer.querySelector(".numInput.cur-year");
+                if (yearInput) {
+                    yearInput.removeAttribute("readonly");
+                }
+            },
+            onChange: () => el.dispatchEvent(new Event('change', {bubbles:true})) 
         });
-    }
-    /* =========================================================
-       AADHAAR VALIDATION
-    ========================================================= */
-    function initializeAadhaarValidation() {
-        if (!aadhaar) {
-            return;
-        }
-        aadhaar.addEventListener("input", function () {
-            this.value = this.value.replace(/\D/g, "");
-            if (this.value.length > 12) {
-                this.value = this.value.substring(0, 12);
-            }
-        });
-    }
-    /* =========================================================
-       COMMON UTILITIES
-    ========================================================= */
-    function showElement(element) {
-        if (element) {
-            element.style.display = "block";
-        }
-    }
-    function hideElement(element) {
-        if (element) {
-            element.style.display = "none";
-        }
-    }
-    function enableElement(element) {
-        if (element) {
-            element.disabled = false;
-        }
-    }
-    function disableElement(element) {
-        if (element) {
-            element.disabled = true;
-        }
-    }
-    function clearInput(element) {
-        if (element) {
-            element.value = "";
-        }
-    }
-    function getValue(element) {
-        if (!element) {
-            return "";
-        }
-        return element.value.trim();
-    }
-    function setValue(element, value) {
-        if (element) {
-            element.value = value;
-        }
-    }
-    /* =========================================================
-       MESSAGE HELPERS
-    ========================================================= */
-    function showSuccess(message) {
-        alert(message);
-    }
-    function showError(message) {
-        alert(message);
-    }
-    /* =========================================================
-       PART 2 END
-    ========================================================= */
-
-
-/* =========================================================
-   FORM VALIDATION
-========================================================= */
-
-function validateMembershipForm(){
-
-    const employeeName = document.getElementById("employeeName");
-    const gender = document.getElementById("gender");
-    const dob = document.getElementById("dob");
-
-    const village = document.getElementById("village");
-    const mandal = document.getElementById("mandal");
-    const district = document.getElementById("district");
-    const pincode = document.getElementById("pincode");
-    const postOffice = document.getElementById("postOffice");
-
-    const company = document.getElementById("company");
-    const employeeId = document.getElementById("employeeId");
-
-    const declaration = document.getElementById("declaration");
-
-    if(employeeName && getValue(employeeName) === ""){
-        showError("Please Enter Employee Name");
-        employeeName.focus();
-        return false;
-    }
-
-    if(gender && getValue(gender) === ""){
-        showError("Please Select Gender");
-        gender.focus();
-        return false;
-    }
-
-    if(age && Number(age.value) < 15){
-    showError("Membership is not allowed for members below 15 years of age.");
-    dob.focus();
-    return false;
-}
-
-    if(village && getValue(village) === ""){
-        showError("Please Enter Village / Town / City");
-        village.focus();
-        return false;
-    }
-
-    if(mandal && getValue(mandal) === ""){
-        showError("Please Enter Mandal");
-        mandal.focus();
-        return false;
-    }
-
-    if(district && getValue(district) === ""){
-        showError("Please Select District");
-        district.focus();
-        return false;
-    }
-
-    if(pincode && getValue(pincode) === ""){
-        showError("Please Enter PIN Code");
-        pincode.focus();
-        return false;
-    }
-
-    if(postOffice && getValue(postOffice) === ""){
-        showError("Please Enter Post Office");
-        postOffice.focus();
-        return false;
-    }
-
-    if(mobile && mobile.value.length !== 10){
-        showError("Please Enter Valid Mobile Number");
-        mobile.focus();
-        return false;
-    }
-
-    if(aadhaar && aadhaar.value.length !== 12){
-        showError("Please Enter Valid Aadhaar Number");
-        aadhaar.focus();
-        return false;
-    }
-
-    if(company && getValue(company) === ""){
-        showError("Please Select Company");
-        company.focus();
-        return false;
-    }
-
-    if(employeeId && getValue(employeeId) === ""){
-        showError("Please Enter Employee ID");
-        employeeId.focus();
-        return false;
-    }
-
-    if(declaration && !declaration.checked){
-        showError("Please Accept Declaration");
-        declaration.focus();
-        return false;
-    }
-
-    return true;
-
-}
-    /* =========================================================
-       MEMBER DATA
-    ========================================================= */
-    function collectMembershipData() {
-        return {
-            membershipMode: membershipMode,
-            fullName: getValue(document.getElementById("fullName")),
-            fatherName: getValue(document.getElementById("fatherName")),
-            gender: getValue(document.getElementById("gender")),
-            dob: getValue(document.getElementById("dob")),
-            mobile: getValue(document.getElementById("mobile")),
-            email: getValue(document.getElementById("email")),
-            aadhaar: getValue(document.getElementById("aadhaar")),
-            company: getValue(document.getElementById("company")),
-            circle: getValue(document.getElementById("circle")),
-            division: getValue(document.getElementById("division")),
-            subDivision: getValue(document.getElementById("subDivision")),
-            section: getValue(document.getElementById("section")),
-            employeeId: getValue(document.getElementById("employeeId")),
-            designation: getValue(document.getElementById("designation")),
-            joiningDate: getValue(document.getElementById("joiningDate")),
-            regionalUnit: getValue(document.getElementById("regionalUnit")),
-            membershipType: getValue(document.getElementById("membershipType")),
-            transactionId: getValue(document.getElementById("transactionId")),
-            createdDate: new Date().toISOString()
-        };
-    }
-
-/* =========================================================
-   FORM SUBMIT
-========================================================= */
-
-function initializeFormSubmit(){
-
-    if(!submitMembershipBtn){
-        return;
-    }
-
-    submitMembershipBtn.addEventListener("click",function(e){
-
-        e.preventDefault();
-
-        if(!validateMembershipForm()){
-            return;
-        }
-
-        if(!validatePaymentDetails()){
-            return;
-        }
-
-        const memberData=collectMembershipData();
-
-        console.log("Membership Data");
-        console.log(memberData);
-
-        // Future Integration
-        // saveToGoogleSheets(memberData);
-        // uploadPhoto();
-        // uploadReceipt();
-        // generateMembershipId();
-
-        showSuccess("Membership Details Collected Successfully.");
-
     });
 
-}
-
-document.addEventListener("DOMContentLoaded",function(){
-
-    initializeFormSubmit();
-
-});
-
-
-    /* =========================================================
-       RESET FORM
-    ========================================================= */
-    function resetMembershipForm() {
-        const formElements = document.querySelectorAll("input,select,textarea");
-        formElements.forEach(function (element) {
-            if (element.type === "checkbox" || element.type === "radio") {
-                element.checked = false;
-            } else if (element.type !== "button" && element.type !== "submit") {
-                element.value = "";
+   // 1. Pay Now Date (ఈరోజు మాత్రమే మరియు పైకే ఓపెన్ అవ్వాలి)
+    const payNowEl = document.querySelector("#payNowDate");
+    if (payNowEl) {
+        flatpickr(payNowEl, { 
+            ...base, 
+            dateFormat: "d-m-Y", 
+            minDate: "today", 
+            maxDate: "today", 
+            position: "above", 
+            onChange: () => {
+                payNowEl.dispatchEvent(new Event('input', {bubbles:true}));
+                payNowEl.dispatchEvent(new Event('change', {bubbles:true}));
             }
         });
-        if (photoPreview) {
-            photoPreview.removeAttribute("src");
-            photoPreview.style.display = "none";
+    }
+
+    // 2. Already Paid Date (గత తేదీలు మరియు ఈరోజు మాత్రమే)
+    const manualDateEl = document.querySelector("#manualDate");
+    if (manualDateEl) {
+        flatpickr(manualDateEl, { 
+            ...base, 
+            dateFormat: "d-m-Y", 
+            maxDate: "today", // రేపటి నుండి అన్నీ బ్లాక్ అవుతాయి
+            onChange: () => {
+                manualDateEl.dispatchEvent(new Event('input', {bubbles:true}));
+                manualDateEl.dispatchEvent(new Event('change', {bubbles:true}));
+            }
+        });
+    }
+
+    // 3. Payment Times
+    ["#payNowTimeNative", "#manualTimeNative"].forEach(id => {
+        const el = document.querySelector(id);
+        if (el) {
+            const fp = flatpickr(el, { 
+                ...base, 
+                enableTime: true, 
+                noCalendar: true, 
+                dateFormat: "H:i",
+                position: "above", // ఎప్పుడూ పైకే ఓపెన్ అవ్వడానికి
+                onChange: () => el.dispatchEvent(new Event('input', {bubbles:true})) 
+            });
+            
+            const formatSelector = id === "#payNowTimeNative" ? document.getElementById("payNowTimeFormat") : document.getElementById("manualTimeFormat");
+            if (formatSelector) {
+                formatSelector.addEventListener("change", () => {
+                    const is24 = formatSelector.value === "24";
+                    fp.set("time_24hr", is24);
+                });
+            }
         }
-        hideElement(upiPaymentSection);
-        hideElement(alreadyPaidSection);
-    }
-    /* =========================================================
-       GOOGLE SHEETS PLACEHOLDER
-    ========================================================= */
-    function saveToGoogleSheets(data) {
-        console.log("Google Sheets Integration Ready");
-        console.log(data);
-    }
-    /* =========================================================
-       STATISTICS PLACEHOLDER
-    ========================================================= */
-    function loadStatistics() {
-        console.log("Statistics Module Ready");
-    }
+    });
+}
 
-
-
-function initializePhotoModule(){
-const photoInput=document.getElementById("memberPhoto");
-const photoPreview=document.getElementById("photoPreview");
-const photoFileName=document.getElementById("photoFileName");
-const previewText=document.querySelector(".preview-text");
-const takePhotoBtn=document.getElementById("takePhotoBtn");
-if(!photoInput||!photoPreview||!photoFileName||!takePhotoBtn){
-return;
-}
-photoInput.addEventListener("change",function(){
-if(!this.files||this.files.length===0){
-resetPhotoModule();
-return;
-}
-const file=this.files[0];
-const allowedTypes=["image/jpeg","image/png","image/webp"];
-if(!allowedTypes.includes(file.type)){
-alert("Please select JPG, PNG or WEBP image only.");
-resetPhotoModule();
-return;
-}
-if(file.size>4*1024*1024){
-alert("Photo size should not exceed 4 MB.");
-resetPhotoModule();
-return;
-}
-photoFileName.value=file.name;
-const reader=new FileReader();
-reader.onload=function(e){
-photoPreview.src=e.target.result;
-photoPreview.style.display="block";
-if(previewText){
-previewText.style.display="none";
-}
-};
-reader.readAsDataURL(file);
-});
-
-takePhotoBtn.addEventListener("click",function(){
-const isMobile=/Android|iPhone|iPad|iPod|Opera Mini|IEMobile|Mobile/i.test(navigator.userAgent);
-if(!isMobile){
-alert("Take Photo works only on mobile devices. On desktop, please use Upload Photo to select an image.");
-return;
-}
-photoInput.setAttribute("capture","environment");
-photoInput.click();
-});
-
-function resetPhotoModule(){
-photoInput.value="";
-photoFileName.value="No file selected";
-photoPreview.removeAttribute("src");
-photoPreview.style.display="none";
-if(previewText){
-previewText.style.display="block";
-}
-}
-}
 /* =========================================================
-   END OF FILE
+   INITIALIZE APPLICATION
 ========================================================= */
+
+document.addEventListener("DOMContentLoaded", function () {
+    initializeNavigation();
+    initializeMembershipMode();
+    initializeEmploymentModule();
+    initializeDistrictDropdown();
+    initializePhotoPreview();
+    initializeRenewalOtp();
+    initializeAgeCalculation();
+    initializeJoiningDateValidation();
+    initializeAadhaarFormatting();
+    initializePhotoPreview();
+    initializeDatePickers();
+
+    if (typeof PaymentModuleV25 !== 'undefined') {
+        PaymentModuleV25.init();
+        PaymentModuleV25.restrictDates();
+    }
+
+    showPage("home");
+});

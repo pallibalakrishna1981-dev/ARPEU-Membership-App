@@ -13,6 +13,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
 <link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 </head>
 
@@ -350,47 +351,20 @@ Fast • Secure • Digital Membership System
 
         <!-- Date of Birth + Age -->
 
-        <div class="dob-age-row">
-
-             <!-- Date of Birth -->
-
-            <div class="form-group dob-field">
-
-         <label for="dob">
-            Date of Birth
-            <span class="required">*</span>
-         </label>
-
-         <input
-            type="date"
-            id="dob"
-            name="dob"
-            max="2026-12-31">
-
+        <div class="dob-age-grid">
+            <div class="form-group">
+                <label for="dob">Date of Birth <span class="required">*</span></label>
+                <div class="dt-box-wrap">
+                    <input type="text" id="dob" name="dob" class="dt-field-final" placeholder="Select Date" readonly>
+                    <i class="fas fa-calendar-alt dt-icon-right"></i>
+                </div>
             </div>
 
-            <!-- Age -->
-
-        <div class="form-group age-field">
-
-            <label for="age">
-                Age
-             </label>
-
-            <input
-            type="text"
-            id="age"
-            name="age"
-            placeholder="Age"
-            readonly>
-
-    </div>
-
-</div>
-
-    </div>
-
-</div>
+            <div class="form-group">
+                <label for="age">Calculated Age</label>
+                <input type="text" id="age" name="age" class="dt-field-final" style="background:#f9f9f9;" placeholder="0Y 0M 0D" readonly>
+            </div>
+        </div>
 
     <!-- =========================================================
      ADDRESS DETAILS CARD
@@ -917,13 +891,7 @@ Fast • Secure • Digital Membership System
         </div>
 
         <div class="photo-info">
-
-            JPG • PNG • WEBP
-
-            <br>
-
-            Max Size : 4 MB
-
+            JPG • PNG • WEBP &nbsp; | &nbsp; Max Size : 4 MB
         </div>
 
         <button
@@ -941,9 +909,7 @@ Fast • Secure • Digital Membership System
     <div class="photo-preview">
 
         <img
-            id="photoPreview"
-            src=""
-            alt="Photo Preview">
+            <img id="photoPreview" src="" alt="">
 
         <span class="preview-text">
 
@@ -957,688 +923,170 @@ Fast • Secure • Digital Membership System
 
 </div>
 
-<!-- =========================================================
-     HTML PART - 2 END
-========================================================= -->
-
-<!-- =========================================================
-     MEMBERSHIP PAGE CONTINUE
-     HTML PART - 3
-========================================================= -->
 
 
 
 <!-- =========================================================
-     PAYMENT DETAILS - V3
+   PAYMENT MODULE V25 - NATIVE OVERLAY PICKERS (FINAL FIX)
 ========================================================= -->
+<!-- =========================================================
+   PAYMENT MODULE V25 - NATIVE OVERLAY PICKERS (FINAL FIX)
+========================================================= -->
+<div id="paymentModuleCard" class="form-card">
+    <div class="card-header"><i class="fas fa-credit-card"></i> PAYMENT DETAILS</div>
 
-<div class="form-card">
-
-    <div class="card-header">
-
-        <span class="card-icon">💳</span>
-
-        <span class="card-title">
-            Payment Details
-        </span>
-
+    <!-- 1. Selection Options -->
+    <div class="payment-method-row">
+        <label class="compact-method-btn" for="payNowOption">
+            <input type="radio" name="paymentMethod" id="payNowOption" value="payNow">
+            <span>Pay Now (Online)</span>
+        </label>
+        <label class="compact-method-btn" for="alreadyPaidOption">
+            <input type="radio" name="paymentMethod" id="alreadyPaidOption" value="alreadyPaid">
+            <span>Already Paid</span>
+        </label>
     </div>
 
-    <div class="card-body">
-
-        <!-- =====================================================
-             PAYMENT OPTION
-        ====================================================== -->
-
+    <!-- SECTION 1: PAY NOW -->
+    <div id="payNowSection" style="display: none; margin-top: 15px;">
         <div class="form-group">
-
-            <label>
-
-                Payment Option
-                <span class="required">*</span>
-
-            </label>
-
-            <div class="radio-group">
-
-                <label class="radio-item">
-
-                    <input
-                        type="radio"
-                        name="paymentOption"
-                        value="payNow">
-
-                    Pay Now (UPI)
-
-                </label>
-
-                <label class="radio-item">
-
-                    <input
-                        type="radio"
-                        name="paymentOption"
-                        value="alreadyPaid">
-
-                    Already Paid
-
-                </label>
-
-            </div>
-
+            <label>Amount You are Paying <span class="required">*</span></label>
+            <input type="number" id="payNowAmount" placeholder="Min ₹460 or More">
         </div>
 
-        <!-- =====================================================
-             MEMBERSHIP FEE (PAY NOW ONLY)
-        ====================================================== -->
-
-        <div
-            id="membershipFeeSection"
-            style="display:none;">
-
-            <div class="form-group">
-
-                <label for="membershipFee">
-
-                    Membership Fee
-                    <span class="required">*</span>
-
-                </label>
-
-                <input
-                    type="number"
-                    id="membershipFee"
-                    name="membershipFee"
-                    min="0"
-                    placeholder="Enter Membership Fee">
-
+        <div id="payNowBreakdown" class="breakdown-box" style="display: none;">
+            <div class="summary-row"><span>Admission Fee:</span> <strong>₹100</strong></div>
+            <div class="summary-row"><span>Annual Subscription:</span> <strong>₹360</strong></div>
+            <div id="payNowDonRow" class="summary-row donation-text" style="display: none;"><span>Donation:</span> <strong id="payNowDonVal">₹0</strong></div>
+            <div class="total-row-display"><span>Total Entered:</span> <strong id="payNowTotal">₹0</strong></div>
+            <div class="center-content">
+                <button type="button" id="continueToPayBtn" class="submit-btn" style="width: auto; padding: 0 40px; display: none;">CONTINUE TO PAYMENT</button>
             </div>
-
-            <!-- Fee Information -->
-
-            <div
-                id="paymentInfoBox"
-                class="payment-info-box">
-
-                <div class="payment-info-row">
-
-                    <span>
-                        Admission Fee
-                    </span>
-
-                    <strong id="admissionFeeText">
-                        ₹100
-                    </strong>
-
-                </div>
-
-                <div class="payment-info-row">
-
-                    <span>
-                        Annual Subscription
-                    </span>
-
-                    <strong>
-                        ₹360
-                    </strong>
-
-                </div>
-
-                <div class="payment-info-row payment-total">
-
-                    <span>
-                        Minimum Payable
-                    </span>
-
-                    <strong id="minimumFeeText">
-                        ₹460
-                    </strong>
-
-                </div>
-
-            </div>
-
-            <!-- Validation -->
-
-            <div
-                id="paymentValidationMessage"
-                class="payment-message"
-                style="display:none;">
-
-            </div>
-
         </div>
 
-        <!-- =====================================================
-             PAY NOW SECTION
-        ====================================================== -->
-
-        <div
-            id="upiPaymentSection"
-            style="display:none;">
-
-            <div class="payment-box">
-
-                <h4>
-
-                    Scan QR Code
-
-                </h4>
-
-                <!--
-
-                <img
-                    id="upiQrImage"
-                    src="images/payment-qr.png"
-                    alt="UPI QR Code">
-
-                -->
-
-                <p>
-
-                    Scan the QR Code using any UPI App
-                    (Google Pay / PhonePe / Paytm / BHIM)
-
-                </p>
-
-                <p>
-
-                    UPI ID :
-
-                    <strong>
-
-                        arpeu@upi
-
-                    </strong>
-
-                </p>
-
-                <button
-                    type="button"
-                    class="pay-button">
-
-                    Pay Now
-
-                </button>
-
-            </div>
-
-            <div class="form-group">
-
-                <label class="checkbox-item">
-
-                    <input
-                        type="checkbox"
-                        id="paymentCompleted">
-
-                    I Have Completed Payment
-
-                </label>
-
-            </div>
-
-            <!-- Payment Completed -->
-
-            <div
-                id="paymentCompletedSection"
-                style="display:none;">
-
-                <div class="form-group">
-
-                    <label>
-
-                        Transaction ID
-                        <span class="required">*</span>
-
-                    </label>
-
-                    <input
-                        type="text"
-                        id="transactionId"
-                        placeholder="Enter Transaction ID">
-
+        <div id="payNowStep2" style="display: none; margin-top: 15px;">
+            <div class="upi-box-large">
+                <div class="qr-container">
+                    <img id="dynamicQR" src="" alt="Scan QR">
+                    <p style="font-size: 10px; font-weight: 700; margin-top: 5px;">SCAN QR</p>
                 </div>
-
-                <div class="form-group">
-
-                    <label>
-
-                        Payment Date
-                        <span class="required">*</span>
-
-                    </label>
-
-                    <input
-                        type="date"
-                        id="paymentDate">
-
+                <div class="apps-container">
+                    <p style="font-size: 11px; font-weight: 700; color: #333;">UPI ID: <span style="color:#0b4ea2; word-break: break-all;">andhrarastrapowerempunion@sbi</span></p>
+                    <div class="large-icon-grid">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/f/f2/Google_Pay_Logo.svg">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/7/71/PhonePe_Logo.png">
+                    </div>
                 </div>
-
             </div>
-
+            <button type="button" id="payNowCompletedBtn" class="completed-btn" style="margin-top: 15px;">I HAVE COMPLETED PAYMENT</button>
         </div>
 
-        <!-- =====================================================
-             ALREADY PAID SECTION
-             (Continued in Part-2)
-        ====================================================== -->
-
-         <!-- =====================================================
-             ALREADY PAID SECTION
-        ====================================================== -->
-
-        <div
-            id="alreadyPaidSection"
-            style="display:none;">
-
-            <div class="transaction-row">
-
-   <div class="transaction-row">
-
-    <div class="form-group transaction-date">
-
-        <label>
-            Transaction Date
-            <span class="required">*</span>
-        </label>
-
-        <input
-            type="date"
-            id="alreadyPaymentDate">
-
+        <div id="payNowStep3" style="display: none; margin-top: 20px;">
+            <div class="dt-container-final">
+                <div class="dt-header-labels">
+                    <label class="dt-label-main">Date & Time *</label>
+                    <select id="payNowTimeFormat" class="dt-format-box">
+                        <option value="12" selected>12 Hours Format</option>
+                        <option value="24">24 Hours Format</option>
+                    </select>
+                </div>
+                <div class="dt-input-grid">
+                    <div class="dt-box-wrap">
+                       <input type="text" id="payNowDate" class="dt-field-final final-val" placeholder="Select Date" readonly>
+                        <i class="fas fa-calendar-alt dt-icon-right"></i>
+                    </div>
+                    <div class="dt-box-wrap">
+                        <input type="text" id="payNowTimeDisplay" class="dt-field-final final-val" placeholder="Set Time" readonly>
+                        <input type="text" id="payNowTimeNative" class="native-picker-overlay" readonly>
+                        <i class="fas fa-clock dt-icon-right"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group" style="margin-top:15px;">
+                <label>Transaction ID / UTR No / Reference No <span class="required">*</span></label>
+                <input type="text" id="payNowTransactionId" placeholder="Alphanumeric Only" class="final-val utr-field">
+            </div>
+            <div class="form-group"><label>Upload Receipt <span class="required">*</span></label><input type="file" id="payNowReceipt" class="final-val"></div>
+        </div>
     </div>
 
-    <div class="form-group transaction-amount">
+    <!-- SECTION 2: ALREADY PAID -->
+    <div id="alreadyPaidSection" style="display: none; margin-top: 15px;">
+        <div class="form-group">
+            <label>Amount Already Paid <span class="required">*</span></label>
+            <input type="number" id="manualAmount" placeholder="Enter Amount" class="final-val">
+        </div>
 
-        <label>
-            Transaction Amount
-            <span class="required">*</span>
-        </label>
+        <div id="manualBreakdown" class="breakdown-box" style="display: none;">
+            <div class="summary-row"><span>Admission Fee:</span> <strong>₹100</strong></div>
+            <div class="summary-row"><span>Annual Subscription:</span> <strong>₹360</strong></div>
+            <div id="manualBalRow" class="summary-row" style="display: none; color: #cf1322;"><span>Balance Due:</span> <strong id="manualBalVal">₹0</strong></div>
+            <div id="manualDonRow" class="summary-row donation-text" style="display: none;"><span>Donation:</span> <strong id="manualDonVal">₹0</strong></div>
+            <div class="total-row-display"><span>Total Paid:</span> <strong id="manualTotal">₹0</strong></div>
+            <button type="button" id="payBalanceBtn" class="balance-trigger" style="margin-top: 15px; display: none;">PAY BALANCE NOW</button>
+        </div>
 
-        <input
-            type="number"
-            id="alreadyPaymentAmount"
-            min="0"
-            placeholder="Amount">
+        <div id="inlineBalanceBox" class="inline-pay-box" style="display: none;">
+            <p style="font-weight: 700; font-size: 13px; color:#cf1322; margin-bottom:12px;">Pay Balance: <span id="balanceAmtDisp">₹0</span></p>
+            <div class="upi-box-large">
+                <div class="qr-container"><img id="inlineQR" src="" style="width: 90px;"></div>
+                <div class="apps-container">
+                    <div class="large-icon-grid">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/f/f2/Google_Pay_Logo.svg" style="height:25px;">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/7/71/PhonePe_Logo.png" style="height:25px;">
+                    </div>
+                </div>
+            </div>
+            <button type="button" id="inlinePaidDoneBtn" class="completed-btn" style="margin-top: 15px;">I HAVE PAID BALANCE</button>
+        </div>
 
+        <div id="manualFields" style="display: none; margin-top: 15px;">
+            <div class="dt-container-final">
+                <div class="dt-header-labels">
+                    <label class="dt-label-main">Date & Time *</label>
+                    <select id="manualTimeFormat" class="dt-format-box">
+                        <option value="12" selected>12 Hours Format</option>
+                        <option value="24">24 Hours Format</option>
+                    </select>
+                </div>
+                <div class="dt-input-grid">
+                    <div class="dt-box-wrap">
+                        <input type="text" id="manualDate" class="dt-field-final final-val" placeholder="Select Date" readonly>
+                        <i class="fas fa-calendar-alt dt-icon-right"></i>
+                    </div>
+                    <div class="dt-box-wrap">
+                        <input type="text" id="manualTimeDisplay" class="dt-field-final final-val" placeholder="Set Time" readonly>
+                        <input type="text" id="manualTimeNative" class="native-picker-overlay" readonly>
+                        <i class="fas fa-clock dt-icon-right"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group" style="margin-top:15px;">
+                <label>Transaction ID / UTR No / Reference No <span class="required">*</span></label>
+                <input type="text" id="manualTransactionId" placeholder="Alphanumeric Only" class="final-val utr-field">
+            </div>
+            <div class="form-group"><label>Upload Receipt <span class="required">*</span></label><input type="file" id="manualReceipt" class="final-val"></div>
+        </div>
     </div>
 
-</div>
-</div>
-
-            <div class="form-group">
-
-                <label>
-
-                    Transaction ID
-                    <span class="required">*</span>
-
-                </label>
-
-                <input
-                    type="text"
-                    id="alreadyTransactionId"
-                    placeholder="Enter Transaction ID">
-
-            </div>
-
-            <div class="form-group">
-
-                <label>
-
-                    Upload Payment Receipt
-                    <span class="required">*</span>
-
-                </label>
-
-                <input
-                    type="file"
-                    id="paymentReceipt"
-                    accept="image/*,.pdf">
-
-            </div>
-
-            <!-- ===============================================
-                 PARTIAL PAYMENT SUMMARY
-            ================================================ -->
-
-            <div
-                id="partialPaymentSummary"
-                class="payment-summary-box"
-                style="display:none;">
-
-                <div class="payment-summary-row">
-
-                    <span>
-
-                        Required Amount
-
-                    </span>
-
-                    <strong id="requiredAmountText">
-
-                        ₹360
-
-                    </strong>
-
-                </div>
-
-            
-
-                <div class="payment-summary-row">
-
-                    <span>
-
-                        Already Paid
-
-                    </span>
-
-                    <strong id="alreadyPaidAmountText">
-
-                        ₹350
-
-                    </strong>
-
-                </div>
-
-                <div class="payment-summary-row payment-total">
-
-                    <span>
-
-                        Balance Amount
-
-                    </span>
-
-                    <strong id="balanceAmountText">
-
-                        ₹10
-
-                    </strong>
-
-                </div>
-
-            </div>
-
-            <!-- ===============================================
-                 BALANCE WARNING
-            ================================================ -->
-
-            <div
-                id="balanceWarningMessage"
-                class="payment-message payment-warning"
-                style="display:none;">
-
-                Please pay ₹10 or above to complete your
-                membership.
-
-                <br><br>
-
-                Any extra amount will be treated as a
-                donation.
-
-            </div>
-
-            <!-- ===============================================
-                 COMPLETE PAYMENT BUTTON
-            ================================================ -->
-
-            <button
-                type="button"
-                id="completePaymentButton"
-                class="pay-button"
-                style="display:none;">
-
-                Complete Payment
-
-            </button>
-
-        </div>
-
-        <!-- =====================================================
-             COMPLETE PAYMENT SECTION
-             (Continued in Part-3)
-        ====================================================== -->
-        
-        
-                <!-- =====================================================
-             COMPLETE PAYMENT SECTION
-        ====================================================== -->
-
-        <div
-            id="balancePaymentSection"
-            style="display:none;">
-
-            <div class="payment-box">
-
-                <h4>
-
-                    Complete Payment
-
-                </h4>
-
-                <p>
-
-                    Complete the remaining payment to activate your membership.
-
-                </p>
-
-            </div>
-
-            <div class="form-group">
-
-                <label>
-
-                    Payment Amount
-                    <span class="required">*</span>
-
-                </label>
-
-                <input
-                    type="number"
-                    id="balancePaymentAmount"
-                    min="0"
-                    placeholder="Enter Payment Amount">
-
-            </div>
-
-            <div class="form-group">
-
-                <label>
-
-                    Transaction ID
-                    <span class="required">*</span>
-
-                </label>
-
-                <input
-                    type="text"
-                    id="balanceTransactionId"
-                    placeholder="Enter Transaction ID">
-
-            </div>
-
-            <div class="form-group">
-
-                <label>
-
-                    Payment Date
-                    <span class="required">*</span>
-
-                </label>
-
-                <input
-                    type="date"
-                    id="balancePaymentDate">
-
-            </div>
-
-            <div class="form-group">
-
-                <label>
-
-                    Upload Payment Receipt
-                    <span class="required">*</span>
-
-                </label>
-
-                <input
-                    type="file"
-                    id="balancePaymentReceipt"
-                    accept="image/*,.pdf">
-
-            </div>
-
-        </div>
-
-        <!-- =====================================================
-             FINAL PAYMENT SUMMARY
-        ====================================================== -->
-
-        <div
-            id="finalPaymentSummary"
-            class="payment-summary-box"
-            style="display:none;">
-
-            <div class="payment-summary-row">
-
-                <span>
-
-                    Required Membership Fee
-
-                </span>
-
-                <strong id="summaryRequiredFee">
-
-                    ₹360
-
-                </strong>
-
-            </div>
-
-            <div class="payment-summary-row">
-
-                <span>
-
-                    Already Paid
-
-                </span>
-
-                <strong id="summaryAlreadyPaid">
-
-                    ₹0
-
-                </strong>
-
-            </div>
-
-            <div class="payment-summary-row">
-
-                <span>
-
-                    Current Payment
-
-                </span>
-
-                <strong id="summaryAdditionalPayment">
-
-                    ₹0
-
-                </strong>
-
-            </div>
-
-
-            <div class="payment-summary-row">
-
-                <span>
-
-                    Balance Amount
-
-                </span>
-
-                <strong id="summaryFinalBalanceAmount">
-
-                    ₹0
-
-                </strong>
-
-            </div>
-
-            <div class="payment-summary-row">
-
-                <span>
-
-                    Total Paid
-
-                </span>
-
-                <strong id="summaryTotalPaid">
-
-                    ₹360
-
-                </strong>
-
-            </div>
-
-            <div class="payment-summary-row payment-total">
-
-                <span>
-
-                    Membership Fee
-
-                </span>
-
-                <strong id="summaryMembershipFee">
-
-                    ₹360
-
-                </strong>
-
-            </div>
-
-            <div class="payment-summary-row payment-total">
-
-                <span>
-
-                    Donation
-
-                </span>
-
-                <strong id="summaryDonation">
-
-                    ₹0
-
-                </strong>
-
-            </div>
-
-        </div>
-
-    </div>
-
-</div>
-
-<!-- =========================================================
-     PAYMENT DETAILS END
-========================================================= -->
-
-
-
-
-
-    <!-- Submit Button -->
-
-    <div class="submit-section">
-
-        <button
-            type="submit"
-            id="submitMembershipBtn"
-            class="submit-btn">
-
-            SUBMIT MEMBERSHIP
-
+    <!-- GLOBAL FINAL SUBMIT -->
+    <div id="finalSubmitSection" style="display: none; margin-top: 30px;">
+        <button type="button" id="submitMembershipBtn" class="submit-btn" style="background: #0b4ea2; height: 50px;">
+            SUBMIT MEMBERSHIP APPLICATION
         </button>
-
     </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
 
 </section>
 <!-- =========================================================
@@ -1875,7 +1323,7 @@ Fast • Secure • Digital Membership System
 
     </div>
 
-    <!-- ===========================================
+<!-- ===========================================
      COMPANY WISE MEMBERSHIP
 =========================================== -->
 
@@ -2003,10 +1451,8 @@ Fast • Secure • Digital Membership System
 <p>Developed by P. Balakrishna | State Treasurer</p>
 </div>
 </footer>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script src="js/script.js"></script>
 </body>
 
 </html>
-
-
-
