@@ -1989,6 +1989,168 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 
+/* ==========================================================
+   CHECK MOBILE DUPLICATE
+========================================================== */
+
+async function checkMobileDuplicate(mobile) {
+    try {
+        const response = await fetch(BACKEND_URL, {
+            method: "POST",
+            body: JSON.stringify({
+                action: "checkDuplicate",
+                data: {
+                    field: "mobile",
+                    value: mobile
+                }
+            })
+        });
+
+        return await response.json();
+    } catch (error) {
+        console.error(error);
+
+        return {
+            success: false,
+            exists: false
+        };
+    }
+}
+
+
+/* ==========================================================
+   CHECK TRANSACTION ID DUPLICATE
+========================================================== */
+
+async function checkTransactionIdDuplicate(transactionId) {
+    try {
+        const response = await fetch(BACKEND_URL, {
+            method: "POST",
+            body: JSON.stringify({
+                action: "checkDuplicate",
+                data: {
+                    field: "transactionid",
+                    value: transactionId
+                }
+            })
+        });
+
+        return await response.json();
+
+    } catch (error) {
+
+        console.error(error);
+
+        return {
+            success: false,
+            exists: false
+        };
+    }
+}
+
+
+/* ==========================================================
+   CHECK AADHAAR DUPLICATE
+========================================================== */
+
+async function checkAadhaarDuplicate(aadhaar) {
+    try {
+        const response = await fetch(BACKEND_URL, {
+            method: "POST",
+            body: JSON.stringify({
+                action: "checkDuplicate",
+                data: {
+                    field: "aadhaar",
+                    value: aadhaar
+                }
+            })
+        });
+
+        return await response.json();
+    } catch (error) {
+        console.error(error);
+
+        return {
+            success: false,
+            exists: false
+        };
+    }
+}
+
+
+/* ==========================================================
+   CHECK EMPLOYEE ID DUPLICATE
+========================================================== */
+
+async function checkEmployeeIdDuplicate(employeeId) {
+    try {
+        const response = await fetch(BACKEND_URL, {
+            method: "POST",
+            body: JSON.stringify({
+                action: "checkDuplicate",
+                data: {
+                    field: "employeeid",
+                    value: employeeId
+                }
+            })
+        });
+
+        return await response.json();
+    } catch (error) {
+        console.error(error);
+
+        return {
+            success: false,
+            exists: false
+        };
+    }
+}
+
+const employeeIdInput = document.getElementById("employeeId");
+
+employeeIdInput.addEventListener("input", async function () {
+
+    const employeeId = this.value.trim();
+
+    if (employeeId.length === 0) {
+        return;
+    }
+
+    const result = await checkEmployeeIdDuplicate(employeeId);
+
+    console.log(result);
+
+});
+
+const mobileInput = document.getElementById("mobile");
+
+mobileInput.addEventListener("input", async function () {
+    const mobile = this.value.trim();
+
+    if (mobile.length !== 10) {
+        return;
+    }
+
+    const result = await checkMobileDuplicate(mobile);
+
+    console.log(result);
+});
+
+const aadhaarInput = document.getElementById("aadhaar");
+
+aadhaarInput.addEventListener("input", async function () {
+
+    const aadhaar = this.value.replace(/\s/g, "").trim();
+
+    if (aadhaar.length !== 12) {
+        return;
+    }
+
+    const result = await checkAadhaarDuplicate(aadhaar);
+
+    console.log(result);
+
+});
 
 
 /* ============================================
@@ -2023,17 +2185,158 @@ async function testBackendConnection() {
 
 }
 
+
+
 /* =========================================================
    SUBMIT MEMBERSHIP
 ========================================================= */
 
 async function submitMembership() {
 
+    /* ------------------------------
+   DECLARATION VALIDATION
+------------------------------ */
+
+
+    if (!document.getElementById("declarationCheck").checked) {
+
+    alert(
+        "Please accept the Declaration before submitting your Membership Application."
+    );
+
+    document.getElementById("declarationCheck").focus();
+
+    return;
+
+    }
+
+
+
+
+
+
+    /* ------------------------------
+       DUPLICATE VALIDATION
+    ------------------------------ */
+
+    const mobile = document.getElementById("mobile").value.trim();
+    const employeeId = document.getElementById("employeeId").value.trim();
+    const aadhaar = document.getElementById("aadhaar").value.replace(/\s/g, "").trim();
+
+    const transactionId =
+    document.getElementById("payNowOption").checked
+        ? document.getElementById("payNowTransactionId").value.trim()
+        : document.getElementById("manualTransactionId").value.trim();
+
+
+if (mobile === "") {
+
+    alert("Please Enter Mobile Number");
+
+    document.getElementById("mobile").focus();
+
+    return;
+
+}
+
+if (aadhaar === "") {
+
+    alert("Please Enter Aadhaar Number");
+
+    document.getElementById("aadhaar").focus();
+
+    return;
+
+}
+
+
+
+
+    // Mobile Duplicate Check
+     
+if (mobile !== "") {
+
+    const mobileDuplicate = await checkMobileDuplicate(mobile);
+
+    console.log("Mobile Result :", mobileDuplicate);
+
+    if (mobileDuplicate.exists) {
+
+        alert(
+    "Mobile Number Already Registered\n\n" +
+    "Mobile Number : " + mobile + "\n" +
+    "Membership ID : " + mobileDuplicate.member.membershipId + "\n" +
+    "Member Name : " + mobileDuplicate.member.fullName
+);
+
+        return;
+    }
+
+}
+
+    // Employee ID Duplicate Check
+    const employeeDuplicate = await checkEmployeeIdDuplicate(employeeId);
+    console.log("Employee Result :", employeeDuplicate);
+
+    if (employeeDuplicate.exists) {
+
+       alert(
+    "Employee ID Already Registered\n\n" +
+    "Employee ID : " + employeeId + "\n" +
+    "Membership ID : " + employeeDuplicate.member.membershipId + "\n" +
+    "Member Name : " + employeeDuplicate.member.fullName
+);
+
+        return;
+    }
+
+    // Aadhaar Duplicate Check
+    const aadhaarDuplicate = await checkAadhaarDuplicate(aadhaar);
+    console.log("Aadhaar Result :", aadhaarDuplicate);
+
+    if (aadhaarDuplicate.exists) {
+
+        alert(
+    "Aadhaar Number Already Registered\n\n" +
+    "Aadhaar Number : " + aadhaar + "\n" +
+    "Membership ID : " + aadhaarDuplicate.member.membershipId + "\n" +
+    "Member Name : " + aadhaarDuplicate.member.fullName
+);
+
+        return;
+    }
+
+
+
+    // Transaction ID Duplicate Check
+    console.log("Transaction ID Before Check:", transactionId);
+    const transactionDuplicate = await checkTransactionIdDuplicate(transactionId);
+    console.log("Transaction Result :", transactionDuplicate);
+
+    if (transactionDuplicate.exists) {
+
+   alert(
+    "Transaction ID Already Registered\n\n" +
+    "Transaction ID : " + transactionId + "\n" +
+    "Membership ID : " + transactionDuplicate.member.membershipId + "\n" +
+    "Member Name : " + transactionDuplicate.member.fullName
+);
+
+    return;
+}
+
+
+    /* ------------------------------
+       MEMBER DATA
+    ------------------------------ */
+
     const data = {
 
+        employeeId: employeeId,
         fullName: document.getElementById("employeeName").value.trim(),
-
-        mobile: document.getElementById("mobile").value.trim(),
+        mobile: mobile,
+        email: document.getElementById("email").value.trim(),
+        aadhaar: aadhaar,
 
         company: document.getElementById("company").value,
 
@@ -2048,11 +2351,11 @@ async function submitMembership() {
             document.getElementById("subDivision").value,
 
         admissionFee: 100,
-
         annualSubscription: 360,
-
         donation: 0,
 
+        paymentMode: "UPI",
+        transactionId: transactionId,
         paymentStatus: "Paid"
 
     };
@@ -2078,17 +2381,17 @@ async function submitMembership() {
 
         const raw = await response.text();
 
-        console.log("RAW RESPONSE:", raw);
+        console.log("RAW RESPONSE :", raw);
 
         const result = JSON.parse(raw);
 
-        console.log("PARSED RESPONSE:", result);
+        console.log("PARSED RESPONSE :", result);
 
         if (result.success) {
 
             alert(
-                "✅ Member Saved Successfully\n\nMembership ID : " +
-                result.membershipId
+                "✅ Member Saved Successfully\n\n" +
+                "Membership ID : " + result.membershipId
             );
 
         } else {
@@ -2099,7 +2402,7 @@ async function submitMembership() {
 
     } catch (error) {
 
-        console.error("FULL ERROR:", error);
+        console.error("FULL ERROR :", error);
 
         alert("❌ " + error);
 
