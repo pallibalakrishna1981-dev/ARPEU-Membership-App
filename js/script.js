@@ -2413,7 +2413,7 @@ if (aadhaar === "") {
 
 
 
-    // Mobile Duplicate Check
+// Mobile Duplicate Check
      
 if (mobile !== "") {
 
@@ -2435,7 +2435,8 @@ if (mobile !== "") {
 
     return;
 
-}
+
+    }
 
     // Employee ID Duplicate Check
     const employeeDuplicate = await checkEmployeeIdDuplicate(employeeId);
@@ -2455,7 +2456,7 @@ if (mobile !== "") {
 
     return;
 
-}
+    }
 
     // Aadhaar Duplicate Check
     const aadhaarDuplicate = await checkAadhaarDuplicate(aadhaar);
@@ -2475,8 +2476,8 @@ if (mobile !== "") {
 
     return;
 
+    }
 }
-
 
 
     // Transaction ID Duplicate Check
