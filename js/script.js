@@ -777,7 +777,89 @@ function initializePhotoPreview() {
 
         const file = this.files[0];
 
-        if (!file) {
+if (!file) {
+
+    photoPreview.removeAttribute("src");
+    photoPreview.style.display = "none";
+
+    if (previewText) {
+        previewText.style.display = "block";
+    }
+
+    return;
+}
+
+/* ==========================================
+   FILE TYPE VALIDATION
+========================================== */
+
+const allowedTypes = [
+    "image/jpeg",
+    "image/jpg",
+    "image/png",
+    "image/webp"
+];
+
+if (!allowedTypes.includes(file.type)) {
+
+    alert(
+        "Invalid file format.\n\n" +
+        "Only JPG, JPEG, PNG and WEBP files are allowed."
+    );
+
+    memberPhoto.value = "";
+
+    photoPreview.removeAttribute("src");
+    photoPreview.style.display = "none";
+
+    if (previewText) {
+        previewText.style.display = "block";
+    }
+
+    return;
+}
+
+/* ==========================================
+   FILE SIZE VALIDATION
+========================================== */
+
+const MAX_SIZE = 2 * 1024 * 1024;
+
+if (file.size > MAX_SIZE) {
+
+    alert(
+        "Photo size exceeds 2 MB.\n\n" +
+        "Please upload a photo smaller than 2 MB."
+    );
+
+    memberPhoto.value = "";
+
+    photoPreview.removeAttribute("src");
+    photoPreview.style.display = "none";
+
+    if (previewText) {
+        previewText.style.display = "block";
+    }
+
+    return;
+}
+
+ const reader = new FileReader();
+
+reader.onload = function (e) {
+
+    const img = new Image();
+
+    img.onload = function () {
+
+        if (img.width < 300 || img.height < 400) {
+
+            alert(
+                "Photo resolution is too low.\n\n" +
+                "Minimum required resolution is 300 × 400 pixels."
+            );
+
+            memberPhoto.value = "";
 
             photoPreview.removeAttribute("src");
             photoPreview.style.display = "none";
@@ -789,20 +871,20 @@ function initializePhotoPreview() {
             return;
         }
 
-        const reader = new FileReader();
+        photoPreview.src = e.target.result;
+        photoPreview.style.display = "block";
 
-        reader.onload = function (e) {
+        if (previewText) {
+            previewText.style.display = "none";
+        }
 
-            photoPreview.src = e.target.result;
-            photoPreview.style.display = "block";
+    };
 
-            if (previewText) {
-                previewText.style.display = "none";
-            }
+    img.src = e.target.result;
 
-        };
+};
 
-        reader.readAsDataURL(file);
+reader.readAsDataURL(file);
 
     });
 
@@ -1714,10 +1796,6 @@ function onSubDivisionChange() {
    ARPEU PAYMENT MODULE V25 - Final Robust Logic
 ========================================================== */
 
-/* ==========================================================
-   ARPEU PAYMENT MODULE V25 - Final Robust Logic
-========================================================== */
-
 const PaymentModuleV25 = {
     currentTime24: { payNow: "", manual: "" },
 
@@ -1956,6 +2034,62 @@ function initializeDatePickers() {
     });
 }
 
+
+
+/* =========================================================
+   PAYMENT RECEIPT VALIDATION
+========================================================= */
+
+function initializeReceiptValidation() {
+
+    const payNowReceipt = document.getElementById("payNowReceipt");
+
+    if (!payNowReceipt) return;
+
+    payNowReceipt.addEventListener("change", function () {
+
+        const file = this.files[0];
+
+        if (!file) return;
+
+        const allowedTypes = [
+            "image/jpeg",
+            "image/jpg",
+            "image/png",
+            "image/webp"
+        ];
+
+        if (!allowedTypes.includes(file.type)) {
+
+            alert(
+                "Invalid receipt format.\n\n" +
+                "Only JPG, JPEG, PNG and WEBP files are allowed."
+            );
+
+            this.value = "";
+
+            return;
+        }
+
+        const MAX_SIZE = 2 * 1024 * 1024;
+
+        if (file.size > MAX_SIZE) {
+
+            alert(
+                "Receipt size exceeds 2 MB.\n\n" +
+                "Please upload a receipt smaller than 2 MB."
+            );
+
+            this.value = "";
+
+            return;
+        }
+
+    });
+
+}
+
+
 /* =========================================================
    INITIALIZE APPLICATION
 ========================================================= */
@@ -1969,8 +2103,8 @@ document.addEventListener("DOMContentLoaded", function () {
     initializeRenewalOtp();
     initializeAgeCalculation();
     initializeJoiningDateValidation();
+    initializeReceiptValidation();
     initializeAadhaarFormatting();
-    initializePhotoPreview();
     initializeDatePickers();
 
     if (typeof PaymentModuleV25 !== 'undefined') {
@@ -2193,6 +2327,13 @@ async function testBackendConnection() {
 
 async function submitMembership() {
 
+
+    const submitBtn = document.getElementById("submitMembershipBtn");
+const originalButtonText = submitBtn.innerHTML;
+
+submitBtn.disabled = true;
+submitBtn.innerHTML = "Submitting...";
+
     /* ------------------------------
    DECLARATION VALIDATION
 ------------------------------ */
@@ -2205,13 +2346,30 @@ async function submitMembership() {
     );
 
     document.getElementById("declarationCheck").focus();
-
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = originalButtonText;
     return;
 
     }
 
+    /* ------------------------------
+   PHOTO VALIDATION
+------------------------------ */
 
+const memberPhotoFile = document.getElementById("memberPhoto");
 
+if (!memberPhotoFile.files || memberPhotoFile.files.length === 0) {
+
+    alert(
+        "Please upload or capture your passport-size photograph before submitting the Membership Application."
+    );
+
+    memberPhotoFile.focus();
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = originalButtonText;
+    return;
+
+}
 
 
 
@@ -2234,6 +2392,8 @@ if (mobile === "") {
     alert("Please Enter Mobile Number");
 
     document.getElementById("mobile").focus();
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = originalButtonText;
 
     return;
 
@@ -2244,11 +2404,12 @@ if (aadhaar === "") {
     alert("Please Enter Aadhaar Number");
 
     document.getElementById("aadhaar").focus();
-
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = originalButtonText;
+    
     return;
 
 }
-
 
 
 
@@ -2260,17 +2421,19 @@ if (mobile !== "") {
 
     console.log("Mobile Result :", mobileDuplicate);
 
-    if (mobileDuplicate.exists) {
+   if (mobileDuplicate.exists) {
 
-        alert(
-    "Mobile Number Already Registered\n\n" +
-    "Mobile Number : " + mobile + "\n" +
-    "Membership ID : " + mobileDuplicate.member.membershipId + "\n" +
-    "Member Name : " + mobileDuplicate.member.fullName
-);
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = originalButtonText;
 
-        return;
-    }
+    alert(
+        "Mobile Number Already Registered\n\n" +
+        "Mobile Number : " + mobile + "\n" +
+        "Membership ID : " + mobileDuplicate.member.membershipId + "\n" +
+        "Member Name : " + mobileDuplicate.member.fullName
+    );
+
+    return;
 
 }
 
@@ -2280,15 +2443,19 @@ if (mobile !== "") {
 
     if (employeeDuplicate.exists) {
 
-       alert(
-    "Employee ID Already Registered\n\n" +
-    "Employee ID : " + employeeId + "\n" +
-    "Membership ID : " + employeeDuplicate.member.membershipId + "\n" +
-    "Member Name : " + employeeDuplicate.member.fullName
-);
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = originalButtonText;
 
-        return;
-    }
+    alert(
+        "Employee ID Already Registered\n\n" +
+        "Employee ID : " + employeeId + "\n" +
+        "Membership ID : " + employeeDuplicate.member.membershipId + "\n" +
+        "Member Name : " + employeeDuplicate.member.fullName
+    );
+
+    return;
+
+}
 
     // Aadhaar Duplicate Check
     const aadhaarDuplicate = await checkAadhaarDuplicate(aadhaar);
@@ -2296,15 +2463,19 @@ if (mobile !== "") {
 
     if (aadhaarDuplicate.exists) {
 
-        alert(
-    "Aadhaar Number Already Registered\n\n" +
-    "Aadhaar Number : " + aadhaar + "\n" +
-    "Membership ID : " + aadhaarDuplicate.member.membershipId + "\n" +
-    "Member Name : " + aadhaarDuplicate.member.fullName
-);
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = originalButtonText;
 
-        return;
-    }
+    alert(
+        "Aadhaar Number Already Registered\n\n" +
+        "Aadhaar Number : " + aadhaar + "\n" +
+        "Membership ID : " + aadhaarDuplicate.member.membershipId + "\n" +
+        "Member Name : " + aadhaarDuplicate.member.fullName
+    );
+
+    return;
+
+}
 
 
 
@@ -2313,16 +2484,20 @@ if (mobile !== "") {
     const transactionDuplicate = await checkTransactionIdDuplicate(transactionId);
     console.log("Transaction Result :", transactionDuplicate);
 
-    if (transactionDuplicate.exists) {
+if (transactionDuplicate.exists) {
 
-   alert(
-    "Transaction ID Already Registered\n\n" +
-    "Transaction ID : " + transactionId + "\n" +
-    "Membership ID : " + transactionDuplicate.member.membershipId + "\n" +
-    "Member Name : " + transactionDuplicate.member.fullName
-);
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = originalButtonText;
+
+    alert(
+        "Transaction ID Already Registered\n\n" +
+        "Transaction ID : " + transactionId + "\n" +
+        "Membership ID : " + transactionDuplicate.member.membershipId + "\n" +
+        "Member Name : " + transactionDuplicate.member.fullName
+    );
 
     return;
+
 }
 
 
@@ -2356,11 +2531,80 @@ if (mobile !== "") {
 
         paymentMode: "UPI",
         transactionId: transactionId,
-        paymentStatus: "Paid"
+        paymentStatus: "Paid",
 
+        photoBase64: "",
+        photoType: "",
+
+        receiptBase64: "",
+        receiptType: ""
     };
 
+    /* ------------------------------
+   CONVERT PHOTO TO BASE64
+------------------------------ */
+
+const photoInput = document.getElementById("memberPhoto");
+
+if (photoInput.files.length > 0) {
+
+    const photoFile = photoInput.files[0];
+
+    data.photoType = photoFile.type;
+
+    data.photoBase64 = await new Promise((resolve, reject) => {
+
+        const reader = new FileReader();
+
+        reader.onload = function () {
+
+            resolve(reader.result.split(",")[1]);
+
+        };
+
+        reader.onerror = reject;
+
+        reader.readAsDataURL(photoFile);
+
+    });
+
+}
+
+/* ------------------------------
+   CONVERT RECEIPT TO BASE64
+------------------------------ */
+
+const receiptInput = document.getElementById("payNowReceipt");
+
+if (receiptInput.files.length > 0) {
+
+    const receiptFile = receiptInput.files[0];
+
+    data.receiptType = receiptFile.type;
+
+    data.receiptBase64 = await new Promise((resolve, reject) => {
+
+        const reader = new FileReader();
+
+        reader.onload = function () {
+            resolve(reader.result.split(",")[1]);
+        };
+
+        reader.onerror = reject;
+
+        reader.readAsDataURL(receiptFile);
+
+    });
+
+}
+
     console.log("Sending Data :", data);
+
+    console.log("Photo Type :", data.photoType);
+    console.log("Photo Base64 Length :", data.photoBase64.length);
+
+    console.log("Receipt Type :", data.receiptType);
+    console.log("Receipt Base64 Length :", data.receiptBase64.length);
 
     try {
 
@@ -2387,25 +2631,58 @@ if (mobile !== "") {
 
         console.log("PARSED RESPONSE :", result);
 
-        if (result.success) {
+    if (result.success) {
 
-            alert(
-                "✅ Member Saved Successfully\n\n" +
-                "Membership ID : " + result.membershipId
-            );
+    alert(
+        "✅ Member Saved Successfully\n\n" +
+        "Membership ID : " + result.membershipId
+    );
 
-        } else {
 
-            alert(result.message);
 
-        }
+
+
+    /* ----------------------------------
+       RESET FORM
+    ---------------------------------- */
+
+    // document.getElementById("membershipForm").reset();
+
+    if (photoPreview) {
+        photoPreview.removeAttribute("src");
+        photoPreview.style.display = "none";
+    }
+
+    const previewText = document.querySelector(".preview-text");
+
+    if (previewText) {
+        previewText.style.display = "block";
+    }
+
+    document.getElementById("finalSubmitSection").style.display = "none";
+
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = originalButtonText;
+
+} else {
+
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = originalButtonText;
+
+    alert(result.message);
+
+}
+
 
     } catch (error) {
 
-        console.error("FULL ERROR :", error);
+    console.error("FULL ERROR :", error);
 
-        alert("❌ " + error);
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = originalButtonText;
 
-    }
+    alert("❌ " + error);
+
+}
 
 }
