@@ -564,6 +564,36 @@ height:24px;
     cursor:pointer;
 }
 
+/* ==========================================================
+   FIELD VALIDATION STATUS
+========================================================== */
+
+.field-status{
+
+    margin-top:8px;
+    font-size:15px;
+    font-weight:600;
+    min-height:22px;
+
+}
+
+.field-status.success{
+
+    color:#16A34A;
+
+}
+
+.field-status.error{
+
+    color:#DC2626;
+
+}
+
+.field-status.checking{
+
+    color:#6B7280;
+
+}
 
 /*=========================================
 PHOTO UPLOAD SECTION - REFINED LAYOUT

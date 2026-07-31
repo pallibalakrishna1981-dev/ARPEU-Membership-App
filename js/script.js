@@ -348,34 +348,6 @@ function initializeAadhaarFormatting(){
 
 
 /* =========================================================
-   INITIALIZE APPLICATION
-========================================================= */
-
-document.addEventListener("DOMContentLoaded", function () {
-
-    initializeNavigation();
-
-    initializeMembershipMode();
-
-    initializeEmploymentModule();
-
-    initializeDistrictDropdown();
-
-    initializePhotoPreview();
-
-    // initializeValidations();
-
-    initializeRenewalOtp();
-
-    initializeAgeCalculation();
-    initializeJoiningDateValidation();
-    initializeAadhaarFormatting();
-    initializePhotoPreview(); // ఇక్కడ పేరు సరిచేశాను
-    initializeDatePickers();
-
-});
-
-/* =========================================================
    INITIALIZE RENEWAL OTP
 ========================================================= */
 function initializeRenewalOtp() {
@@ -570,6 +542,8 @@ function showPage(page) {
             if (navStatistics) {
                 navStatistics.classList.add("active");
             }
+
+            loadMembershipStatistics();
 
             break;
 
@@ -2100,6 +2074,7 @@ document.addEventListener("DOMContentLoaded", function () {
     initializeEmploymentModule();
     initializeDistrictDropdown();
     initializePhotoPreview();
+    initializeValidations();
     initializeRenewalOtp();
     initializeAgeCalculation();
     initializeJoiningDateValidation();
@@ -2183,6 +2158,7 @@ async function checkTransactionIdDuplicate(transactionId) {
 }
 
 
+
 /* ==========================================================
    CHECK AADHAAR DUPLICATE
 ========================================================== */
@@ -2209,6 +2185,176 @@ async function checkAadhaarDuplicate(aadhaar) {
             exists: false
         };
     }
+}
+
+
+/* ==========================================================
+   INITIALIZE VALIDATIONS
+========================================================== */
+
+let employeeIdTimer;
+let latestEmployeeId = "";
+
+function initializeValidations() {
+
+    const employeeIdInput = document.getElementById("employeeId");
+
+employeeIdInput.addEventListener("input", function () {
+
+    clearTimeout(employeeIdTimer);
+
+    const employeeId = this.value.trim();
+    const status = document.getElementById("employeeIdStatus");
+
+    if (employeeId === "") {
+
+        status.className = "field-status";
+        status.innerHTML = "";
+        return;
+
+    }
+
+    employeeIdTimer = setTimeout(async () => {
+
+        latestEmployeeId = employeeId;
+
+        status.className = "field-status checking";
+        status.innerHTML = "Checking...";
+
+        const result = await checkEmployeeIdDuplicate(employeeId);
+
+        if (employeeId !== latestEmployeeId) {
+            return;
+        }
+
+        if (result.success && result.exists) {
+
+            status.className = "field-status error";
+            status.innerHTML = "✖ Already Registered";
+
+        } else {
+
+            status.className = "field-status success";
+            status.innerHTML = "✔ Available";
+
+        }
+
+    }, 400);
+
+});
+
+const mobileInput = document.getElementById("mobile");
+
+mobileInput.addEventListener("input", async function () {
+    const mobile = this.value.trim();
+
+    if (mobile.length !== 10) {
+
+    status.innerHTML = "";
+
+    return;
+
+    }
+
+    const status = document.getElementById("mobileStatus");
+
+    status.className = "field-status checking";
+    status.innerHTML = "Checking...";
+
+    const result = await checkMobileDuplicate(mobile);
+
+    if (result.success && result.exists) {
+
+    status.className = "field-status error";
+    status.innerHTML = "✖ Already Registered";
+
+    } else {
+
+    status.className = "field-status success";
+    status.innerHTML = "✔ Available";
+
+    }
+});
+
+const aadhaarInput = document.getElementById("aadhaar");
+console.log(aadhaarInput);
+
+aadhaarInput.addEventListener("input", async function () {
+
+    const status = document.getElementById("aadhaarStatus");
+
+    const aadhaar = this.value.replace(/\s/g, "").trim();
+    console.log("Aadhaar :", aadhaar);
+    console.log("Length :", aadhaar.length);
+
+    if (aadhaar.length !== 12) {
+
+        status.className = "field-status";
+        status.innerHTML = "";
+
+        return;
+
+    }
+    
+    status.className = "field-status checking";
+    status.innerHTML = "Checking...";
+
+    const result = await checkAadhaarDuplicate(aadhaar);
+
+    if (result.success && result.exists) {
+
+        status.className = "field-status error";
+        status.innerHTML = "✖ Already Registered";
+
+    } else {
+
+        status.className = "field-status success";
+        status.innerHTML = "✔ Available";
+
+    }
+
+});
+
+
+const transactionIdInput = document.getElementById("payNowTransactionId");
+
+if (transactionIdInput) {
+
+    transactionIdInput.addEventListener("input", async function () {
+
+        const transactionId = this.value.trim();
+        const status = document.getElementById("transactionIdStatus");
+
+        if (transactionId === "") {
+
+            status.className = "field-status";
+            status.innerHTML = "";
+            return;
+
+        }
+
+        status.className = "field-status checking";
+        status.innerHTML = "Checking...";
+
+        const result = await checkTransactionIdDuplicate(transactionId);
+
+        if (result.success && result.exists) {
+
+            status.className = "field-status error";
+            status.innerHTML = "✖ Already Registered";
+
+        } else {
+
+            status.className = "field-status success";
+            status.innerHTML = "✔ Available";
+
+        }
+
+    });
+
+}
+
+
 }
 
 
@@ -2240,51 +2386,41 @@ async function checkEmployeeIdDuplicate(employeeId) {
     }
 }
 
-const employeeIdInput = document.getElementById("employeeId");
 
-employeeIdInput.addEventListener("input", async function () {
 
-    const employeeId = this.value.trim();
+/* ==========================================================
+   VALIDATE EMPLOYEE ID
+========================================================== */
 
-    if (employeeId.length === 0) {
+async function validateEmployeeId() {
+
+    const employeeId = document.getElementById("employeeId").value.trim();
+
+    const status = document.getElementById("employeeIdStatus");
+
+    if (employeeId === "") {
+
+        status.innerHTML = "";
+
         return;
+
     }
 
-    const result = await checkEmployeeIdDuplicate(employeeId);
+    status.innerHTML = "🔄 Checking...";
 
-    console.log(result);
+    const result = await checkDuplicate("employeeid", employeeId);
 
-});
+    if (result.success && result.exists) {
 
-const mobileInput = document.getElementById("mobile");
+        status.innerHTML = "❌ Employee ID Already Registered";
 
-mobileInput.addEventListener("input", async function () {
-    const mobile = this.value.trim();
+    } else {
 
-    if (mobile.length !== 10) {
-        return;
+        status.innerHTML = "✅ Available";
+
     }
 
-    const result = await checkMobileDuplicate(mobile);
-
-    console.log(result);
-});
-
-const aadhaarInput = document.getElementById("aadhaar");
-
-aadhaarInput.addEventListener("input", async function () {
-
-    const aadhaar = this.value.replace(/\s/g, "").trim();
-
-    if (aadhaar.length !== 12) {
-        return;
-    }
-
-    const result = await checkAadhaarDuplicate(aadhaar);
-
-    console.log(result);
-
-});
+}
 
 
 /* ============================================
@@ -2318,6 +2454,9 @@ async function testBackendConnection() {
     }
 
 }
+
+
+
 
 
 
@@ -2500,6 +2639,8 @@ if (transactionDuplicate.exists) {
     return;
 
 }
+
+
 
 
     /* ------------------------------
@@ -2687,3 +2828,48 @@ if (receiptInput.files.length > 0) {
 }
 
 }
+
+
+/* ==========================================================
+   LOAD MEMBERSHIP STATISTICS
+========================================================== */
+
+async function loadMembershipStatistics() {
+
+    try {
+
+        const response = await fetch(BACKEND_URL, {
+            method: "POST",
+            body: JSON.stringify({
+                action: "getMembershipStatistics"
+            })
+        });
+
+        const result = await response.json();
+
+        if (!result.success) {
+            console.error(result.message);
+            return;
+        }
+
+        const stats = result.statistics;
+
+        document.getElementById("totalMembers").textContent = stats.totalMembers;
+        document.getElementById("todayMembers").textContent = stats.todayMembers;
+        document.getElementById("monthMembers").textContent = stats.monthMembers;
+        document.getElementById("yearMembers").textContent = stats.yearMembers;
+
+        document.getElementById("apgencoCount").textContent = stats.companies.APGENCO;
+        document.getElementById("aptranscoCount").textContent = stats.companies.APTRANSCO;
+        document.getElementById("apspdclCount").textContent = stats.companies.APSPDCL;
+        document.getElementById("apcpdclCount").textContent = stats.companies.APCPDCL;
+        document.getElementById("apepdclCount").textContent = stats.companies.APEPDCL;
+
+    } catch (error) {
+
+        console.error("Statistics Error:", error);
+
+    }
+
+}
+
