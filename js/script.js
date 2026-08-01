@@ -8,6 +8,12 @@
 
 "use strict";
 
+/* =========================================================
+   DEVELOPMENT MODE
+========================================================= */
+
+const DEV_MODE = true;
+
 console.log("SCRIPT LOADED");
 
 
@@ -317,71 +323,60 @@ function initializeJoiningDateValidation(){
 
 /* =========================================================
    AADHAAR FORMATTING
-   NOTE: This single handler owns the aadhaar field's "input"
-   event (digit-only enforcement + 4-digit grouping + 12 digit
-   cap). A second, separate validation handler used to be bound
-   to the same event and fought with this one over the field's
-   value on every keystroke - removed. See initializeValidations().
 ========================================================= */
 
-function initializeAadhaarFormatting(){
-    const aadhaar=document.getElementById("aadhaar");
-    if(!aadhaar){
+function initializeAadhaarFormatting() {
+
+    const aadhaar = document.getElementById("aadhaar");
+
+    if (!aadhaar) {
+
         return;
+
     }
-    aadhaar.addEventListener("input",function(){
-        let digits=this.value.replace(/\D/g,"");
-        if(digits.length>12){
-            digits=digits.substring(0,12);
+
+    aadhaar.setAttribute("maxlength", "14");
+
+    aadhaar.addEventListener("input", function () {
+
+        let digits = this.value.replace(/\D/g, "");
+
+        if (digits.length > 12) {
+
+            digits = digits.substring(0, 12);
+
         }
-        let formatted="";
-        for(let i=0;i<digits.length;i++){
-            if(i>0&&i%4===0){
-                formatted+=" ";
+
+        let formatted = "";
+
+        for (let i = 0; i < digits.length; i++) {
+
+            if (i > 0 && i % 4 === 0) {
+
+                formatted += " ";
+
             }
-            formatted+=digits[i];
+
+            formatted += digits[i];
+
         }
-        this.value=formatted;
+
+        this.value = formatted;
+
     });
-}
 
+    aadhaar.addEventListener("keypress", function (e) {
 
+        const digits = this.value.replace(/\D/g, "");
 
-/* =========================================================
-   INITIALIZE RENEWAL OTP
-========================================================= */
-function initializeRenewalOtp() {
-    if (!sendOtpBtn) {
-        return;
-    }
-    sendOtpBtn.addEventListener("click", sendOtp);
-    if (resendOtpBtn) {
-        resendOtpBtn.addEventListener("click", sendOtp);
-    }
-}
-/* =========================================================
-   SEND OTP
-========================================================= */
-function sendOtp() {
-    const searchValue = getValue(renewalSearch);
-    if (searchValue === "") {
-        showError("Please Enter Member ID or Mobile Number");
-        renewalSearch.focus();
-        return;
-    }
-    disableElement(renewalSearch);
-    disableElement(sendOtpBtn);
-    clearInput(renewalOtp);
-    showElement(otpCard);
-    showElement(otpStatus);
-    showElement(otpTimer);
-    hideElement(resendOtpBtn);
-    otpStatus.textContent = "OTP Sent Successfully.";
-    otpStatus.style.color = "green";
-    enableElement(renewalOtp);
-    enableElement(verifyOtpBtn);
-    renewalOtp.focus();
-    startOtpTimer();
+        if (digits.length >= 12 && /\d/.test(e.key)) {
+
+            e.preventDefault();
+
+        }
+
+    });
+
 }
 
 
@@ -674,11 +669,9 @@ function setMembershipMode(mode) {
        always undefined, so switching New Member <-> Renewal never
        reset the payment module state. Fixed to call the real
        object and its real reset method. */
-    if (typeof PaymentModuleV4 !== "undefined") {
-
-        PaymentModuleV4.reset();
-
-    }
+   if(!DEV_MODE){
+    PaymentModuleV4.reset();
+}
 
     if (!membershipTitle || !submitMembershipBtn) {
         return;
@@ -1928,7 +1921,6 @@ const PaymentModuleV25 = {
     }
 };
 
-document.addEventListener("DOMContentLoaded", () => PaymentModuleV25.init());
 
 
 function initializeDatePickers() {
@@ -2069,34 +2061,52 @@ function initializeReceiptValidation() {
 ========================================================= */
 
 document.addEventListener("DOMContentLoaded", function () {
+
     initializeNavigation();
+
     initializeMembershipMode();
+
     initializeEmploymentModule();
+
     initializeDistrictDropdown();
+
     initializePhotoPreview();
+
     initializeValidations();
-    initializeRenewalOtp();
-    initializeAgeCalculation();
-    initializeJoiningDateValidation();
-    initializeReceiptValidation();
+
     initializeAadhaarFormatting();
+
+    initializeAgeCalculation();
+
+    initializeJoiningDateValidation();
+
+    initializeReceiptValidation();
+
     initializeDatePickers();
 
-    if (typeof PaymentModuleV25 !== 'undefined') {
-        PaymentModuleV25.init();
-        PaymentModuleV25.restrictDates();
+    if (typeof initializeRenewalOtp === "function") {
+
+        initializeRenewalOtp();
+
     }
 
+    if (typeof PaymentModuleV25 !== "undefined") {
+
+        PaymentModuleV25.init();
+
+        PaymentModuleV25.restrictDates();
+
+    }
 
     if (submitMembershipBtn) {
 
-    submitMembershipBtn.addEventListener("click", submitMembership);
+        submitMembershipBtn.addEventListener("click", submitMembership);
 
     }
 
     showPage("home");
-});
 
+});
 
 /* ==========================================================
    CHECK MOBILE DUPLICATE
@@ -2192,171 +2202,233 @@ async function checkAadhaarDuplicate(aadhaar) {
    INITIALIZE VALIDATIONS
 ========================================================== */
 
-let employeeIdTimer;
+let employeeIdTimer = null;
 let latestEmployeeId = "";
+
+let aadhaarTimer = null;
+let latestAadhaar = "";
+
+let transactionCheckTimer = null;
+let latestTransactionId = "";
 
 function initializeValidations() {
 
+    /* ------------------------------
+       EMPLOYEE ID
+    ------------------------------ */
+
     const employeeIdInput = document.getElementById("employeeId");
 
-employeeIdInput.addEventListener("input", function () {
+    if (employeeIdInput) {
 
-    clearTimeout(employeeIdTimer);
+        employeeIdInput.addEventListener("input", function () {
 
-    const employeeId = this.value.trim();
-    const status = document.getElementById("employeeIdStatus");
+            clearTimeout(employeeIdTimer);
 
-    if (employeeId === "") {
+            const employeeId = this.value.trim();
+            latestEmployeeId = employeeId;
 
-        status.className = "field-status";
-        status.innerHTML = "";
-        return;
+            const status = document.getElementById("employeeIdStatus");
 
-    }
+            if (employeeId === "") {
 
-    employeeIdTimer = setTimeout(async () => {
+                status.className = "field-status";
+                status.innerHTML = "";
 
-        latestEmployeeId = employeeId;
+                return;
 
-        status.className = "field-status checking";
-        status.innerHTML = "Checking...";
+            }
 
-        const result = await checkEmployeeIdDuplicate(employeeId);
+            status.className = "field-status checking";
+            status.innerHTML = "Checking...";
 
-        if (employeeId !== latestEmployeeId) {
-            return;
-        }
+            employeeIdTimer = setTimeout(async () => {
 
-        if (result.success && result.exists) {
+                const result = await checkEmployeeIdDuplicate(employeeId);
 
-            status.className = "field-status error";
-            status.innerHTML = "✖ Already Registered";
+                if (employeeId !== latestEmployeeId) {
 
-        } else {
+                    return;
 
-            status.className = "field-status success";
-            status.innerHTML = "✔ Available";
+                }
 
-        }
+                if (result.success && result.exists) {
 
-    }, 400);
+                    status.className = "field-status error";
+                    status.innerHTML = "✖ Already Registered";
 
-});
+                } else {
 
-const mobileInput = document.getElementById("mobile");
+                    status.className = "field-status success";
+                    status.innerHTML = "✔ Available";
 
-mobileInput.addEventListener("input", async function () {
-    const mobile = this.value.trim();
+                }
 
-    if (mobile.length !== 10) {
+            }, 400);
 
-    status.innerHTML = "";
-
-    return;
+        });
 
     }
 
-    const status = document.getElementById("mobileStatus");
+    /* ------------------------------
+       MOBILE
+    ------------------------------ */
 
-    status.className = "field-status checking";
-    status.innerHTML = "Checking...";
+    const mobileInput = document.getElementById("mobile");
 
-    const result = await checkMobileDuplicate(mobile);
+    if (mobileInput) {
 
-    if (result.success && result.exists) {
+        mobileInput.addEventListener("input", async function () {
 
-    status.className = "field-status error";
-    status.innerHTML = "✖ Already Registered";
+            const status = document.getElementById("mobileStatus");
 
-    } else {
+            const mobile = this.value.trim();
 
-    status.className = "field-status success";
-    status.innerHTML = "✔ Available";
+            if (mobile.length !== 10) {
 
-    }
-});
+                status.className = "field-status";
+                status.innerHTML = "";
 
-const aadhaarInput = document.getElementById("aadhaar");
-console.log(aadhaarInput);
+                return;
 
-aadhaarInput.addEventListener("input", async function () {
+            }
 
-    const status = document.getElementById("aadhaarStatus");
+            status.className = "field-status checking";
+            status.innerHTML = "Checking...";
 
-    const aadhaar = this.value.replace(/\s/g, "").trim();
-    console.log("Aadhaar :", aadhaar);
-    console.log("Length :", aadhaar.length);
+            const result = await checkMobileDuplicate(mobile);
 
-    if (aadhaar.length !== 12) {
+            if (result.success && result.exists) {
 
-        status.className = "field-status";
-        status.innerHTML = "";
+                status.className = "field-status error";
+                status.innerHTML = "✖ Already Registered";
 
-        return;
+            } else {
 
-    }
-    
-    status.className = "field-status checking";
-    status.innerHTML = "Checking...";
+                status.className = "field-status success";
+                status.innerHTML = "✔ Available";
 
-    const result = await checkAadhaarDuplicate(aadhaar);
+            }
 
-    if (result.success && result.exists) {
-
-        status.className = "field-status error";
-        status.innerHTML = "✖ Already Registered";
-
-    } else {
-
-        status.className = "field-status success";
-        status.innerHTML = "✔ Available";
+        });
 
     }
 
-});
+    /* ------------------------------
+       AADHAAR
+    ------------------------------ */
 
+    const aadhaarInput = document.getElementById("aadhaar");
 
-const transactionIdInput = document.getElementById("payNowTransactionId");
+    if (aadhaarInput) {
 
-if (transactionIdInput) {
+        aadhaarInput.addEventListener("input", function () {
 
-    transactionIdInput.addEventListener("input", async function () {
+            clearTimeout(aadhaarTimer);
 
-        const transactionId = this.value.trim();
-        const status = document.getElementById("transactionIdStatus");
+            const aadhaar = this.value.replace(/\s/g, "").trim();
+            latestAadhaar = aadhaar;
 
-        if (transactionId === "") {
+            const status = document.getElementById("aadhaarStatus");
 
-            status.className = "field-status";
-            status.innerHTML = "";
-            return;
+            if (aadhaar.length !== 12) {
 
-        }
+                status.className = "field-status";
+                status.innerHTML = "";
 
-        status.className = "field-status checking";
-        status.innerHTML = "Checking...";
+                return;
 
-        const result = await checkTransactionIdDuplicate(transactionId);
+            }
 
-        if (result.success && result.exists) {
+            status.className = "field-status checking";
+            status.innerHTML = "Checking...";
 
-            status.className = "field-status error";
-            status.innerHTML = "✖ Already Registered";
+            aadhaarTimer = setTimeout(async () => {
 
-        } else {
+                const result = await checkAadhaarDuplicate(aadhaar);
 
-            status.className = "field-status success";
-            status.innerHTML = "✔ Available";
+                if (aadhaar !== latestAadhaar) {
 
-        }
+                    return;
 
-    });
+                }
+
+                if (result.success && result.exists) {
+
+                    status.className = "field-status error";
+                    status.innerHTML = "✖ Already Registered";
+
+                } else {
+
+                    status.className = "field-status success";
+                    status.innerHTML = "✔ Available";
+
+                }
+
+            }, 500);
+
+        });
+
+    }
+
+    /* ------------------------------
+       TRANSACTION ID
+    ------------------------------ */
+
+    const transactionIdInput = document.getElementById("payNowTransactionId");
+
+    if (transactionIdInput) {
+
+        transactionIdInput.addEventListener("input", function () {
+
+            clearTimeout(transactionCheckTimer);
+
+            const transactionId = this.value.trim();
+            latestTransactionId = transactionId;
+
+            const status = document.getElementById("transactionIdStatus");
+
+            if (transactionId === "") {
+
+                status.className = "field-status";
+                status.innerHTML = "";
+
+                return;
+
+            }
+
+            status.className = "field-status checking";
+            status.innerHTML = "Checking...";
+
+            transactionCheckTimer = setTimeout(async () => {
+
+                const result = await checkTransactionIdDuplicate(transactionId);
+
+                if (transactionId !== latestTransactionId) {
+
+                    return;
+
+                }
+
+                if (result.success && result.exists) {
+
+                    status.className = "field-status error";
+                    status.innerHTML = "✖ Already Registered";
+
+                } else {
+
+                    status.className = "field-status success";
+                    status.innerHTML = "✔ Available";
+
+                }
+
+            }, 500);
+
+        });
+
+    }
 
 }
-
-
-}
-
 
 /* ==========================================================
    CHECK EMPLOYEE ID DUPLICATE
@@ -2464,66 +2536,64 @@ async function testBackendConnection() {
    SUBMIT MEMBERSHIP
 ========================================================= */
 
-async function submitMembership() {
+async function submitMembership(){
 
+    const submitBtn=document.getElementById("submitMembershipBtn");
+    const originalButtonText=submitBtn.innerHTML;
 
-    const submitBtn = document.getElementById("submitMembershipBtn");
-const originalButtonText = submitBtn.innerHTML;
-
-submitBtn.disabled = true;
-submitBtn.innerHTML = "Submitting...";
+    submitBtn.disabled=true;
+    submitBtn.innerHTML="Submitting...";
 
     /* ------------------------------
-   DECLARATION VALIDATION
------------------------------- */
+       DECLARATION VALIDATION
+    ------------------------------ */
 
+    if(!document.getElementById("declarationCheck").checked){
 
-    if (!document.getElementById("declarationCheck").checked) {
+        alert("Please accept the Declaration before submitting your Membership Application.");
 
-    alert(
-        "Please accept the Declaration before submitting your Membership Application."
-    );
+        document.getElementById("declarationCheck").focus();
 
-    document.getElementById("declarationCheck").focus();
-    submitBtn.disabled = false;
-    submitBtn.innerHTML = originalButtonText;
-    return;
+        submitBtn.disabled=false;
+        submitBtn.innerHTML=originalButtonText;
+
+        return;
 
     }
 
     /* ------------------------------
-   PHOTO VALIDATION
------------------------------- */
-
-const memberPhotoFile = document.getElementById("memberPhoto");
-
-if (!memberPhotoFile.files || memberPhotoFile.files.length === 0) {
-
-    alert(
-        "Please upload or capture your passport-size photograph before submitting the Membership Application."
-    );
-
-    memberPhotoFile.focus();
-    submitBtn.disabled = false;
-    submitBtn.innerHTML = originalButtonText;
-    return;
-
-}
-
-
-
-    /* ------------------------------
-       DUPLICATE VALIDATION
+       PHOTO VALIDATION
     ------------------------------ */
 
-    const mobile = document.getElementById("mobile").value.trim();
-    const employeeId = document.getElementById("employeeId").value.trim();
-    const aadhaar = document.getElementById("aadhaar").value.replace(/\s/g, "").trim();
+    const memberPhotoFile=document.getElementById("memberPhoto");
 
-    const transactionId =
-    document.getElementById("payNowOption").checked
-        ? document.getElementById("payNowTransactionId").value.trim()
-        : document.getElementById("manualTransactionId").value.trim();
+    if(!memberPhotoFile.files||memberPhotoFile.files.length===0){
+
+        alert("Please upload or capture your passport-size photograph before submitting the Membership Application.");
+
+        memberPhotoFile.focus();
+
+        submitBtn.disabled=false;
+        submitBtn.innerHTML=originalButtonText;
+
+        return;
+
+    }
+
+    /* ------------------------------
+   DUPLICATE VALIDATION
+------------------------------ */
+
+const mobile = document.getElementById("mobile").value.trim();
+
+const employeeId = document.getElementById("employeeId").value.trim();
+
+const aadhaar = document.getElementById("aadhaar").value.replace(/\s/g, "").trim();
+
+const transactionId =
+document.getElementById("payNowOption").checked
+? document.getElementById("payNowTransactionId").value.trim()
+: document.getElementById("manualTransactionId").value.trim();
 
 
 if (mobile === "") {
@@ -2531,6 +2601,7 @@ if (mobile === "") {
     alert("Please Enter Mobile Number");
 
     document.getElementById("mobile").focus();
+
     submitBtn.disabled = false;
     submitBtn.innerHTML = originalButtonText;
 
@@ -2543,24 +2614,24 @@ if (aadhaar === "") {
     alert("Please Enter Aadhaar Number");
 
     document.getElementById("aadhaar").focus();
+
     submitBtn.disabled = false;
     submitBtn.innerHTML = originalButtonText;
-    
+
     return;
 
 }
 
 
+/* ------------------------------
+   MOBILE DUPLICATE
+------------------------------ */
 
-// Mobile Duplicate Check
-     
-if (mobile !== "") {
+const mobileDuplicate = await checkMobileDuplicate(mobile);
 
-    const mobileDuplicate = await checkMobileDuplicate(mobile);
+console.log("Mobile Result :", mobileDuplicate);
 
-    console.log("Mobile Result :", mobileDuplicate);
-
-   if (mobileDuplicate.exists) {
+if (mobileDuplicate.exists) {
 
     submitBtn.disabled = false;
     submitBtn.innerHTML = originalButtonText;
@@ -2574,14 +2645,18 @@ if (mobile !== "") {
 
     return;
 
+}
 
-    }
 
-    // Employee ID Duplicate Check
-    const employeeDuplicate = await checkEmployeeIdDuplicate(employeeId);
-    console.log("Employee Result :", employeeDuplicate);
+/* ------------------------------
+   EMPLOYEE ID DUPLICATE
+------------------------------ */
 
-    if (employeeDuplicate.exists) {
+const employeeDuplicate = await checkEmployeeIdDuplicate(employeeId);
+
+console.log("Employee Result :", employeeDuplicate);
+
+if (employeeDuplicate.exists) {
 
     submitBtn.disabled = false;
     submitBtn.innerHTML = originalButtonText;
@@ -2595,13 +2670,18 @@ if (mobile !== "") {
 
     return;
 
-    }
+}
 
-    // Aadhaar Duplicate Check
-    const aadhaarDuplicate = await checkAadhaarDuplicate(aadhaar);
-    console.log("Aadhaar Result :", aadhaarDuplicate);
 
-    if (aadhaarDuplicate.exists) {
+/* ------------------------------
+   AADHAAR DUPLICATE
+------------------------------ */
+
+const aadhaarDuplicate = await checkAadhaarDuplicate(aadhaar);
+
+console.log("Aadhaar Result :", aadhaarDuplicate);
+
+if (aadhaarDuplicate.exists) {
 
     submitBtn.disabled = false;
     submitBtn.innerHTML = originalButtonText;
@@ -2615,34 +2695,38 @@ if (mobile !== "") {
 
     return;
 
-    }
 }
 
 
-    // Transaction ID Duplicate Check
-    console.log("Transaction ID Before Check:", transactionId);
+/* ------------------------------
+   TRANSACTION ID DUPLICATE
+------------------------------ */
+
+if (transactionId !== "") {
+
+    console.log("Transaction ID Before Check :", transactionId);
+
     const transactionDuplicate = await checkTransactionIdDuplicate(transactionId);
+
     console.log("Transaction Result :", transactionDuplicate);
 
-if (transactionDuplicate.exists) {
+    if (transactionDuplicate.exists) {
 
-    submitBtn.disabled = false;
-    submitBtn.innerHTML = originalButtonText;
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalButtonText;
 
-    alert(
-        "Transaction ID Already Registered\n\n" +
-        "Transaction ID : " + transactionId + "\n" +
-        "Membership ID : " + transactionDuplicate.member.membershipId + "\n" +
-        "Member Name : " + transactionDuplicate.member.fullName
-    );
+        alert(
+            "Transaction ID Already Registered\n\n" +
+            "Transaction ID : " + transactionId + "\n" +
+            "Membership ID : " + transactionDuplicate.member.membershipId + "\n" +
+            "Member Name : " + transactionDuplicate.member.fullName
+        );
 
-    return;
+        return;
+
+    }
 
 }
-
-
-
-
     /* ------------------------------
        MEMBER DATA
     ------------------------------ */
@@ -2682,7 +2766,7 @@ if (transactionDuplicate.exists) {
         receiptType: ""
     };
 
-    /* ------------------------------
+/* ------------------------------
    CONVERT PHOTO TO BASE64
 ------------------------------ */
 
@@ -2740,83 +2824,77 @@ if (receiptInput.files.length > 0) {
 
 }
 
-    console.log("Sending Data :", data);
+console.log("Sending Data :", data);
+console.log("Photo Type :", data.photoType);
+console.log("Photo Base64 Length :", data.photoBase64.length);
+console.log("Receipt Type :", data.receiptType);
+console.log("Receipt Base64 Length :", data.receiptBase64.length);
 
-    console.log("Photo Type :", data.photoType);
-    console.log("Photo Base64 Length :", data.photoBase64.length);
+try {
 
-    console.log("Receipt Type :", data.receiptType);
-    console.log("Receipt Base64 Length :", data.receiptBase64.length);
+    const response = await fetch(BACKEND_URL, {
 
-    try {
+        method: "POST",
 
-        const response = await fetch(BACKEND_URL, {
+        headers: {
+            "Content-Type": "text/plain;charset=utf-8"
+        },
 
-            method: "POST",
+        body: JSON.stringify({
+            action: "saveMember",
+            data: data
+        })
 
-            headers: {
-                "Content-Type": "text/plain;charset=utf-8"
-            },
+    });
 
-            body: JSON.stringify({
-                action: "saveMember",
-                data: data
-            })
+    const raw = await response.text();
 
-        });
+    console.log("RAW RESPONSE :", raw);
 
-        const raw = await response.text();
+    const result = JSON.parse(raw);
 
-        console.log("RAW RESPONSE :", raw);
-
-        const result = JSON.parse(raw);
-
-        console.log("PARSED RESPONSE :", result);
+    console.log("PARSED RESPONSE :", result);
 
     if (result.success) {
 
-    alert(
-        "✅ Member Saved Successfully\n\n" +
-        "Membership ID : " + result.membershipId
-    );
+        window.lastMembershipId = result.membershipId;
 
+        openReceipt();
 
+        if (!DEV_MODE) {
 
+            if (photoPreview) {
 
+                photoPreview.removeAttribute("src");
+                photoPreview.style.display = "none";
 
-    /* ----------------------------------
-       RESET FORM
-    ---------------------------------- */
+            }
 
-    // document.getElementById("membershipForm").reset();
+            const previewText = document.querySelector(".preview-text");
 
-    if (photoPreview) {
-        photoPreview.removeAttribute("src");
-        photoPreview.style.display = "none";
+            if (previewText) {
+
+                previewText.style.display = "block";
+
+            }
+
+            document.getElementById("finalSubmitSection").style.display = "none";
+
+        }
+
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalButtonText;
+
+    } else {
+
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalButtonText;
+
+        alert(result.message);
+
     }
 
-    const previewText = document.querySelector(".preview-text");
-
-    if (previewText) {
-        previewText.style.display = "block";
-    }
-
-    document.getElementById("finalSubmitSection").style.display = "none";
-
-    submitBtn.disabled = false;
-    submitBtn.innerHTML = originalButtonText;
-
-} else {
-
-    submitBtn.disabled = false;
-    submitBtn.innerHTML = originalButtonText;
-
-    alert(result.message);
-
-}
-
-
-    } catch (error) {
+} catch (error) {
 
     console.error("FULL ERROR :", error);
 
@@ -2827,7 +2905,7 @@ if (receiptInput.files.length > 0) {
 
 }
 
-}
+}   // submitMembership()
 
 
 /* ==========================================================
@@ -2873,3 +2951,200 @@ async function loadMembershipStatistics() {
 
 }
 
+/* ==========================================================
+   RECEIPT TYPES
+========================================================== */
+
+const ReceiptTypes={
+
+membership:{
+title:"MEMBERSHIP RECEIPT",
+layout:"member",
+table:"membership"
+},
+
+renewal:{
+title:"MEMBERSHIP RENEWAL RECEIPT",
+layout:"member",
+table:"membership"
+},
+
+diaryAdvertisement:{
+title:"DIARY ADVERTISEMENT RECEIPT",
+layout:"business",
+table:"advertisement"
+},
+
+diaryFund:{
+title:"DIARY FUND RECEIPT",
+layout:"donation",
+table:"donation"
+},
+
+donation:{
+title:"DONATION RECEIPT",
+layout:"donation",
+table:"donation"
+},
+
+eventFund:{
+title:"EVENT FUND RECEIPT",
+layout:"event",
+table:"event"
+}
+
+};
+
+/* ==========================================================
+   RECEIPT MODULE V1
+========================================================== */
+
+function initializeReceiptModule(){
+
+    setReceiptType("membership");
+
+}
+
+/* ==========================================================
+   COLLECT RECEIPT DATA
+========================================================== */
+
+function collectReceiptData(){
+
+    const receiptType=
+window.receiptType||
+"membership";
+
+    const company=document.getElementById("company")?.value||"";
+
+    const station=document.getElementById("station")?.value||
+    document.getElementById("circle")?.value||"";
+
+    const division=document.getElementById("division")?.value||
+    document.getElementById("region")?.value||"";
+
+    const transactionId=
+    document.getElementById("payNowTransactionId")?.value||
+    document.getElementById("manualTransactionId")?.value||
+    "";
+
+    const receiptDate=
+    document.getElementById("payNowDate")?.value||
+    document.getElementById("manualDate")?.value||
+    "";
+
+    const receiptTime=
+    document.getElementById("payNowTimeDisplay")?.value||
+    document.getElementById("manualTimeDisplay")?.value||
+    "";
+
+    const paymentMode=
+    document.querySelector('input[name="paymentOption"]:checked')
+    ?.value||"UPI";
+
+    return{
+
+        receiptType:receiptType,
+
+        receiptTitle:ReceiptTypes[receiptType].title,
+
+        receiptLayout:ReceiptTypes[receiptType].layout,
+
+        receiptTable:ReceiptTypes[receiptType].table,
+
+        receiptNumber:window.lastMembershipId||"",
+
+        membershipId:window.lastMembershipId||"",
+
+        receiptDate:receiptDate,
+
+        receiptTime:receiptTime,
+
+        company:company,
+
+        memberName:document.getElementById("employeeName")?.value||"",
+
+        employeeId:document.getElementById("employeeId")?.value||"",
+
+        mobile:document.getElementById("mobile")?.value||"",
+
+        station:station,
+
+        division:division,
+
+        paymentMode:paymentMode,
+
+        transactionId:transactionId
+
+    };
+
+}
+
+/* ==========================================================
+   LOAD RECEIPT PREVIEW
+========================================================== */
+
+function loadReceiptPreview(){
+
+    const data=collectReceiptData();
+
+    document.getElementById("receiptTitle").textContent=data.receiptTitle;
+    document.getElementById("receiptNumber").textContent=data.receiptNumber;
+    document.getElementById("receiptMembershipId").textContent=data.membershipId;
+    document.getElementById("receiptDate").textContent=data.receiptDate;
+    document.getElementById("receiptTime").textContent=data.receiptTime;
+
+}
+
+
+/* ==========================================================
+   OPEN RECEIPT
+========================================================== */
+
+function openReceipt(){
+
+    loadReceiptPreview();
+
+    document.getElementById("membershipPage").style.display="none";
+
+    document.getElementById("receiptContainer").style.display="block";
+
+}
+
+/* ==========================================================
+   CLOSE RECEIPT
+========================================================== */
+
+function closeReceipt(){
+
+    document.getElementById("receiptContainer").style.display="none";
+
+    document.getElementById("membershipPage").style.display="block";
+
+}
+
+/* ==========================================================
+   SET RECEIPT TYPE
+========================================================== */
+
+function setReceiptType(type){
+
+    if(!ReceiptTypes[type]){
+
+        console.warn("Invalid Receipt Type :",type);
+
+        return;
+
+    }
+
+    window.receiptType=type;
+
+}
+
+/* ==========================================================
+   INITIALIZE RECEIPT MODULE
+========================================================== */
+
+initializeReceiptModule()
+
+console.log("ARPEU SCRIPT END");

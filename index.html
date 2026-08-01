@@ -1111,15 +1111,8 @@ Fast • Secure • Digital Membership System
 
 
 
-
-
-
-
-
-
-
-
 </section>
+
 <!-- =========================================================
      RENEWAL SECTION
      HTML PART - 1A
@@ -1276,8 +1269,111 @@ Fast • Secure • Digital Membership System
 ========================================================= -->
 
 
+<!-- ==========================================================
+     ARPEU DIGITAL MEMBERSHIP PORTAL
+     RECEIPT MODULE
+========================================================== -->
 
+<div id="receiptContainer" class="receipt-container" style="display:none;">
 
+<img src="images/receipt-template.png"
+     id="receiptBackground"
+     class="receipt-background"
+     alt="Receipt Background">
+
+<div id="receiptOverlay" class="receipt-overlay">
+    <div class="receipt-grid"></div>
+
+<div id="receiptTitle"></div>
+
+<div id="receiptNumber"></div>
+
+<div id="receiptMembershipId"></div>
+
+<div id="receiptDate"></div>
+
+<div id="receiptTime"></div>
+
+</div>
+
+</div>
+
+<!-- =========================================
+     STATISTICS SECTION
+========================================= -->
+
+<section id="statisticsSection" class="statistics-page" style="display:none;">
+
+<div class="page-header">
+
+<h2 class="dashboard-title">
+<i class="fas fa-chart-line"></i>
+Live Statistics Dashboard
+</h2>
+
+<small class="dashboard-subtitle">
+Statewide Live Membership Statistics
+</small>
+
+</div>
+
+<div class="stats-list">
+
+<div class="stats-row total-row">
+
+<div class="stats-info">
+<i class="fas fa-users"></i>
+<span>Total Members</span>
+</div>
+
+<div class="stats-count" id="totalMembers">
+0
+</div>
+
+</div>
+
+<div class="stats-row today-row">
+
+<div class="stats-info">
+<i class="fas fa-user-plus"></i>
+<span>Today's Registrations</span>
+</div>
+
+<div class="stats-count" id="todayMembers">
+0
+</div>
+
+</div>
+
+<div class="stats-row month-row">
+
+<div class="stats-info">
+<i class="fas fa-calendar-alt"></i>
+<span>This Month</span>
+</div>
+
+<div class="stats-count" id="monthMembers">
+0
+</div>
+
+</div>
+
+<div class="stats-row year-row">
+
+<div class="stats-info">
+<i class="fas fa-chart-line"></i>
+<span>This Year</span>
+</div>
+
+<div class="stats-count" id="yearMembers">
+0
+</div>
+
+</div>
+
+</div>
+
+</section>
 
 <!-- =========================================
      STATISTICS SECTION
@@ -1484,6 +1580,7 @@ Fast • Secure • Digital Membership System
 </footer>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="js/script.js"></script>
 </body>
 
