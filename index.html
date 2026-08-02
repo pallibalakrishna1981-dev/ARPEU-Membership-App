@@ -1264,130 +1264,190 @@ Fast • Secure • Digital Membership System
 
 </section>
 
-
 <!-- ==========================================================
      ARPEU DIGITAL MEMBERSHIP PORTAL
-     RECEIPT MODULE
+     RECEIPT MODULE - EXACT DEMO MATCH (LOCKED ARCHITECTURE)
 ========================================================== -->
 
-<div id="receiptContainer"
-     class="receipt-container"
-     style="display:none;">
+<div id="receiptContainer" class="receipt-container" style="display:none;">
+    
+    <div class="receipt-actions-bar no-print">
+        <button type="button" class="receipt-btn print-btn" onclick="window.print()">
+            <i class="fas fa-print"></i> Print Receipt
+        </button>
+        <button type="button" class="receipt-btn close-btn" onclick="closeReceipt()">
+            <i class="fas fa-times"></i> Close
+        </button>
+    </div>
 
-    <div id="receiptOverlay"
-         class="receipt-overlay">
+    <div id="receiptOverlay" class="receipt-card">
 
         <div class="receipt-header">
-
-            <img
-                src="images/arpeu-logo.png"
-                class="receipt-logo receipt-logo-left"
-                alt="ARPEU">
-
-            <div id="receiptTitle">
-                MEMBERSHIP RECEIPT
+            <div class="header-logo-box">
+                <img src="images/arpeu-logo.png" class="receipt-logo" alt="ARPEU Logo">
             </div>
 
-            <img
-                src="images/bms-logo.png"
-                class="receipt-logo receipt-logo-right"
-                alt="BMS">
+            <div class="header-center-info">
+                <div class="receipt-pill-title" id="receiptTitle">MEMBERSHIP RECEIPT</div>
+                <h1 class="receipt-union-heading">ANDHRA RASTRA POWER EMPLOYEES UNION</h1>
+                <p class="receipt-reg-info">
+                    Regd. No: G - 445, Estd. 1982, Affiliated to <span class="bms-highlight">BMS & ABVMM</span>
+                </p>
+                <p class="receipt-address">
+                    Head office: Q.No.SRT -14, Dr. NTTPS, Ibrahimpatnam, Vijayawada- 521456, NTR Dist - A.P
+                </p>
+                <p class="receipt-contacts">
+                    www.arpeu.org.in &nbsp;&nbsp;|&nbsp;&nbsp; info@arpeu.org.in
+                </p>
+            </div>
 
+            <div class="header-logo-box">
+                <img src="images/bms-logo.png" class="receipt-logo" alt="BMS Logo">
+            </div>
         </div>
 
-        <div class="receipt-body">
+        <div class="receipt-divider-line"></div>
 
-            <div id="receiptNumber"></div>
+        <div class="receipt-meta-grid">
+            <div class="meta-row split-row">
+                <div class="meta-col">
+                    <span class="lbl-red">Receipt No:</span>
+                    <span id="rReceiptNo" class="val-bold"></span>
+                </div>
+                <div class="meta-col right-align">
+                    <span class="lbl-red">Membership ID:</span>
+                    <span id="rMembershipId" class="val-bold"></span>
+                </div>
+            </div>
 
-            <div id="receiptMembershipId"></div>
+            <div class="meta-row split-row">
+                <div class="meta-col">
+                    <span class="lbl-red">Date:</span>
+                    <span id="rDate" class="val-bold"></span>
+                </div>
+                <div class="meta-col right-align">
+                    <span class="lbl-red">Time:</span>
+                    <span id="rTime" class="val-bold"></span>
+                </div>
+            </div>
 
-            <div id="receiptDate"></div>
+            <div class="meta-row full-row">
+                <span class="lbl-dark">Received with thanks from:</span>
+                <span id="rMemberName" class="val-bold val-underline"></span>
+            </div>
 
-            <div id="receiptTime"></div>
+            <div class="meta-columns-wrapper">
+                <div class="meta-column-left">
+                    <div class="meta-field">
+                        <span class="lbl-dark">Emp. ID.No.:</span>
+                        <span id="rEmpId" class="val-text"></span>
+                    </div>
+                    <div class="meta-field">
+                        <span class="lbl-dark">Company:</span>
+                        <span id="rCompany" class="val-text"></span>
+                    </div>
+                    <div class="meta-field">
+                        <span class="lbl-dark">Circle:</span>
+                        <span id="rCircle" class="val-text"></span>
+                    </div>
+                    <div class="meta-field">
+                        <span class="lbl-dark">Division:</span>
+                        <span id="rDivision" class="val-text"></span>
+                    </div>
+                </div>
 
+                <div class="meta-column-right">
+                    <div class="meta-field">
+                        <span class="lbl-dark">Mobile.No.:</span>
+                        <span id="rMobile" class="val-text"></span>
+                    </div>
+                    <div class="meta-field">
+                        <span class="lbl-dark">Station:</span>
+                        <span id="rStation" class="val-text"></span>
+                    </div>
+                    <div class="meta-field">
+                        <span class="lbl-dark">Stage:</span>
+                        <span id="rStage" class="val-text"></span>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <div class="receipt-grid"></div>
+        <div class="receipt-table-wrapper">
+            <div class="table-watermark-bg"></div>
+            <table class="receipt-table">
+                <thead>
+                    <tr>
+                        <th class="th-particulars">Particlurs</th>
+                        <th class="th-amount">Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Admission Fee</td>
+                        <td class="amt-col">Rs. <span id="rAdmissionFee">100</span></td>
+                    </tr>
+                    <tr>
+                        <td>Annual Subscription</td>
+                        <td class="amt-col">Rs. <span id="rAnnualSub">360</span></td>
+                    </tr>
+                    <tr>
+                        <td>Donation</td>
+                        <td class="amt-col">Rs. <span id="rDonation">0</span></td>
+                    </tr>
+                    <tr>
+                        <td>Others</td>
+                        <td class="amt-col">Rs. <span id="rOthers">0</span></td>
+                    </tr>
+                    <tr class="total-row">
+                        <td class="total-lbl">Total</td>
+                        <td class="amt-col total-val">Rs. <span id="rTotal">460</span></td>
+                    </tr>
+                    <tr class="words-row">
+                        <td colspan="2">
+                            <span class="lbl-dark">Total in Words: Rupees</span>
+                            <span id="rTotalInWords" class="val-bold">Four Hundred Sixty Only</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="receipt-payment-info">
+            <div class="pay-info-row">
+                <span class="lbl-dark">Payment Mode :</span>
+                <span id="rPaymentMode">UPI</span>
+            </div>
+            <div class="pay-info-row">
+                <span class="lbl-dark">Transaction ID / UTR No :</span>
+                <span id="rTransactionId"></span>
+            </div>
+            <div class="pay-info-row">
+                <span class="lbl-dark">Payment Status :</span>
+                <span id="rPaymentStatus" class="status-success">SUCCESSFUL / PAID</span>
+            </div>
+        </div>
+
+        <div class="receipt-footer-bottom">
+            <div class="qr-box-container">
+                <div class="qr-box" id="receiptQrCode"></div>
+                <div class="qr-label">QR Verification</div>
+            </div>
+
+            <div class="notice-box-container">
+                <div class="notice-badge">IMPORTANT</div>
+                <p class="notice-text">
+                    This is a Computer Generated Receipt. No Signature is Required.<br>
+                    <strong class="notice-red">Please verify this receipt using QR Code.</strong>
+                </p>
+            </div>
+        </div>
 
     </div>
 
 </div>
-<!-- =========================================
-     STATISTICS SECTION
-========================================= -->
 
-<section id="statisticsSection" class="statistics-page" style="display:none;">
 
-<div class="page-header">
-
-<h2 class="dashboard-title">
-<i class="fas fa-chart-line"></i>
-Live Statistics Dashboard
-</h2>
-
-<small class="dashboard-subtitle">
-Statewide Live Membership Statistics
-</small>
-
-</div>
-
-<div class="stats-list">
-
-<div class="stats-row total-row">
-
-<div class="stats-info">
-<i class="fas fa-users"></i>
-<span>Total Members</span>
-</div>
-
-<div class="stats-count" id="totalMembers">
-0
-</div>
-
-</div>
-
-<div class="stats-row today-row">
-
-<div class="stats-info">
-<i class="fas fa-user-plus"></i>
-<span>Today's Registrations</span>
-</div>
-
-<div class="stats-count" id="todayMembers">
-0
-</div>
-
-</div>
-
-<div class="stats-row month-row">
-
-<div class="stats-info">
-<i class="fas fa-calendar-alt"></i>
-<span>This Month</span>
-</div>
-
-<div class="stats-count" id="monthMembers">
-0
-</div>
-
-</div>
-
-<div class="stats-row year-row">
-
-<div class="stats-info">
-<i class="fas fa-chart-line"></i>
-<span>This Year</span>
-</div>
-
-<div class="stats-count" id="yearMembers">
-0
-</div>
-
-</div>
-
-</div>
-
-</section>
 
 <!-- =========================================
      STATISTICS SECTION

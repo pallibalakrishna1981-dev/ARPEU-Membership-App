@@ -2940,186 +2940,119 @@ table:"event"
 };
 
 /* ==========================================================
-   RECEIPT MODULE V1
+   LOCKED RECEIPT MODULE ENGINE
 ========================================================== */
 
-function initializeReceiptModule(){
+function collectReceiptData() {
+    const isPayNow = document.getElementById("payNowOption")?.checked;
+    const payNowAmt = parseInt(document.getElementById("payNowAmount")?.value) || 460;
+    const manualAmt = parseInt(document.getElementById("manualAmount")?.value) || 460;
+    const totalAmount = isPayNow ? payNowAmt : manualAmt;
 
-    setReceiptType("membership");
+    const admissionFee = 100;
+    const annualSub = 360;
+    const donation = Math.max(0, totalAmount - 460);
+    const others = 0;
 
-}
+    const transactionId = isPayNow
+        ? (document.getElementById("payNowTransactionId")?.value || "")
+        : (document.getElementById("manualTransactionId")?.value || "");
 
-/* ==========================================================
-   COLLECT RECEIPT DATA
-========================================================== */
+    const receiptDate = isPayNow
+        ? (document.getElementById("payNowDate")?.value || "")
+        : (document.getElementById("manualDate")?.value || "");
 
-function collectReceiptData(){
+    const receiptTime = isPayNow
+        ? (document.getElementById("payNowTimeDisplay")?.value || "")
+        : (document.getElementById("manualTimeDisplay")?.value || "");
 
-    const receiptType=
-window.receiptType||
-"membership";
+    const companyVal = document.getElementById("company")?.value || "";
 
-    const company=document.getElementById("company")?.value||"";
-
-    const station=document.getElementById("station")?.value||
-    document.getElementById("circle")?.value||"";
-
-    const division=document.getElementById("division")?.value||
-    document.getElementById("region")?.value||"";
-
-    const transactionId=
-    document.getElementById("payNowTransactionId")?.value||
-    document.getElementById("manualTransactionId")?.value||
-    "";
-
-    const receiptDate=
-    document.getElementById("payNowDate")?.value||
-    document.getElementById("manualDate")?.value||
-    "";
-
-    const receiptTime=
-    document.getElementById("payNowTimeDisplay")?.value||
-    document.getElementById("manualTimeDisplay")?.value||
-    "";
-
-    const paymentMode=
-    document.querySelector('input[name="paymentOption"]:checked')
-    ?.value||"UPI";
-
-    return{
-
-        receiptType:receiptType,
-
-        receiptTitle:ReceiptTypes[receiptType].title,
-
-        receiptLayout:ReceiptTypes[receiptType].layout,
-
-        receiptTable:ReceiptTypes[receiptType].table,
-
-        receiptNumber:window.lastMembershipId||"",
-
-        membershipId:window.lastMembershipId||"",
-
-        receiptDate:receiptDate,
-
-        receiptTime:receiptTime,
-
-        company:company,
-
-        memberName:document.getElementById("employeeName")?.value||"",
-
-        employeeId:document.getElementById("employeeId")?.value||"",
-
-        mobile:document.getElementById("mobile")?.value||"",
-
-        station:station,
-
-        division:division,
-
-        paymentMode:paymentMode,
-
-        transactionId:transactionId
-
+    return {
+        receiptNumber: window.lastMembershipId || ("ARPEU-" + Math.floor(100000 + Math.random() * 900000)),
+        membershipId: window.lastMembershipId || ("ARPEU-" + Math.floor(100000 + Math.random() * 900000)),
+        receiptDate: receiptDate || new Date().toLocaleDateString('en-GB'),
+        receiptTime: receiptTime || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        memberName: document.getElementById("employeeName")?.value || "",
+        employeeId: document.getElementById("employeeId")?.value || "",
+        mobile: document.getElementById("mobile")?.value || "",
+        company: companyVal,
+        circle: companyVal !== "APGENCO" ? (document.getElementById("circle")?.value || "") : "",
+        station: companyVal === "APGENCO" ? (document.getElementById("station")?.value || "") : "",
+        stage: companyVal === "APGENCO" ? (document.getElementById("stage")?.value || "") : "",
+        division: document.getElementById("division")?.value || "",
+        admissionFee,
+        annualSub,
+        donation,
+        others,
+        totalAmount,
+        paymentMode: "UPI",
+        transactionId: transactionId || "N/A",
+        paymentStatus: "SUCCESSFUL / PAID"
     };
-
 }
 
-/* ==========================================================
-   LOAD RECEIPT PREVIEW
-========================================================== */
+function loadReceiptPreview() {
+    const data = collectReceiptData();
 
-function loadReceiptPreview(){
+    document.getElementById("rReceiptNo").textContent = data.receiptNumber;
+    document.getElementById("rMembershipId").textContent = data.membershipId;
+    document.getElementById("rDate").textContent = data.receiptDate;
+    document.getElementById("rTime").textContent = data.receiptTime;
 
-    const data=collectReceiptData();
+    document.getElementById("rMemberName").textContent = data.memberName;
+    document.getElementById("rEmpId").textContent = data.employeeId;
+    document.getElementById("rMobile").textContent = data.mobile;
+    document.getElementById("rCompany").textContent = data.company;
+    document.getElementById("rCircle").textContent = data.circle || "-";
+    document.getElementById("rStation").textContent = data.station || "-";
+    document.getElementById("rStage").textContent = data.stage || "-";
+    document.getElementById("rDivision").textContent = data.division || "-";
 
-    document.getElementById("receiptTitle").textContent=data.receiptTitle;
+    document.getElementById("rAdmissionFee").textContent = data.admissionFee;
+document.getElementById("rAnnualSub").textContent = data.annualSub;
+document.getElementById("rDonation").textContent = data.donation;
+document.getElementById("rOthers").textContent = data.others;
+document.getElementById("rTotal").textContent = data.totalAmount;
+document.getElementById("rTotalInWords").textContent = data.amountInWords || data.totalAmount;
 
-    document.getElementById("receiptNumber").textContent=
-    "Receipt No : "+data.receiptNumber;
+document.getElementById("rPaymentMode").textContent = data.paymentMode;
+document.getElementById("rTransactionId").textContent = data.transactionId;
+document.getElementById("rPaymentStatus").textContent = data.paymentStatus;
 
-    document.getElementById("receiptMembershipId").textContent=
-    "Membership ID : "+data.membershipId;
-
-    document.getElementById("receiptDate").textContent=
-    "Transaction Date : "+data.receiptDate;
-
-    document.getElementById("receiptTime").textContent=
-    "Transaction Time : "+data.receiptTime;
-
+    generateReceiptQR(data);
 }
 
-/* ==========================================================
-   OPEN RECEIPT
-========================================================== */
+function generateReceiptQR(data) {
+    const qrContainer = document.getElementById("receiptQrCode");
+    if (!qrContainer) return;
+    qrContainer.innerHTML = "";
 
-function openReceipt(){
+    const qrPayload = `ARPEU MEMBERSHIP RECEIPT\nReceipt No: ${data.receiptNumber}\nMember ID: ${data.membershipId}\nName: ${data.memberName}\nEmp ID: ${data.employeeId}\nCompany: ${data.company}\nTotal Paid: Rs. ${data.totalAmount}\nTxn ID: ${data.transactionId}\nStatus: ${data.paymentStatus}`;
 
+    new QRCode(qrContainer, {
+        text: qrPayload,
+        width: 80,
+        height: 80,
+        colorDark: "#000000",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.M
+    });
+}
+
+function openReceipt() {
     loadReceiptPreview();
+    if (membershipPage) membershipPage.style.display = "none";
+    if (homeSection) homeSection.style.display = "none";
+    if (statisticsSection) statisticsSection.style.display = "none";
 
-    const membershipPage=document.getElementById("membershipPage");
-    const receiptContainer=document.getElementById("receiptContainer");
-
-    if(membershipPage){
-
-        membershipPage.style.display="none";
-
-    }
-
-    if(receiptContainer){
-
-        receiptContainer.style.display="block";
-
-    }
-
+    const rc = document.getElementById("receiptContainer");
+    if (rc) rc.style.display = "block";
+    window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
-
-/* ==========================================================
-   CLOSE RECEIPT
-========================================================== */
-
-function closeReceipt(){
-
-    const receiptContainer=document.getElementById("receiptContainer");
-    const membershipPage=document.getElementById("membershipPage");
-
-    if(receiptContainer){
-
-        receiptContainer.style.display="none";
-
-    }
-
-    if(membershipPage){
-
-        membershipPage.style.display="block";
-
-    }
-
+function closeReceipt() {
+    const rc = document.getElementById("receiptContainer");
+    if (rc) rc.style.display = "none";
+    showPage("home");
 }
-
-
-/* ==========================================================
-   SET RECEIPT TYPE
-========================================================== */
-
-function setReceiptType(type){
-
-    if(!ReceiptTypes[type]){
-
-        console.warn("Invalid Receipt Type :",type);
-
-        return;
-
-    }
-
-    window.receiptType=type;
-
-}
-
-/* ==========================================================
-   INITIALIZE RECEIPT MODULE
-========================================================== */
-
-initializeReceiptModule()
-
-console.log("ARPEU SCRIPT END");
