@@ -1785,11 +1785,12 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 /* Header */
-.receipt-header {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 8px;
+.receipt-header{
+    display:grid;
+    grid-template-columns:52px 1fr 52px;
+    column-gap:8px;
+    align-items:start;
+    width:100%;
 }
 
 .header-logo-box {
@@ -1805,39 +1806,57 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 .header-center-info {
     flex: 1;
+    width: 100%;
     text-align: center;
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
 }
 
-.receipt-pill-title {
-    background: #0B4EA2;
-    color: #ffffff;
-    font-weight: 700;
-    font-size: 15px;
-    padding: 3px 18px;
-    border-radius: 20px;
-    display: inline-block;
-    letter-spacing: 0.5px;
-    margin-bottom: 4px;
-    text-transform: uppercase;
+.receipt-pill-title{
+    background:#0B4EA2;
+    color:#fff;
+    font-weight:700;
+    font-size:19px;
+    padding:12px 26px;
+    border-radius:16px;
+    display:inline-block;
+    margin-bottom:8px;
+    letter-spacing:.5px;
+    text-transform:uppercase;
 }
 
-.receipt-union-heading {
-    color: #0B4EA2;
-    font-size: 18px;
-    font-weight: 900;
-    line-height: 1.1;
-    margin: 2px 0;
-    letter-spacing: 0.2px;
+.receipt-union-heading{
+    font-family:'Anton',sans-serif;
+    color:#0B4EA2;
+    font-size:26px;
+    font-weight:400;
+    line-height:1;
+    letter-spacing:.3px;
+    white-space:nowrap;
+    margin: 8px 0 2px 0;
 }
 
 .receipt-reg-info {
-    font-size: 10px;
+    font-size: 14px;
     font-weight: 700;
     color: #000000;
     margin-top: 2px;
+    display: block;
+    text-align: center;
+    width: 100%;
+}
+
+.receipt-address{
+    display:block;
+    width:100%;
+    text-align:center;
+    font-size:12px;
+    font-weight:600;
+    color:#111;
+    line-height:1.15;
+    margin-top:2px;
 }
 
 .bms-highlight {
@@ -1845,16 +1864,19 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     font-weight: 800;
 }
 
-.receipt-address {
-    font-size: 9.5px;
-    font-weight: 600;
-    color: #111111;
-    margin-top: 2px;
-    line-height: 1.2;
+.receipt-contacts{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:16px;
+    margin-top:4px;
+    font-size:9.5px;
+    font-weight:700;
+    color:#0B4EA2;
 }
 
 .receipt-contacts {
-    font-size: 9.5px;
+    font-size: 14px;
     font-weight: 700;
     color: #0B4EA2;
     margin-top: 2px;
