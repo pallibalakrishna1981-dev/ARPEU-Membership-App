@@ -1264,40 +1264,54 @@ Fast • Secure • Digital Membership System
 
 </section>
 
-<!-- =========================================================
-     MEMBERSHIP PAGE END
-========================================================= -->
-
 
 <!-- ==========================================================
      ARPEU DIGITAL MEMBERSHIP PORTAL
      RECEIPT MODULE
 ========================================================== -->
 
-<div id="receiptContainer" class="receipt-container" style="display:none;">
+<div id="receiptContainer"
+     class="receipt-container"
+     style="display:none;">
 
-<img src="images/receipt-template.png"
-     id="receiptBackground"
-     class="receipt-background"
-     alt="Receipt Background">
+    <div id="receiptOverlay"
+         class="receipt-overlay">
 
-<div id="receiptOverlay" class="receipt-overlay">
-    <div class="receipt-grid"></div>
+        <div class="receipt-header">
 
-<div id="receiptTitle"></div>
+            <img
+                src="images/arpeu-logo.png"
+                class="receipt-logo receipt-logo-left"
+                alt="ARPEU">
 
-<div id="receiptNumber"></div>
+            <div id="receiptTitle">
+                MEMBERSHIP RECEIPT
+            </div>
 
-<div id="receiptMembershipId"></div>
+            <img
+                src="images/bms-logo.png"
+                class="receipt-logo receipt-logo-right"
+                alt="BMS">
 
-<div id="receiptDate"></div>
+        </div>
 
-<div id="receiptTime"></div>
+        <div class="receipt-body">
+
+            <div id="receiptNumber"></div>
+
+            <div id="receiptMembershipId"></div>
+
+            <div id="receiptDate"></div>
+
+            <div id="receiptTime"></div>
+
+        </div>
+
+        <div class="receipt-grid"></div>
+
+    </div>
 
 </div>
-
-</div>
-
 <!-- =========================================
      STATISTICS SECTION
 ========================================= -->

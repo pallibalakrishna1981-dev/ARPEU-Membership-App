@@ -2203,230 +2203,209 @@ async function checkAadhaarDuplicate(aadhaar) {
 ========================================================== */
 
 let employeeIdTimer = null;
-let latestEmployeeId = "";
 
 let aadhaarTimer = null;
-let latestAadhaar = "";
 
 let transactionCheckTimer = null;
-let latestTransactionId = "";
+
 
 function initializeValidations() {
 
     /* ------------------------------
-       EMPLOYEE ID
+            EMPLOYEE ID
     ------------------------------ */
 
-    const employeeIdInput = document.getElementById("employeeId");
+const employeeIdInput=document.getElementById("employeeId");
 
-    if (employeeIdInput) {
+if(employeeIdInput){
 
-        employeeIdInput.addEventListener("input", function () {
+    employeeIdInput.addEventListener("input",function(){
 
-            clearTimeout(employeeIdTimer);
+        clearTimeout(employeeIdTimer);
 
-            const employeeId = this.value.trim();
-            latestEmployeeId = employeeId;
+        const employeeId=this.value.trim();
 
-            const status = document.getElementById("employeeIdStatus");
+        const status=document.getElementById("employeeIdStatus");
 
-            if (employeeId === "") {
+        if(employeeId.length<3){
 
-                status.className = "field-status";
-                status.innerHTML = "";
+            status.className="field-status";
+            status.innerHTML="";
 
-                return;
+            return;
+
+        }
+
+        status.className="field-status checking";
+        status.innerHTML="Checking...";
+
+        employeeIdTimer=setTimeout(async()=>{
+
+            const result=await checkEmployeeIdDuplicate(employeeId);
+
+            if(result.success && result.exists){
+
+                status.className="field-status error";
+                status.innerHTML="✖ Already Registered";
+
+            }else{
+
+                status.className="field-status success";
+                status.innerHTML="✔ Available";
 
             }
 
-            status.className = "field-status checking";
-            status.innerHTML = "Checking...";
+        },150);
 
-            employeeIdTimer = setTimeout(async () => {
+    });
 
-                const result = await checkEmployeeIdDuplicate(employeeId);
-
-                if (employeeId !== latestEmployeeId) {
-
-                    return;
-
-                }
-
-                if (result.success && result.exists) {
-
-                    status.className = "field-status error";
-                    status.innerHTML = "✖ Already Registered";
-
-                } else {
-
-                    status.className = "field-status success";
-                    status.innerHTML = "✔ Available";
-
-                }
-
-            }, 400);
-
-        });
-
-    }
+}
 
     /* ------------------------------
-       MOBILE
-    ------------------------------ */
+   MOBILE
+------------------------------ */
 
-    const mobileInput = document.getElementById("mobile");
+const mobileInput=document.getElementById("mobile");
 
-    if (mobileInput) {
+if(mobileInput){
 
-        mobileInput.addEventListener("input", async function () {
+    mobileInput.addEventListener("input",async function(){
 
-            const status = document.getElementById("mobileStatus");
+        this.value=this.value.replace(/\D/g,"").slice(0,10);
 
-            const mobile = this.value.trim();
+        const status=document.getElementById("mobileStatus");
 
-            if (mobile.length !== 10) {
+        const mobile=this.value.trim();
 
-                status.className = "field-status";
-                status.innerHTML = "";
+        if(mobile.length!==10){
 
-                return;
+            status.className="field-status";
+            status.innerHTML="";
 
-            }
+            return;
 
-            status.className = "field-status checking";
-            status.innerHTML = "Checking...";
+        }
 
-            const result = await checkMobileDuplicate(mobile);
+        status.className="field-status checking";
+        status.innerHTML="Checking...";
 
-            if (result.success && result.exists) {
+        const result=await checkMobileDuplicate(mobile);
 
-                status.className = "field-status error";
-                status.innerHTML = "✖ Already Registered";
+        if(result.success && result.exists){
 
-            } else {
+            status.className="field-status error";
+            status.innerHTML="✖ Already Registered";
 
-                status.className = "field-status success";
-                status.innerHTML = "✔ Available";
+        }else{
 
-            }
+            status.className="field-status success";
+            status.innerHTML="✔ Available";
 
-        });
+        }
 
-    }
+    });
 
+}
     /* ------------------------------
-       AADHAAR
-    ------------------------------ */
+   AADHAAR
+------------------------------ */
 
-    const aadhaarInput = document.getElementById("aadhaar");
+const aadhaarInput=document.getElementById("aadhaar");
 
-    if (aadhaarInput) {
+if(aadhaarInput){
 
-        aadhaarInput.addEventListener("input", function () {
+    aadhaarInput.addEventListener("input",function(){
 
-            clearTimeout(aadhaarTimer);
+        clearTimeout(aadhaarTimer);
 
-            const aadhaar = this.value.replace(/\s/g, "").trim();
-            latestAadhaar = aadhaar;
+        const aadhaar=this.value.replace(/\s/g,"").trim();
 
-            const status = document.getElementById("aadhaarStatus");
+        const status=document.getElementById("aadhaarStatus");
 
-            if (aadhaar.length !== 12) {
+        if(aadhaar.length!==12){
 
-                status.className = "field-status";
-                status.innerHTML = "";
+            status.className="field-status";
+            status.innerHTML="";
 
-                return;
+            return;
+
+        }
+
+        status.className="field-status checking";
+        status.innerHTML="Checking...";
+
+        aadhaarTimer=setTimeout(async()=>{
+
+            const result=await checkAadhaarDuplicate(aadhaar);
+
+            if(result.success && result.exists){
+
+                status.className="field-status error";
+                status.innerHTML="✖ Already Registered";
+
+            }else{
+
+                status.className="field-status success";
+                status.innerHTML="✔ Available";
 
             }
 
-            status.className = "field-status checking";
-            status.innerHTML = "Checking...";
+        },150);
 
-            aadhaarTimer = setTimeout(async () => {
+    });
 
-                const result = await checkAadhaarDuplicate(aadhaar);
-
-                if (aadhaar !== latestAadhaar) {
-
-                    return;
-
-                }
-
-                if (result.success && result.exists) {
-
-                    status.className = "field-status error";
-                    status.innerHTML = "✖ Already Registered";
-
-                } else {
-
-                    status.className = "field-status success";
-                    status.innerHTML = "✔ Available";
-
-                }
-
-            }, 500);
-
-        });
-
-    }
-
+}
     /* ------------------------------
        TRANSACTION ID
     ------------------------------ */
 
-    const transactionIdInput = document.getElementById("payNowTransactionId");
+ 
 
-    if (transactionIdInput) {
+const transactionIdInput=document.getElementById("payNowTransactionId");
 
-        transactionIdInput.addEventListener("input", function () {
+if(transactionIdInput){
 
-            clearTimeout(transactionCheckTimer);
+    transactionIdInput.addEventListener("input",function(){
 
-            const transactionId = this.value.trim();
-            latestTransactionId = transactionId;
+        clearTimeout(transactionCheckTimer);
 
-            const status = document.getElementById("transactionIdStatus");
+        const transactionId=this.value.trim();
 
-            if (transactionId === "") {
+        const status=document.getElementById("transactionIdStatus");
 
-                status.className = "field-status";
-                status.innerHTML = "";
+        if(transactionId.length<4){
 
-                return;
+            status.className="field-status";
+            status.innerHTML="";
+
+            return;
+
+        }
+
+        status.className="field-status checking";
+        status.innerHTML="Checking...";
+
+        transactionCheckTimer=setTimeout(async()=>{
+
+            const result=await checkTransactionIdDuplicate(transactionId);
+
+            if(result.success && result.exists){
+
+                status.className="field-status error";
+                status.innerHTML="✖ Already Registered";
+
+            }else{
+
+                status.className="field-status success";
+                status.innerHTML="✔ Available";
 
             }
 
-            status.className = "field-status checking";
-            status.innerHTML = "Checking...";
+        },150);
 
-            transactionCheckTimer = setTimeout(async () => {
+    });
 
-                const result = await checkTransactionIdDuplicate(transactionId);
-
-                if (transactionId !== latestTransactionId) {
-
-                    return;
-
-                }
-
-                if (result.success && result.exists) {
-
-                    status.className = "field-status error";
-                    status.innerHTML = "✖ Already Registered";
-
-                } else {
-
-                    status.className = "field-status success";
-                    status.innerHTML = "✔ Available";
-
-                }
-
-            }, 500);
-
-        });
-
-    }
+}
 
 }
 
@@ -2458,41 +2437,6 @@ async function checkEmployeeIdDuplicate(employeeId) {
     }
 }
 
-
-
-/* ==========================================================
-   VALIDATE EMPLOYEE ID
-========================================================== */
-
-async function validateEmployeeId() {
-
-    const employeeId = document.getElementById("employeeId").value.trim();
-
-    const status = document.getElementById("employeeIdStatus");
-
-    if (employeeId === "") {
-
-        status.innerHTML = "";
-
-        return;
-
-    }
-
-    status.innerHTML = "🔄 Checking...";
-
-    const result = await checkDuplicate("employeeid", employeeId);
-
-    if (result.success && result.exists) {
-
-        status.innerHTML = "❌ Employee ID Already Registered";
-
-    } else {
-
-        status.innerHTML = "✅ Available";
-
-    }
-
-}
 
 
 /* ============================================
@@ -3089,13 +3033,20 @@ function loadReceiptPreview(){
     const data=collectReceiptData();
 
     document.getElementById("receiptTitle").textContent=data.receiptTitle;
-    document.getElementById("receiptNumber").textContent=data.receiptNumber;
-    document.getElementById("receiptMembershipId").textContent=data.membershipId;
-    document.getElementById("receiptDate").textContent=data.receiptDate;
-    document.getElementById("receiptTime").textContent=data.receiptTime;
+
+    document.getElementById("receiptNumber").textContent=
+    "Receipt No : "+data.receiptNumber;
+
+    document.getElementById("receiptMembershipId").textContent=
+    "Membership ID : "+data.membershipId;
+
+    document.getElementById("receiptDate").textContent=
+    "Transaction Date : "+data.receiptDate;
+
+    document.getElementById("receiptTime").textContent=
+    "Transaction Time : "+data.receiptTime;
 
 }
-
 
 /* ==========================================================
    OPEN RECEIPT
@@ -3105,11 +3056,23 @@ function openReceipt(){
 
     loadReceiptPreview();
 
-    document.getElementById("membershipPage").style.display="none";
+    const membershipPage=document.getElementById("membershipPage");
+    const receiptContainer=document.getElementById("receiptContainer");
 
-    document.getElementById("receiptContainer").style.display="block";
+    if(membershipPage){
+
+        membershipPage.style.display="none";
+
+    }
+
+    if(receiptContainer){
+
+        receiptContainer.style.display="block";
+
+    }
 
 }
+
 
 /* ==========================================================
    CLOSE RECEIPT
@@ -3117,11 +3080,23 @@ function openReceipt(){
 
 function closeReceipt(){
 
-    document.getElementById("receiptContainer").style.display="none";
+    const receiptContainer=document.getElementById("receiptContainer");
+    const membershipPage=document.getElementById("membershipPage");
 
-    document.getElementById("membershipPage").style.display="block";
+    if(receiptContainer){
+
+        receiptContainer.style.display="none";
+
+    }
+
+    if(membershipPage){
+
+        membershipPage.style.display="block";
+
+    }
 
 }
+
 
 /* ==========================================================
    SET RECEIPT TYPE
