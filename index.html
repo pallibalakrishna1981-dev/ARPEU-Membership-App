@@ -775,7 +775,7 @@ Fast • Secure • Digital Membership System
 
             <label for="subStation">
                 Sub Station
-                <span class="required">*</span>
+                <span class="optional"></span>
             </label>
 
             <input
@@ -795,7 +795,7 @@ Fast • Secure • Digital Membership System
 
             <label for="section">
                 Section
-                <span class="required">*</span>
+                <span class="optional"></span>
             </label>
 
             <input
@@ -806,6 +806,26 @@ Fast • Secure • Digital Membership System
                 autocomplete="off">
 
         </div>
+
+        <!-- Location -->
+
+<div
+    class="form-group"
+    id="locationGroup">
+
+    <label for="location">
+        Location
+        <span class="optional">(Optional)</span>
+    </label>
+
+    <input
+        type="text"
+        id="location"
+        name="location"
+        placeholder="Enter Location (Optional)"
+        autocomplete="off">
+
+</div>
 
         <!-- Designation -->
 
@@ -1330,41 +1350,101 @@ Fast • Secure • Digital Membership System
                 <span id="rMemberName" class="val-bold val-underline"></span>
             </div>
 
-            <div class="meta-columns-wrapper">
-                <div class="meta-column-left">
-                    <div class="meta-field">
-                        <span class="lbl-dark">Emp. ID.No.:</span>
-                        <span id="rEmpId" class="val-text"></span>
-                    </div>
-                    <div class="meta-field">
-                        <span class="lbl-dark">Company:</span>
-                        <span id="rCompany" class="val-text"></span>
-                    </div>
-                    <div class="meta-field">
-                        <span class="lbl-dark">Circle:</span>
-                        <span id="rCircle" class="val-text"></span>
-                    </div>
-                    <div class="meta-field">
-                        <span class="lbl-dark">Division:</span>
-                        <span id="rDivision" class="val-text"></span>
-                    </div>
-                </div>
+            <div id="gencoReceiptFields" class="meta-columns-wrapper">
 
-                <div class="meta-column-right">
-                    <div class="meta-field">
-                        <span class="lbl-dark">Mobile.No.:</span>
-                        <span id="rMobile" class="val-text"></span>
-                    </div>
-                    <div class="meta-field">
-                        <span class="lbl-dark">Station:</span>
-                        <span id="rStation" class="val-text"></span>
-                    </div>
-                    <div class="meta-field">
-                        <span class="lbl-dark">Stage:</span>
-                        <span id="rStage" class="val-text"></span>
-                    </div>
-                </div>
-            </div>
+    <div class="meta-column-left">
+        <div class="meta-field">
+            <span class="lbl-dark">Emp. ID.No.:</span>
+            <span id="rEmpId" class="val-text"></span>
+        </div>
+
+        <div class="meta-field">
+            <span class="lbl-dark">Company:</span>
+            <span id="rCompany" class="val-text"></span>
+        </div>
+
+        <div class="meta-field">
+            <span class="lbl-dark">Station:</span>
+            <span id="rStation" class="val-text"></span>
+        </div>
+
+        <div class="meta-field">
+            <span class="lbl-dark">Stage:</span>
+            <span id="rStage" class="val-text"></span>
+        </div>
+    </div>
+
+    <div class="meta-column-right">
+        <div class="meta-field">
+            <span class="lbl-dark">Mobile.No.:</span>
+            <span id="rMobile" class="val-text"></span>
+        </div>
+
+        <div class="meta-field">
+            <span class="lbl-dark">Division:</span>
+            <span id="rDivision" class="val-text"></span>
+        </div>
+
+        <div class="meta-field">
+            <span class="lbl-dark">Sub Division:</span>
+            <span id="rSubDivision" class="val-text"></span>
+        </div>
+
+        <div class="meta-field">
+            <span class="lbl-dark">Location:</span>
+            <span id="rLocation" class="val-text"></span>
+        </div>
+    </div>
+
+</div>
+
+<div id="discomReceiptFields" class="meta-columns-wrapper" style="display:none;">
+
+    <div class="meta-column-left">
+        <div class="meta-field">
+            <span class="lbl-dark">Emp. ID.No.:</span>
+            <span id="rEmpId" class="val-text"></span>
+        </div>
+
+        <div class="meta-field">
+            <span class="lbl-dark">Company:</span>
+            <span id="rCompany" class="val-text"></span>
+        </div>
+
+        <div class="meta-field">
+            <span class="lbl-dark">Circle:</span>
+            <span id="rCircle" class="val-text"></span>
+        </div>
+
+        <div class="meta-field">
+            <span class="lbl-dark">Division:</span>
+            <span id="rDivision" class="val-text"></span>
+        </div>
+    </div>
+
+    <div class="meta-column-right">
+        <div class="meta-field">
+            <span class="lbl-dark">Mobile.No.:</span>
+            <span id="rMobile" class="val-text"></span>
+        </div>
+
+        <div class="meta-field">
+            <span class="lbl-dark">Sub Division:</span>
+            <span id="rSubDivision" class="val-text"></span>
+        </div>
+
+        <div class="meta-field">
+            <span class="lbl-dark">Sub Station:</span>
+            <span id="rSubStation" class="val-text"></span>
+        </div>
+
+        <div class="meta-field">
+            <span class="lbl-dark">Section:</span>
+            <span id="rSection" class="val-text"></span>
+        </div>
+    </div>
+
+</div>
         </div>
 
         <div class="receipt-table-wrapper">
@@ -1649,7 +1729,7 @@ Fast • Secure • Digital Membership System
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-<script src="js/script.js"></script>
+<script src="js/script.js?v=99"></script>
 </body>
 
 </html>

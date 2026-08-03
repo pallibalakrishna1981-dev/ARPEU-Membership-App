@@ -1908,7 +1908,8 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 .meta-col.right-align {
-    text-align: right;
+    text-align: left;
+    padding-left: 25px;
 }
 
 .lbl-red {

@@ -2108,332 +2108,239 @@ document.addEventListener("DOMContentLoaded", function () {
 
 });
 
+
 /* ==========================================================
-   CHECK MOBILE DUPLICATE
+   SUPER-FAST POST DUPLICATE CHECK ENGINE (NO 404 ERRORS)
 ========================================================== */
 
+const activeFetchControllers = {
+    mobile: null,
+    employeeid: null,
+    aadhaar: null,
+    transactionid: null
+};
+
+const debounceTimers = {
+    mobile: null,
+    employeeid: null,
+    aadhaar: null,
+    transactionid: null
+};
+
+// Common Fetch for Submit
+async function fetchDuplicateCheck(field, value) {
+    if (!value || value.trim() === "") return { success: true, exists: false };
+    try {
+        const response = await fetch(BACKEND_URL, {
+            method: "POST",
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: JSON.stringify({
+                action: "checkDuplicate",
+                data: { field: field, value: value }
+            })
+        });
+        const text = await response.text();
+        try {
+            return JSON.parse(text);
+        } catch (err) {
+            // సర్వర్ ఆలస్యం చేసినా ఫారమ్ ఆగకుండా సేఫ్ గా ముందుకు పంపుతుంది
+            return { success: true, exists: false };
+        }
+    } catch (e) {
+        console.error(`[${field}] Check Error:`, e);
+        return { success: true, exists: false };
+    }
+}
+
+// Real-time POST Checker
+async function executeDuplicateCheck(field, value, statusElementId) {
+    const statusEl = document.getElementById(statusElementId);
+    if (!statusEl) return;
+
+    if (activeFetchControllers[field]) {
+        activeFetchControllers[field].abort();
+    }
+    activeFetchControllers[field] = new AbortController();
+
+    statusEl.className = "field-status checking";
+    statusEl.innerHTML = "Checking...";
+
+    try {
+        const response = await fetch(BACKEND_URL, {
+            method: "POST",
+            headers: {
+                "Content-Type": "text/plain;charset=utf-8"
+            },
+            body: JSON.stringify({
+                action: "checkDuplicate",
+                data: {
+                    field: field,
+                    value: value
+                }
+            }),
+            signal: activeFetchControllers[field].signal
+        });
+
+        const rawText = await response.text();
+        let result;
+
+        try {
+            result = JSON.parse(rawText);
+        } catch (e) {
+            statusEl.className = "field-status error";
+            statusEl.innerHTML = "⚠️ Server Busy";
+            return;
+        }
+
+        if (result.success && result.exists) {
+            statusEl.className = "field-status error";
+            statusEl.innerHTML = "✖ Already Registered";
+        } else if (result.success) {
+            statusEl.className = "field-status success";
+            statusEl.innerHTML = "✔ Available";
+        } else {
+            statusEl.className = "field-status error";
+            statusEl.innerHTML = "⚠️ Check Failed";
+        }
+
+    } catch (error) {
+        if (error.name === 'AbortError') {
+            // Ignore intentional aborts silently
+        } else {
+            console.error(`[${field}] Connection Error:`, error);
+            statusEl.className = "field-status error";
+            statusEl.innerHTML = "❌ Connection Error";
+        }
+    } finally {
+        activeFetchControllers[field] = null;
+    }
+}
+
+// Submit Check Wrappers
 async function checkMobileDuplicate(mobile) {
-    try {
-        const response = await fetch(BACKEND_URL, {
-            method: "POST",
-            body: JSON.stringify({
-                action: "checkDuplicate",
-                data: {
-                    field: "mobile",
-                    value: mobile
-                }
-            })
-        });
-
-        return await response.json();
-    } catch (error) {
-        console.error(error);
-
-        return {
-            success: false,
-            exists: false
-        };
-    }
+    return await fetchDuplicateCheck("mobile", mobile);
 }
 
-
-/* ==========================================================
-   CHECK TRANSACTION ID DUPLICATE
-========================================================== */
-
-async function checkTransactionIdDuplicate(transactionId) {
-    try {
-        const response = await fetch(BACKEND_URL, {
-            method: "POST",
-            body: JSON.stringify({
-                action: "checkDuplicate",
-                data: {
-                    field: "transactionid",
-                    value: transactionId
-                }
-            })
-        });
-
-        return await response.json();
-
-    } catch (error) {
-
-        console.error(error);
-
-        return {
-            success: false,
-            exists: false
-        };
-    }
+async function checkEmployeeIdDuplicate(employeeId) {
+    return await fetchDuplicateCheck("employeeid", employeeId);
 }
-
-
-
-/* ==========================================================
-   CHECK AADHAAR DUPLICATE
-========================================================== */
 
 async function checkAadhaarDuplicate(aadhaar) {
-    try {
-        const response = await fetch(BACKEND_URL, {
-            method: "POST",
-            body: JSON.stringify({
-                action: "checkDuplicate",
-                data: {
-                    field: "aadhaar",
-                    value: aadhaar
-                }
-            })
-        });
-
-        return await response.json();
-    } catch (error) {
-        console.error(error);
-
-        return {
-            success: false,
-            exists: false
-        };
-    }
+    return await fetchDuplicateCheck("aadhaar", aadhaar);
 }
+
+async function checkTransactionIdDuplicate(transactionId) {
+    return await fetchDuplicateCheck("transactionid", transactionId);
+}
+
 
 
 /* ==========================================================
    INITIALIZE VALIDATIONS
 ========================================================== */
 
-let employeeIdTimer = null;
-
-let aadhaarTimer = null;
-
-let transactionCheckTimer = null;
-
-
 function initializeValidations() {
 
-    /* ------------------------------
-            EMPLOYEE ID
-    ------------------------------ */
+    /* 1. MOBILE (Strict 10 Digits) */
+    const mobileInput = document.getElementById("mobile");
+    if (mobileInput) {
+        mobileInput.addEventListener("input", function () {
+            this.value = this.value.replace(/\D/g, "").slice(0, 10);
+            const val = this.value.trim();
+            const status = document.getElementById("mobileStatus");
 
-const employeeIdInput=document.getElementById("employeeId");
+            clearTimeout(debounceTimers.mobile);
 
-if(employeeIdInput){
-
-    employeeIdInput.addEventListener("input",function(){
-
-        clearTimeout(employeeIdTimer);
-
-        const employeeId=this.value.trim();
-
-        const status=document.getElementById("employeeIdStatus");
-
-        if(employeeId.length<3){
-
-            status.className="field-status";
-            status.innerHTML="";
-
-            return;
-
-        }
-
-        status.className="field-status checking";
-        status.innerHTML="Checking...";
-
-        employeeIdTimer=setTimeout(async()=>{
-
-            const result=await checkEmployeeIdDuplicate(employeeId);
-
-            if(result.success && result.exists){
-
-                status.className="field-status error";
-                status.innerHTML="✖ Already Registered";
-
-            }else{
-
-                status.className="field-status success";
-                status.innerHTML="✔ Available";
-
+            if (val.length !== 10) {
+                if (status) { status.className = "field-status"; status.innerHTML = ""; }
+                if (activeFetchControllers.mobile) activeFetchControllers.mobile.abort();
+                return;
             }
 
-        },150);
+            debounceTimers.mobile = setTimeout(() => {
+                executeDuplicateCheck("mobile", val, "mobileStatus");
+            }, 500);
+        });
+    }
 
-    });
+    /* 2. AADHAAR (Strict 12 Digits) */
+    const aadhaarInput = document.getElementById("aadhaar");
+    if (aadhaarInput) {
+        aadhaarInput.addEventListener("input", function () {
+            const rawAadhaar = this.value.replace(/\s/g, "").replace(/\D/g, "");
+            const status = document.getElementById("aadhaarStatus");
 
-}
+            clearTimeout(debounceTimers.aadhaar);
 
-    /* ------------------------------
-   MOBILE
------------------------------- */
-
-const mobileInput=document.getElementById("mobile");
-
-if(mobileInput){
-
-    mobileInput.addEventListener("input",async function(){
-
-        this.value=this.value.replace(/\D/g,"").slice(0,10);
-
-        const status=document.getElementById("mobileStatus");
-
-        const mobile=this.value.trim();
-
-        if(mobile.length!==10){
-
-            status.className="field-status";
-            status.innerHTML="";
-
-            return;
-
-        }
-
-        status.className="field-status checking";
-        status.innerHTML="Checking...";
-
-        const result=await checkMobileDuplicate(mobile);
-
-        if(result.success && result.exists){
-
-            status.className="field-status error";
-            status.innerHTML="✖ Already Registered";
-
-        }else{
-
-            status.className="field-status success";
-            status.innerHTML="✔ Available";
-
-        }
-
-    });
-
-}
-    /* ------------------------------
-   AADHAAR
------------------------------- */
-
-const aadhaarInput=document.getElementById("aadhaar");
-
-if(aadhaarInput){
-
-    aadhaarInput.addEventListener("input",function(){
-
-        clearTimeout(aadhaarTimer);
-
-        const aadhaar=this.value.replace(/\s/g,"").trim();
-
-        const status=document.getElementById("aadhaarStatus");
-
-        if(aadhaar.length!==12){
-
-            status.className="field-status";
-            status.innerHTML="";
-
-            return;
-
-        }
-
-        status.className="field-status checking";
-        status.innerHTML="Checking...";
-
-        aadhaarTimer=setTimeout(async()=>{
-
-            const result=await checkAadhaarDuplicate(aadhaar);
-
-            if(result.success && result.exists){
-
-                status.className="field-status error";
-                status.innerHTML="✖ Already Registered";
-
-            }else{
-
-                status.className="field-status success";
-                status.innerHTML="✔ Available";
-
+            if (rawAadhaar.length !== 12) {
+                if (status) { status.className = "field-status"; status.innerHTML = ""; }
+                if (activeFetchControllers.aadhaar) activeFetchControllers.aadhaar.abort();
+                return;
             }
 
-        },150);
+            debounceTimers.aadhaar = setTimeout(() => {
+                executeDuplicateCheck("aadhaar", rawAadhaar, "aadhaarStatus");
+            }, 500);
+        });
+    }
 
-    });
+    /* 3. EMPLOYEE ID (Check on Blur & Typing Pause) */
+    const employeeIdInput = document.getElementById("employeeId");
+    if (employeeIdInput) {
+        employeeIdInput.addEventListener("input", function () {
+            const val = this.value.trim();
+            const status = document.getElementById("employeeIdStatus");
 
-}
-    /* ------------------------------
-       TRANSACTION ID
-    ------------------------------ */
+            clearTimeout(debounceTimers.employeeid);
 
- 
-
-const transactionIdInput=document.getElementById("payNowTransactionId");
-
-if(transactionIdInput){
-
-    transactionIdInput.addEventListener("input",function(){
-
-        clearTimeout(transactionCheckTimer);
-
-        const transactionId=this.value.trim();
-
-        const status=document.getElementById("transactionIdStatus");
-
-        if(transactionId.length<4){
-
-            status.className="field-status";
-            status.innerHTML="";
-
-            return;
-
-        }
-
-        status.className="field-status checking";
-        status.innerHTML="Checking...";
-
-        transactionCheckTimer=setTimeout(async()=>{
-
-            const result=await checkTransactionIdDuplicate(transactionId);
-
-            if(result.success && result.exists){
-
-                status.className="field-status error";
-                status.innerHTML="✖ Already Registered";
-
-            }else{
-
-                status.className="field-status success";
-                status.innerHTML="✔ Available";
-
+            if (val.length < 3) {
+                if (status) { status.className = "field-status"; status.innerHTML = ""; }
+                return;
             }
 
-        },150);
-
-    });
-
-}
-
-}
-
-/* ==========================================================
-   CHECK EMPLOYEE ID DUPLICATE
-========================================================== */
-
-async function checkEmployeeIdDuplicate(employeeId) {
-    try {
-        const response = await fetch(BACKEND_URL, {
-            method: "POST",
-            body: JSON.stringify({
-                action: "checkDuplicate",
-                data: {
-                    field: "employeeid",
-                    value: employeeId
-                }
-            })
+            // టైపింగ్ ఆపిన 1 సెకన్ తర్వాత చెక్ చేస్తుంది
+            debounceTimers.employeeid = setTimeout(() => {
+                executeDuplicateCheck("employeeid", val, "employeeIdStatus");
+            }, 1000);
         });
 
-        return await response.json();
-    } catch (error) {
-        console.error(error);
+        // బాక్స్ నుండి బయటికి క్లిక్ చేయగానే తక్షణమే చెక్ చేస్తుంది
+        employeeIdInput.addEventListener("blur", function() {
+            const val = this.value.trim();
+            if (val.length >= 3) {
+                clearTimeout(debounceTimers.employeeid);
+                executeDuplicateCheck("employeeid", val, "employeeIdStatus");
+            }
+        });
+    }
 
-        return {
-            success: false,
-            exists: false
-        };
+    /* 4. TRANSACTION ID (Check on Blur & Typing Pause) */
+    const transactionIdInput = document.getElementById("payNowTransactionId");
+    if (transactionIdInput) {
+        transactionIdInput.addEventListener("input", function () {
+            const val = this.value.trim();
+            const status = document.getElementById("transactionIdStatus");
+
+            clearTimeout(debounceTimers.transactionid);
+
+            if (val.length < 5) {
+                if (status) { status.className = "field-status"; status.innerHTML = ""; }
+                return;
+            }
+
+            debounceTimers.transactionid = setTimeout(() => {
+                executeDuplicateCheck("transactionid", val, "transactionIdStatus");
+            }, 1000);
+        });
+
+        // బాక్స్ నుండి బయటికి క్లిక్ చేయగానే తక్షణమే చెక్ చేస్తుంది
+        transactionIdInput.addEventListener("blur", function() {
+            const val = this.value.trim();
+            if (val.length >= 5) {
+                clearTimeout(debounceTimers.transactionid);
+                executeDuplicateCheck("transactionid", val, "transactionIdStatus");
+            }
+        });
     }
 }
 
@@ -2443,7 +2350,7 @@ async function checkEmployeeIdDuplicate(employeeId) {
    ARPEU Backend Configuration
 ============================================ */
 
-const BACKEND_URL = "https://script.google.com/macros/s/AKfycbz1zye0KwFFPnKELex9ZYK7796oopR6iF_R2nyNsLdxrUJ7EZAlJONyYsDBzWwTZ1aK/exec";
+const BACKEND_URL = "https://script.google.com/macros/s/AKfycbybpqT-flmk2uGHAKiQsxksho_J-YdIh9bsDtals95dmXp1IfDnHPoHHQuuNQToJJmB/exec";
 
 async function testBackendConnection() {
 
@@ -2451,7 +2358,12 @@ async function testBackendConnection() {
 
         const response = await fetch(BACKEND_URL);
 
-        const result = await response.json();
+        const text = await response.text();
+
+        console.log("STATUS:", response.status);
+        console.log("RAW:", text);
+
+        return;
 
         console.log(result);
 
@@ -2802,6 +2714,7 @@ try {
     if (result.success) {
 
         window.lastMembershipId = result.membershipId;
+        window.lastReceiptNo = result.receiptNo; 
 
         openReceipt();
 
@@ -2943,6 +2856,27 @@ table:"event"
    LOCKED RECEIPT MODULE ENGINE
 ========================================================== */
 
+// నంబర్లను మాటల్లోకి మార్చే ఫంక్షన్ (Number to Words Converter)
+function numberToWords(num) {
+    if (!num || isNaN(num)) return "Zero Only";
+    num = parseInt(num, 10);
+    if (num === 0) return "Zero Only";
+
+    const a = ['', 'One ', 'Two ', 'Three ', 'Four ', 'Five ', 'Six ', 'Seven ', 'Eight ', 'Nine ', 'Ten ', 'Eleven ', 'Twelve ', 'Thirteen ', 'Fourteen ', 'Fifteen ', 'Sixteen ', 'Seventeen ', 'Eighteen ', 'Nineteen '];
+    const b = ['', '', 'Twenty ', 'Thirty ', 'Forty ', 'Fifty ', 'Sixty ', 'Seventy ', 'Eighty ', 'Ninety '];
+
+    function inWords(n) {
+        if (n < 20) return a[n];
+        if (n < 100) return b[Math.floor(n / 10)] + a[n % 10];
+        if (n < 1000) return a[Math.floor(n / 100)] + 'Hundred ' + (n % 100 !== 0 ? 'and ' + inWords(n % 100) : '');
+        if (n < 100000) return inWords(Math.floor(n / 1000)) + 'Thousand ' + (n % 1000 !== 0 ? inWords(n % 1000) : '');
+        if (n < 10000000) return inWords(Math.floor(n / 100000)) + 'Lakh ' + (n % 100000 !== 0 ? inWords(n % 100000) : '');
+        return inWords(Math.floor(n / 10000000)) + 'Crore ' + (n % 10000000 !== 0 ? inWords(n % 10000000) : '');
+    }
+
+    return (inWords(num).trim() + " Only");
+}
+
 function collectReceiptData() {
     const isPayNow = document.getElementById("payNowOption")?.checked;
     const payNowAmt = parseInt(document.getElementById("payNowAmount")?.value) || 460;
@@ -2962,17 +2896,22 @@ function collectReceiptData() {
         ? (document.getElementById("payNowDate")?.value || "")
         : (document.getElementById("manualDate")?.value || "");
 
-    const receiptTime = isPayNow
-        ? (document.getElementById("payNowTimeDisplay")?.value || "")
-        : (document.getElementById("manualTimeDisplay")?.value || "");
+    const now = new Date();
+    const hrs = String(now.getHours() % 12 || 12).padStart(2, '0');
+    const mins = String(now.getMinutes()).padStart(2, '0');
+    const secs = String(now.getSeconds()).padStart(2, '0');
+    const ms = String(Math.floor(now.getMilliseconds() / 10)).padStart(2, '0');
+    const ampm = now.getHours() >= 12 ? 'PM' : 'AM';
 
+    const receiptTime = `${hrs}:${mins}:${secs}:${ms} ${ampm}`;
     const companyVal = document.getElementById("company")?.value || "";
+    const currentYear = new Date().getFullYear();
 
     return {
-        receiptNumber: window.lastMembershipId || ("ARPEU-" + Math.floor(100000 + Math.random() * 900000)),
-        membershipId: window.lastMembershipId || ("ARPEU-" + Math.floor(100000 + Math.random() * 900000)),
+        receiptNumber: window.lastReceiptNo || (`ARPEU/${currentYear}/1`),
+        membershipId: window.lastMembershipId || "ARPEU00001",
         receiptDate: receiptDate || new Date().toLocaleDateString('en-GB'),
-        receiptTime: receiptTime || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        receiptTime: receiptTime,
         memberName: document.getElementById("employeeName")?.value || "",
         employeeId: document.getElementById("employeeId")?.value || "",
         mobile: document.getElementById("mobile")?.value || "",
@@ -2981,11 +2920,14 @@ function collectReceiptData() {
         station: companyVal === "APGENCO" ? (document.getElementById("station")?.value || "") : "",
         stage: companyVal === "APGENCO" ? (document.getElementById("stage")?.value || "") : "",
         division: document.getElementById("division")?.value || "",
+        subDivision: document.getElementById("subDivision")?.value || "", // 👈 సబ్ డివిజన్
+        location: document.getElementById("location")?.value || "",       // 👈 లొకేషన్
         admissionFee,
         annualSub,
         donation,
         others,
         totalAmount,
+        totalInWords: numberToWords(totalAmount),
         paymentMode: "UPI",
         transactionId: transactionId || "N/A",
         paymentStatus: "SUCCESSFUL / PAID"
@@ -3009,19 +2951,36 @@ function loadReceiptPreview() {
     document.getElementById("rStage").textContent = data.stage || "-";
     document.getElementById("rDivision").textContent = data.division || "-";
 
-    document.getElementById("rAdmissionFee").textContent = data.admissionFee;
-document.getElementById("rAnnualSub").textContent = data.annualSub;
-document.getElementById("rDonation").textContent = data.donation;
-document.getElementById("rOthers").textContent = data.others;
-document.getElementById("rTotal").textContent = data.totalAmount;
-document.getElementById("rTotalInWords").textContent = data.amountInWords || data.totalAmount;
+    // Sub Division Logic (డేటా ఉంటే చూపిస్తుంది, లేకపోతే హైడ్ చేస్తుంది)
+    const subDivEl = document.getElementById("rSubDivision");
+    if (subDivEl) {
+        subDivEl.textContent = data.subDivision || "";
+        const parentField = subDivEl.closest(".meta-field");
+        if (parentField) parentField.style.display = data.subDivision ? "flex" : "none";
+    }
 
-document.getElementById("rPaymentMode").textContent = data.paymentMode;
-document.getElementById("rTransactionId").textContent = data.transactionId;
-document.getElementById("rPaymentStatus").textContent = data.paymentStatus;
+    // Location Logic (డేటా ఉంటే చూపిస్తుంది, లేకపోతే హైడ్ చేస్తుంది)
+    const locEl = document.getElementById("rLocation");
+    if (locEl) {
+        locEl.textContent = data.location || "";
+        const parentField = locEl.closest(".meta-field");
+        if (parentField) parentField.style.display = data.location ? "flex" : "none";
+    }
+
+    document.getElementById("rAdmissionFee").textContent = data.admissionFee;
+    document.getElementById("rAnnualSub").textContent = data.annualSub;
+    document.getElementById("rDonation").textContent = data.donation;
+    document.getElementById("rOthers").textContent = data.others;
+    document.getElementById("rTotal").textContent = data.totalAmount;
+    document.getElementById("rTotalInWords").textContent = data.totalInWords;
+
+    document.getElementById("rPaymentMode").textContent = data.paymentMode;
+    document.getElementById("rTransactionId").textContent = data.transactionId;
+    document.getElementById("rPaymentStatus").textContent = data.paymentStatus;
 
     generateReceiptQR(data);
 }
+
 
 function generateReceiptQR(data) {
     const qrContainer = document.getElementById("receiptQrCode");
