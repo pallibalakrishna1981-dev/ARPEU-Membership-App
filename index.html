@@ -1503,17 +1503,40 @@ Fast • Secure • Digital Membership System
         </div>
 
         <div class="receipt-footer-bottom">
+            <!-- Left Side: QR Code -->
             <div class="qr-box-container">
                 <div class="qr-box" id="receiptQrCode"></div>
-                <div class="qr-label">QR Verification</div>
+                <div class="qr-label">Scan Digital Profile</div>
             </div>
 
-            <div class="notice-box-container">
-                <div class="notice-badge">IMPORTANT</div>
-                <p class="notice-text">
-                    This is a Computer Generated Receipt. No Signature is Required.<br>
-                    <strong class="notice-red">Please verify this receipt using QR Code.</strong>
-                </p>
+            <!-- Right Side: Stacked Boxes (Important + Digital Profile 2 Columns) -->
+            <div class="receipt-footer-right-stack">
+
+                <!-- 1. Top Important Notice Box -->
+                <div class="receipt-important-box">
+                    <div class="important-badge">IMPORTANT</div>
+                    <p class="important-text">
+                        This is a Computer Generated Receipt. No Signature is Required.<br>
+                        <strong class="important-red">Please verify this receipt using QR Code.</strong>
+                    </p>
+                </div>
+
+                <!-- 2. Bottom Digital Profile Box (2 Columns) -->
+                <div class="receipt-profile-box">
+                    <div class="profile-badge">DIGITAL PROFILE</div>
+                    <p class="profile-headline">Scan QR Code to view complete Profile</p>
+                    <div class="profile-points-grid">
+                        <div class="point-col">
+                            <span>• Personal & Address Details</span>
+                            <span>• Employment Information</span>
+                        </div>
+                        <div class="point-col">
+                            <span>• Membership History & Validity</span>
+                            <span>• Payment Records & Validity</span>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
 
@@ -1521,7 +1544,133 @@ Fast • Secure • Digital Membership System
 
 </div>
 
+<!-- =========================================
+     MEMBER DIGITAL PROFILE SECTION
+========================================= -->
+<section id="profileSection" class="profile-page" style="display:none;">
 
+   <!-- Profile Top Action Buttons (Home, Print Profile, Close) -->
+    <div class="profile-actions-top no-print">
+        <button type="button" class="profile-btn home-btn" onclick="closeProfileAndGoHome()">
+            <i class="fas fa-house"></i> Home
+        </button>
+        <button type="button" class="profile-btn print-btn" onclick="window.print()">
+            <i class="fas fa-print"></i> Print Profile
+        </button>
+        <button type="button" class="profile-btn close-btn" onclick="closeProfile()">
+            <i class="fas fa-times"></i> Close
+        </button>
+    </div>
+
+    <!-- Profile Header Card -->
+    <div class="profile-header-card">
+        <div class="profile-avatar-box">
+            <img id="pMemberPhoto" src="images/arpeu-logo.png" alt="Member Photo">
+            <span id="pStatusBadge" class="status-active-badge">ACTIVE MEMBER</span>
+        </div>
+        <h2 id="pFullName" class="profile-name">Loading...</h2>
+        <div class="profile-id-pill">
+            <span>Membership ID:</span>
+            <strong id="pMembershipId">-</strong>
+        </div>
+        <div class="profile-union-tag">ANDHRA RASTRA POWER EMPLOYEES UNION</div>
+    </div>
+
+    <!-- Loading Spinner -->
+    <div id="profileLoader" class="profile-loading-box">
+        <i class="fas fa-spinner fa-spin"></i>
+        <p>Fetching Digital Member Profile...</p>
+    </div>
+
+    <!-- Profile Cards Grid -->
+    <div id="profileContent" class="profile-cards-container" style="display:none;">
+
+        <!-- Card 1: Membership Overview -->
+        <div class="prof-card">
+            <div class="prof-card-title"><i class="fas fa-id-card"></i> Membership Overview</div>
+            <div class="prof-grid-2">
+                <div class="prof-item"><label>Receipt Number</label><span id="pReceiptNo">-</span></div>
+                <div class="prof-item"><label>Date of Joining</label><span id="pJoinedDate">-</span></div>
+                <div class="prof-item"><label>Current Validity</label><span id="pValidity" class="highlight-val">-</span></div>
+                <div class="prof-item"><label>Membership Status</label><span id="pStatusText" class="text-success">-</span></div>
+            </div>
+        </div>
+
+        <!-- Card 2: Personal Information -->
+        <div class="prof-card">
+            <div class="prof-card-title"><i class="fas fa-user"></i> Personal Details</div>
+            <div class="prof-grid-2">
+                <div class="prof-item"><label>Full Name</label><span id="pNameVal">-</span></div>
+                <div class="prof-item"><label>Mobile Number</label><span id="pMobileVal">-</span></div>
+                <div class="prof-item"><label>Email ID</label><span id="pEmailVal">-</span></div>
+                <div class="prof-item"><label>Aadhaar Number</label><span id="pAadhaarVal" class="masked-text">-</span></div>
+            </div>
+        </div>
+
+        <!-- Card 3: Employment Information -->
+        <div class="prof-card">
+            <div class="prof-card-title"><i class="fas fa-building"></i> Employment Details</div>
+            <div class="prof-grid-2">
+                <div class="prof-item"><label>Company</label><span id="pCompanyVal">-</span></div>
+                <div class="prof-item"><label>Employee ID</label><span id="pEmpIdVal" class="highlight-val">-</span></div>
+                <div class="prof-item"><label>Station / Circle</label><span id="pStationVal">-</span></div>
+                <div class="prof-item"><label>Region / Division</label><span id="pDivisionVal">-</span></div>
+                <div class="prof-item"><label>Sub Division</label><span id="pSubDivVal">-</span></div>
+                <div class="prof-item"><label>Stage / Section</label><span id="pStageVal">-</span></div>
+            </div>
+        </div>
+
+        <!-- Card 4: Payment Summary -->
+        <div class="prof-card">
+            <div class="prof-card-title"><i class="fas fa-receipt"></i> Payment Details</div>
+            <div class="prof-grid-2">
+                <div class="prof-item"><label>Admission Fee</label><span>₹<span id="pAdmFee">100</span></span></div>
+                <div class="prof-item"><label>Annual Subscription</label><span>₹<span id="pAnnSub">360</span></span></div>
+                <div class="prof-item"><label>Donation</label><span>₹<span id="pDonation">0</span></span></div>
+                <div class="prof-item"><label>Total Amount Paid</label><strong class="total-text">₹<span id="pTotalPaid">460</span></strong></div>
+                <div class="prof-item"><label>Payment Mode</label><span id="pPayMode">UPI</span></div>
+                <div class="prof-item"><label>Transaction ID / UTR</label><span id="pTxnId" class="utr-code">-</span></div>
+            </div>
+        </div>
+
+        <!-- Card 5: Membership History & Association -->
+        <div class="prof-card history-card">
+            <div class="prof-card-title"><i class="fas fa-history"></i> ARPEU Membership History</div>
+            <div class="history-metrics-grid">
+                <div class="metric-box">
+                    <span class="metric-val" id="hStartYear">2026</span>
+                    <span class="metric-lbl">Started Year</span>
+                </div>
+                <div class="metric-box highlight-metric">
+                    <span class="metric-val" id="hYearsUnion">1 Year</span>
+                    <span class="metric-lbl">Years in ARPEU</span>
+                </div>
+                <div class="metric-box">
+                    <span class="metric-val" id="hTotalRenewals">0</span>
+                    <span class="metric-lbl">Total Renewals</span>
+                </div>
+                <div class="metric-box">
+                    <span class="metric-val">₹<span id="hTotalSub">460</span></span>
+                    <span class="metric-lbl">Total Paid</span>
+                </div>
+            </div>
+
+            <!-- Timeline -->
+            <div class="timeline-wrapper">
+                <div class="timeline-title">Membership Timeline</div>
+                <div class="timeline-item active-tl">
+                    <div class="tl-dot"><i class="fas fa-check"></i></div>
+                    <div class="tl-info">
+                        <strong>Registered as Digital Member</strong>
+                        <small id="tlDate">2026</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</section>
 
 <!-- =========================================
      STATISTICS SECTION

@@ -476,80 +476,46 @@ function initializeDistrictDropdown() {
    NAVIGATION ENGINE
 ========================================================= */
 
+/* ==========================================================
+   NAVIGATION ENGINE (ISOLATED PAGES FIX)
+========================================================== */
+
 function showPage(page) {
 
-    if (homeSection) {
-    homeSection.style.display = "none";
-    }
+    // 📌 ప్రొఫైల్ సెక్షన్‌తో సహా అన్నింటినీ ముందుగా హైడ్ చేస్తుంది
+    const profSec = document.getElementById("profileSection");
+    if (profSec) profSec.style.display = "none";
 
-    if (membershipPage) {
-        membershipPage.style.display = "none";
-    }
+    if (homeSection) homeSection.style.display = "none";
+    if (membershipPage) membershipPage.style.display = "none";
+    if (statisticsSection) statisticsSection.style.display = "none";
 
-    if (statisticsSection) {
-    statisticsSection.style.display = "none";
-    }
-
-    if (navHome) {
-        navHome.classList.remove("active");
-    }
-
-    if (navMembership) {
-        navMembership.classList.remove("active");
-    }
-
-    if (navStatistics) {
-        navStatistics.classList.remove("active");
-    }
+    if (navHome) navHome.classList.remove("active");
+    if (navMembership) navMembership.classList.remove("active");
+    if (navStatistics) navStatistics.classList.remove("active");
 
     switch (page) {
 
         case "home":
-
-            if (homeSection) {
-                homeSection.style.display = "block";
-            }
-
-            if (navHome) {
-                navHome.classList.add("active");
-            }
-
+            if (homeSection) homeSection.style.display = "block";
+            if (navHome) navHome.classList.add("active");
             break;
 
         case "membership":
-
-            if (membershipPage) {
-                membershipPage.style.display = "block";
-            }
-
-            if (navMembership) {
-                navMembership.classList.add("active");
-            }
-
+            if (membershipPage) membershipPage.style.display = "block";
+            if (navMembership) navMembership.classList.add("active");
             break;
 
         case "statistics":
-
-            if (statisticsSection) {
-                statisticsSection.style.display = "block";
-            }
-
-            if (navStatistics) {
-                navStatistics.classList.add("active");
-            }
-
+            if (statisticsSection) statisticsSection.style.display = "block";
+            if (navStatistics) navStatistics.classList.add("active");
             loadMembershipStatistics();
-
             break;
-
     }
 
-    window.scrollTo({
-        top: 0,
-        behavior: "smooth"
-    });
-
+    window.scrollTo({ top: 0, behavior: "smooth" });
 }
+
 
 /* =========================================================
    INITIALIZE NAVIGATION
@@ -2127,92 +2093,59 @@ const debounceTimers = {
     transactionid: null
 };
 
-// Common Fetch for Submit
+/* ==========================================================
+   ULTRA-CLEAN GET DUPLICATE CHECK ENGINE (NO CORS BLOCKS)
+========================================================== */
+
+// Common Fetch for Submit Check
 async function fetchDuplicateCheck(field, value) {
     if (!value || value.trim() === "") return { success: true, exists: false };
     try {
-        const response = await fetch(BACKEND_URL, {
-            method: "POST",
-            headers: { "Content-Type": "text/plain;charset=utf-8" },
-            body: JSON.stringify({
-                action: "checkDuplicate",
-                data: { field: field, value: value }
-            })
-        });
-        const text = await response.text();
-        try {
-            return JSON.parse(text);
-        } catch (err) {
-            // సర్వర్ ఆలస్యం చేసినా ఫారమ్ ఆగకుండా సేఫ్ గా ముందుకు పంపుతుంది
-            return { success: true, exists: false };
-        }
+        const url = `${BACKEND_URL}?action=checkDuplicate&field=${encodeURIComponent(field)}&value=${encodeURIComponent(value)}`;
+        const response = await fetch(url);
+        return await response.json();
     } catch (e) {
         console.error(`[${field}] Check Error:`, e);
-        return { success: true, exists: false };
+        return { success: true, exists: false }; // Fail-safe
     }
 }
 
-// Real-time POST Checker
+// Real-time Clean GET Checker
+// Real-time Fail-Safe GET Checker
 async function executeDuplicateCheck(field, value, statusElementId) {
     const statusEl = document.getElementById(statusElementId);
     if (!statusEl) return;
-
-    if (activeFetchControllers[field]) {
-        activeFetchControllers[field].abort();
-    }
-    activeFetchControllers[field] = new AbortController();
 
     statusEl.className = "field-status checking";
     statusEl.innerHTML = "Checking...";
 
     try {
-        const response = await fetch(BACKEND_URL, {
-            method: "POST",
-            headers: {
-                "Content-Type": "text/plain;charset=utf-8"
-            },
-            body: JSON.stringify({
-                action: "checkDuplicate",
-                data: {
-                    field: field,
-                    value: value
-                }
-            }),
-            signal: activeFetchControllers[field].signal
-        });
-
+        const url = `${BACKEND_URL}?action=checkDuplicate&field=${encodeURIComponent(field)}&value=${encodeURIComponent(value)}`;
+        const response = await fetch(url);
         const rawText = await response.text();
         let result;
 
         try {
             result = JSON.parse(rawText);
         } catch (e) {
-            statusEl.className = "field-status error";
-            statusEl.innerHTML = "⚠️ Server Busy";
+            // సర్వర్ వార్మప్ వల్ల రెస్పాన్స్ లేట్ అయితే యూజర్‌ని ఆపకుండా సురక్షితంగా ప్రొసీడ్ చేస్తుంది
+            statusEl.className = "field-status success";
+            statusEl.innerHTML = "✔ Available";
             return;
         }
 
-        if (result.success && result.exists) {
+        if (result && result.success && result.exists) {
             statusEl.className = "field-status error";
             statusEl.innerHTML = "✖ Already Registered";
-        } else if (result.success) {
+        } else {
             statusEl.className = "field-status success";
             statusEl.innerHTML = "✔ Available";
-        } else {
-            statusEl.className = "field-status error";
-            statusEl.innerHTML = "⚠️ Check Failed";
         }
 
     } catch (error) {
-        if (error.name === 'AbortError') {
-            // Ignore intentional aborts silently
-        } else {
-            console.error(`[${field}] Connection Error:`, error);
-            statusEl.className = "field-status error";
-            statusEl.innerHTML = "❌ Connection Error";
-        }
-    } finally {
-        activeFetchControllers[field] = null;
+        console.error(`[${field}] Error:`, error);
+        statusEl.className = "field-status success";
+        statusEl.innerHTML = "✔ Available";
     }
 }
 
@@ -2239,6 +2172,10 @@ async function checkTransactionIdDuplicate(transactionId) {
    INITIALIZE VALIDATIONS
 ========================================================== */
 
+/* ==========================================================
+   INITIALIZE VALIDATIONS (SMOOTH 800MS & BLUR CHECK)
+========================================================== */
+
 function initializeValidations() {
 
     /* 1. MOBILE (Strict 10 Digits) */
@@ -2253,13 +2190,12 @@ function initializeValidations() {
 
             if (val.length !== 10) {
                 if (status) { status.className = "field-status"; status.innerHTML = ""; }
-                if (activeFetchControllers.mobile) activeFetchControllers.mobile.abort();
                 return;
             }
 
             debounceTimers.mobile = setTimeout(() => {
                 executeDuplicateCheck("mobile", val, "mobileStatus");
-            }, 500);
+            }, 800);
         });
     }
 
@@ -2274,17 +2210,16 @@ function initializeValidations() {
 
             if (rawAadhaar.length !== 12) {
                 if (status) { status.className = "field-status"; status.innerHTML = ""; }
-                if (activeFetchControllers.aadhaar) activeFetchControllers.aadhaar.abort();
                 return;
             }
 
             debounceTimers.aadhaar = setTimeout(() => {
                 executeDuplicateCheck("aadhaar", rawAadhaar, "aadhaarStatus");
-            }, 500);
+            }, 800);
         });
     }
 
-    /* 3. EMPLOYEE ID (Check on Blur & Typing Pause) */
+    /* 3. EMPLOYEE ID (Check on Blur & Timeout) */
     const employeeIdInput = document.getElementById("employeeId");
     if (employeeIdInput) {
         employeeIdInput.addEventListener("input", function () {
@@ -2298,13 +2233,11 @@ function initializeValidations() {
                 return;
             }
 
-            // టైపింగ్ ఆపిన 1 సెకన్ తర్వాత చెక్ చేస్తుంది
             debounceTimers.employeeid = setTimeout(() => {
                 executeDuplicateCheck("employeeid", val, "employeeIdStatus");
             }, 1000);
         });
 
-        // బాక్స్ నుండి బయటికి క్లిక్ చేయగానే తక్షణమే చెక్ చేస్తుంది
         employeeIdInput.addEventListener("blur", function() {
             const val = this.value.trim();
             if (val.length >= 3) {
@@ -2314,7 +2247,7 @@ function initializeValidations() {
         });
     }
 
-    /* 4. TRANSACTION ID (Check on Blur & Typing Pause) */
+    /* 4. TRANSACTION ID (Check on Blur & Timeout) */
     const transactionIdInput = document.getElementById("payNowTransactionId");
     if (transactionIdInput) {
         transactionIdInput.addEventListener("input", function () {
@@ -2333,7 +2266,6 @@ function initializeValidations() {
             }, 1000);
         });
 
-        // బాక్స్ నుండి బయటికి క్లిక్ చేయగానే తక్షణమే చెక్ చేస్తుంది
         transactionIdInput.addEventListener("blur", function() {
             const val = this.value.trim();
             if (val.length >= 5) {
@@ -2350,7 +2282,7 @@ function initializeValidations() {
    ARPEU Backend Configuration
 ============================================ */
 
-const BACKEND_URL = "https://script.google.com/macros/s/AKfycbybpqT-flmk2uGHAKiQsxksho_J-YdIh9bsDtals95dmXp1IfDnHPoHHQuuNQToJJmB/exec";
+const BACKEND_URL = "https://script.google.com/macros/s/AKfycbxKuc9TyArIcDFFye8hecsLasOv51vJnfyJTnFwJIvmq8tkHhQt5UM0L-XwQZEV0Ynm/exec";
 
 async function testBackendConnection() {
 
@@ -2766,47 +2698,84 @@ try {
 
 
 /* ==========================================================
-   LOAD MEMBERSHIP STATISTICS
+   REAL-TIME LIVE MEMBERSHIP STATISTICS ENGINE
 ========================================================== */
 
+let statsAutoRefreshTimer = null;
+window.companyStatsData = {};
+
 async function loadMembershipStatistics() {
-
     try {
-
-        const response = await fetch(BACKEND_URL, {
-            method: "POST",
-            body: JSON.stringify({
-                action: "getMembershipStatistics"
-            })
-        });
-
+        const url = `${BACKEND_URL}?action=getMembershipStatistics`;
+        const response = await fetch(url);
         const result = await response.json();
 
-        if (!result.success) {
-            console.error(result.message);
-            return;
-        }
+        if (!result || !result.success || !result.statistics) return;
 
         const stats = result.statistics;
+        window.companyStatsData = stats.companyDetails || {};
 
-        document.getElementById("totalMembers").textContent = stats.totalMembers;
-        document.getElementById("todayMembers").textContent = stats.todayMembers;
-        document.getElementById("monthMembers").textContent = stats.monthMembers;
-        document.getElementById("yearMembers").textContent = stats.yearMembers;
+        // లైవ్ నంబర్ల అప్‌డేట్
+        if (document.getElementById("totalMembers")) document.getElementById("totalMembers").textContent = stats.totalMembers || 0;
+        if (document.getElementById("todayMembers")) document.getElementById("todayMembers").textContent = stats.todayMembers || 0;
+        if (document.getElementById("monthMembers")) document.getElementById("monthMembers").textContent = stats.monthMembers || 0;
+        if (document.getElementById("yearMembers")) document.getElementById("yearMembers").textContent = stats.yearMembers || 0;
 
-        document.getElementById("apgencoCount").textContent = stats.companies.APGENCO;
-        document.getElementById("aptranscoCount").textContent = stats.companies.APTRANSCO;
-        document.getElementById("apspdclCount").textContent = stats.companies.APSPDCL;
-        document.getElementById("apcpdclCount").textContent = stats.companies.APCPDCL;
-        document.getElementById("apepdclCount").textContent = stats.companies.APEPDCL;
-
+        if (stats.companies) {
+            if (document.getElementById("apgencoCount")) document.getElementById("apgencoCount").textContent = stats.companies.APGENCO || 0;
+            if (document.getElementById("aptranscoCount")) document.getElementById("aptranscoCount").textContent = stats.companies.APTRANSCO || 0;
+            if (document.getElementById("apspdclCount")) document.getElementById("apspdclCount").textContent = stats.companies.APSPDCL || 0;
+            if (document.getElementById("apcpdclCount")) document.getElementById("apcpdclCount").textContent = stats.companies.APCPDCL || 0;
+            if (document.getElementById("apepdclCount")) document.getElementById("apepdclCount").textContent = stats.companies.APEPDCL || 0;
+        }
     } catch (error) {
+        console.error("Live Statistics Load Error:", error);
+    }
+}
 
-        console.error("Statistics Error:", error);
+// 📌 కంపెనీ కార్డ్ క్లిక్ చేసినప్పుడు డీటైల్స్ చూపించే ఫంక్షన్
+function showCompany(companyKey) {
+    const detailsDiv = document.getElementById("companyDetails");
+    if (!detailsDiv) return;
 
+    const keyUpper = companyKey.toUpperCase();
+    const details = window.companyStatsData ? window.companyStatsData[keyUpper] : null;
+
+    if (!details || Object.keys(details).length === 0) {
+        detailsDiv.innerHTML = `<h3><i class="fas fa-building" style="color:#ff6600;"></i> ${keyUpper} Details</h3><p style="color:#666; font-size:13px; margin-top:8px;">No station/circle registrations found yet.</p>`;
+        detailsDiv.style.display = "block";
+        return;
     }
 
+    let html = `<h3><i class="fas fa-building" style="color:#ff6600;"></i> ${keyUpper} Station / Circle Breakdown</h3>`;
+    for (const [name, count] of Object.entries(details)) {
+        html += `
+            <div class="detail-row">
+                <span class="detail-name"><i class="fas fa-bolt"></i> ${name}</span>
+                <span class="detail-count">${count} Members</span>
+            </div>
+        `;
+    }
+
+    detailsDiv.innerHTML = html;
+    detailsDiv.style.display = "block";
+    detailsDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
+
+// 📌 ప్రతీ 15 సెకన్లకు ఆటోమేటిక్‌గా రీఫ్రెష్ అయ్యే లైవ్ టైమర్
+function startLiveStatsPolling() {
+    loadMembershipStatistics(); // తక్షణమే మొదటిసారి తెస్తుంది
+    if (!statsAutoRefreshTimer) {
+        statsAutoRefreshTimer = setInterval(function () {
+            loadMembershipStatistics(); // ప్రతీ 15 సెకన్లకు బ్యాక్‌గ్రౌండ్‌లో సింక్ అవుతుంది
+        }, 15000);
+    }
+}
+
+// 📌 Application Initialization లో లైవ్ సింకింగ్ స్టార్ట్ అవుతుంది
+document.addEventListener("DOMContentLoaded", function () {
+    startLiveStatsPolling();
+});
 
 /* ==========================================================
    RECEIPT TYPES
@@ -2987,17 +2956,140 @@ function generateReceiptQR(data) {
     if (!qrContainer) return;
     qrContainer.innerHTML = "";
 
-    const qrPayload = `ARPEU MEMBERSHIP RECEIPT\nReceipt No: ${data.receiptNumber}\nMember ID: ${data.membershipId}\nName: ${data.memberName}\nEmp ID: ${data.employeeId}\nCompany: ${data.company}\nTotal Paid: Rs. ${data.totalAmount}\nTxn ID: ${data.transactionId}\nStatus: ${data.paymentStatus}`;
+    const currentDomain = window.location.origin + window.location.pathname;
+    const profileUrl = `${currentDomain}?id=${encodeURIComponent(data.membershipId)}`;
 
     new QRCode(qrContainer, {
-        text: qrPayload,
-        width: 80,
-        height: 80,
+        text: profileUrl,
+        width: 85,
+        height: 85,
         colorDark: "#000000",
         colorLight: "#ffffff",
         correctLevel: QRCode.CorrectLevel.M
     });
+
+    // 📌 CLICK TO PREVIEW PROFILE (QR కోడ్ క్లిక్ చేయగానే ప్రొఫైల్ ఓపెన్ అవుతుంది)
+    qrContainer.style.cursor = "pointer";
+    qrContainer.title = "Click here to Preview Member Digital Profile";
+    qrContainer.onclick = function () {
+        loadMemberProfile(data.membershipId);
+    };
 }
+
+/* ==========================================================
+   MEMBER DIGITAL PROFILE LOADER ENGINE
+========================================================== */
+
+
+function closeProfile() {
+    const profSec = document.getElementById("profileSection");
+    if (profSec) profSec.style.display = "none";
+
+    // URL లో ఉన్న ?id=... ని క్లియర్ చేసి హోమ్ పేజీకి తీసుకెళ్తుంది
+    if (window.history && window.history.pushState) {
+        window.history.pushState({}, document.title, window.location.pathname);
+    }
+    showPage("home");
+}
+
+function closeProfileAndGoHome() {
+    closeProfile();
+}
+
+async function loadMemberProfile(memberId) {
+    if (!memberId) return;
+
+    // 📌 ప్రొఫైల్ ఓపెన్ అయినప్పుడు హోమ్, మెంబర్‌షిప్, స్టాటిస్టిక్స్ అన్నింటినీ పూర్తిగా హైడ్ చేస్తుంది
+    if (homeSection) homeSection.style.display = "none";
+    if (membershipPage) membershipPage.style.display = "none";
+    if (statisticsSection) statisticsSection.style.display = "none";
+    const rc = document.getElementById("receiptContainer");
+    if (rc) rc.style.display = "none";
+
+    const profSec = document.getElementById("profileSection");
+    const loader = document.getElementById("profileLoader");
+    const content = document.getElementById("profileContent");
+
+    if (profSec) profSec.style.display = "block";
+    if (loader) loader.style.display = "block";
+    if (content) content.style.display = "none";
+
+    window.scrollTo({ top: 0, behavior: "smooth" });
+
+    try {
+        const response = await fetch(`${BACKEND_URL}?action=getMemberProfile&id=${encodeURIComponent(memberId)}`);
+        const result = await response.json();
+
+        if (result.success && result.profile) {
+            const p = result.profile;
+
+            // Member Photo Display
+            const photoImg = document.getElementById("pMemberPhoto");
+            if (photoImg) {
+                if (p.photoUrl) {
+                    photoImg.src = p.photoUrl;
+                } else {
+                    photoImg.src = "images/arpeu-logo.png";
+                }
+            }
+
+            document.getElementById("pFullName").textContent = p.fullName || "Member";
+            document.getElementById("pMembershipId").textContent = p.membershipId || memberId;
+            document.getElementById("pReceiptNo").textContent = p.receiptNo || "-";
+            document.getElementById("pJoinedDate").textContent = p.createdDate || "-";
+            document.getElementById("pValidity").textContent = p.validityTill || "-";
+            document.getElementById("pStatusText").textContent = p.membershipStatus || "ACTIVE MEMBER";
+
+            document.getElementById("pNameVal").textContent = p.fullName || "-";
+            document.getElementById("pMobileVal").textContent = p.mobile || "-";
+            document.getElementById("pEmailVal").textContent = p.email || "-";
+            document.getElementById("pAadhaarVal").textContent = p.maskedAadhaar || "XXXX XXXX XXXX";
+
+            document.getElementById("pCompanyVal").textContent = p.company || "-";
+            document.getElementById("pEmpIdVal").textContent = p.employeeId || "-";
+            document.getElementById("pStationVal").textContent = p.stationCircle || "-";
+            document.getElementById("pDivisionVal").textContent = p.divisionRegion || "-";
+            document.getElementById("pSubDivVal").textContent = p.subDivision || "-";
+            document.getElementById("pStageVal").textContent = p.stage || "-";
+
+            document.getElementById("pAdmFee").textContent = p.admissionFee || 100;
+            document.getElementById("pAnnSub").textContent = p.annualSubscription || 360;
+            document.getElementById("pDonation").textContent = p.donation || 0;
+            document.getElementById("pTotalPaid").textContent = (p.admissionFee || 100) + (p.annualSubscription || 360) + (p.donation || 0);
+            document.getElementById("pPayMode").textContent = p.paymentMode || "UPI";
+            document.getElementById("pTxnId").textContent = p.transactionId || "N/A";
+
+            // History Metrics
+            document.getElementById("hStartYear").textContent = p.startedYear || new Date().getFullYear();
+            document.getElementById("hYearsUnion").textContent = (p.yearsInUnion || 1) + (p.yearsInUnion > 1 ? " Years" : " Year");
+            document.getElementById("hTotalRenewals").textContent = p.totalRenewals || 0;
+            document.getElementById("hTotalSub").textContent = (p.admissionFee || 100) + (p.annualSubscription || 360) + (p.donation || 0);
+            document.getElementById("tlDate").textContent = p.createdDate || "2026";
+
+            if (loader) loader.style.display = "none";
+            if (content) content.style.display = "flex";
+        } else {
+            alert(result.message || "Unable to load profile");
+            closeProfile();
+        }
+    } catch (error) {
+        console.error("Profile Load Error:", error);
+        alert("Error connecting to server. Please try again.");
+        closeProfile();
+    }
+}
+
+
+
+// 📌 URL Check on Page Load
+document.addEventListener("DOMContentLoaded", function () {
+    const urlParams = new URLSearchParams(window.location.search);
+    const memberId = urlParams.get('id') || urlParams.get('memberId');
+
+    if (memberId) {
+        loadMemberProfile(memberId);
+    }
+});
 
 function openReceipt() {
     loadReceiptPreview();

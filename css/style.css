@@ -2052,12 +2052,13 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 /* Bottom Area (QR + Notice) */
+/* Bottom Area (QR + Stacked Notice Boxes) */
 .receipt-footer-bottom {
-    margin-top: 15px;
+    margin-top: 10px;
     display: flex;
-    align-items: flex-end;
+    align-items: stretch;
     justify-content: space-between;
-    gap: 12px;
+    gap: 10px;
 }
 
 .qr-box-container {
@@ -2089,39 +2090,99 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     margin-top: 3px;
 }
 
-.notice-box-container {
+.receipt-footer-right-stack {
     flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 6px;
+}
+
+/* 1. TOP BOX: IMPORTANT */
+.receipt-important-box {
     border: 1px dashed #d32f2f;
     border-radius: 6px;
-    padding: 6px 8px;
+    padding: 5px 8px;
     text-align: center;
     background: #fffafa;
     position: relative;
 }
 
-.notice-badge {
+.important-badge {
     position: absolute;
-    top: -8px;
+    top: -7px;
     left: 50%;
     transform: translateX(-50%);
     background: #d32f2f;
     color: #fff;
-    font-size: 8.5px;
+    font-size: 8px;
     font-weight: 800;
-    padding: 1px 8px;
-    border-radius: 10px;
+    padding: 1px 7px;
+    border-radius: 8px;
     letter-spacing: 0.5px;
 }
 
-.notice-text {
-    font-size: 9.5px;
-    line-height: 1.3;
-    color: #222222;
+.important-text {
+    font-size: 8.5px;
+    line-height: 1.25;
+    color: #222;
     margin-top: 2px;
 }
 
-.notice-red {
+.important-red {
     color: #d32f2f;
+}
+
+/* 2. BOTTOM BOX: DIGITAL PROFILE (2 COLUMNS) */
+.receipt-profile-box {
+    border: 1px solid #0B4EA2;
+    border-radius: 6px;
+    padding: 5px 8px;
+    background: #f4f8ff;
+    position: relative;
+    text-align: center;
+}
+
+.profile-badge {
+    position: absolute;
+    top: -7px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #0B4EA2;
+    color: #fff;
+    font-size: 8px;
+    font-weight: 800;
+    padding: 1px 7px;
+    border-radius: 8px;
+    letter-spacing: 0.5px;
+}
+
+.profile-headline {
+    font-size: 8.5px;
+    font-weight: 800;
+    color: #0B4EA2;
+    margin: 2px 0 3px 0;
+}
+
+.profile-points-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px;
+    text-align: left;
+}
+
+.point-col {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.point-col span {
+    font-size: 7.5px;
+    font-weight: 700;
+    color: #111;
+    white-space: nowrap;
+    line-height: 1.2;
 }
 
 /* Print Styles */
@@ -2154,4 +2215,290 @@ input[type="date"]::-webkit-calendar-picker-indicator {
         border-radius: 0;
         padding: 20px;
     }
+}
+
+/* =========================================
+   RECEIPT QR PROFILE NOTICE BOX
+========================================= */
+.qr-profile-notice-box {
+    border: 1.5px solid #0B4EA2 !important;
+    background: #f4f8ff !important;
+    padding: 6px 10px !important;
+    border-radius: 8px !important;
+    text-align: left !important;
+}
+
+.notice-headline {
+    font-size: 10px;
+    font-weight: 800;
+    color: #0B4EA2;
+    margin: 4px 0 3px 0;
+    text-align: center;
+}
+
+.notice-bullet-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.notice-bullet-list li {
+    font-size: 8.5px;
+    font-weight: 700;
+    color: #222;
+    line-height: 1.3;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.notice-bullet-list li i {
+    color: #0B4EA2;
+    font-size: 8px;
+}
+
+/* =========================================
+   DIGITAL PROFILE PAGE STYLES (MOBILE FIRST)
+========================================= */
+.profile-page {
+    width: 100%;
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 12px;
+    box-sizing: border-box;
+    background: #F3F7FC;
+    min-height: 100vh;
+    z-index: 9999;
+    position: relative;
+}
+
+.profile-actions-top {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.profile-btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.profile-btn.back-btn { background: #666; color: #fff; }
+.profile-btn.print-btn { background: #0B4EA2; color: #fff; }
+
+.profile-header-card {
+    background: linear-gradient(135deg, #0B4EA2, #1565C0);
+    border-radius: 16px;
+    padding: 20px 15px;
+    text-align: center;
+    color: #ffffff;
+    box-shadow: 0 4px 15px rgba(11,78,162,0.25);
+    margin-bottom: 15px;
+}
+
+.profile-avatar-box {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    margin: 0 auto 10px;
+}
+
+.profile-avatar-box img {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    border: 3px solid #ffffff;
+    object-fit: cover;
+    background: #fff;
+}
+
+.status-active-badge {
+    position: absolute;
+    bottom: -6px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #2e7d32;
+    color: #fff;
+    font-size: 9px;
+    font-weight: 800;
+    padding: 3px 8px;
+    border-radius: 12px;
+    white-space: nowrap;
+    border: 1px solid #fff;
+}
+
+.profile-name {
+    font-size: 18px;
+    font-weight: 800;
+    margin: 6px 0 4px 0;
+    text-transform: uppercase;
+}
+
+.profile-id-pill {
+    display: inline-block;
+    background: rgba(255,255,255,0.2);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+}
+
+.profile-union-tag {
+    font-size: 10px;
+    font-weight: 700;
+    color: #ffcc80;
+    margin-top: 8px;
+    letter-spacing: 0.5px;
+}
+
+.profile-loading-box {
+    text-align: center;
+    padding: 40px 10px;
+    color: #0B4EA2;
+    font-weight: 700;
+}
+
+.profile-loading-box i {
+    font-size: 32px;
+    margin-bottom: 10px;
+}
+
+.profile-cards-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.prof-card {
+    background: #ffffff;
+    border-radius: 14px;
+    padding: 14px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+.prof-card-title {
+    font-size: 14px;
+    font-weight: 800;
+    color: #0B4EA2;
+    border-bottom: 2px solid #eef4ff;
+    padding-bottom: 6px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.prof-grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.prof-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.prof-item label {
+    font-size: 10.5px;
+    color: #64748b;
+    font-weight: 600;
+}
+
+.prof-item span, .prof-item strong {
+    font-size: 12.5px;
+    font-weight: 700;
+    color: #1e293b;
+    word-break: break-word;
+}
+
+.highlight-val { color: #0B4EA2 !important; }
+.masked-text { font-family: monospace; letter-spacing: 1px; }
+.text-success { color: #2e7d32 !important; }
+.total-text { color: #d32f2f; font-size: 14px !important; }
+
+/* History Section */
+.history-metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.metric-box {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    padding: 10px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.highlight-metric {
+    background: #eff6ff;
+    border-color: #bfdbfe;
+}
+
+.metric-val {
+    display: block;
+    font-size: 16px;
+    font-weight: 800;
+    color: #0B4EA2;
+}
+
+.metric-lbl {
+    font-size: 10px;
+    color: #64748b;
+    font-weight: 700;
+}
+
+.timeline-wrapper {
+    background: #fafafa;
+    padding: 10px;
+    border-radius: 8px;
+}
+
+.timeline-title {
+    font-size: 11px;
+    font-weight: 800;
+    color: #333;
+    margin-bottom: 8px;
+}
+
+.timeline-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.tl-dot {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #2e7d32;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+}
+
+.tl-info strong { font-size: 12px; display: block; }
+.tl-info small { font-size: 10px; color: #666; }
+
+.qr-box {
+    cursor: pointer !important;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.qr-box:hover {
+    transform: scale(1.06);
+    border-color: #0B4EA2 !important;
+    box-shadow: 0 4px 12px rgba(11, 78, 162, 0.3);
 }
