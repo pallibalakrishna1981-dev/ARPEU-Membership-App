@@ -695,132 +695,113 @@ function setMembershipMode(mode) {
 
 
 /* =========================================================
-   PHOTO PREVIEW
+   PHOTO UPLOAD & CROPPER ENGINE (WHATSAPP STYLE)
 ========================================================= */
 
+let cropperInstance = null;
+window.croppedPhotoFile = null;
+
 function initializePhotoPreview() {
-
-    if (!memberPhoto || !photoPreview) {
-        return;
-    }
-
-    const previewText = document.querySelector(".preview-text");
+    if (!memberPhoto) return;
 
     memberPhoto.addEventListener("change", function () {
-
         const file = this.files[0];
+        if (!file) return;
 
-if (!file) {
-
-    photoPreview.removeAttribute("src");
-    photoPreview.style.display = "none";
-
-    if (previewText) {
-        previewText.style.display = "block";
-    }
-
-    return;
-}
-
-/* ==========================================
-   FILE TYPE VALIDATION
-========================================== */
-
-const allowedTypes = [
-    "image/jpeg",
-    "image/jpg",
-    "image/png",
-    "image/webp"
-];
-
-if (!allowedTypes.includes(file.type)) {
-
-    alert(
-        "Invalid file format.\n\n" +
-        "Only JPG, JPEG, PNG and WEBP files are allowed."
-    );
-
-    memberPhoto.value = "";
-
-    photoPreview.removeAttribute("src");
-    photoPreview.style.display = "none";
-
-    if (previewText) {
-        previewText.style.display = "block";
-    }
-
-    return;
-}
-
-/* ==========================================
-   FILE SIZE VALIDATION
-========================================== */
-
-const MAX_SIZE = 2 * 1024 * 1024;
-
-if (file.size > MAX_SIZE) {
-
-    alert(
-        "Photo size exceeds 2 MB.\n\n" +
-        "Please upload a photo smaller than 2 MB."
-    );
-
-    memberPhoto.value = "";
-
-    photoPreview.removeAttribute("src");
-    photoPreview.style.display = "none";
-
-    if (previewText) {
-        previewText.style.display = "block";
-    }
-
-    return;
-}
-
- const reader = new FileReader();
-
-reader.onload = function (e) {
-
-    const img = new Image();
-
-    img.onload = function () {
-
-        if (img.width < 300 || img.height < 400) {
-
-            alert(
-                "Photo resolution is too low.\n\n" +
-                "Minimum required resolution is 300 × 400 pixels."
-            );
-
-            memberPhoto.value = "";
-
-            photoPreview.removeAttribute("src");
-            photoPreview.style.display = "none";
-
-            if (previewText) {
-                previewText.style.display = "block";
-            }
-
+        const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+        if (!allowedTypes.includes(file.type)) {
+            alert("Invalid file format.\nOnly JPG, PNG and WEBP files are allowed.");
+            this.value = "";
             return;
         }
 
-        photoPreview.src = e.target.result;
-        photoPreview.style.display = "block";
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            openCropperModal(e.target.result);
+        };
+        reader.readAsDataURL(file);
+    });
+}
 
-        if (previewText) {
-            previewText.style.display = "none";
-        }
+function openCropperModal(imageSrc) {
+    const modal = document.getElementById("cropperModal");
+    const cropImg = document.getElementById("cropperImage");
+    if (!modal || !cropImg) return;
 
-    };
+    cropImg.src = imageSrc;
+    modal.style.display = "flex";
 
-    img.src = e.target.result;
+    if (cropperInstance) {
+        cropperInstance.destroy();
+    }
 
-};
+    // Passport Size Aspect Ratio (3:4)
+    cropperInstance = new Cropper(cropImg, {
+        aspectRatio: 3 / 4,
+        viewMode: 1,
+        dragMode: 'move',
+        autoCropArea: 0.9,
+        responsive: true,
+        restore: false,
+        guides: true,
+        center: true,
+        highlight: false,
+        cropBoxMovable: true,
+        cropBoxResizable: true,
+        toggleDragOnDblclick: false
+    });
+}
 
-reader.readAsDataURL(file);
+function cropperZoom(delta) {
+    if (cropperInstance) cropperInstance.zoom(delta);
+}
 
+function cropperRotate(degree) {
+    if (cropperInstance) cropperInstance.rotate(degree);
+}
+
+function cropperReset() {
+    if (cropperInstance) cropperInstance.reset();
+}
+
+function closeCropperModal() {
+    const modal = document.getElementById("cropperModal");
+    if (modal) modal.style.display = "none";
+    if (cropperInstance) {
+        cropperInstance.destroy();
+        cropperInstance = null;
+    }
+}
+
+function applyPhotoCrop() {
+    if (!cropperInstance) return;
+
+    // High quality cropped canvas (300x400 Passport Specs)
+    const canvas = cropperInstance.getCroppedCanvas({
+        width: 300,
+        height: 400,
+        imageSmoothingEnabled: true,
+        imageSmoothingQuality: 'high'
     });
 
+    canvas.toBlob((blob) => {
+        const croppedFile = new File([blob], "cropped-passport-photo.jpg", { type: "image/jpeg" });
+        window.croppedPhotoFile = croppedFile; // Save cropped reference
+
+        // Preview UI update
+        const photoPreview = document.getElementById("photoPreview");
+        const previewText = document.querySelector(".preview-text");
+        const photoFileName = document.getElementById("photoFileName");
+
+        if (photoPreview) {
+            photoPreview.src = canvas.toDataURL("image/jpeg", 0.9);
+            photoPreview.style.display = "block";
+        }
+        if (previewText) previewText.style.display = "none";
+        if (photoFileName) photoFileName.value = "Photo Cropped & Adjusted ✔";
+
+        closeCropperModal();
+    }, "image/jpeg", 0.9);
 }
 
 
@@ -1362,13 +1343,14 @@ function initializeEmploymentModule() {
 
 
 /* =========================================================
-   COMPANY CHANGE
+   COMPANY CHANGE (DYNAMIC LOCATION VISIBILITY FIX)
 ========================================================= */
 
 function onCompanyChange() {
 
-    // Hide All Groups
+    const locGroup = document.getElementById("locationGroup");
 
+    // Hide All Groups By Default
     hideElement(stationGroup);
     hideElement(stageGroup);
 
@@ -1378,11 +1360,13 @@ function onCompanyChange() {
 
     hideElement(subStationGroup);
     hideElement(sectionGroup);
+    
+    // 👈 డిఫాల్ట్‌గా లొకేషన్ ఫీల్డ్‌ని ఆటోమేటిక్‌గా హైడ్ చేస్తుంది
+    if (locGroup) locGroup.style.display = "none";
 
     hideElement(designationGroup);
 
-    // Clear Dropdowns
-
+    // Clear Dropdowns & Inputs
     DropdownEngine.clear(station, "Select Station");
     DropdownEngine.clear(stage, "Select Stage");
 
@@ -1394,11 +1378,13 @@ function onCompanyChange() {
 
     clearInput(subStation);
     clearInput(section);
+    
+    const locInput = document.getElementById("location");
+    if (locInput) locInput.value = "";
 
     /* ==========================================
-       APGENCO
+       1. APGENCO (Shows Station, Stage & Location)
     ========================================== */
-
     if (company.value === "APGENCO") {
 
         showElement(stationGroup);
@@ -1406,6 +1392,9 @@ function onCompanyChange() {
 
         showElement(divisionGroup);
         showElement(subDivisionGroup);
+
+        // 👈 APGENCO ఎంచుకుంటే మాత్రమే Location ఫీల్డ్ కనిపిస్తుంది!
+        if (locGroup) locGroup.style.display = "block";
 
         showElement(designationGroup);
 
@@ -1416,13 +1405,11 @@ function onCompanyChange() {
         );
 
         return;
-
     }
 
     /* ==========================================
-       APTRANSCO
+       2. APTRANSCO (Hides Location)
     ========================================== */
-
     if (company.value === "APTRANSCO") {
 
         showElement(circleGroup);
@@ -1431,6 +1418,7 @@ function onCompanyChange() {
 
         showElement(subStationGroup);
         showElement(sectionGroup);
+        // Location is hidden!
 
         showElement(designationGroup);
 
@@ -1441,13 +1429,11 @@ function onCompanyChange() {
         );
 
         return;
-
     }
 
     /* ==========================================
-       DISCOMS
+       3. DISCOMS (APSPDCL, APCPDCL, APEPDCL) (Hides Location)
     ========================================== */
-
     if (
         company.value === "APSPDCL" ||
         company.value === "APCPDCL" ||
@@ -1460,6 +1446,7 @@ function onCompanyChange() {
 
         showElement(subStationGroup);
         showElement(sectionGroup);
+        // Location is hidden!
 
         showElement(designationGroup);
 
@@ -1472,10 +1459,9 @@ function onCompanyChange() {
         );
 
         return;
-
     }
-
 }
+
 
 /* =========================================================
    CIRCLE CHANGE
