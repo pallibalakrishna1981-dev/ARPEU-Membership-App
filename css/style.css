@@ -220,6 +220,101 @@ margin-top:8px;
 font-size:12px;
 opacity:.95;
 }
+
+
+/* =========================================
+   MORE MENU STYLES
+========================================= */
+
+.more-menu{
+position:relative;
+flex:1;
+display:flex;
+justify-content:center;
+align-items:center;
+}
+.more-btn{
+width:100%;
+height:100%;
+border:none;
+background:transparent;
+display:flex;
+align-items:center;
+justify-content:center;
+gap:6px;
+cursor:pointer;
+padding:0;
+font:inherit;
+color:inherit;
+}
+.more-btn i{
+font-size:16px;
+color:#0B4EA2;
+margin:0;
+}
+.more-btn span{
+font-size:13px;
+font-weight:600;
+color:#333;
+}
+.more-btn:hover{
+background:#f5f5f5;
+}
+.more-dropdown{
+display:none;
+position:absolute;
+right:8px;
+top:100%;
+margin-top:6px;
+width:230px;
+background:#ffffff;
+border:1px solid #e5e7eb;
+border-radius:14px;
+box-shadow:0 8px 24px rgba(0,0,0,.15);
+overflow:hidden;
+z-index:9999;
+}
+.more-dropdown.show{
+display:block;
+animation:menuFade .2s ease;
+}
+@keyframes menuFade{
+from{
+opacity:0;
+transform:translateY(10px);
+}
+to{
+opacity:1;
+transform:translateY(0);
+}
+}
+.more-dropdown a{
+display:flex;
+align-items:center;
+gap:12px;
+padding:13px 16px;
+text-decoration:none;
+font-size:14px;
+font-weight:600;
+color:#333;
+border-bottom:1px solid #f1f1f1;
+transition:.2s;
+}
+.more-dropdown a:last-child{
+border-bottom:none;
+}
+.more-dropdown a:hover{
+background:#EEF5FF;
+color:#0B4EA2;
+}
+.more-dropdown a i{
+width:20px;
+text-align:center;
+color:#0B4EA2;
+font-size:16px;
+}
+
+
 /*=========================================
 MEMBERSHIP SERVICES
 =========================================*/
@@ -3087,4 +3182,294 @@ body{
     font-size: 10px;
     color: #1877F2;
     font-weight: 600;
+}
+
+/* =========================================
+   CONTACT US PAGE STYLES (REFOCUSED DESIGN)
+========================================= */
+
+.contact-page {
+    padding: 16px 12px 28px;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+/* Page Header */
+.contact-page-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.contact-logo-box {
+    width: 65px;
+    height: 65px;
+    margin: 0 auto 10px;
+}
+
+.contact-logo-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.contact-main-title {
+    font-size: 22px;
+    font-weight: 800;
+    color: #0B4EA2;
+    letter-spacing: 0.8px;
+    margin: 0 0 4px;
+}
+
+/* Divider Line with Orange Dot */
+.contact-title-divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin: 4px 0 10px;
+}
+
+.divider-line {
+    width: 40px;
+    height: 2px;
+    background-color: #d1d5db;
+}
+
+.divider-dot {
+    width: 6px;
+    height: 6px;
+    background-color: #f97316;
+    border-radius: 50%;
+}
+
+.contact-sub-title {
+    font-size: 12px;
+    color: #475569;
+    font-weight: 500;
+    line-height: 1.4;
+    margin: 0;
+}
+
+/* Contact Bearers Layout */
+.contact-cards-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.contact-bearer-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 10px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+/* Avatar Box */
+.bearer-avatar-box {
+    width: 68px;
+    height: 68px;
+    min-width: 68px;
+    border-radius: 50%;
+    border: 2px solid #0B4EA2;
+    overflow: hidden;
+    background: #f8fafc;
+}
+
+.bearer-avatar-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Bearer Text Info */
+.bearer-info {
+    flex: 1;
+    margin: 0 10px;
+}
+
+.bearer-title {
+    font-size: 13px;
+    font-weight: 800;
+    color: #0B4EA2;
+    margin: 0 0 2px;
+    line-height: 1.2;
+}
+
+.bearer-name {
+    font-size: 12px;
+    font-weight: 600;
+    color: #334155;
+    margin: 0;
+}
+
+/* Action Buttons */
+.bearer-action-btns {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.btn-call, .btn-whatsapp {
+    height: 34px;
+    padding: 0 10px;
+    border-radius: 6px;
+    font-size: 11.5px;
+    font-weight: 700;
+    color: #ffffff !important;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    transition: opacity 0.2s;
+}
+
+.btn-call {
+    background-color: #0B4EA2;
+}
+
+.btn-whatsapp {
+    background-color: #22c55e;
+}
+
+.btn-call:active, .btn-whatsapp:active {
+    opacity: 0.85;
+}
+
+/* Info Grid (Email & Website) */
+.contact-info-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.contact-info-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 10px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+.info-card-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.info-card-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    color: #ffffff;
+    flex-shrink: 0;
+}
+
+.email-bg {
+    background-color: #0B4EA2;
+}
+
+.web-bg {
+    background-color: #0B4EA2;
+}
+
+.info-card-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.info-card-text label {
+    font-size: 10.5px;
+    color: #64748b;
+    font-weight: 600;
+}
+
+.info-card-text span {
+    font-size: 12px;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+/* Outlined Buttons */
+.btn-outline {
+    border: 1px solid #0B4EA2;
+    color: #0B4EA2 !important;
+    background: transparent;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    flex-shrink: 0;
+    transition: background-color 0.2s;
+}
+
+.btn-outline:active {
+    background-color: #eef5ff;
+}
+
+/* Social Media Section */
+.contact-social-section {
+    text-align: center;
+    margin-top: 10px;
+}
+
+.social-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #0B4EA2;
+    margin-bottom: 10px;
+}
+
+.contact-social-icons {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+}
+
+.social-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    color: #ffffff !important;
+    text-decoration: none;
+}
+
+.social-btn.fb { background-color: #1877F2; }
+.social-btn.yt { background-color: #FF0000; }
+.social-btn.insta { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); }
+.social-btn.twitter { background-color: #000000; }
+
+/* Responsive adjustments */
+@media (max-width: 380px) {
+    .btn-call, .btn-whatsapp {
+        padding: 0 8px;
+        font-size: 11px;
+    }
+    .bearer-avatar-box {
+        width: 58px;
+        height: 58px;
+        min-width: 58px;
+    }
 }

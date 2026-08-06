@@ -64,26 +64,82 @@
 
 </header>
 
+
 <nav class="navbar">
 
-<a href="#" class="nav-item active" id="navHome">
-    <i class="fa-solid fa-house"></i>
-    <span>Home</span>
-</a>
+    <a href="#" class="nav-item active" id="navHome">
+        <i class="fa-solid fa-house"></i>
+        <span>Home</span>
+    </a>
 
-<a href="#" class="nav-item" id="navMembership">
-    <i class="fa-solid fa-id-card"></i>
-    <span>Membership</span>
-</a>
+    <a href="#" class="nav-item" id="navMembership">
+        <i class="fa-solid fa-id-card"></i>
+        <span>Membership</span>
+    </a>
 
-<a href="#" class="nav-item" id="navStatistics">
-    <i class="fa-solid fa-chart-column"></i>
-    <span>Statistics</span>
-</a>
+    <a href="#" class="nav-item" id="navStatistics">
+        <i class="fa-solid fa-chart-column"></i>
+        <span>Statistics</span>
+    </a>
+
+    <div class="nav-item more-menu">
+
+        <button type="button" id="moreBtn" class="more-btn">
+            <span>More</span>
+            <i class="fa-solid fa-bars"></i>
+        </button>
+
+        <div class="more-dropdown" id="moreDropdown">
+
+            <a href="#" id="navAbout">
+                <i class="fa-solid fa-circle-info"></i>
+                <span>About ARPEU</span>
+            </a>
+
+            <a href="#" id="navOfficeBearers">
+                <i class="fa-solid fa-users"></i>
+                <span>Office Bearers</span>
+            </a>
+
+            <a href="#" id="navContact">
+                <i class="fa-solid fa-address-book"></i>
+                <span>Contact Us</span>
+            </a>
+
+            <a href="#" id="navGallery">
+                <i class="fa-solid fa-images"></i>
+                <span>Gallery</span>
+            </a>
+
+            <a href="#" id="navDownloads">
+                <i class="fa-solid fa-download"></i>
+                <span>Downloads</span>
+            </a>
+
+            <a href="#" id="navNotifications">
+                <i class="fa-solid fa-bell"></i>
+                <span>Notifications</span>
+            </a>
+
+            <a href="#" id="navSettings">
+                <i class="fa-solid fa-gear"></i>
+                <span>Settings</span>
+            </a>
+
+            <a href="#" id="navAdmin">
+                <i class="fa-solid fa-user-shield"></i>
+                <span>Admin Login</span>
+            </a>
+
+        </div>
+
+    </div>
 
 </nav>
+
+
 <main id="contentArea" class="content-area">
-    
+
 <!-- =========================================
      HOME SECTION (COMPACT & SCROLLABLE)
 ========================================= -->
@@ -1975,6 +2031,148 @@
 </div>
 
 </section>
+
+
+<!-- =========================================
+     CONTACT US SECTION
+========================================= -->
+<section id="contactSection" class="contact-page" style="display:none;">
+
+    <!-- Top Page Header -->
+    <div class="contact-page-header">
+        <div class="contact-logo-box">
+            <img src="images/arpeu-logo.png" alt="ARPEU Logo" onerror="this.src='images/arpeu-logo.png';">
+        </div>
+        <h2 class="contact-main-title">CONTACT US</h2>
+        <div class="contact-title-divider">
+            <span class="divider-line"></span>
+            <span class="divider-dot"></span>
+            <span class="divider-line"></span>
+        </div>
+        <p class="contact-sub-title">We are always here to serve you.<br>Feel free to reach out to us anytime.</p>
+    </div>
+
+    <!-- Contact Cards Container -->
+    <div class="contact-cards-container">
+
+        <!-- Card 1: State President -->
+        <div class="contact-bearer-card">
+            <div class="bearer-avatar-box">
+                <img src="images/state-president.jpg" alt="State President" onerror="this.src='images/arpeu-logo.png';">
+            </div>
+            <div class="bearer-info">
+                <h3 class="bearer-title">State President</h3>
+                <p class="bearer-name">Sri T. Sambasiva Rao</p>
+            </div>
+            <div class="bearer-action-btns">
+                <a href="tel:+919849195995" class="btn-call">
+                    <i class="fas fa-phone-alt"></i> Call
+                </a>
+                <a href="https://wa.me/919849195995" target="_blank" class="btn-whatsapp">
+                    <i class="fab fa-whatsapp"></i> WhatsApp
+                </a>
+            </div>
+        </div>
+
+        <!-- Card 2: General Secretary -->
+        <div class="contact-bearer-card">
+            <div class="bearer-avatar-box">
+                <img src="images/general-secretary.jpg" alt="General Secretary" onerror="this.src='images/arpeu-logo.png';">
+            </div>
+            <div class="bearer-info">
+                <h3 class="bearer-title">State General Secretary</h3>
+                <p class="bearer-name">Sri C. Ramagopal Reddy</p>
+            </div>
+            <div class="bearer-action-btns">
+                <a href="tel:+917989215049" class="btn-call">
+                    <i class="fas fa-phone-alt"></i> Call
+                </a>
+                <a href="https://wa.me/917989215049" target="_blank" class="btn-whatsapp">
+                    <i class="fab fa-whatsapp"></i> WhatsApp
+                </a>
+            </div>
+        </div>
+
+        <!-- Card 3: State Treasurer -->
+        <div class="contact-bearer-card">
+            <div class="bearer-avatar-box">
+                <img src="images/state-treasurer.jpg" alt="State Treasurer" onerror="this.src='images/arpeu-logo.png';">
+            </div>
+            <div class="bearer-info">
+                <h3 class="bearer-title">State Treasurer</h3>
+                <p class="bearer-name">Sri P. Balakrishna</p>
+            </div>
+            <div class="bearer-action-btns">
+                <a href="tel:+919642788786" class="btn-call">
+                    <i class="fas fa-phone-alt"></i> Call
+                </a>
+                <a href="https://wa.me/919642788786" target="_blank" class="btn-whatsapp">
+                    <i class="fab fa-whatsapp"></i> WhatsApp
+                </a>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Official Communication Grid (Email & Website) -->
+    <div class="contact-info-grid">
+
+        <!-- Email Card -->
+        <div class="contact-info-card">
+            <div class="info-card-left">
+                <div class="info-card-icon email-bg">
+                    <i class="fas fa-envelope"></i>
+                </div>
+                <div class="info-card-text">
+                    <label>Email</label>
+                    <span>info@arpeu.org.in</span>
+                </div>
+            </div>
+            <a href="mailto:info@arpeu.org.in" class="btn-outline">
+                <i class="fas fa-envelope"></i> Send Email
+            </a>
+        </div>
+
+        <!-- Website Card -->
+        <div class="contact-info-card">
+            <div class="info-card-left">
+                <div class="info-card-icon web-bg">
+                    <i class="fas fa-globe"></i>
+                </div>
+                <div class="info-card-text">
+                    <label>Website</label>
+                    <span>www.arpeu.org.in</span>
+                </div>
+            </div>
+            <a href="https://www.arpeu.org.in" target="_blank" class="btn-outline">
+                <i class="fas fa-globe"></i> Visit Website
+            </a>
+        </div>
+
+    </div>
+
+    <!-- Social Media Links Section -->
+    <div class="contact-social-section">
+        <h4 class="social-title">Follow Us</h4>
+        <div class="contact-social-icons">
+            <a href="https://www.facebook.com/profile.php?id=61583326633639" target="_blank" class="social-btn fb" title="Facebook">
+                <i class="fab fa-facebook-f"></i>
+            </a>
+            <a href="https://youtube.com" target="_blank" class="social-btn yt" title="YouTube">
+                <i class="fab fa-youtube"></i>
+            </a>
+            <a href="https://instagram.com" target="_blank" class="social-btn insta" title="Instagram">
+                <i class="fab fa-instagram"></i>
+            </a>
+            <a href="https://x.com" target="_blank" class="social-btn twitter" title="X (Twitter)">
+                <i class="fab fa-x-twitter"></i>
+            </a>
+        </div>
+    </div>
+
+</section>
+
+
 
 <!-- =========================================
      PHOTO CROPPER MODAL (WHATSAPP STYLE)

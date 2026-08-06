@@ -66,6 +66,8 @@ const navStatistics = document.getElementById("navStatistics");
 const homeSection = document.getElementById("homeSection");
 const membershipPage = document.getElementById("membershipPage");
 const statisticsSection = document.getElementById("statisticsSection");
+const navContact = document.getElementById("navContact");
+const contactSection = document.getElementById("contactSection");
 
 const newMemberBtn = document.getElementById("newMemberBtn");
 const renewalBtn = document.getElementById("renewalBtn");
@@ -489,6 +491,7 @@ function showPage(page) {
     if (homeSection) homeSection.style.display = "none";
     if (membershipPage) membershipPage.style.display = "none";
     if (statisticsSection) statisticsSection.style.display = "none";
+    if (contactSection) contactSection.style.display = "none";
 
     if (navHome) navHome.classList.remove("active");
     if (navMembership) navMembership.classList.remove("active");
@@ -510,6 +513,10 @@ function showPage(page) {
             if (statisticsSection) statisticsSection.style.display = "block";
             if (navStatistics) navStatistics.classList.add("active");
             loadMembershipStatistics();
+            break;
+
+            case "contact":
+            if (contactSection) contactSection.style.display = "block";
             break;
     }
 
@@ -564,6 +571,23 @@ function initializeNavigation() {
             e.preventDefault();
 
             showPage("statistics");
+
+        });
+
+    }
+
+    if (navContact) {
+
+        navContact.addEventListener("click", function (e) {
+
+            e.preventDefault();
+
+            showPage("contact");
+
+            const moreDropdown = document.getElementById("moreDropdown");
+            if (moreDropdown) {
+                moreDropdown.classList.remove("show");
+            }
 
         });
 
@@ -3156,3 +3180,22 @@ loadMembershipStatistics = async function() {
         originalLoadStats();
     }
 };
+
+const moreBtn=document.getElementById("moreBtn");
+const moreDropdown=document.getElementById("moreDropdown");
+if(moreBtn&&moreDropdown){
+moreBtn.addEventListener("click",function(e){
+e.stopPropagation();
+moreDropdown.classList.toggle("show");
+});
+document.addEventListener("click",function(e){
+if(!moreDropdown.contains(e.target)&&!moreBtn.contains(e.target)){
+moreDropdown.classList.remove("show");
+}
+});
+document.querySelectorAll("#moreDropdown a").forEach(function(item){
+item.addEventListener("click",function(){
+moreDropdown.classList.remove("show");
+});
+});
+}
