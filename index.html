@@ -12,7 +12,7 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/style.css?v=2026">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
@@ -82,121 +82,230 @@
 </a>
 
 </nav>
-
-<main class="main-content">
-<section id="homeSection">
-<section class="welcome-section">
-
-<div class="welcome-card">
-
-<span class="welcome-tag">
-
-WELCOME TO
-
-</span>
-
-<h2>
-
-ARPEU DIGITAL<br>
-
-MEMBERSHIP PORTAL
-
-</h2>
-
-<p>
-
-Fast • Secure • Digital Membership System
-
-</p>
-
-</div>
-
-</section>
-
-<section class="service-section">
-<h3 class="section-title">Membership Services</h3>
-<div class="service-grid">
-<a href="#" id="newMemberBtn" class="service-card new-card">
-    <span>New Member</span>
-</a>
-<a href="#" id="renewalBtn" class="service-card renewal-card">
-    <span>Renewal</span>
-</a>
-</div>
-</section>
-
-
-
+<main id="contentArea" class="content-area">
+    
 <!-- =========================================
-     CONTACT SECTION
+     HOME SECTION (COMPACT & SCROLLABLE)
 ========================================= -->
+<section id="homeSection">
 
-<section class="contact-section">
+    <!-- 1 & 2. AUTO-HIDING WELCOME BANNER & CONTACT CARD -->
+    <div id="homeBannerContainer" class="home-banner-container">
+        
+        <!-- Welcome Card -->
+        <section class="welcome-section">
+            <div class="welcome-card">
+                <div class="welcome-card-header">
+                    <span class="welcome-tag">WELCOME TO</span>
+                    <button type="button" class="dismiss-banner-btn" onclick="dismissHomeBanner()" title="Dismiss Banner">&times; Close</button>
+                </div>
+                <h2>ARPEU DIGITAL<br>MEMBERSHIP PORTAL</h2>
+                <p>Fast • Secure • Digital Membership System</p>
+            </div>
+        </section>
 
-<div class="contact-card">
-
-    <!-- Contact Information -->
-    <div class="contact-left">
-
-        <h4>Contact Information</h4>
-
-        <a href="tel:+919642788786" class="contact-link">
-            <i class="fa-solid fa-phone"></i>
-            +91 9642788786
-        </a>
-
-        <a href="mailto:info@arpeu.org.in" class="contact-link">
-            <i class="fa-solid fa-envelope"></i>
-            info@arpeu.org.in
-        </a>
-
-        <a href="https://www.arpeu.org.in" class="contact-link" target="_blank">
-            <i class="fa-solid fa-globe"></i>
-            www.arpeu.org.in
-        </a>
+        <!-- Collapsible Contact Card -->
+        <section class="contact-section-home">
+            <div class="contact-card-inner">
+                <div class="contact-info-title"><i class="fas fa-building-flag"></i> ARPEU State Head Office</div>
+                <div class="contact-links-grid">
+                    <a href="tel:+919642788786" class="c-link"><i class="fas fa-phone-alt"></i> +91 9642788786</a>
+                    <a href="mailto:info@arpeu.org.in" class="c-link"><i class="fas fa-envelope"></i> info@arpeu.org.in</a>
+                    <a href="https://www.arpeu.org.in" target="_blank" class="c-link"><i class="fas fa-globe"></i> www.arpeu.org.in</a>
+                    <span class="c-link"><i class="fas fa-clock"></i> Mon-Sat: 10AM-5PM</span>
+                </div>
+            </div>
+        </section>
 
     </div>
 
-    <!-- Divider -->
-    <div class="contact-divider"></div>
+    <!-- 3. MEMBERSHIP SERVICES (LOCKED - UNTOUCHED) -->
+    <section class="service-section">
+        <h3 class="section-title">Membership Services</h3>
+        <div class="service-grid">
+            <a href="#" id="newMemberBtn" class="service-card new-card">
+                <span>New Member</span>
+            </a>
+            <a href="#" id="renewalBtn" class="service-card renewal-card">
+                <span>Renewal</span>
+            </a>
+        </div>
+    </section>
 
-    <!-- Social Media -->
-    <div class="contact-right">
+    <!-- 4. COMPACT LIVE COUNTERS (LINK MOVED TO TOP RIGHT) -->
+    <section class="home-counters-section">
+        <div class="counters-card-compact">
+            <div class="counters-header-split">
+                <div class="counters-title-box">
+                    <span class="live-dot-pulse"></span>
+                    <span class="counters-title"><i class="fas fa-chart-line"></i> Live Membership Overview</span>
+                </div>
+                <a href="#" class="view-stats-link-top" onclick="showPage('statistics'); return false;">
+                    Detailed Statistics <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+            <div class="counters-grid-compact">
+                <div class="counter-box total">
+                    <span class="c-val" id="hTotalMembers">0</span>
+                    <span class="c-lbl">Total Members</span>
+                </div>
+                <div class="counter-box last-year">
+                    <span class="c-val" id="hLastYearMembers">0</span>
+                    <span class="c-lbl">Last Year</span>
+                </div>
+                <div class="counter-box current-year">
+                    <span class="c-val" id="hCurrentYearMembers">0</span>
+                    <span class="c-lbl">Current Year</span>
+                </div>
+                <div class="counter-box growth">
+                    <span class="c-val" id="hGrowthMembers">+0</span>
+                    <span class="c-lbl">Growth</span>
+                </div>
+            </div>
+        </div>
+    </section>
 
-        <h4>Follow Us On</h4>
+    <!-- 8. NOTICE BOARD (SCROLLING TICKER) -->
+    <section class="notice-board-section">
+        <div class="notice-board-card">
+            <div class="notice-ticker-title">
+                <i class="fas fa-bullhorn"></i> Notice Board
+            </div>
+            <div class="notice-ticker-wrapper">
+                <div class="notice-ticker-content">
+                    <span><i class="fas fa-circle-dot"></i> August 31: Last Date for Statewide Digital Membership Drive 2026.</span>
+                    <span><i class="fas fa-circle-dot"></i> August 17: Central BMS Call for Nationwide Protest & Dharna at all District Headquarters.</span>
+                    <span><i class="fas fa-circle-dot"></i> September 17: National Workers Day (Sri Vishwakarma Jayanti) Grand Celebrations.</span>
+                </div>
+            </div>
+        </div>
+    </section>
 
-        <div class="social-icons">
+    <!-- 5. LATEST NEWS & ANNOUNCEMENTS (SHRUNK HEIGHT) -->
+    <section class="news-section">
+        <h3 class="section-title"><i class="fas fa-newspaper"></i> Latest News & Circulars</h3>
+        <div class="news-list">
+            
+            <!-- News 1 -->
+            <div class="news-card">
+                <div class="news-card-header">
+                    <span class="news-badge urgent"><i class="fas fa-bolt"></i> Urgent</span>
+                    <span class="news-deadline-pill"><i class="fas fa-clock"></i> Last Date: August 31, 2026</span>
+                </div>
+                <h4>Statewide Digital Membership Drive 2026 Active</h4>
+                <p>All electricity employees across APGENCO, APTRANSCO, and DISCOMs are requested to complete online membership registration before August 31.</p>
+            </div>
 
-            <a href="#" class="facebook">
-                <i class="fab fa-facebook"></i>
+            <!-- News 2 -->
+            <div class="news-card">
+                <div class="news-card-header">
+                    <span class="news-badge notice"><i class="fas fa-flag"></i> BMS Protest Call</span>
+                    <span class="news-date-pill"><i class="far fa-calendar-alt"></i> August 17, 2026</span>
+                </div>
+                <h4>August 17 - Nationwide Strike & District Headquarters Dharna</h4>
+                <p>Central BMS (Bharatiya Mazdoor Sangh) call for Nationwide Protest Program and Dharna at all District Headquarters demanding electricity employee rights.</p>
+            </div>
+
+        </div>
+    </section>
+
+   <!-- 6. UPCOMING EVENTS (1:1 SQUARE CARDS GRID) -->
+    <section class="events-section">
+        <h3 class="section-title"><i class="fas fa-calendar-alt"></i> Upcoming Events & Programs</h3>
+        <div class="events-grid-2col">
+            
+            <!-- Event 1: Amrita Devi Balidan Divas (Aug 28) -->
+            <div class="event-card-compact">
+                <div class="event-thumb-box">
+                    <img src="images/arpeu-logo.png" alt="Environment Day" class="event-img-fit">
+                    <span class="e-badge">Aug 28</span>
+                </div>
+                <div class="event-body-compact">
+                    <h4>Mata Amrita Devi Balidan Divas</h4>
+                    <small><i class="fas fa-leaf"></i> Environment Protection Day</small>
+                </div>
+            </div>
+
+            <!-- Event 2: Vishwakarma Jayanti (Sept 17) -->
+            <div class="event-card-compact">
+                <div class="event-thumb-box">
+                    <img src="images/arpeu-logo.png" alt="Vishwakarma Jayanti" class="event-img-fit">
+                    <span class="e-badge">Sept 17</span>
+                </div>
+                <div class="event-body-compact">
+                    <h4>National Workers Day (Vishwakarma Jayanti)</h4>
+                    <small><i class="fas fa-tools"></i> Divine Architect Day</small>
+                </div>
+            </div>
+
+            <!-- Event 3: Dattopant Thengadi Punyathithi (Oct 14) -->
+            <div class="event-card-compact">
+                <div class="event-thumb-box">
+                    <img src="images/bms-logo.png" alt="Dattopant Thengadi" class="event-img-fit">
+                    <span class="e-badge">Oct 14</span>
+                </div>
+                <div class="event-body-compact">
+                    <h4>Samajika Samarasa Divas (Dattopant Thengadi)</h4>
+                    <small><i class="fas fa-users"></i> BMS Founder Memorial</small>
+                </div>
+            </div>
+
+            <!-- Event 4: Swadeshi Divas (Dec 12) -->
+            <div class="event-card-compact">
+                <div class="event-thumb-box">
+                    <img src="images/bms-logo.png" alt="Swadeshi Divas" class="event-img-fit">
+                    <span class="e-badge">Dec 12</span>
+                </div>
+                <div class="event-body-compact">
+                    <h4>Swadeshi Divas Celebrations</h4>
+                    <small><i class="fas fa-flag"></i> National Self-Reliance Day</small>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- 7. RECENT ACTIVITIES (DIRECT OFFICIAL FACEBOOK PROFILE LINK) -->
+    <section class="activities-section">
+        <h3 class="section-title"><i class="fab fa-facebook"></i> Recent Union Activities</h3>
+        <div class="activities-grid">
+            
+            <a href="https://www.facebook.com/profile.php?id=61583326633639" target="_blank" class="activity-card">
+                <div class="activity-thumb">
+                    <img src="images/arpeu-logo.png" alt="Activity 1">
+                    <span class="fb-overlay-icon"><i class="fab fa-facebook-f"></i></span>
+                </div>
+                <div class="activity-meta">
+                    <h4>Digital Portal Launch & State Executive Assembly</h4>
+                    <small><i class="far fa-calendar"></i> August 2026 • View on Facebook</small>
+                </div>
             </a>
 
-            <a href="#" class="twitter">
-                <i class="fab fa-x-twitter"></i>
+            <a href="https://www.facebook.com/profile.php?id=61583326633639" target="_blank" class="activity-card">
+                <div class="activity-thumb">
+                    <img src="images/bms-logo.png" alt="Activity 2">
+                    <span class="fb-overlay-icon"><i class="fab fa-facebook-f"></i></span>
+                </div>
+                <div class="activity-meta">
+                    <h4>Power Workers Welfare & Safety Representations</h4>
+                    <small><i class="far fa-calendar"></i> July 2026 • View on Facebook</small>
+                </div>
             </a>
 
-            <a href="#" class="instagram">
-                <i class="fab fa-instagram"></i>
-            </a>
-
-            <a href="#" class="youtube">
-                <i class="fab fa-youtube"></i>
-            </a>
-
-            <a href="#" class="whatsapp">
-                <i class="fab fa-whatsapp"></i>
-            </a>
-            <a href="#" class="telegram">
-                 <i class="fab fa-telegram"></i>
+            <a href="https://www.facebook.com/profile.php?id=61583326633639" target="_blank" class="activity-card">
+                <div class="activity-thumb">
+                    <img src="images/arpeu-logo.png" alt="Activity 3">
+                    <span class="fb-overlay-icon"><i class="fab fa-facebook-f"></i></span>
+                </div>
+                <div class="activity-meta">
+                    <h4>Dr. NTTPS Local Branch General Body Meeting</h4>
+                    <small><i class="far fa-calendar"></i> June 2026 • View on Facebook</small>
+                </div>
             </a>
 
         </div>
+    </section>
 
-    </div>
-
-
-</div>
-</section>
 </section>
 
 

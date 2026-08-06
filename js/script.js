@@ -513,7 +513,15 @@ function showPage(page) {
             break;
     }
 
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    document
+    .getElementById("contentArea")
+    .scrollTo({
+
+    top:0,
+
+    behavior:"smooth"
+
+    });
 }
 
 
@@ -3093,3 +3101,58 @@ function closeReceipt() {
     if (rc) rc.style.display = "none";
     showPage("home");
 }
+
+/* ==========================================================
+   HOME PAGE ENHANCEMENTS ENGINE
+========================================================== */
+
+function dismissHomeBanner() {
+    const banner = document.getElementById("homeBannerContainer");
+    if (banner) {
+        banner.style.opacity = "0";
+        banner.style.transform = "translateY(-20px)";
+        banner.style.maxHeight = "0px";
+        banner.style.marginBottom = "0px";
+        banner.style.padding = "0px";
+        banner.style.overflow = "hidden";
+    }
+}
+
+// 📌 6 సెకన్ల తర్వాత ఆటోమేటిక్‌గా వెల్‌కమ్ బ్యానర్ దాగిపోతుంది (Auto Disappear)
+setTimeout(function () {
+    dismissHomeBanner();
+}, 6000);
+
+// 📌 హోమ్ పేజీ కౌంటర్లను లైవ్ డేటాతో అప్‌డేట్ చేస్తుంది
+function syncHomeLiveCounters(stats) {
+    if (!stats) return;
+    
+    const total = stats.totalMembers || 0;
+    const today = stats.todayMembers || 0;
+    const year = stats.yearMembers || 0;
+    const lastYear = Math.max(0, total - today);
+    const growth = Math.max(0, year - today);
+
+    if (document.getElementById("hTotalMembers")) document.getElementById("hTotalMembers").textContent = total;
+    if (document.getElementById("hLastYearMembers")) document.getElementById("hLastYearMembers").textContent = lastYear;
+    if (document.getElementById("hCurrentYearMembers")) document.getElementById("hCurrentYearMembers").textContent = year;
+    if (document.getElementById("hGrowthMembers")) document.getElementById("hGrowthMembers").textContent = "+" + growth;
+}
+
+// loadMembershipStatistics లో ఈ లైన్ చేర్చబడింది
+const originalLoadStats = loadMembershipStatistics;
+loadMembershipStatistics = async function() {
+    try {
+        const url = `${BACKEND_URL}?action=getMembershipStatistics`;
+        const response = await fetch(url);
+        const result = await response.json();
+
+        if (result && result.success && result.statistics) {
+            syncHomeLiveCounters(result.statistics);
+        }
+    } catch(e){}
+    
+    if (typeof originalLoadStats === "function") {
+        originalLoadStats();
+    }
+};
