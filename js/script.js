@@ -3222,3 +3222,148 @@ moreDropdown.classList.remove("show");
 });
 });
 }
+
+/*=========================================
+DOWNLOADS & RESOURCES ENGINE - SPA COUPLING
+=========================================*/
+
+// 📌 మీ ఎగ్జిస్టింగ్ showPage ఫంక్షన్‌ను డిస్టర్బ్ చేయకుండా హుక్ చేయడం
+if (typeof showPage === "function") {
+    const originalShowPage = showPage;
+    
+    showPage = function (page) {
+        // డౌన్‌లోడ్స్ సెక్షన్‌ను డిఫాల్ట్‌గా హైడ్ చేస్తుంది
+        const dSec = document.getElementById("downloadsSection");
+        if (dSec) dSec.style.display = "none";
+
+        // మీ పాత ఒరిజినల్ ఫంక్షన్‌ను రన్ చేస్తుంది
+        originalShowPage(page);
+
+        // ఒకవేళ డౌన్‌లోడ్స్ పేజీ క్లిక్ చేస్తే ఈ సెక్షన్‌ను యాక్టివేట్ చేస్తుంది
+        if (page === "downloads") {
+            if (dSec) dSec.style.display = "block";
+            
+            // మెనూ Dropdown క్లోజ్ అవ్వడానికి
+            const moreDropdown = document.getElementById("moreDropdown");
+            if (moreDropdown) {
+                moreDropdown.classList.remove("show");
+            }
+        }
+    };
+}
+
+// 📌 ప్రెజెంటేషన్ కోసం వివిధ వెక్టర్ లోగోల SVG టెంప్లేట్స్
+const dlModalVectors = {
+    'arpeu': `<svg viewBox="0 0 100 100" fill="none" class="arpeu-blue" style="width:90px;height:90px;"><circle cx="50" cy="50" r="40" fill="#0f294a" /><circle cx="50" cy="50" r="32" fill="#eab308" /><path d="M50 10 L50 90 M10 50 L90 50" stroke="#0f294a" stroke-width="4" /><circle cx="50" cy="50" r="22" fill="#ef4444" /><polygon points="50,32 55,48 70,50 55,52 50,68 45,52 30,50 45,48" fill="#ffffff" /></svg>`,
+    'bms': `<svg viewBox="0 0 100 100" fill="none" style="width:90px;height:90px;"><circle cx="50" cy="50" r="40" fill="#3b82f6" /><circle cx="50" cy="50" r="30" stroke="#f97316" stroke-width="8" stroke-dasharray="12 4" /><path d="M50 30 V70 M30 50 H70" stroke="#ffffff" stroke-width="3" /><circle cx="50" cy="50" r="14" fill="#f97316" /></svg>`,
+    'bharatmata': `<svg viewBox="0 0 100 100" fill="none" style="width:90px;height:90px;"><rect x="15" y="15" width="70" height="70" rx="35" fill="#fff7ed" /><path d="M30 40 L50 20 L70 40 L60 80 L40 80 Z" fill="#ffedd5" /><path d="M20 55 C35 45, 65 45, 80 55" stroke="#f97316" stroke-width="6" /><path d="M20 62 C35 52, 65 52, 80 62" stroke="#ffffff" stroke-width="6" /><path d="M20 69 C35 59, 65 59, 80 69" stroke="#16a34a" stroke-width="6" /><circle cx="50" cy="45" r="10" fill="#ea580c" /></svg>`,
+    'dcmf': `<svg viewBox="0 0 100 100" fill="none" style="width:90px;height:90px;"><circle cx="50" cy="50" r="40" fill="#f0fdf4" /><path d="M30 45 C40 35, 60 35, 70 45" stroke="#2563eb" stroke-width="6" stroke-linecap="round" /><path d="M30 55 C40 65, 60 65, 70 55" stroke="#ea580c" stroke-width="6" stroke-linecap="round" /><circle cx="50" cy="50" r="10" fill="#1e293b" /></svg>`,
+    'bmsflag': `<svg viewBox="0 0 100 100" fill="none" style="width:90px;height:90px;"><line x1="25" y1="15" x2="25" y2="85" stroke="#475569" stroke-width="4" stroke-linecap="round" /><path d="M27 20 H75 C65 30, 75 40, 75 40 L27 50 Z" fill="#ea580c" /></svg>`,
+    'arpeuflag': `<svg viewBox="0 0 100 100" fill="none" style="width:90px;height:90px;"><line x1="25" y1="15" x2="25" y2="85" stroke="#475569" stroke-width="4" stroke-linecap="round" /><path d="M27 20 H75 L75 50 L27 50 Z" fill="#ffffff" stroke="#e2e8f0" stroke-width="1" /><circle cx="51" cy="35" r="8" fill="#0f294a" /><circle cx="51" cy="35" r="5" fill="#eab308" /></svg>`,
+    'arpeutr': `<svg viewBox="0 0 100 100" fill="none" style="width:90px;height:90px;"><circle cx="50" cy="50" r="40" stroke="#0f294a" stroke-width="4" /><circle cx="50" cy="50" r="32" fill="#eab308" opacity="0.9" /><polygon points="50,32 55,48 70,50 55,52 50,68 45,52 30,50 45,48" fill="#ef4444" /></svg>`,
+    'bmstr': `<svg viewBox="0 0 100 100" fill="none" style="width:90px;height:90px;"><circle cx="50" cy="50" r="30" stroke="#f97316" stroke-width="8" stroke-dasharray="12 4" /><circle cx="50" cy="50" r="14" fill="#f97316" opacity="0.8" /></svg>`,
+    'avatar': `<svg class="text-slate-400" viewBox="0 0 100 100" fill="none" style="width:90px;height:90px;"><circle cx="50" cy="50" r="45" fill="#f1f5f9" /><path d="M50 25 C40 25 38 35 38 42 C38 52 44 56 50 56 C56 56 62 52 62 42 C62 35 60 25 50 25 Z" fill="#cbd5e1" /><rect x="42" y="38" width="7" height="5" rx="1.5" stroke="#475569" stroke-width="2" /><rect x="51" y="38" width="7" height="5" rx="1.5" stroke="#475569" stroke-width="2" /><path d="M49 40 H51" stroke="#475569" stroke-width="2" /><path d="M30 75 C30 65 40 60 50 60 C60 60 70 65 70 75 Z" fill="#94a3b8" /></svg>`,
+    'avatar-b': `<svg class="text-slate-400" viewBox="0 0 100 100" fill="none" style="width:90px;height:90px;"><circle cx="50" cy="50" r="45" fill="#f8fafc" /><path d="M50 25 C40 25 38 35 38 42 C38 52 44 56 50 56 C56 56 62 52 62 42 C62 35 60 25 50 25 Z" fill="#94a3b8" /><rect x="42" y="38" width="7" height="5" rx="1.5" stroke="#1e293b" stroke-width="2" /><rect x="51" y="38" width="7" height="5" rx="1.5" stroke="#1e293b" stroke-width="2" /><path d="M49 40 H51" stroke="#1e293b" stroke-width="2" /><path d="M30 75 C30 65 40 60 50 60 C60 60 70 65 70 75 Z" fill="#cbd5e1" /></svg>`,
+    'pdf': `<div style="text-align:center;"><i class="fa-solid fa-file-pdf" style="font-size: 60px; color: #ef4444;"></i><p style="font-size:11px; font-weight:700; color:#475569; margin-top:8px;">Document File (PDF)</p></div>`
+};
+
+// 📌 Preview Modalను ఓపెన్ చేసే ఫంక్షన్
+function openDownloadsPreview(title, type, vectorKey) {
+    const modal = document.getElementById('downloadsPreviewModal');
+    const container = document.getElementById('dlModalContainer');
+    
+    if (!modal || !container) return;
+
+    document.getElementById('dlModalTitle').innerText = title;
+    document.getElementById('dlModalBadge').innerText = `${type} Resource`;
+    document.getElementById('dlModalFormat').innerText = type;
+
+    const visualBox = document.getElementById('dlModalVisual');
+    if (dlModalVectors[vectorKey]) {
+        visualBox.innerHTML = dlModalVectors[vectorKey];
+    } else {
+        visualBox.innerHTML = `<span style="font-size:12px; font-weight:700; color:#94a3b8;">Preview N/A</span>`;
+    }
+
+    // Modal లోపల ఉన్న డౌన్‌లోడ్ బటన్ యాక్షన్
+    const modalDownloadBtn = document.getElementById('dlModalDownloadActionBtn');
+    modalDownloadBtn.onclick = function() {
+        triggerDownloadsFile(`${title.replace(/\s+/g, '_')}.${type.toLowerCase()}`);
+        closeDownloadsPreview();
+    };
+
+    // ఓపెనింగ్ యానిమేషన్స్
+    modal.style.display = "flex";
+    setTimeout(() => {
+        modal.style.opacity = "1";
+        container.style.transform = "scale(1)";
+    }, 10);
+}
+
+// 📌 Preview Modalను క్లోజ్ చేసే ఫంక్షన్
+function closeDownloadsPreview() {
+    const modal = document.getElementById('downloadsPreviewModal');
+    const container = document.getElementById('dlModalContainer');
+    
+    if (!modal || !container) return;
+
+    modal.style.opacity = "0";
+    container.style.transform = "scale(0.95)";
+    
+    setTimeout(() => {
+        modal.style.display = "none";
+    }, 300);
+}
+
+// Overlay క్లిక్ చేస్తే మోడల్ క్లోజ్ అవ్వడానికి
+document.getElementById('downloadsPreviewModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeDownloadsPreview();
+    }
+});
+
+// 📌 డౌన్‌లోడ్ టోస్ట్ నోటిఫికేషన్ ప్లస్ సిమ్యులేషన్ యాక్షన్
+function triggerDownloadsFile(filename) {
+    showDownloadsToast(`Downloading "${filename}"...`);
+    
+    // ఆటోమేటిక్ ఫైల్ డౌన్‌లోడ్ సిమ్యులేషన్ (800ms బఫరింగ్ తర్వాత)
+    setTimeout(() => {
+        const fakeFileBlob = new Blob(["ARPEU Resource - " + filename], {type: "text/plain"});
+        const tempLink = document.createElement("a");
+        tempLink.href = URL.createObjectURL(fakeFileBlob);
+        tempLink.download = filename;
+        document.body.appendChild(tempLink);
+        tempLink.click();
+        document.body.removeChild(tempLink);
+    }, 800);
+}
+
+// టోస్ట్ సందేశాన్ని చూపించే ఫంక్షన్
+function showDownloadsToast(message) {
+    const container = document.getElementById('dlToastContainer');
+    if (!container) return;
+
+    const toast = document.createElement('div');
+    toast.className = "dl-toast";
+    toast.innerHTML = `
+        <i class="fa-solid fa-spinner dl-toast-spinner"></i>
+        <span>${message}</span>
+    `;
+    
+    container.appendChild(toast);
+    
+    // స్లైడ్-ఇన్ యానిమేషన్
+    setTimeout(() => {
+        toast.style.opacity = "1";
+        toast.style.transform = "translateY(0)";
+    }, 10);
+
+    // 3 సెకన్ల తర్వాత టోస్ట్ క్లోజ్ అవ్వడం
+    setTimeout(() => {
+        toast.style.opacity = "0";
+        toast.style.transform = "translateY(15px)";
+        setTimeout(() => {
+            toast.remove();
+        }, 300);
+    }, 3000);
+}
