@@ -492,6 +492,8 @@ function showPage(page) {
     if (membershipPage) membershipPage.style.display = "none";
     if (statisticsSection) statisticsSection.style.display = "none";
     if (contactSection) contactSection.style.display = "none";
+    const aboutSection = document.getElementById("aboutSection");
+    if (aboutSection) aboutSection.style.display = "none";
 
     if (navHome) navHome.classList.remove("active");
     if (navMembership) navMembership.classList.remove("active");
@@ -515,8 +517,12 @@ function showPage(page) {
             loadMembershipStatistics();
             break;
 
-            case "contact":
+        case "contact":
             if (contactSection) contactSection.style.display = "block";
+            break;
+
+        case "about":
+            if (aboutSection) aboutSection.style.display = "block";
             break;
     }
 
@@ -588,6 +594,23 @@ function initializeNavigation() {
             if (moreDropdown) {
                 moreDropdown.classList.remove("show");
             }
+
+        });
+
+    }
+
+    if (navAbout) {
+
+        navAbout.addEventListener("click", function (e) {
+
+            e.preventDefault();
+
+            showPage("about");
+
+            const moreDropdown = document.getElementById("moreDropdown");
+            if (moreDropdown) {
+             moreDropdown.classList.remove("show");
+           }
 
         });
 

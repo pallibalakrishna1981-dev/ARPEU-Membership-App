@@ -91,27 +91,31 @@
 
         <div class="more-dropdown" id="moreDropdown">
 
-            <a href="#" id="navAbout">
-                <i class="fa-solid fa-circle-info"></i>
-                <span>About ARPEU</span>
-            </a>
+            <a href="#" id="navAbout" onclick="
+    document.querySelectorAll('#contentArea > section').forEach(s => s.style.display='none');
+    document.getElementById('aboutSection').style.display='flex';
+    return false;
+">
+    <i class="fa-solid fa-circle-info"></i>
+    <span>About ARPEU</span>
+</a>
 
-            <a href="#" id="navOfficeBearers">
+            <a href="#" id="navOfficeBearers" onclick="showPage('office-bearers'); return false;">
                 <i class="fa-solid fa-users"></i>
                 <span>Office Bearers</span>
             </a>
 
-            <a href="#" id="navContact">
+            <a href="#" id="navContact" onclick="showPage('contact'); return false;">
                 <i class="fa-solid fa-address-book"></i>
                 <span>Contact Us</span>
             </a>
 
-            <a href="#" id="navGallery">
+            <a href="#" id="navGallery" onclick="showPage('gallery'); return false;">
                 <i class="fa-solid fa-images"></i>
                 <span>Gallery</span>
             </a>
 
-            <a href="#" id="navDownloads">
+            <a href="#" id="navDownloads" onclick="showPage('downloads'); return false;">
                 <i class="fa-solid fa-download"></i>
                 <span>Downloads</span>
             </a>
@@ -2172,7 +2176,227 @@
 
 </section>
 
+<!-- =========================================
+     ABOUT ARPEU SECTION (EXACT MOCKUP MATCH)
+========================================= -->
+<section id="aboutSection" class="about-page" style="display:none;">
 
+    <!-- 1. TITLE -->
+    <div class="about-header">
+        <h2 class="about-title">ABOUT ARPEU</h2>
+    </div>
+
+    <!-- 2. FOUNDER HERO CARD -->
+    <div class="about-card founder-card">
+        <div class="founder-avatar-wrap">
+            <img src="images/founder-arpeu.png" alt="Sri K.S. Tanuku Seshachalam Garu" class="founder-img" onerror="this.src='images/arpeu-logo.png';">
+        </div>
+        <h3 class="founder-name">శ్రీ కే.శే. తణుకు. శేషాచలం గారు</h3>
+        <p class="founder-role">Founder, ARPEU</p>
+        <p class="founder-dates">(24-06-1933 – 23-10-2019)</p>
+
+        <div class="founder-quote-box">
+            <span class="q-mark q-left">“</span>
+            <p>Employees' Unity, Welfare and Service –<br>The guiding principles on which ARPEU was founded.</p>
+            <span class="q-mark q-right">”</span>
+        </div>
+    </div>
+
+    <!-- 3. ROW 1: WHO WE ARE & OUR VISION (2 COLUMNS SIDE-BY-SIDE) -->
+    <div class="about-row-2col">
+        
+        <!-- WHO WE ARE -->
+        <div class="about-card who-we-are-card">
+            <h4 class="card-sec-title">WHO WE ARE</h4>
+            <div class="who-text-content">
+                <p><strong>Andhra Rastra Power Employees Union (ARPEU)</strong> was established on <strong>06th July 1982</strong>. Regd. No. G-445, affiliated to <strong>Bharatiya Mazdoor Sangh (BMS)</strong>.</p>
+                <p>ARPEU is the collective voice of power sector employees in Andhra Pradesh, committed to protecting their rights and promoting their welfare.</p>
+            </div>
+            <div class="pylon-watermark">
+                <i class="fas fa-tower-cell"></i>
+            </div>
+        </div>
+
+        <!-- OUR VISION -->
+        <div class="about-card">
+            <h4 class="card-sec-title">OUR VISION</h4>
+            <div class="vision-grid-2x2">
+                <div class="mini-icon-card">
+                    <i class="fas fa-users-line icon-org"></i>
+                    <span>Employee Welfare</span>
+                </div>
+                <div class="mini-icon-card">
+                    <i class="fas fa-people-group icon-blu"></i>
+                    <span>Unity & Solidarity</span>
+                </div>
+                <div class="mini-icon-card">
+                    <i class="fas fa-shield-halved icon-grn"></i>
+                    <span>Transparency & Integrity</span>
+                </div>
+                <div class="mini-icon-card">
+                    <i class="fas fa-network-wired icon-prp"></i>
+                    <span>Digital Transformation</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- 4. ROW 2: OUR MISSION & COMPANIES COVERED (2 COLUMNS SIDE-BY-SIDE) -->
+    <div class="about-row-2col">
+
+        <!-- OUR MISSION -->
+        <div class="about-card">
+            <h4 class="card-sec-title">OUR MISSION</h4>
+            <div class="mission-grid-3x2">
+                <div class="mini-icon-card">
+                    <i class="fas fa-gavel icon-org"></i>
+                    <span>Protect Employees' Rights</span>
+                </div>
+                <div class="mini-icon-card">
+                    <i class="fas fa-user-plus icon-blu"></i>
+                    <span>Membership Expansion</span>
+                </div>
+                <div class="mini-icon-card">
+                    <i class="fas fa-book-open icon-grn"></i>
+                    <span>Training & Development</span>
+                </div>
+                <div class="mini-icon-card">
+                    <i class="fas fa-heart-pulse icon-prp"></i>
+                    <span>Welfare Activities</span>
+                </div>
+                <div class="mini-icon-card">
+                    <i class="fas fa-scale-balanced icon-org"></i>
+                    <span>Legal Assistance</span>
+                </div>
+                <div class="mini-icon-card">
+                    <i class="fas fa-bullhorn icon-teal"></i>
+                    <span>Better Communication</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- COMPANIES COVERED -->
+        <div class="about-card">
+            <h4 class="card-sec-title">COMPANIES COVERED</h4>
+            <div class="companies-mockup-grid">
+                <div class="comp-top-row">
+                    <div class="comp-mini-box"><img src="images/apgenco.png" alt="APGENCO"><span>APGENCO</span></div>
+                    <div class="comp-mini-box"><img src="images/aptransco.png" alt="APTRANSCO"><span>APTRANSCO</span></div>
+                </div>
+                <div class="comp-bottom-row">
+                    <div class="comp-mini-box"><img src="images/apspdcl.png" alt="APSPDCL"><span>APSPDCL</span></div>
+                    <div class="comp-mini-box"><img src="images/apcpdcl.png" alt="APCPDCL"><span>APCPDCL</span></div>
+                    <div class="comp-mini-box"><img src="images/apepdcl.png" alt="APEPDCL"><span>APEPDCL</span></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- 5. ROW 3: WHAT WE DO & WHY JOIN ARPEU (2 COLUMNS SIDE-BY-SIDE) -->
+    <div class="about-row-2col">
+
+        <!-- WHAT WE DO -->
+        <div class="about-card">
+            <h4 class="card-sec-title">WHAT WE DO</h4>
+            <div class="mission-grid-3x2">
+                <div class="mini-icon-card">
+                    <i class="fas fa-users icon-blu"></i>
+                    <span>Employee Representation</span>
+                </div>
+                <div class="mini-icon-card">
+                    <i class="fas fa-indian-rupee-sign icon-blu"></i>
+                    <span>Wage & Service Matters</span>
+                </div>
+                <div class="mini-icon-card">
+                    <i class="fas fa-scale-balanced icon-blu"></i>
+                    <span>Legal Support</span>
+                </div>
+                <div class="mini-icon-card">
+                    <i class="fas fa-chalkboard-user icon-blu"></i>
+                    <span>Training Programmes</span>
+                </div>
+                <div class="mini-icon-card">
+                    <i class="fas fa-hands-holding-child icon-blu"></i>
+                    <span>Welfare Activities</span>
+                </div>
+                <div class="mini-icon-card">
+                    <i class="fas fa-bullhorn icon-blu"></i>
+                    <span>Awareness Programmes</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- WHY JOIN ARPEU -->
+        <div class="about-card">
+            <h4 class="card-sec-title">WHY JOIN ARPEU?</h4>
+            <div class="why-join-grid">
+                <div class="why-item"><i class="fas fa-circle-check"></i><span>Digital Membership</span></div>
+                <div class="why-item"><i class="fas fa-circle-check"></i><span>Strong Representation</span></div>
+                <div class="why-item"><i class="fas fa-circle-check"></i><span>QR Digital Identity</span></div>
+                <div class="why-item"><i class="fas fa-circle-check"></i><span>Secure Database</span></div>
+                <div class="why-item"><i class="fas fa-circle-check"></i><span>Transparent Records</span></div>
+                <div class="why-item"><i class="fas fa-circle-check"></i><span>Statewide Network</span></div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- 6. ROW 4: DIGITAL MEMBERSHIP PORTAL & OUR VALUES (2 COLUMNS SIDE-BY-SIDE) -->
+    <div class="about-row-2col">
+
+        <!-- DIGITAL MEMBERSHIP PORTAL -->
+        <div class="about-card">
+            <h4 class="card-sec-title">DIGITAL MEMBERSHIP PORTAL</h4>
+            <div class="portal-card-body">
+                <div class="portal-phone-gfx">
+                    <i class="fas fa-mobile-screen-button"></i>
+                    <i class="fas fa-qrcode qr-sub"></i>
+                    <i class="fas fa-circle-check chk-sub"></i>
+                </div>
+                <div class="portal-checks-grid">
+                    <div class="p-item"><i class="fas fa-check"></i><span>Online Membership</span></div>
+                    <div class="p-item"><i class="fas fa-check"></i><span>Live Statistics</span></div>
+                    <div class="p-item"><i class="fas fa-check"></i><span>QR Digital Profile</span></div>
+                    <div class="p-item"><i class="fas fa-check"></i><span>Secure Member Database</span></div>
+                    <div class="p-item"><i class="fas fa-check"></i><span>Digital Receipt</span></div>
+                    <div class="p-item"><i class="fas fa-check"></i><span>Future Online Renewal</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- OUR VALUES -->
+        <div class="about-card">
+            <h4 class="card-sec-title">OUR VALUES</h4>
+            <div class="values-circle-grid">
+                <div class="v-badge-item"><div class="v-circle v-grn"><i class="fas fa-shield-halved"></i></div><span>Integrity</span></div>
+                <div class="v-badge-item"><div class="v-circle v-org"><i class="fas fa-handshake"></i></div><span>Commitment</span></div>
+                <div class="v-badge-item"><div class="v-circle v-blu"><i class="fas fa-user-check"></i></div><span>Service</span></div>
+                <div class="v-badge-item"><div class="v-circle v-prp"><i class="fas fa-users"></i></div><span>Unity</span></div>
+                <div class="v-badge-item"><div class="v-circle v-red"><i class="fas fa-clipboard-check"></i></div><span>Discipline</span></div>
+                <div class="v-badge-item"><div class="v-circle v-teal"><i class="fas fa-magnifying-glass"></i></div><span>Transparency</span></div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- 7. BOTTOM QUICK CONTACT STRIP -->
+    <div class="about-contact-strip">
+        <a href="https://www.arpeu.org.in" target="_blank" class="ac-link">
+            <div class="ac-icon-box"><i class="fas fa-globe"></i></div>
+            <div class="ac-info"><label>Website</label><span>www.arpeu.org.in</span></div>
+        </a>
+        <a href="mailto:info@arpeu.org.in" class="ac-link">
+            <div class="ac-icon-box"><i class="fas fa-envelope"></i></div>
+            <div class="ac-info"><label>Email</label><span>info@arpeu.org.in</span></div>
+        </a>
+        <a href="#" onclick="showPage('contact'); return false;" class="ac-btn-pill">
+            Contact Us <i class="fas fa-chevron-right"></i>
+        </a>
+    </div>
+
+</section>
 
 <!-- =========================================
      PHOTO CROPPER MODAL (WHATSAPP STYLE)

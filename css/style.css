@@ -3473,3 +3473,472 @@ body{
         min-width: 58px;
     }
 }
+
+/*=========================================
+   ABOUT ARPEU PAGE STYLES (MATCHING MASTER MOCKUP)
+=========================================*/
+.about-page {
+    padding: 8px 10px 20px;
+    max-width: 100%;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background: #f4f7fb;
+    box-sizing: border-box;
+}
+
+.about-header {
+    text-align: center;
+    margin-top: 2px;
+    margin-bottom: 2px;
+}
+
+.about-title {
+    font-size: 18px;
+    font-weight: 800;
+    color: #0B4EA2;
+    letter-spacing: 0.5px;
+    display: inline-block;
+    position: relative;
+}
+
+.about-title::after {
+    content: '';
+    display: block;
+    width: 28px;
+    height: 2.5px;
+    background: #f57c00;
+    margin: 3px auto 0;
+    border-radius: 2px;
+}
+
+/* Elevated Dashboard Card Design */
+.about-card {
+    background: #ffffff;
+    border: 1px solid #e1e8f0;
+    border-radius: 12px;
+    padding: 10px 12px;
+    box-shadow: 0 3px 10px rgba(11, 78, 162, 0.07);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.card-sec-title {
+    font-size: 12px;
+    font-weight: 800;
+    color: #0B4EA2;
+    text-align: center;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+}
+
+.card-sec-title::after {
+    content: '';
+    display: block;
+    width: 20px;
+    height: 2px;
+    background: #f57c00;
+    margin: 2px auto 0;
+    border-radius: 2px;
+}
+
+/* Founder Hero Card */
+.founder-card {
+    text-align: center;
+    padding: 12px 10px;
+}
+
+.founder-avatar-wrap {
+    width: 85px;
+    height: 85px;
+    margin: 0 auto 6px;
+    border-radius: 50%;
+    border: 2.5px solid #0B4EA2;
+    padding: 2px;
+    background: #ffffff;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
+}
+
+.founder-img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Mandali&display=swap');
+
+.founder-name{
+    font-family: 'Mandali', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: #0B4EA2;
+    line-height: 1.35;
+    letter-spacing: 0.2px;
+    margin: 8px 0 4px;
+    text-shadow: 0 1px 2px rgba(0,0,0,.10);
+}
+
+.founder-role {
+    font-size: 12px;
+    font-weight: 700;
+    color: #d32f2f;
+    margin-bottom: 1px;
+}
+
+.founder-dates {
+    font-size: 12px;
+    font-weight: 700;
+    color: #475569;
+    margin-bottom: 8px;
+}
+
+.founder-quote-box{
+    background:#FFF8F0;
+    border:1px solid #FFD59A;
+    border-radius:12px;
+    padding:12px 26px;
+    position:relative;
+    margin-top:10px;
+    box-shadow:0 2px 6px rgba(0,0,0,.06);
+}
+
+.founder-quote-box p {
+    font-size: 10.5px;
+    font-weight: 600;
+    color: #1e293b;
+    line-height: 1.35;
+    margin: 0;
+}
+
+.q-mark {
+    color: #f57c00;
+    font-size: 16px;
+    font-weight: 800;
+    position: absolute;
+    top: 4px;
+}
+
+.q-left { left: 6px; }
+.q-right { right: 6px; }
+
+/* 2 COLUMNS LAYOUT FOR PAIRED SECTIONS (MATCHES MOCKUP EXACTLY) */
+.about-row-2col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+/* Who We Are */
+.who-we-are-card {
+    position: relative;
+}
+
+.who-text-content p {
+    font-size: 10px;
+    color: #334155;
+    line-height: 1.4;
+    margin-bottom: 6px;
+}
+
+.who-text-content p:last-child {
+    margin-bottom: 0;
+}
+
+.pylon-watermark {
+    position: absolute;
+    right: 8px;
+    bottom: 4px;
+    font-size: 48px;
+    color: rgba(11, 78, 162, 0.06);
+    pointer-events: none;
+}
+
+/* Vision Grid 2x2 */
+.vision-grid-2x2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    flex: 1;
+}
+
+.mini-icon-card {
+    background: #f8fafc;
+    border: 1px solid #edf2f7;
+    border-radius: 8px;
+    padding: 6px 4px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+}
+
+.mini-icon-card i {
+    font-size: 14px;
+}
+
+.mini-icon-card span {
+    font-size: 9px;
+    font-weight: 700;
+    color: #1e293b;
+    line-height: 1.15;
+}
+
+/* Mission Grid 3x2 */
+.mission-grid-3x2 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+    flex: 1;
+}
+
+/* Icon Color Utilities */
+.icon-org { color: #f57c00; }
+.icon-blu { color: #0B4EA2; }
+.icon-grn { color: #2e7d32; }
+.icon-prp { color: #7b1fa2; }
+.icon-teal { color: #00897b; }
+
+/* Companies Covered Mockup Layout */
+.companies-mockup-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    justify-content: center;
+    flex: 1;
+}
+
+.comp-top-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+}
+
+.comp-bottom-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+}
+
+.comp-mini-box {
+    background: #ffffff;
+    border: 1px solid #e1e8f0;
+    border-radius: 8px;
+    padding: 4px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+}
+
+.comp-mini-box img {
+    height: 26px;
+    width: auto;
+    max-width: 100%;
+    object-fit: contain;
+}
+
+.comp-mini-box span {
+    font-size: 8.5px;
+    font-weight: 800;
+    color: #0B4EA2;
+}
+
+/* Why Join ARPEU Check Grid */
+.why-join-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px 8px;
+    flex: 1;
+    align-content: center;
+}
+
+.why-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.why-item i {
+    color: #0B4EA2;
+    font-size: 11px;
+    flex-shrink: 0;
+}
+
+.why-item span {
+    font-size: 9.5px;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+/* Digital Portal Body */
+.portal-card-body {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+}
+
+.portal-phone-gfx {
+    width: 38px;
+    height: 60px;
+    background: #0B4EA2;
+    color: #ffffff;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    flex-shrink: 0;
+    position: relative;
+}
+
+.portal-phone-gfx i.fa-mobile-screen-button { font-size: 18px; }
+.portal-phone-gfx i.qr-sub { font-size: 10px; opacity: 0.9; }
+.portal-phone-gfx i.chk-sub { font-size: 9px; color: #4caf50; }
+
+.portal-checks-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5px;
+    flex: 1;
+}
+
+.p-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.p-item i {
+    color: #2e7d32;
+    font-size: 8.5px;
+}
+
+.p-item span {
+    font-size: 9px;
+    font-weight: 700;
+    color: #334155;
+}
+
+/* Our Values Badge Circle Grid */
+.values-circle-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px 4px;
+    flex: 1;
+    align-items: center;
+}
+
+.v-badge-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    text-align: center;
+}
+
+.v-circle {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+}
+
+.v-grn { background: #e8f5e9; color: #2e7d32; }
+.v-org { background: #fff3e0; color: #f57c00; }
+.v-blu { background: #e3f2fd; color: #0B4EA2; }
+.v-prp { background: #f3e5f5; color: #7b1fa2; }
+.v-red { background: #ffebee; color: #c62828; }
+.v-teal { background: #e0f2f1; color: #00695c; }
+
+.v-badge-item span {
+    font-size: 8.5px;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+/* Quick Contact Strip Bottom */
+.about-contact-strip {
+    background: #ffffff;
+    border: 1px solid #0B4EA2;
+    border-radius: 12px;
+    padding: 6px 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+    box-shadow: 0 3px 10px rgba(11, 78, 162, 0.08);
+}
+
+.ac-link {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    text-decoration: none;
+}
+
+.ac-icon-box {
+    width: 26px;
+    height: 26px;
+    border-radius: 6px;
+    background: #0B4EA2;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    flex-shrink: 0;
+}
+
+.ac-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.ac-info label {
+    font-size: 7.5px;
+    color: #64748b;
+    font-weight: 600;
+}
+
+.ac-info span {
+    font-size: 8.5px;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+.ac-btn-pill {
+    background: #0B4EA2;
+    color: #ffffff !important;
+    padding: 5px 9px;
+    border-radius: 6px;
+    font-size: 9.5px;
+    font-weight: 700;
+    text-decoration: none;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* Mobile Screen Small Fallback */
+@media (max-width: 380px) {
+    .about-row-2col {
+        grid-template-columns: 1fr;
+    }
+}
