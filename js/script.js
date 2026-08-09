@@ -3367,3 +3367,405 @@ function showDownloadsToast(message) {
         }, 300);
     }, 3000);
 }
+
+/* =========================================================
+   ARPEU DONATION MODULE & UNIVERSAL AUTO-FILL ENGINE
+========================================================= */
+
+document.addEventListener("DOMContentLoaded", function () {
+    initializeDonationModule();
+});
+
+// Hook into showPage safely
+if (typeof showPage === "function") {
+    const originalShowPage = showPage;
+    showPage = function (page) {
+        document.querySelectorAll(".navbar .nav-item").forEach(el => el.classList.remove("active"));
+
+        const donSec = document.getElementById("donationsSection");
+        if (donSec) donSec.style.display = "none";
+        const donRc = document.getElementById("donationReceiptContainer");
+        if (donRc) donRc.style.display = "none";
+
+        originalShowPage(page);
+
+        if (page === "donations") {
+            if (donSec) donSec.style.display = "block";
+            const navDonations = document.getElementById("navDonations");
+            if (navDonations) navDonations.classList.add("active");
+            const moreDropdown = document.getElementById("moreDropdown");
+            if (moreDropdown) moreDropdown.classList.remove("show");
+            window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+    };
+}
+
+function initializeDonationModule() {
+    const navDonations = document.getElementById("navDonations");
+    if (navDonations) {
+        navDonations.addEventListener("click", function (e) {
+            e.preventDefault();
+            showPage("donations");
+        });
+    }
+
+    // 1. Mobile Auto-search (Enhanced Real-Time Search)
+    const mobileInput = document.getElementById("donorMobile");
+    const statusEl = document.getElementById("donorMobileStatus");
+
+    if (mobileInput) {
+        let lastSearchedVal = "";
+
+        const triggerSearch = function () {
+            const val = mobileInput.value.replace(/\D/g, "").slice(0, 10);
+            mobileInput.value = val;
+
+            if (val.length === 10) {
+                if (val !== lastSearchedVal) {
+                    lastSearchedVal = val;
+                    if (statusEl) {
+                        statusEl.className = "field-status checking";
+                        statusEl.style.color = "#0B4EA2";
+                        statusEl.innerHTML = "🔍 Searching Database...";
+                    }
+                    searchDonorOrMember(val);
+                }
+            } else {
+                lastSearchedVal = "";
+                if (statusEl) {
+                    statusEl.className = "field-status";
+                    statusEl.innerHTML = "";
+                }
+            }
+        };
+
+        mobileInput.addEventListener("input", triggerSearch);
+        mobileInput.addEventListener("change", triggerSearch);
+        mobileInput.addEventListener("blur", triggerSearch);
+    }
+
+    const autoFillBtn = document.getElementById("confirmAutoFillBtn");
+    if (autoFillBtn) {
+        autoFillBtn.addEventListener("click", applyAutoFillData);
+    }
+
+    // 2. Conditional Donation Type
+    const donationType = document.getElementById("donationType");
+    const diaryAdvtBox = document.getElementById("diaryAdvtBox");
+    const diaryDonationBox = document.getElementById("diaryDonationBox");
+    const donationAmount = document.getElementById("donationAmount");
+    const advtSize = document.getElementById("advtSize");
+    const diaryCount = document.getElementById("diaryCount");
+    const diaryRate = document.getElementById("diaryRate");
+
+    if (donationType) {
+        donationType.addEventListener("change", function () {
+            const val = this.value;
+            diaryAdvtBox.style.display = "none";
+            diaryDonationBox.style.display = "none";
+            donationAmount.readOnly = false;
+
+            if (val === "Diary Advertisement") {
+                diaryAdvtBox.style.display = "block";
+                donationAmount.readOnly = true;
+                updateAdvtAmount();
+            } else if (val === "Diary Donation") {
+                diaryDonationBox.style.display = "block";
+                donationAmount.readOnly = true;
+                calcDiaryTotal();
+            } else {
+                donationAmount.value = "";
+            }
+        });
+    }
+
+    if (advtSize) {
+        advtSize.addEventListener("change", updateAdvtAmount);
+    }
+
+    function updateAdvtAmount() {
+        if (!advtSize) return;
+        if (advtSize.value === "Full Page Colour") {
+            donationAmount.value = 10000;
+        } else if (advtSize.value === "Half Page Colour") {
+            donationAmount.value = 5000;
+        } else {
+            donationAmount.value = "";
+        }
+        updateDonationQR();
+    }
+
+    if (diaryCount && diaryRate) {
+        diaryCount.addEventListener("input", calcDiaryTotal);
+        diaryRate.addEventListener("input", calcDiaryTotal);
+    }
+
+    function calcDiaryTotal() {
+        const qty = parseInt(diaryCount.value) || 0;
+        const rate = parseInt(diaryRate.value) || 0;
+        donationAmount.value = qty * rate;
+        updateDonationQR();
+    }
+
+    if (donationAmount) {
+        donationAmount.addEventListener("input", updateDonationQR);
+    }
+
+    function updateDonationQR() {
+        const amt = donationAmount.value || 0;
+        const qrImg = document.getElementById("donDynamicQR");
+        if (qrImg) {
+            qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=andhrarastrapowerempunion@sbi%26pn=ARPEU%26am=${amt}%26cu=INR`;
+        }
+    }
+
+    // 3. Payment Mode Sub-sections
+    const payModes = document.querySelectorAll('input[name="donPayMode"]');
+    payModes.forEach(radio => {
+        radio.addEventListener("change", function () {
+            document.getElementById("donUpiSection").style.display = "none";
+            document.getElementById("donBankSection").style.display = "none";
+            document.getElementById("donCashSection").style.display = "none";
+            document.getElementById("donChequeSection").style.display = "none";
+
+            if (this.value === "UPI") document.getElementById("donUpiSection").style.display = "block";
+            if (this.value === "Bank Transfer") document.getElementById("donBankSection").style.display = "block";
+            if (this.value === "Cash") document.getElementById("donCashSection").style.display = "block";
+            if (this.value === "Cheque") document.getElementById("donChequeSection").style.display = "block";
+        });
+    });
+
+    // 4. Date Pickers Init
+    ["#donUpiDate", "#donBankDate", "#donCashDate", "#donChequeDate"].forEach(id => {
+        const el = document.querySelector(id);
+        if (el && typeof flatpickr === "function") {
+            flatpickr(el, { dateFormat: "d-m-Y", maxDate: "today", disableMobile: true });
+        }
+    });
+
+    // 5. Submit Donation Button
+    const submitBtn = document.getElementById("submitDonationBtn");
+    if (submitBtn) {
+        submitBtn.addEventListener("click", submitDonationForm);
+    }
+}
+
+// ---------------------------------------------------------
+// SEARCH BACKEND API FOR DONOR / MEMBER
+// ---------------------------------------------------------
+let foundSearchRecord = null;
+
+async function searchDonorOrMember(queryKey) {
+    const statusEl = document.getElementById("donorMobileStatus");
+    if (!queryKey || typeof BACKEND_URL === "undefined") {
+        if (statusEl) { statusEl.className = "field-status"; statusEl.innerHTML = ""; }
+        return;
+    }
+
+    try {
+        const url = `${BACKEND_URL}?action=searchDonorOrMember&query=${encodeURIComponent(queryKey)}`;
+        const response = await fetch(url);
+        const result = await response.json();
+
+        if (result && result.success && result.found) {
+            if (statusEl) {
+                statusEl.className = "field-status success";
+                statusEl.style.color = "#16A34A";
+                statusEl.innerHTML = "✔ Existing Record Found";
+            }
+            foundSearchRecord = result.data;
+            showDonorSearchModal(result.data);
+        } else {
+            if (statusEl) {
+                statusEl.className = "field-status";
+                statusEl.style.color = "#666";
+                statusEl.innerHTML = "ℹ New Record (No previous data found)";
+            }
+        }
+    } catch (e) {
+        console.log("Donor search error:", e);
+        if (statusEl) {
+            statusEl.className = "field-status";
+            statusEl.innerHTML = "";
+        }
+    }
+}
+
+function showDonorSearchModal(data) {
+    document.getElementById("sModalName").textContent = data.name || "Donor Name";
+    document.getElementById("sModalInfo").textContent = `${data.source} Detected`;
+    document.getElementById("sModalSource").textContent = data.source || "Database";
+    document.getElementById("sModalMobile").textContent = data.mobile || "-";
+    document.getElementById("sModalOrg").textContent = data.organization || data.station || "-";
+
+    const modal = document.getElementById("donorSearchModal");
+    if (modal) modal.style.display = "flex";
+}
+
+function closeDonorSearchModal() {
+    const modal = document.getElementById("donorSearchModal");
+    if (modal) modal.style.display = "none";
+}
+
+function applyAutoFillData() {
+    if (!foundSearchRecord) return;
+    const d = foundSearchRecord;
+
+    if (d.donorType && document.getElementById("donorType")) document.getElementById("donorType").value = d.donorType;
+    if (d.name && document.getElementById("donorName")) document.getElementById("donorName").value = d.name;
+    if (d.mobile && document.getElementById("donorMobile")) document.getElementById("donorMobile").value = d.mobile;
+    if (d.email && document.getElementById("donorEmail")) document.getElementById("donorEmail").value = d.email;
+    if ((d.organization || d.station) && document.getElementById("donorOrganization")) {
+        document.getElementById("donorOrganization").value = d.organization || d.station || "";
+    }
+    if (d.address && document.getElementById("donorAddress")) document.getElementById("donorAddress").value = d.address;
+    if (d.pan && document.getElementById("donorPan")) document.getElementById("donorPan").value = d.pan;
+
+    closeDonorSearchModal();
+    alert("✔ మీ వివరాలు ఆటోమేటిక్‌గా నమోదు చేయబడ్డాయి!");
+}
+
+// ---------------------------------------------------------
+// SUBMIT DONATION FORM TO BACKEND
+// ---------------------------------------------------------
+async function submitDonationForm() {
+    const submitBtn = document.getElementById("submitDonationBtn");
+
+    if (!document.getElementById("donDeclarationCheck").checked) {
+        alert("Please accept the declaration before submitting your donation.");
+        return;
+    }
+
+    const donorType = document.getElementById("donorType").value;
+    const donorName = document.getElementById("donorName").value.trim();
+    const donorMobile = document.getElementById("donorMobile").value.trim();
+    const donationType = document.getElementById("donationType").value;
+    const amount = document.getElementById("donationAmount").value;
+
+    if (!donorType || !donorName || !donorMobile || !donationType || !amount || amount <= 0) {
+        alert("Please fill all mandatory fields (Donor Type, Name, Mobile, Donation Type and Amount).");
+        return;
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = "Submitting Donation...";
+
+    const selectedPayMode = document.querySelector('input[name="donPayMode"]:checked').value;
+    let txnId = "";
+    let payDate = "";
+
+    if (selectedPayMode === "UPI") {
+        txnId = document.getElementById("donUpiTxnId").value.trim();
+        payDate = document.getElementById("donUpiDate").value;
+    } else if (selectedPayMode === "Bank Transfer") {
+        txnId = document.getElementById("donBankRefNo").value.trim();
+        payDate = document.getElementById("donBankDate").value;
+    } else if (selectedPayMode === "Cash") {
+        txnId = "CASH-" + (document.getElementById("donCashRecBy").value.trim() || "REP");
+        payDate = document.getElementById("donCashDate").value;
+    } else if (selectedPayMode === "Cheque") {
+        txnId = "CHQ-" + document.getElementById("donChequeNo").value.trim();
+        payDate = document.getElementById("donChequeDate").value;
+    }
+
+    const donationData = {
+        donorType,
+        donorName,
+        donorMobile,
+        donorEmail: document.getElementById("donorEmail").value.trim(),
+        organization: document.getElementById("donorOrganization").value.trim(),
+        address: document.getElementById("donorAddress").value.trim(),
+        pan: document.getElementById("donorPan").value.trim().toUpperCase(),
+        donationType,
+        advtSize: document.getElementById("advtSize") ? document.getElementById("advtSize").value : "",
+        diaryCount: document.getElementById("diaryCount") ? document.getElementById("diaryCount").value : "",
+        amount: parseInt(amount),
+        purpose: document.getElementById("donationPurpose").value.trim(),
+        paymentMode: selectedPayMode,
+        transactionId: txnId,
+        paymentDate: payDate,
+        proofBase64: "",
+        proofType: ""
+    };
+
+    const proofFile = document.getElementById("donReceiptProof").files[0];
+    if (proofFile) {
+        donationData.proofType = proofFile.type;
+        donationData.proofBase64 = await new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result.split(",")[1]);
+            reader.readAsDataURL(proofFile);
+        });
+    }
+
+    try {
+        const response = await fetch(BACKEND_URL, {
+            method: "POST",
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: JSON.stringify({ action: "saveDonation", data: donationData })
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            openDonationReceipt(result.donation);
+        } else {
+            alert(result.message || "Failed to submit donation.");
+        }
+    } catch (e) {
+        console.error("Donation Submit Error:", e);
+        alert("Error submitting donation. Please check backend connection.");
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = "SUBMIT DONATION";
+    }
+}
+
+// ---------------------------------------------------------
+// OPEN & CLOSE DONATION RECEIPT OVERLAY
+// ---------------------------------------------------------
+function openDonationReceipt(data) {
+    document.querySelectorAll("#contentArea > section").forEach(s => s.style.display = "none");
+
+    document.getElementById("drReceiptNo").textContent = data.receiptNo || "ARPEU/DON/2026/01";
+    document.getElementById("drDonationId").textContent = data.donationId || "DON001";
+    document.getElementById("drDate").textContent = data.paymentDate || new Date().toLocaleDateString('en-GB');
+    document.getElementById("drDonorType").textContent = data.donorType || "-";
+    document.getElementById("drDonorName").textContent = data.donorName || "-";
+    document.getElementById("drMobile").textContent = data.donorMobile || "-";
+    document.getElementById("drOrg").textContent = data.organization || "-";
+
+    document.getElementById("drDonationType").textContent = data.donationType;
+    document.getElementById("drPurpose").textContent = data.purpose || "";
+    document.getElementById("drAmount").textContent = data.amount;
+    document.getElementById("drTotal").textContent = data.amount;
+
+    if (typeof numberToWords === "function") {
+        document.getElementById("drInWords").textContent = numberToWords(data.amount);
+    } else {
+        document.getElementById("drInWords").textContent = data.amount + " Only";
+    }
+
+    document.getElementById("drPayMode").textContent = data.paymentMode;
+    document.getElementById("drTxnId").textContent = data.transactionId || "N/A";
+
+    const qrBox = document.getElementById("donationReceiptQr");
+    if (qrBox && typeof QRCode === "function") {
+        qrBox.innerHTML = "";
+        new QRCode(qrBox, { text: `ARPEU DONATION: ${data.donationId} | Amount: Rs.${data.amount}`, width: 85, height: 85 });
+    }
+
+    const container = document.getElementById("donationReceiptContainer");
+    if (container) container.style.display = "block";
+    
+    const contentArea = document.getElementById("contentArea");
+    if (contentArea) contentArea.scrollTop = 0;
+}
+
+function closeDonationReceipt() {
+    const donRc = document.getElementById("donationReceiptContainer");
+    if (donRc) donRc.style.display = "none";
+    if (typeof showPage === "function") {
+        showPage("home");
+    }
+}
