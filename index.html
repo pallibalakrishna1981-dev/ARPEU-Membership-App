@@ -3221,7 +3221,7 @@
         <button type="button" class="dl-modal-close-btn" onclick="closeDonorSearchModal()">&times;</button>
         <div class="dl-modal-body" style="text-align:center;">
             <div style="font-size:36px; color:#2e7d32; margin-bottom:5px;">🎉</div>
-            <span class="dl-modal-badge" style="background:#e8f5e9; color:#2e7d32;">RECORD FOUND</span>
+            <span class="dl-modal-badge" style="background:#e8f5e9; color:#2e7d32; font-size:13px; font-weight:800; padding:6px 14px; letter-spacing:0.8px;">RECORD FOUND</span>
             <h3 class="dl-modal-title" style="margin:8px 0 4px; font-size:16px;" id="sModalName">Donor Name</h3>
             <p style="font-size:12px; color:#666; margin-bottom:12px;" id="sModalInfo">Details found in Database</p>
 
@@ -3232,13 +3232,12 @@
             </div>
 
             <p style="font-size:12px; font-weight:700; color:#1e293b; margin-bottom:15px;">
-                మీ వివరాలు దొరికాయి. వీటిని ఫారమ్‌లో ఆటో-ఫిల్ చేయమంటారా?
+                Matching record detected in database. Would you like to auto-fill these details into the form?
             </p>
         </div>
-        <div class="dl-modal-footer" style="justify-content:center; gap:10px;">
-            <button type="button" class="dl-modal-btn-cancel" onclick="closeDonorSearchModal()">మళ్ళీ టైప్ చేస్తాను</button>
-            <button type="button" id="confirmAutoFillBtn" class="dl-modal-btn-download" style="background:#2e7d32;">
-                ✅ ఆటో-ఫిల్ చేయి
+       <div class="dl-modal-footer" style="justify-content:center;">
+            <button type="button" id="confirmAutoFillBtn" class="dl-modal-btn-download" style="background:#2e7d32; padding:10px 24px; font-size:13.5px; font-weight:700;">
+                 ✅ Auto-Fill Form
             </button>
         </div>
     </div>

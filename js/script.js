@@ -482,63 +482,120 @@ function initializeDistrictDropdown() {
    NAVIGATION ENGINE (ISOLATED PAGES FIX)
 ========================================================== */
 
+/**
+ * Handles view switching across all portal pages and ensures active tab underline highlighting.
+ * @param {string} page - Selected page target name
+ */
 function showPage(page) {
+  // 1. Guard check: Block tab switching ONLY if receipt is explicitly open
+  const rc = document.getElementById("receiptContainer");
+  if (rc && rc.getAttribute("data-receipt-open") === "true") {
+    console.warn("Navigation locked: Please close receipt before navigating.");
+    return;
+  }
 
-     // 📌 ఏ పేజీ మారినా రిసిప్ట్‌ని ముందుగా దాచివేస్తుంది
-    const rc = document.getElementById("receiptContainer");
-    if (rc) rc.style.display = "none";
+  // 2. Safely capture all page section DOM elements
+  const homeSec = document.getElementById("homeSection") || document.getElementById("homePage");
+  const membSec = document.getElementById("membershipPage") || document.getElementById("membershipSection");
+  const donSec  = document.getElementById("donationsSection") || document.getElementById("donationsPage") || document.getElementById("donationSection");
+  const statSec = document.getElementById("statisticsSection") || document.getElementById("statisticsPage");
+  const abtSec  = document.getElementById("aboutSection") || document.getElementById("aboutPage") || document.getElementById("aboutUsSection");
+  const cntSec  = document.getElementById("contactSection") || document.getElementById("contactPage") || document.getElementById("contactUsSection");
+  const dwnSec  = document.getElementById("downloadsSection") || document.getElementById("downloadsPage");
+  const profSec = document.getElementById("profileSection") || document.getElementById("profilePage");
 
-    // 📌 ప్రొఫైల్ సెక్షన్‌తో సహా అన్నింటినీ ముందుగా హైడ్ చేస్తుంది
-    const profSec = document.getElementById("profileSection");
-    if (profSec) profSec.style.display = "none";
+  // 3. Hide ALL sections completely to prevent page overlap issues
+  if (rc) rc.style.display = "none";
+  if (homeSec) homeSec.style.display = "none";
+  if (membSec) membSec.style.display = "none";
+  if (donSec) donSec.style.display = "none";
+  if (statSec) statSec.style.display = "none";
+  if (abtSec) abtSec.style.display = "none";
+  if (cntSec) cntSec.style.display = "none";
+  if (dwnSec) dwnSec.style.display = "none";
+  if (profSec) profSec.style.display = "none";
 
-    if (homeSection) homeSection.style.display = "none";
-    if (membershipPage) membershipPage.style.display = "none";
-    if (statisticsSection) statisticsSection.style.display = "none";
-    if (contactSection) contactSection.style.display = "none";
-    const aboutSection = document.getElementById("aboutSection");
-    if (aboutSection) aboutSection.style.display = "none";
+  // 4. Remove 'active' highlight class from all navigation links and parent nav-items
+  const navLinks = document.querySelectorAll(".nav-link, .nav-tab-link, .dropdown-item, .navbar-nav a, .nav-item");
+  navLinks.forEach(function (link) {
+    link.classList.remove("active");
+  });
 
-    if (navHome) navHome.classList.remove("active");
-    if (navMembership) navMembership.classList.remove("active");
-    if (navStatistics) navStatistics.classList.remove("active");
+  // 5. Scroll page view smoothly to top position
+  window.scrollTo({ top: 0, behavior: "smooth" });
 
-    switch (page) {
+  const targetPage = String(page).toLowerCase();
 
-        case "home":
-            if (homeSection) homeSection.style.display = "block";
-            if (navHome) navHome.classList.add("active");
-            break;
+  // 6. Dynamically locate active navigation tab element
+  let activeLink = document.getElementById(`nav${targetPage.charAt(0).toUpperCase() + targetPage.slice(1)}`) ||
+                   document.getElementById(`nav-${targetPage}`) ||
+                   document.querySelector(`[onclick*="'${targetPage}'"]`) || 
+                   document.querySelector(`[onclick*='"${targetPage}"']`);
 
-        case "membership":
-            if (membershipPage) membershipPage.style.display = "block";
-            if (navMembership) navMembership.classList.add("active");
-            break;
+  // Special alias targeting for statistics tab
+  if (!activeLink && (targetPage === "statistics" || targetPage === "stats")) {
+    activeLink = document.querySelector('[onclick*="statistics"]') || 
+                 document.querySelector('[onclick*="stats"]') ||
+                 document.getElementById("navStatistics") ||
+                 document.getElementById("navStats");
+  }
 
-        case "statistics":
-            if (statisticsSection) statisticsSection.style.display = "block";
-            if (navStatistics) navStatistics.classList.add("active");
-            loadMembershipStatistics();
-            break;
-
-        case "contact":
-            if (contactSection) contactSection.style.display = "block";
-            break;
-
-        case "about":
-            if (aboutSection) aboutSection.style.display = "block";
-            break;
+  // Add active highlight class to target link and parent element
+  if (activeLink) {
+    activeLink.classList.add("active");
+    if (activeLink.parentElement && activeLink.parentElement.classList.contains("nav-item")) {
+      activeLink.parentElement.classList.add("active");
     }
+  }
 
-    document
-    .getElementById("contentArea")
-    .scrollTo({
+  // 7. Display ONLY the targeted page section
+  switch (targetPage) {
+    case "home":
+      if (homeSec) homeSec.style.display = "block";
+      break;
 
-    top:0,
+    case "membership":
+      if (membSec) membSec.style.display = "block";
+      break;
 
-    behavior:"smooth"
+    case "donations":
+    case "donation":
+      if (donSec) donSec.style.display = "block";
+      break;
 
-    });
+    case "statistics":
+    case "stats":
+      if (statSec) statSec.style.display = "block";
+      if (typeof renderStatisticsCharts === "function") {
+        renderStatisticsCharts();
+      }
+      break;
+
+    case "about":
+    case "aboutus":
+    case "about-arpeu":
+      if (abtSec) abtSec.style.display = "block";
+      break;
+
+    case "contact":
+    case "contactus":
+    case "contact-us":
+      if (cntSec) cntSec.style.display = "block";
+      break;
+
+    case "downloads":
+    case "download":
+      if (dwnSec) dwnSec.style.display = "block";
+      break;
+
+    case "profile":
+      if (profSec) profSec.style.display = "block";
+      break;
+
+    default:
+      if (homeSec) homeSec.style.display = "block";
+      break;
+  }
 }
 
 
@@ -2995,15 +3052,15 @@ async function loadMemberProfile(memberId) {
         if (result.success && result.profile) {
             const p = result.profile;
 
-            // Member Photo Display
+           // Member Photo Display (Direct Drive Converter Fix)
             const photoImg = document.getElementById("pMemberPhoto");
             if (photoImg) {
-                if (p.photoUrl) {
-                    photoImg.src = p.photoUrl;
-                } else {
-                    photoImg.src = "images/arpeu-logo.png";
-                }
+            if (p.photoUrl) {
+            photoImg.src = formatDriveImageUrl(p.photoUrl); // <-- పక్కన formatDriveImageUrl చేర్చాం
+            } else {
+            photoImg.src = "images/arpeu-logo.png";
             }
+        }
 
             document.getElementById("pFullName").textContent = p.fullName || "Member";
             document.getElementById("pMembershipId").textContent = p.membershipId || memberId;
@@ -3063,24 +3120,46 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 });
 
+/* ==========================================================
+   RECEIPT DISPLAY & CLOSE HANDLERS
+   ========================================================== */
+
 function openReceipt() {
-    loadReceiptPreview();
-    if (membershipPage) membershipPage.style.display = "none";
-    if (homeSection) homeSection.style.display = "none";
-    if (statisticsSection) statisticsSection.style.display = "none";
+  loadReceiptPreview();
 
-    const rc = document.getElementById("receiptContainer");
-    if (rc) rc.style.display = "block";
-    window.scrollTo({ top: 0, behavior: "smooth" });
+  if (typeof membershipPage !== 'undefined' && membershipPage) membershipPage.style.display = "none";
+  if (typeof homeSection !== 'undefined' && homeSection) homeSection.style.display = "none";
+  if (typeof statisticsSection !== 'undefined' && statisticsSection) statisticsSection.style.display = "none";
 
-    // 📌 రిసిప్ట్ ఓపెన్ అవ్వగానే ఫారమ్ ఆటోమేటిక్‌గా రీసెట్ అవుతుంది 👇
+  const rc = document.getElementById("receiptContainer");
+  if (rc) {
+    rc.style.display = "block";
+    rc.setAttribute("data-active", "true"); // Locks receipt view active status
+  }
+
+  window.scrollTo({ top: 0, behavior: "smooth" });
+
+  // Reset membership form automatically upon receipt generation
+  if (typeof resetMembershipForm === 'function') {
     resetMembershipForm();
+  }
 }
 
+/**
+ * Closes the receipt view and navigates back to Home page.
+ * Executed strictly when user clicks the Close button.
+ */
 function closeReceipt() {
-    const rc = document.getElementById("receiptContainer");
-    if (rc) rc.style.display = "none";
-    showPage("home");
+  const rc = document.getElementById("receiptContainer");
+  if (rc) {
+    rc.style.display = "none";
+    rc.removeAttribute("data-active"); // Clears receipt view active lock
+  }
+
+  // Navigate back to home page with force bypass flag
+  if (typeof showPage === 'function') {
+    showPage("home", true);
+  }
 }
 
 /* ==========================================================
@@ -3525,38 +3604,78 @@ async function searchDonorOrMember(queryKey) {
     }
 }
 
+/* ==========================================================
+   UNIVERSAL DONOR / MEMBER AUTO-FILL SEARCH HANDLERS
+   ========================================================== */
+
+/**
+ * Displays the search detection modal with detected member/donor details.
+ * @param {Object} data - Search record result object
+ */
 function showDonorSearchModal(data) {
-    document.getElementById("sModalName").textContent = data.name || "Donor Name";
-    document.getElementById("sModalInfo").textContent = `${data.source} Detected`;
-    document.getElementById("sModalSource").textContent = data.source || "Database";
-    document.getElementById("sModalMobile").textContent = data.mobile || "-";
-    document.getElementById("sModalOrg").textContent = data.organization || data.station || "-";
+  if (!data) return;
 
-    const modal = document.getElementById("donorSearchModal");
-    if (modal) modal.style.display = "flex";
+  // Set modal preview fields dynamically
+  const nameEl   = document.getElementById("sModalName");
+  const infoEl   = document.getElementById("sModalInfo");
+  const sourceEl = document.getElementById("sModalSource");
+  const mobileEl = document.getElementById("sModalMobile");
+  const orgEl    = document.getElementById("sModalOrg");
+
+  if (nameEl)   nameEl.textContent   = data.name || "Member Name";
+  if (infoEl)   infoEl.textContent   = `${data.source || "Database"} Record Detected`;
+  if (sourceEl) sourceEl.textContent = data.source || "Database";
+  if (mobileEl) mobileEl.textContent = data.mobile || "-";
+  if (orgEl)    orgEl.textContent    = data.organization || data.station || "-";
+
+  // Bind confirm auto-fill button click event
+  const confirmBtn = document.getElementById("confirmAutoFillBtn");
+  if (confirmBtn) {
+    confirmBtn.onclick = applyAutoFillData;
+  }
+
+  const modal = document.getElementById("donorSearchModal");
+  if (modal) modal.style.display = "flex";
 }
 
+/**
+ * Dismisses modal and enforces auto-fill data application to maintain database integrity.
+ */
 function closeDonorSearchModal() {
-    const modal = document.getElementById("donorSearchModal");
-    if (modal) modal.style.display = "none";
+  const modal = document.getElementById("donorSearchModal");
+  if (modal) modal.style.display = "none";
+
+  // Enforce mandatory auto-fill if an existing record was detected
+  if (typeof foundSearchRecord !== "undefined" && foundSearchRecord) {
+    applyAutoFillData();
+  }
 }
 
+/**
+ * Auto-fills form fields with detected record data and notifies user in English.
+ */
 function applyAutoFillData() {
-    if (!foundSearchRecord) return;
-    const d = foundSearchRecord;
+  if (typeof foundSearchRecord === "undefined" || !foundSearchRecord) return;
+  const d = foundSearchRecord;
 
-    if (d.donorType && document.getElementById("donorType")) document.getElementById("donorType").value = d.donorType;
-    if (d.name && document.getElementById("donorName")) document.getElementById("donorName").value = d.name;
-    if (d.mobile && document.getElementById("donorMobile")) document.getElementById("donorMobile").value = d.mobile;
-    if (d.email && document.getElementById("donorEmail")) document.getElementById("donorEmail").value = d.email;
-    if ((d.organization || d.station) && document.getElementById("donorOrganization")) {
-        document.getElementById("donorOrganization").value = d.organization || d.station || "";
-    }
-    if (d.address && document.getElementById("donorAddress")) document.getElementById("donorAddress").value = d.address;
-    if (d.pan && document.getElementById("donorPan")) document.getElementById("donorPan").value = d.pan;
+  if (d.donorType && document.getElementById("donorType")) document.getElementById("donorType").value = d.donorType;
+  if (d.name && document.getElementById("donorName")) document.getElementById("donorName").value = d.name;
+  if (d.mobile && document.getElementById("donorMobile")) document.getElementById("donorMobile").value = d.mobile;
+  if (d.email && document.getElementById("donorEmail")) document.getElementById("donorEmail").value = d.email;
+  
+  if ((d.organization || d.station) && document.getElementById("donorOrganization")) {
+    document.getElementById("donorOrganization").value = d.organization || d.station || "";
+  }
+  
+  if (d.address && document.getElementById("donorAddress")) document.getElementById("donorAddress").value = d.address;
+  if (d.pan && document.getElementById("donorPan")) document.getElementById("donorPan").value = d.pan;
 
-    closeDonorSearchModal();
-    alert("✔ మీ వివరాలు ఆటోమేటిక్‌గా నమోదు చేయబడ్డాయి!");
+  // Hide search modal element
+  const modal = document.getElementById("donorSearchModal");
+  if (modal) modal.style.display = "none";
+
+  // Professional English notification message
+  alert("✔ Details successfully auto-filled from database!");
 }
 
 // ---------------------------------------------------------
@@ -3758,3 +3877,16 @@ function readFileAsBase64(fileInput) {
     });
 }
 
+// ==========================================================
+// GOOGLE DRIVE DIRECT IMAGE CONVERTER
+// ==========================================================
+function formatDriveImageUrl(url) {
+    if (!url || url.trim() === "") return "images/default-avatar.png";
+    
+    // Google Drive File ID ని సేకరించి డైరెక్ట్ ఇమేజ్ URL కి మారుస్తుంది
+    const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/) || url.match(/id=([a-zA-Z0-9_-]+)/);
+    if (match && match[1]) {
+        return "https://lh3.googleusercontent.com/d/" + match[1];
+    }
+    return url;
+}
