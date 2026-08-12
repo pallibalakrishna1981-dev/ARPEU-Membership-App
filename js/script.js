@@ -255,50 +255,77 @@ let otpTimerInterval = null;
 
 
 
-/* =========================================================
-   AGE CALCULATION
-========================================================= */
+/* ==========================================================
+   UNIVERSAL AGE CALCULATION ENGINE (MEMBERSHIP & PROFILE)
+   Single Reusable Engine for Date of Birth & Age Calculation
+   ========================================================== */
 
-function initializeAgeCalculation(){
-    const dob=document.getElementById("dob");
-    const age=document.getElementById("age");
-    if(!dob||!age){
-        return;
+/**
+ * Calculates age in Y/M/D format dynamically upon Date of Birth selection.
+ * Works universally for both Membership (#dob -> #age) and Profile (#profDob -> #profAge).
+ * @param {string} dobSelector - Date of Birth input selector
+ * @param {string} ageSelector - Calculated Age output selector
+ */
+function bindUniversalAgeCalculator(dobSelector, ageSelector) {
+  const dobEl = document.querySelector(dobSelector);
+  const ageEl = document.querySelector(ageSelector);
+  if (!dobEl || !ageEl) return;
+
+  // Restrict future dates beyond today
+  dobEl.max = new Date().toISOString().split("T")[0];
+
+  dobEl.addEventListener("change", function () {
+    if (!this.value || this.value.trim() === "") {
+      ageEl.value = "";
+      return;
     }
-    dob.max=new Date().toISOString().split("T")[0];
-    dob.addEventListener("change", function() {
-        if (this.value === "") {
-            age.value = "";
-            return;
-        }
-        const birthDate = ParseDate(this.value);
-        const today = new Date();
-        
-        let years = today.getFullYear() - birthDate.getFullYear();
-        let months = today.getMonth() - birthDate.getMonth();
-        let days = today.getDate() - birthDate.getDate();
 
-        if (days < 0) {
-            months--;
-            const lastMonth = new Date(today.getFullYear(), today.getMonth(), 0);
-            days += lastMonth.getDate();
-        }
-        if (months < 0) {
-            years--;
-            months += 12;
-        }
+    const birthDate = ParseDate(this.value);
+    if (!birthDate || isNaN(birthDate.getTime())) {
+      ageEl.value = "";
+      return;
+    }
 
-        if (years < 15) {
-            age.value = "";
-            PortalSync(dob, "", "change");
-            showError("Minimum 15 years age required for membership.");
-            return;
-        }
+    const today = new Date();
+    let years  = today.getFullYear() - birthDate.getFullYear();
+    let months = today.getMonth() - birthDate.getMonth();
+    let days   = today.getDate() - birthDate.getDate();
 
-        // ఇక్కడ Years, Months, Days ఫార్మాట్ లో చూపిస్తున్నాను
-        age.value = `${years}Y ${months}M ${days}D`;
-    });
+    if (days < 0) {
+      months--;
+      const lastMonth = new Date(today.getFullYear(), today.getMonth(), 0);
+      days += lastMonth.getDate();
+    }
+    if (months < 0) {
+      years--;
+      months += 12;
+    }
+
+    // Minimum 15 years age validation as per union bye-laws
+    if (years < 15) {
+      ageEl.value = "";
+      if (typeof PortalSync === "function") {
+        PortalSync(dobEl, "", "change");
+      } else {
+        dobEl.value = "";
+      }
+      showError("Minimum 15 years age required for membership.");
+      return;
+    }
+
+    // Output formatted age: e.g., 28Y 5M 14D
+    ageEl.value = `${years}Y ${months}M ${days}D`;
+  });
 }
+
+/**
+ * Universal Initialization Call for Age Calculation Across All Forms
+ */
+function initializeAgeCalculation() {
+  bindUniversalAgeCalculator("#dob", "#age");          // Membership Form
+  bindUniversalAgeCalculator("#profDob", "#profAge");  // Profile Form
+}
+
 
 function initializeJoiningDateValidation(){
     const dob=document.getElementById("dob");
@@ -323,63 +350,49 @@ function initializeJoiningDateValidation(){
 }
 
 
-/* =========================================================
-   AADHAAR FORMATTING
-========================================================= */
 
+
+/* ==========================================================
+   AADHAAR FORMATTING ENGINE (MEMBERSHIP & PROFILE REUSE)
+   ========================================================== */
+
+/**
+ * Enforces 12-digit numeric constraint and 4-4-4 auto-spacing formatting on Aadhaar inputs.
+ */
 function initializeAadhaarFormatting() {
+  ["#aadhaar", "#profAadhaar"].forEach(selector => {
+    const aadhaarEl = document.querySelector(selector);
+    if (!aadhaarEl) return;
 
-    const aadhaar = document.getElementById("aadhaar");
+    aadhaarEl.setAttribute("maxlength", "14");
 
-    if (!aadhaar) {
+    aadhaarEl.addEventListener("input", function () {
+      let digits = this.value.replace(/\D/g, "");
 
-        return;
+      if (digits.length > 12) {
+        digits = digits.substring(0, 12);
+      }
 
-    }
-
-    aadhaar.setAttribute("maxlength", "14");
-
-    aadhaar.addEventListener("input", function () {
-
-        let digits = this.value.replace(/\D/g, "");
-
-        if (digits.length > 12) {
-
-            digits = digits.substring(0, 12);
-
+      let formatted = "";
+      for (let i = 0; i < digits.length; i++) {
+        if (i > 0 && i % 4 === 0) {
+          formatted += " ";
         }
+        formatted += digits[i];
+      }
 
-        let formatted = "";
-
-        for (let i = 0; i < digits.length; i++) {
-
-            if (i > 0 && i % 4 === 0) {
-
-                formatted += " ";
-
-            }
-
-            formatted += digits[i];
-
-        }
-
-        this.value = formatted;
-
+      this.value = formatted;
     });
 
-    aadhaar.addEventListener("keypress", function (e) {
-
-        const digits = this.value.replace(/\D/g, "");
-
-        if (digits.length >= 12 && /\d/.test(e.key)) {
-
-            e.preventDefault();
-
-        }
-
+    aadhaarEl.addEventListener("keypress", function (e) {
+      const digits = this.value.replace(/\D/g, "");
+      if (digits.length >= 12 && /\d/.test(e.key)) {
+        e.preventDefault();
+      }
     });
-
+  });
 }
+
 
 
 /* =========================================================
@@ -417,11 +430,10 @@ function startOtpTimer() {
 }
 
 /* =========================================================
-   DISTRICT DROPDOWN
+   DISTRICTS MASTER DATA & UNIVERSAL ENGINE
 ========================================================= */
 
-const districtSelect = document.getElementById("district");
-
+// Master List of 26 AP Districts (Single Source of Truth)
 const districts = [
     "Alluri Sitarama Raju",
     "Anakapalli",
@@ -451,40 +463,51 @@ const districts = [
     "YSR Kadapa"
 ];
 
-function initializeDistrictDropdown() {
+/**
+ * Universal District Populator Engine.
+ * Automatically finds and populates ALL district dropdowns across Membership, Profile & Donations.
+ */
+function initializeUniversalDistrictEngine() {
+  if (typeof districts === "undefined" || !Array.isArray(districts)) return;
 
-    if (!districtSelect) {
-        return;
-    }
+  // Query ALL district select elements across Membership, Profile, and Donations
+  const allDistrictSelects = document.querySelectorAll(
+    '#district, #profPermDistrict, #profPresDistrict, #donorDistrict, select[name*="district"], select[id*="district"], select[id*="District"]'
+  );
 
-    districts.forEach(function (district) {
+  allDistrictSelects.forEach(selectEl => {
+    if (!selectEl) return;
 
-        const option = document.createElement("option");
+    // Capture currently selected value if available
+    const currentValue = selectEl.value;
 
-        option.value = district;
+    // Clear existing options and set default placeholder
+    selectEl.innerHTML = '<option value="">Select District</option>';
 
-        option.textContent = district;
-
-        districtSelect.appendChild(option);
-
+    // Populate all 26 AP Districts from single master array
+    districts.forEach(function (districtName) {
+      const option = document.createElement("option");
+      option.value = districtName;
+      option.textContent = districtName;
+      selectEl.appendChild(option);
     });
 
+    // Restore selected value if already set
+    if (currentValue) {
+      selectEl.value = currentValue;
+    }
+  });
 }
 
 
-
-
-/* =========================================================
-   NAVIGATION ENGINE
-========================================================= */
-
 /* ==========================================================
-   NAVIGATION ENGINE (ISOLATED PAGES FIX)
-========================================================== */
+   COMPLETE NAVIGATION ENGINE WITH UNDER-DEVELOPMENT GUARD
+   ========================================================== */
 
 /**
- * Handles view switching across all portal pages and ensures active tab underline highlighting.
- * @param {string} page - Selected page target name
+ * Manages view switching for all portal pages.
+ * Displays completed pages and shows a professional placeholder for upcoming modules.
+ * @param {string} page - Selected page target identifier
  */
 function showPage(page) {
   // 1. Guard check: Block tab switching ONLY if receipt is explicitly open
@@ -502,9 +525,34 @@ function showPage(page) {
   const abtSec  = document.getElementById("aboutSection") || document.getElementById("aboutPage") || document.getElementById("aboutUsSection");
   const cntSec  = document.getElementById("contactSection") || document.getElementById("contactPage") || document.getElementById("contactUsSection");
   const dwnSec  = document.getElementById("downloadsSection") || document.getElementById("downloadsPage");
-  const profSec = document.getElementById("profileSection") || document.getElementById("profilePage");
+  const profSec = document.getElementById("profileSection") || document.getElementById("profilePage") || document.getElementById("myProfileSection");
 
-  // 3. Hide ALL sections completely to prevent page overlap issues
+  // Placeholder section for under-development modules
+  let placeholderSec = document.getElementById("underDevPlaceholderSection");
+
+  // Create placeholder section dynamically if missing in HTML
+  if (!placeholderSec) {
+    placeholderSec = document.createElement("div");
+    placeholderSec.id = "underDevPlaceholderSection";
+    placeholderSec.className = "main-page-section";
+    placeholderSec.style.display = "none";
+    placeholderSec.innerHTML = `
+      <div class="main-page-container" style="padding: 40px 20px; text-align: center;">
+        <div style="background: #ffffff; border: 1px dashed #cbd5e1; border-radius: 12px; padding: 40px 20px; max-width: 500px; margin: 0 auto; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+          <div style="font-size: 48px; color: #003366; margin-bottom: 12px;">🚧</div>
+          <h3 id="devPageTitle" style="color: #003366; font-size: 20px; margin-bottom: 8px; font-weight: 700;">Page Under Development</h3>
+          <p style="color: #64748b; font-size: 14px; margin-bottom: 20px; line-height: 1.5;">This module is currently being configured under the Digital Cadre Management Framework (DCMF). It will be active soon!</p>
+          <button type="button" class="profile-btn profile-btn-primary" onclick="showPage('home')" style="margin: 0 auto; padding: 8px 20px; font-size: 13px;">
+            <i class="fas fa-home"></i> Back to Home Page
+          </button>
+        </div>
+      </div>
+    `;
+    const mainContentArea = document.getElementById("contentArea") || document.body;
+    mainContentArea.appendChild(placeholderSec);
+  }
+
+  // 3. Hide ALL sections completely
   if (rc) rc.style.display = "none";
   if (homeSec) homeSec.style.display = "none";
   if (membSec) membSec.style.display = "none";
@@ -514,8 +562,9 @@ function showPage(page) {
   if (cntSec) cntSec.style.display = "none";
   if (dwnSec) dwnSec.style.display = "none";
   if (profSec) profSec.style.display = "none";
+  if (placeholderSec) placeholderSec.style.display = "none";
 
-  // 4. Remove 'active' highlight class from all navigation links and parent nav-items
+  // 4. Remove 'active' highlight class from all navigation links
   const navLinks = document.querySelectorAll(".nav-link, .nav-tab-link, .dropdown-item, .navbar-nav a, .nav-item");
   navLinks.forEach(function (link) {
     link.classList.remove("active");
@@ -524,7 +573,7 @@ function showPage(page) {
   // 5. Scroll page view smoothly to top position
   window.scrollTo({ top: 0, behavior: "smooth" });
 
-  const targetPage = String(page).toLowerCase();
+  const targetPage = String(page).toLowerCase().trim();
 
   // 6. Dynamically locate active navigation tab element
   let activeLink = document.getElementById(`nav${targetPage.charAt(0).toUpperCase() + targetPage.slice(1)}`) ||
@@ -532,15 +581,6 @@ function showPage(page) {
                    document.querySelector(`[onclick*="'${targetPage}'"]`) || 
                    document.querySelector(`[onclick*='"${targetPage}"']`);
 
-  // Special alias targeting for statistics tab
-  if (!activeLink && (targetPage === "statistics" || targetPage === "stats")) {
-    activeLink = document.querySelector('[onclick*="statistics"]') || 
-                 document.querySelector('[onclick*="stats"]') ||
-                 document.getElementById("navStatistics") ||
-                 document.getElementById("navStats");
-  }
-
-  // Add active highlight class to target link and parent element
   if (activeLink) {
     activeLink.classList.add("active");
     if (activeLink.parentElement && activeLink.parentElement.classList.contains("nav-item")) {
@@ -548,8 +588,16 @@ function showPage(page) {
     }
   }
 
-  // 7. Display ONLY the targeted page section
+  // Helper function to show placeholder card for unmapped modules
+  function showUnderDevelopmentCard(titleName) {
+    const titleEl = document.getElementById("devPageTitle");
+    if (titleEl) titleEl.textContent = `${titleName} - Page Under Development`;
+    if (placeholderSec) placeholderSec.style.display = "block";
+  }
+
+  // 7. Route and display targeted section cleanly
   switch (targetPage) {
+    // COMPLETED MAJOR PAGES
     case "home":
       if (homeSec) homeSec.style.display = "block";
       break;
@@ -571,6 +619,7 @@ function showPage(page) {
       }
       break;
 
+    // COMPLETED 'MORE' MENU PAGES
     case "about":
     case "aboutus":
     case "about-arpeu":
@@ -589,11 +638,40 @@ function showPage(page) {
       break;
 
     case "profile":
+    case "profiles":
+    case "myprofile":
+    case "my-profile":
+    case "digitalprofile":
       if (profSec) profSec.style.display = "block";
       break;
 
+    // UPCOMING MODULES (UNDER DEVELOPMENT PLACEHOLDERS)
+    case "officebearers":
+    case "office-bearers":
+      showUnderDevelopmentCard("Office Bearers");
+      break;
+
+    case "gallery":
+      showUnderDevelopmentCard("Gallery");
+      break;
+
+    case "notifications":
+      showUnderDevelopmentCard("Notifications");
+      break;
+
+    case "settings":
+      showUnderDevelopmentCard("Settings");
+      break;
+
+    case "adminlogin":
+    case "admin":
+    case "admin-login":
+      showUnderDevelopmentCard("Admin Login");
+      break;
+
     default:
-      if (homeSec) homeSec.style.display = "block";
+      // Fallback for any unmapped future link
+      showUnderDevelopmentCard("Module");
       break;
   }
 }
@@ -810,117 +888,70 @@ function setMembershipMode(mode) {
 }
 
 
-/* =========================================================
-   PHOTO UPLOAD & CROPPER ENGINE (WHATSAPP STYLE)
-========================================================= */
+/* ==========================================================
+   UNIVERSAL PHOTO UPLOAD & CROPPER ENGINE (WHATSAPP STYLE)
+   Single Engine for Membership & Profile Photo Uploads
+   ========================================================== */
 
-let cropperInstance = null;
-window.croppedPhotoFile = null;
+/* ==========================================================
+   APPLY PHOTO CROPPER RESULT (DIRECT UNCONDITIONAL PREVIEW)
+   ========================================================== */
 
-function initializePhotoPreview() {
-    if (!memberPhoto) return;
-
-    memberPhoto.addEventListener("change", function () {
-        const file = this.files[0];
-        if (!file) return;
-
-        const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
-        if (!allowedTypes.includes(file.type)) {
-            alert("Invalid file format.\nOnly JPG, PNG and WEBP files are allowed.");
-            this.value = "";
-            return;
-        }
-
-        const reader = new FileReader();
-        reader.onload = function (e) {
-            openCropperModal(e.target.result);
-        };
-        reader.readAsDataURL(file);
-    });
-}
-
-function openCropperModal(imageSrc) {
-    const modal = document.getElementById("cropperModal");
-    const cropImg = document.getElementById("cropperImage");
-    if (!modal || !cropImg) return;
-
-    cropImg.src = imageSrc;
-    modal.style.display = "flex";
-
-    if (cropperInstance) {
-        cropperInstance.destroy();
-    }
-
-    // Passport Size Aspect Ratio (3:4)
-    cropperInstance = new Cropper(cropImg, {
-        aspectRatio: 3 / 4,
-        viewMode: 1,
-        dragMode: 'move',
-        autoCropArea: 0.9,
-        responsive: true,
-        restore: false,
-        guides: true,
-        center: true,
-        highlight: false,
-        cropBoxMovable: true,
-        cropBoxResizable: true,
-        toggleDragOnDblclick: false
-    });
-}
-
-function cropperZoom(delta) {
-    if (cropperInstance) cropperInstance.zoom(delta);
-}
-
-function cropperRotate(degree) {
-    if (cropperInstance) cropperInstance.rotate(degree);
-}
-
-function cropperReset() {
-    if (cropperInstance) cropperInstance.reset();
-}
-
-function closeCropperModal() {
-    const modal = document.getElementById("cropperModal");
-    if (modal) modal.style.display = "none";
-    if (cropperInstance) {
-        cropperInstance.destroy();
-        cropperInstance = null;
-    }
-}
-
+/**
+ * Applies cropped photo result and updates ALL preview elements unconditionally
+ */
 function applyPhotoCrop() {
-    if (!cropperInstance) return;
+  if (!cropperInstance) return;
 
-    // High quality cropped canvas (300x400 Passport Specs)
-    const canvas = cropperInstance.getCroppedCanvas({
-        width: 300,
-        height: 400,
-        imageSmoothingEnabled: true,
-        imageSmoothingQuality: 'high'
-    });
+  // High quality cropped canvas (300x400 Passport Specs)
+  const canvas = cropperInstance.getCroppedCanvas({
+    width: 300,
+    height: 400,
+    imageSmoothingEnabled: true,
+    imageSmoothingQuality: 'high'
+  });
 
-    canvas.toBlob((blob) => {
-        const croppedFile = new File([blob], "cropped-passport-photo.jpg", { type: "image/jpeg" });
-        window.croppedPhotoFile = croppedFile; // Save cropped reference
+  const dataUrl = canvas.toDataURL("image/jpeg", 0.9);
 
-        // Preview UI update
-        const photoPreview = document.getElementById("photoPreview");
-        const previewText = document.querySelector(".preview-text");
-        const photoFileName = document.getElementById("photoFileName");
+  canvas.toBlob((blob) => {
+    const croppedFile = new File([blob], "cropped-passport-photo.jpg", { type: "image/jpeg" });
+    window.croppedPhotoFile = croppedFile;
 
-        if (photoPreview) {
-            photoPreview.src = canvas.toDataURL("image/jpeg", 0.9);
-            photoPreview.style.display = "block";
-        }
-        if (previewText) previewText.style.display = "none";
-        if (photoFileName) photoFileName.value = "Photo Cropped & Adjusted ✔";
+    // 1. Update Membership Photo Preview Elements
+    const photoPreview  = document.getElementById("photoPreview");
+    const previewText   = document.querySelector(".preview-text");
+    const photoFileName = document.getElementById("photoFileName");
 
-        closeCropperModal();
-    }, "image/jpeg", 0.9);
+    if (photoPreview) {
+      photoPreview.src = dataUrl;
+      photoPreview.style.setProperty("display", "block", "important");
+    }
+    if (previewText) {
+      previewText.style.setProperty("display", "none", "important");
+    }
+    if (photoFileName) {
+      photoFileName.value = "Photo Cropped & Adjusted ✔";
+    }
+
+    // 2. Update Profile Photo Preview Elements
+    const profPreview     = document.getElementById("profilePhotoPreview");
+    const profPreviewText = document.getElementById("profPreviewText");
+    const profFileName    = document.getElementById("profPhotoFileName");
+
+    if (profPreview) {
+      profPreview.src = dataUrl;
+      profPreview.style.setProperty("display", "block", "important");
+    }
+    if (profPreviewText) {
+      profPreviewText.style.setProperty("display", "none", "important");
+    }
+    if (profFileName) {
+      profFileName.value = "Photo Cropped & Adjusted ✔";
+    }
+
+    closeCropperModal();
+  }, "image/jpeg", 0.9);
 }
-
-
 
 /* ==========================================================
    APGENCO STAGE TEMPLATE
@@ -1404,428 +1435,143 @@ function clearInput(element) {
     element.value = "";
 }
 
-/* =========================================================
-   EMPLOYMENT MODULE v4.0
-========================================================= */
+/* ==========================================================
+   UNIFIED UNIVERSAL EMPLOYMENT CASCADING ENGINE
+   Single Reusable Engine for Membership & Profile
+   ========================================================== */
 
-const company = document.getElementById("company");
+/**
+ * Universal Cascading Employment Engine
+ * Handles APGENCO, APTRANSCO, and DISCOMs dropdowns for ANY form section using prefix
+ * @param {string} prefix - Field ID prefix ('' for Membership, 'prof' for Profile)
+ */
+function bindUniversalEmploymentEngine(prefix) {
+  const p = prefix || "";
+  
+  // Dynamic Element Getters
+  const getEl = (id) => document.getElementById(p ? `${p}${id.charAt(0).toUpperCase() + id.slice(1)}` : id);
+  const getGrp = (id) => document.getElementById(p ? `${p}${id.charAt(0).toUpperCase() + id.slice(1)}Group` : `${id}Group`);
 
-const station = document.getElementById("station");
-const stage = document.getElementById("stage");
+  const companyEl     = getEl("company");
+  const stationEl     = getEl("station");
+  const stageEl       = getEl("stage");
+  const circleEl      = getEl("circle");
+  const divisionEl    = getEl("division");
+  const subDivisionEl = getEl("subDivision");
+  const subStationEl  = getEl("subStation");
+  const sectionEl     = getEl("section");
+  const designationEl = getEl("designation");
+  const locationEl    = getEl("location");
 
-const circle = document.getElementById("circle");
-const division = document.getElementById("division");
-const subDivision = document.getElementById("subDivision");
+  if (!companyEl) return;
 
-const subStation = document.getElementById("subStation");
-const section = document.getElementById("section");
+  companyEl.addEventListener("change", function () {
+    const compVal = companyEl.value;
 
-const designation = document.getElementById("designation");
+    // Hide All Groups
+    [getGrp("station"), getGrp("stage"), getGrp("circle"), getGrp("division"), getGrp("subDivision"), getGrp("subStation"), getGrp("section"), getGrp("location"), getGrp("designation")].forEach(hideElement);
 
-const stationGroup = document.getElementById("stationGroup");
-const stageGroup = document.getElementById("stageGroup");
+    // Clear All Dropdowns & Inputs
+    DropdownEngine.clear(stationEl, "Select Station");
+    DropdownEngine.clear(stageEl, "Select Stage");
+    DropdownEngine.clear(circleEl, "Select Circle");
+    DropdownEngine.clear(divisionEl, "Select Division");
+    DropdownEngine.clear(subDivisionEl, "Select Sub Division");
+    DropdownEngine.clear(designationEl, "Select Designation");
 
-const circleGroup = document.getElementById("circleGroup");
-const divisionGroup = document.getElementById("divisionGroup");
-const subDivisionGroup = document.getElementById("subDivisionGroup");
+    clearInput(subStationEl);
+    clearInput(sectionEl);
+    if (locationEl) locationEl.value = "";
 
-const subStationGroup = document.getElementById("subStationGroup");
-const sectionGroup = document.getElementById("sectionGroup");
+    if (!compVal) return;
 
-const designationGroup = document.getElementById("designationGroup");
+    if (compVal === "APGENCO") {
+      showElement(getGrp("station"));
+      showElement(getGrp("stage"));
+      showElement(getGrp("division"));
+      showElement(getGrp("subDivision"));
+      if (getGrp("location")) getGrp("location").style.display = "block";
+      showElement(getGrp("designation"));
 
+      DropdownEngine.populate(stationEl, Object.keys(employmentMaster.APGENCO.stations), "Select Station");
+    } else if (employmentMaster[compVal]) {
+      showElement(getGrp("circle"));
+      showElement(getGrp("division"));
+      showElement(getGrp("subDivision"));
+      showElement(getGrp("subStation"));
+      showElement(getGrp("section"));
+      showElement(getGrp("designation"));
 
-/* =========================================================
-   INITIALIZE EMPLOYMENT MODULE
-========================================================= */
-
-function initializeEmploymentModule() {
-
-    if (!company) return;
-
-    company.addEventListener("change", onCompanyChange);
-
-    station.addEventListener("change", onStationChange);
-    stage.addEventListener("change", onStageChange);
-
-    circle.addEventListener("change", onCircleChange);
-    division.addEventListener("change", onDivisionChange);
-
-    subDivision.addEventListener("change", onSubDivisionChange);
-
-    onCompanyChange();
-
-}
-
-
-/* =========================================================
-   COMPANY CHANGE (DYNAMIC LOCATION VISIBILITY FIX)
-========================================================= */
-
-function onCompanyChange() {
-
-    const locGroup = document.getElementById("locationGroup");
-
-    // Hide All Groups By Default
-    hideElement(stationGroup);
-    hideElement(stageGroup);
-
-    hideElement(circleGroup);
-    hideElement(divisionGroup);
-    hideElement(subDivisionGroup);
-
-    hideElement(subStationGroup);
-    hideElement(sectionGroup);
-    
-    // 👈 డిఫాల్ట్‌గా లొకేషన్ ఫీల్డ్‌ని ఆటోమేటిక్‌గా హైడ్ చేస్తుంది
-    if (locGroup) locGroup.style.display = "none";
-
-    hideElement(designationGroup);
-
-    // Clear Dropdowns & Inputs
-    DropdownEngine.clear(station, "Select Station");
-    DropdownEngine.clear(stage, "Select Stage");
-
-    DropdownEngine.clear(circle, "Select Circle");
-    DropdownEngine.clear(division, "Select Division");
-    DropdownEngine.clear(subDivision, "Select Sub Division");
-
-    DropdownEngine.clear(designation, "Select Designation");
-
-    clearInput(subStation);
-    clearInput(section);
-    
-    const locInput = document.getElementById("location");
-    if (locInput) locInput.value = "";
-
-    /* ==========================================
-       1. APGENCO (Shows Station, Stage & Location)
-    ========================================== */
-    if (company.value === "APGENCO") {
-
-        showElement(stationGroup);
-        showElement(stageGroup);
-
-        showElement(divisionGroup);
-        showElement(subDivisionGroup);
-
-        // 👈 APGENCO ఎంచుకుంటే మాత్రమే Location ఫీల్డ్ కనిపిస్తుంది!
-        if (locGroup) locGroup.style.display = "block";
-
-        showElement(designationGroup);
-
-        DropdownEngine.populate(
-            station,
-            Object.keys(employmentMaster.APGENCO.stations),
-            "Select Station"
-        );
-
-        return;
+      DropdownEngine.populate(circleEl, Object.keys(employmentMaster[compVal].circles), "Select Circle");
     }
+  });
 
-    /* ==========================================
-       2. APTRANSCO (Hides Location)
-    ========================================== */
-    if (company.value === "APTRANSCO") {
+  if (stationEl) {
+    stationEl.addEventListener("change", function () {
+      if (!stationEl.value) return;
+      const stationData = employmentMaster.APGENCO.stations[stationEl.value];
+      if (stationData) DropdownEngine.populate(stageEl, Object.keys(stationData.stages), "Select Stage");
+    });
+  }
 
-        showElement(circleGroup);
-        showElement(divisionGroup);
-        showElement(subDivisionGroup);
+  if (stageEl) {
+    stageEl.addEventListener("change", function () {
+      if (!stageEl.value || !stationEl.value) return;
+      const stageData = employmentMaster.APGENCO.stations[stationEl.value].stages[stageEl.value];
+      if (stageData) DropdownEngine.populate(divisionEl, Object.keys(stageData.divisions), "Select Division");
+    });
+  }
 
-        showElement(subStationGroup);
-        showElement(sectionGroup);
-        // Location is hidden!
+  if (circleEl) {
+    circleEl.addEventListener("change", function () {
+      if (!circleEl.value || !companyEl.value) return;
+      const circleData = employmentMaster[companyEl.value].circles[circleEl.value];
+      if (circleData) DropdownEngine.populate(divisionEl, Object.keys(circleData.divisions), "Select Division");
+    });
+  }
 
-        showElement(designationGroup);
+  if (divisionEl) {
+    divisionEl.addEventListener("change", function () {
+      if (!divisionEl.value) return;
 
-        DropdownEngine.populate(
-            circle,
-            Object.keys(employmentMaster.APTRANSCO.circles),
-            "Select Circle"
-        );
-
-        return;
-    }
-
-    /* ==========================================
-       3. DISCOMS (APSPDCL, APCPDCL, APEPDCL) (Hides Location)
-    ========================================== */
-    if (
-        company.value === "APSPDCL" ||
-        company.value === "APCPDCL" ||
-        company.value === "APEPDCL"
-    ) {
-
-        showElement(circleGroup);
-        showElement(divisionGroup);
-        showElement(subDivisionGroup);
-
-        showElement(subStationGroup);
-        showElement(sectionGroup);
-        // Location is hidden!
-
-        showElement(designationGroup);
-
-        DropdownEngine.populate(
-            circle,
-            Object.keys(
-                employmentMaster[company.value].circles
-            ),
-            "Select Circle"
-        );
-
-        return;
-    }
-}
-
-
-/* =========================================================
-   CIRCLE CHANGE
-========================================================= */
-
-function onCircleChange() {
-
-    // APGENCO uses Station -> Stage Flow
-    if (company.value === "APGENCO") {
-        return;
-    }
-
-    DropdownEngine.clear(
-        division,
-        "Select Division"
-    );
-
-    DropdownEngine.clear(
-        subDivision,
-        "Select Sub Division"
-    );
-
-    DropdownEngine.clear(
-        designation,
-        "Select Designation"
-    );
-
-    clearInput(subStation);
-    clearInput(section);
-
-    const companyData =
-        employmentMaster[company.value];
-
-    if (!companyData) return;
-
-    const circleData =
-        companyData.circles[circle.value];
-
-    if (!circleData) return;
-
-    DropdownEngine.populate(
-        division,
-        Object.keys(circleData.divisions),
-        "Select Division"
-    );
-
-}
-
-
-/* =========================================================
-   STATION CHANGE
-========================================================= */
-
-function onStationChange() {
-
-    if (!station.value) {
-
-        DropdownEngine.clear(
-            stage,
-            "Select Stage"
-        );
-
-        return;
-
-    }
-
-    const stationData =
-        employmentMaster.APGENCO
-        .stations[station.value];
-
-    if (!stationData) return;
-
-    DropdownEngine.populate(
-        stage,
-        Object.keys(stationData.stages),
-        "Select Stage"
-    );
-
-}
-
-
-/* =========================================================
-   STAGE CHANGE
-========================================================= */
-
-function onStageChange() {
-
-    if (!stage.value) {
-
-        DropdownEngine.clear(
-            division,
-            "Select Division"
-        );
-
-        DropdownEngine.clear(
-            subDivision,
-            "Select Sub Division"
-        );
-
-        DropdownEngine.clear(
-            designation,
-            "Select Designation"
-        );
-
-        return;
-
-    }
-
-    const stageData =
-        employmentMaster.APGENCO
-        .stations[station.value]
-        .stages[stage.value];
-
-    if (!stageData) return;
-
-    DropdownEngine.populate(
-        division,
-        Object.keys(stageData.divisions),
-        "Select Division"
-    );
-
-}
-
-
-/* =========================================================
-   DIVISION CHANGE
-========================================================= */
-
-function onDivisionChange() {
-
-    /* ==========================================
-       APGENCO
-    ========================================== */
-
-    if (company.value === "APGENCO") {
-
-        const divisionData =
-            employmentMaster.APGENCO
-            .stations[station.value]
-            .stages[stage.value]
-            .divisions[division.value];
-
+      if (companyEl.value === "APGENCO") {
+        const divisionData = employmentMaster.APGENCO.stations[stationEl.value].stages[stageEl.value].divisions[divisionEl.value];
         if (!divisionData) return;
 
-        DropdownEngine.populate(
-            subDivision,
-            divisionData.subDivisions,
-            "Select Sub Division"
-        );
+        DropdownEngine.populate(subDivisionEl, divisionData.subDivisions, "Select Sub Division");
+        let desigList = [];
+        divisionData.designationGroups.forEach(g => desigList.push(...employmentMaster.APGENCO.designationGroups[g]));
+        DropdownEngine.populate(designationEl, desigList, "Select Designation");
+      } else {
+        const circleData = employmentMaster[companyEl.value].circles[circleEl.value];
+        if (!circleData) return;
+        const divisionData = circleData.divisions[divisionEl.value];
+        if (!divisionData) return;
 
-        let designationList = [];
+        DropdownEngine.populate(subDivisionEl, divisionData.subDivisions, "Select Sub Division");
+      }
+    });
+  }
 
-        divisionData.designationGroups.forEach(group => {
-
-            designationList.push(
-                ...employmentMaster.APGENCO.designationGroups[group]
-            );
-
-        });
-
-        DropdownEngine.populate(
-            designation,
-            designationList,
-            "Select Designation"
-        );
-
-        return;
-
-    }
-
-    /* ==========================================
-       DISCOMS
-    ========================================== */
-
-    DropdownEngine.clear(
-        subDivision,
-        "Select Sub Division"
-    );
-
-    DropdownEngine.clear(
-        designation,
+  if (subDivisionEl) {
+    subDivisionEl.addEventListener("change", function () {
+      if (!companyEl || companyEl.value === "APGENCO") return;
+      DropdownEngine.populate(
+        designationEl,
+        ["AAO", "AE", "AO", "Computer Operator", "Dy. EE", "EE", "Foreman", "Foreman Grade-I", "Foreman Grade-II", "JAO", "JE", "JLM", "JLM Grade-II", "Junior Assistant", "LI", "Senior Assistant", "Senior LI", "Shift Operator", "Watchman", "Others"],
         "Select Designation"
-    );
-
-    const companyData =
-        employmentMaster[company.value];
-
-    if (!companyData) return;
-
-    const circleData =
-        companyData.circles[circle.value];
-
-    if (!circleData) return;
-
-    const divisionData =
-        circleData.divisions[division.value];
-
-    if (!divisionData) return;
-
-    DropdownEngine.populate(
-        subDivision,
-        divisionData.subDivisions,
-        "Select Sub Division"
-    );
-
+      );
+    });
+  }
 }
 
-/* =========================================================
-   SUB DIVISION CHANGE
-========================================================= */
-
-function onSubDivisionChange() {
-
-    // APGENCO loads designation in Division Change
-    if (company.value === "APGENCO") {
-        return;
-    }
-
-    DropdownEngine.populate(
-        designation,
-        [
-        "AAO",
-        "AE",
-        "AO",
-        "Computer Operator",
-        "Dy. EE",
-        "EE",
-        "Foreman",
-        "Foreman Grade-I",
-        "Foreman Grade-II",
-        "JAO",
-        "JE",
-        "JLM",
-        "JLM Grade-II",
-        "Junior Assistant",
-        "LI",
-        "Senior Assistant",
-        "Senior LI",
-        "Shift Operator",
-        "Watchman",
-        "Others"
-        ],
-        "Select Designation"
-    );
-
+/**
+ * Single Universal Initialization Call for both Membership and Profile
+ */
+function initializeEmploymentModule() {
+  bindUniversalEmploymentEngine("");     // Binds Membership Form
+  bindUniversalEmploymentEngine("prof"); // Binds Profile Form
 }
-
-
 
 /* ==========================================================
    ARPEU PAYMENT MODULE V25 - Final Robust Logic
@@ -1991,81 +1737,103 @@ const PaymentModuleV25 = {
 
 
 
+/* ==========================================================
+   FLATPICKR DATE PICKERS ENGINE (WITH PROFILE OVERLAY FIX)
+   ========================================================== */
+
+/**
+ * Initializes Flatpickr on all date inputs including Profile DOB and DOJ
+ * Ensures pickers close cleanly without leaving blocking overlays.
+ */
 function initializeDatePickers() {
-    const base = { disableMobile:true, allowInput:false, clickOpens:true, animate:true, position:"auto", static:false };
+  const base = { 
+    disableMobile: true, 
+    allowInput: false, 
+    clickOpens: true, 
+    animate: true, 
+    position: "above", 
+    static: false 
+  };
 
-    // 1. Personal & Employment Dates
-  // Personal & Employment Dates (DOB మరియు ఇతర తేదీలు)
-    ["#dob", "#joiningDate"].forEach(id => {
-        const el = document.querySelector(id);
-        if (el) flatpickr(el, { 
-            ...base, 
-            dateFormat: "d-m-Y",
-            position: "above", // ఎప్పుడూ పైకే ఓపెన్ అవుతుంది
-            monthSelectorType: "dropdown", // నెలలు డ్రాప్‌డౌన్ లా వస్తాయి
-            // ఇయర్ సెలెక్షన్ రేంజ్ పెంచుతున్నాను
-            onReady: function(selectedDates, dateStr, instance) {
-                const yearInput = instance.calendarContainer.querySelector(".numInput.cur-year");
-                if (yearInput) {
-                    yearInput.removeAttribute("readonly");
-                }
-            },
-            onChange: () => el.dispatchEvent(new Event('change', {bubbles:true})) 
-        });
-    });
-
-   // 1. Pay Now Date (ఈరోజు మాత్రమే మరియు పైకే ఓపెన్ అవ్వాలి)
-    const payNowEl = document.querySelector("#payNowDate");
-    if (payNowEl) {
-        flatpickr(payNowEl, { 
-            ...base, 
-            dateFormat: "d-m-Y", 
-            minDate: "today", 
-            maxDate: "today", 
-            position: "above", 
-            onChange: () => {
-                payNowEl.dispatchEvent(new Event('input', {bubbles:true}));
-                payNowEl.dispatchEvent(new Event('change', {bubbles:true}));
-            }
-        });
-    }
-
-    // 2. Already Paid Date (గత తేదీలు మరియు ఈరోజు మాత్రమే)
-    const manualDateEl = document.querySelector("#manualDate");
-    if (manualDateEl) {
-        flatpickr(manualDateEl, { 
-            ...base, 
-            dateFormat: "d-m-Y", 
-            maxDate: "today", // రేపటి నుండి అన్నీ బ్లాక్ అవుతాయి
-            onChange: () => {
-                manualDateEl.dispatchEvent(new Event('input', {bubbles:true}));
-                manualDateEl.dispatchEvent(new Event('change', {bubbles:true}));
-            }
-        });
-    }
-
-    // 3. Payment Times
-    ["#payNowTimeNative", "#manualTimeNative"].forEach(id => {
-        const el = document.querySelector(id);
-        if (el) {
-            const fp = flatpickr(el, { 
-                ...base, 
-                enableTime: true, 
-                noCalendar: true, 
-                dateFormat: "H:i",
-                position: "above", // ఎప్పుడూ పైకే ఓపెన్ అవ్వడానికి
-                onChange: () => el.dispatchEvent(new Event('input', {bubbles:true})) 
-            });
-            
-            const formatSelector = id === "#payNowTimeNative" ? document.getElementById("payNowTimeFormat") : document.getElementById("manualTimeFormat");
-            if (formatSelector) {
-                formatSelector.addEventListener("change", () => {
-                    const is24 = formatSelector.value === "24";
-                    fp.set("time_24hr", is24);
-                });
-            }
+  // 1. Personal, Employment & Profile Dates (DOB, Joining Date, Profile DOB, Profile DOJ)
+  ["#dob", "#joiningDate", "#profDob", "#profDoj"].forEach(id => {
+    const el = document.querySelector(id);
+    if (el && typeof flatpickr === "function") {
+      flatpickr(el, { 
+        ...base, 
+        dateFormat: "d-m-Y",
+        position: "above",
+        monthSelectorType: "dropdown",
+        onReady: function(selectedDates, dateStr, instance) {
+          const yearInput = instance.calendarContainer.querySelector(".numInput.cur-year");
+          if (yearInput) {
+            yearInput.removeAttribute("readonly");
+          }
+        },
+        onChange: (selectedDates, dateStr, instance) => {
+          el.value = dateStr;
+          el.dispatchEvent(new Event('input', { bubbles: true }));
+          el.dispatchEvent(new Event('change', { bubbles: true }));
+          if (instance) instance.close(); // Cleanly close picker to prevent overlay blocking
         }
+      });
+    }
+  });
+
+  // 2. Pay Now Date (Today only)
+  const payNowEl = document.querySelector("#payNowDate");
+  if (payNowEl && typeof flatpickr === "function") {
+    flatpickr(payNowEl, { 
+      ...base, 
+      dateFormat: "d-m-Y", 
+      minDate: "today", 
+      maxDate: "today", 
+      position: "above", 
+      onChange: (selectedDates, dateStr, instance) => {
+        payNowEl.dispatchEvent(new Event('input', { bubbles: true }));
+        payNowEl.dispatchEvent(new Event('change', { bubbles: true }));
+        if (instance) instance.close();
+      }
     });
+  }
+
+  // 3. Already Paid Date (Up to today)
+  const manualDateEl = document.querySelector("#manualDate");
+  if (manualDateEl && typeof flatpickr === "function") {
+    flatpickr(manualDateEl, { 
+      ...base, 
+      dateFormat: "d-m-Y", 
+      maxDate: "today",
+      onChange: (selectedDates, dateStr, instance) => {
+        manualDateEl.dispatchEvent(new Event('input', { bubbles: true }));
+        manualDateEl.dispatchEvent(new Event('change', { bubbles: true }));
+        if (instance) instance.close();
+      }
+    });
+  }
+
+  // 4. Native Payment Time Pickers
+  ["#payNowTimeNative", "#manualTimeNative"].forEach(id => {
+    const el = document.querySelector(id);
+    if (el && typeof flatpickr === "function") {
+      const fp = flatpickr(el, { 
+        ...base, 
+        enableTime: true, 
+        noCalendar: true, 
+        dateFormat: "H:i",
+        position: "above",
+        onChange: () => el.dispatchEvent(new Event('input', { bubbles: true })) 
+      });
+      
+      const formatSelector = id === "#payNowTimeNative" ? document.getElementById("payNowTimeFormat") : document.getElementById("manualTimeFormat");
+      if (formatSelector) {
+        formatSelector.addEventListener("change", () => {
+          const is24 = formatSelector.value === "24";
+          fp.set("time_24hr", is24);
+        });
+      }
+    }
+  });
 }
 
 
@@ -2136,7 +1904,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     initializeEmploymentModule();
 
-    initializeDistrictDropdown();
+    initializeUniversalDistrictEngine();
 
     initializePhotoPreview();
 
@@ -2271,111 +2039,115 @@ async function checkTransactionIdDuplicate(transactionId) {
 
 
 /* ==========================================================
-   INITIALIZE VALIDATIONS
-========================================================== */
+   MOBILE & FIELD VALIDATIONS ENGINE
+   ========================================================== */
 
-/* ==========================================================
-   INITIALIZE VALIDATIONS (SMOOTH 800MS & BLUR CHECK)
-========================================================== */
-
+/**
+ * Initializes strict 10-digit mobile number constraints and duplicate checking for Membership and Profile.
+ */
 function initializeValidations() {
+  /* 1. MEMBERSHIP & PROFILE MOBILE (Strict 10 Digits) */
+  ["#mobile", "#profMobile"].forEach(selector => {
+    const mobileInput = document.querySelector(selector);
+    if (!mobileInput) return;
 
-    /* 1. MOBILE (Strict 10 Digits) */
-    const mobileInput = document.getElementById("mobile");
-    if (mobileInput) {
-        mobileInput.addEventListener("input", function () {
-            this.value = this.value.replace(/\D/g, "").slice(0, 10);
-            const val = this.value.trim();
-            const status = document.getElementById("mobileStatus");
+    mobileInput.addEventListener("input", function () {
+      this.value = this.value.replace(/\D/g, "").slice(0, 10);
+      const val = this.value.trim();
+      const statusId = selector === "#mobile" ? "mobileStatus" : "profileSearchStatus";
+      const status = document.getElementById(statusId);
 
-            clearTimeout(debounceTimers.mobile);
+      clearTimeout(debounceTimers.mobile);
 
-            if (val.length !== 10) {
-                if (status) { status.className = "field-status"; status.innerHTML = ""; }
-                return;
-            }
+      if (val.length !== 10) {
+        if (status && selector === "#mobile") { status.className = "field-status"; status.innerHTML = ""; }
+        return;
+      }
 
-            debounceTimers.mobile = setTimeout(() => {
-                executeDuplicateCheck("mobile", val, "mobileStatus");
-            }, 800);
-        });
-    }
+      debounceTimers.mobile = setTimeout(() => {
+        executeDuplicateCheck("mobile", val, statusId);
+      }, 800);
+    });
+  });
 
-    /* 2. AADHAAR (Strict 12 Digits) */
-    const aadhaarInput = document.getElementById("aadhaar");
-    if (aadhaarInput) {
-        aadhaarInput.addEventListener("input", function () {
-            const rawAadhaar = this.value.replace(/\s/g, "").replace(/\D/g, "");
-            const status = document.getElementById("aadhaarStatus");
+  /* 2. MEMBERSHIP & PROFILE AADHAAR (Strict 12 Digits Duplicate Check) */
+  ["#aadhaar", "#profAadhaar"].forEach(selector => {
+    const aadhaarInput = document.querySelector(selector);
+    if (!aadhaarInput) return;
 
-            clearTimeout(debounceTimers.aadhaar);
+    aadhaarInput.addEventListener("input", function () {
+      const rawAadhaar = this.value.replace(/\s/g, "").replace(/\D/g, "");
+      const statusId = selector === "#aadhaar" ? "aadhaarStatus" : "profileSearchStatus";
+      const status = document.getElementById(statusId);
 
-            if (rawAadhaar.length !== 12) {
-                if (status) { status.className = "field-status"; status.innerHTML = ""; }
-                return;
-            }
+      clearTimeout(debounceTimers.aadhaar);
 
-            debounceTimers.aadhaar = setTimeout(() => {
-                executeDuplicateCheck("aadhaar", rawAadhaar, "aadhaarStatus");
-            }, 800);
-        });
-    }
+      if (rawAadhaar.length !== 12) {
+        if (status && selector === "#aadhaar") { status.className = "field-status"; status.innerHTML = ""; }
+        return;
+      }
 
-    /* 3. EMPLOYEE ID (Check on Blur & Timeout) */
-    const employeeIdInput = document.getElementById("employeeId");
-    if (employeeIdInput) {
-        employeeIdInput.addEventListener("input", function () {
-            const val = this.value.trim();
-            const status = document.getElementById("employeeIdStatus");
+      debounceTimers.aadhaar = setTimeout(() => {
+        executeDuplicateCheck("aadhaar", rawAadhaar, statusId);
+      }, 800);
+    });
+  });
 
-            clearTimeout(debounceTimers.employeeid);
+  /* 3. EMPLOYEE ID (Check on Blur & Timeout) */
+  const employeeIdInput = document.getElementById("employeeId");
+  if (employeeIdInput) {
+    employeeIdInput.addEventListener("input", function () {
+      const val = this.value.trim();
+      const status = document.getElementById("employeeIdStatus");
 
-            if (val.length < 3) {
-                if (status) { status.className = "field-status"; status.innerHTML = ""; }
-                return;
-            }
+      clearTimeout(debounceTimers.employeeid);
 
-            debounceTimers.employeeid = setTimeout(() => {
-                executeDuplicateCheck("employeeid", val, "employeeIdStatus");
-            }, 1000);
-        });
+      if (val.length < 3) {
+        if (status) { status.className = "field-status"; status.innerHTML = ""; }
+        return;
+      }
 
-        employeeIdInput.addEventListener("blur", function() {
-            const val = this.value.trim();
-            if (val.length >= 3) {
-                clearTimeout(debounceTimers.employeeid);
-                executeDuplicateCheck("employeeid", val, "employeeIdStatus");
-            }
-        });
-    }
+      debounceTimers.employeeid = setTimeout(() => {
+        executeDuplicateCheck("employeeid", val, "employeeIdStatus");
+      }, 1000);
+    });
 
-    /* 4. TRANSACTION ID (Check on Blur & Timeout) */
-    const transactionIdInput = document.getElementById("payNowTransactionId");
-    if (transactionIdInput) {
-        transactionIdInput.addEventListener("input", function () {
-            const val = this.value.trim();
-            const status = document.getElementById("transactionIdStatus");
+    employeeIdInput.addEventListener("blur", function() {
+      const val = this.value.trim();
+      if (val.length >= 3) {
+        clearTimeout(debounceTimers.employeeid);
+        executeDuplicateCheck("employeeid", val, "employeeIdStatus");
+      }
+    });
+  }
 
-            clearTimeout(debounceTimers.transactionid);
+  /* 4. TRANSACTION ID (Check on Blur & Timeout) */
+  const transactionIdInput = document.getElementById("payNowTransactionId");
+  if (transactionIdInput) {
+    transactionIdInput.addEventListener("input", function () {
+      const val = this.value.trim();
+      const status = document.getElementById("transactionIdStatus");
 
-            if (val.length < 5) {
-                if (status) { status.className = "field-status"; status.innerHTML = ""; }
-                return;
-            }
+      clearTimeout(debounceTimers.transactionid);
 
-            debounceTimers.transactionid = setTimeout(() => {
-                executeDuplicateCheck("transactionid", val, "transactionIdStatus");
-            }, 1000);
-        });
+      if (val.length < 5) {
+        if (status) { status.className = "field-status"; status.innerHTML = ""; }
+        return;
+      }
 
-        transactionIdInput.addEventListener("blur", function() {
-            const val = this.value.trim();
-            if (val.length >= 5) {
-                clearTimeout(debounceTimers.transactionid);
-                executeDuplicateCheck("transactionid", val, "transactionIdStatus");
-            }
-        });
-    }
+      debounceTimers.transactionid = setTimeout(() => {
+        executeDuplicateCheck("transactionid", val, "transactionIdStatus");
+      }, 1000);
+    });
+
+    transactionIdInput.addEventListener("blur", function() {
+      const val = this.value.trim();
+      if (val.length >= 5) {
+        clearTimeout(debounceTimers.transactionid);
+        executeDuplicateCheck("transactionid", val, "transactionIdStatus");
+      }
+    });
+  }
 }
 
 
@@ -2725,6 +2497,10 @@ async function submitMembership(){
         alert("❌ " + error);
     }
 }
+
+
+
+
 
 /* ==========================================================
    REAL-TIME LIVE MEMBERSHIP STATISTICS ENGINE
@@ -3889,4 +3665,317 @@ function formatDriveImageUrl(url) {
         return "https://lh3.googleusercontent.com/d/" + match[1];
     }
     return url;
+}
+
+/* ==========================================================
+   PROFILE ADDRESS COPY HANDLER (EXACT MEMBERSHIP FIELD MATCH)
+   ========================================================== */
+
+/**
+ * Copies all 8 Permanent Address fields to Present Address fields when checkbox is toggled.
+ * @param {HTMLInputElement} chk - Checkbox element reference
+ */
+function copyPermanentAddress(chk) {
+  const permDoor       = document.getElementById("profPermDoorNo");
+  const permStreet     = document.getElementById("profPermStreet");
+  const permVillage    = document.getElementById("profPermVillage");
+  const permMandal     = document.getElementById("profPermMandal");
+  const permDistrict   = document.getElementById("profPermDistrict");
+  const permState      = document.getElementById("profPermState");
+  const permPincode    = document.getElementById("profPermPincode");
+  const permPostOffice = document.getElementById("profPermPostOffice");
+
+  const presDoor       = document.getElementById("profPresDoorNo");
+  const presStreet     = document.getElementById("profPresStreet");
+  const presVillage    = document.getElementById("profPresVillage");
+  const presMandal     = document.getElementById("profPresMandal");
+  const presDistrict   = document.getElementById("profPresDistrict");
+  const presState      = document.getElementById("profPresState");
+  const presPincode    = document.getElementById("profPresPincode");
+  const presPostOffice = document.getElementById("profPresPostOffice");
+
+  if (chk && chk.checked) {
+    if (presDoor && permDoor)             presDoor.value       = permDoor.value;
+    if (presStreet && permStreet)         presStreet.value     = permStreet.value;
+    if (presVillage && permVillage)       presVillage.value    = permVillage.value;
+    if (presMandal && permMandal)         presMandal.value     = permMandal.value;
+    if (presDistrict && permDistrict)     presDistrict.value   = permDistrict.value;
+    if (presState && permState)           presState.value      = permState.value;
+    if (presPincode && permPincode)       presPincode.value    = permPincode.value;
+    if (presPostOffice && permPostOffice) presPostOffice.value = permPostOffice.value;
+  }
+}
+
+/**
+ * Previews uploaded profile photo instantly in avatar box
+ * @param {Event} event - File input change event
+ */
+function previewProfilePhoto(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function (e) {
+    const previewImg = document.getElementById("profilePhotoPreview");
+    if (previewImg) {
+      previewImg.src = e.target.result;
+    }
+  };
+  reader.readAsDataURL(file);
+}
+
+/**
+ * Executes Universal Profile Search using Mobile, Aadhaar, Employee ID or Membership ID
+ */
+async function searchUniversalProfile() {
+  const queryInput = document.getElementById("profileSearchQuery");
+  const statusEl   = document.getElementById("profileSearchStatus");
+  if (!queryInput) return;
+
+  const queryKey = queryInput.value.trim();
+  if (!queryKey) {
+    if (statusEl) statusEl.textContent = "Please enter Mobile, Aadhaar, Employee ID or Membership ID.";
+    return;
+  }
+
+  if (statusEl) {
+    statusEl.style.color = "#003366";
+    statusEl.textContent = "Searching database for existing record...";
+  }
+
+  // Reuse existing search engine searchDonorOrMember if available
+  if (typeof searchDonorOrMember === "function") {
+    await searchDonorOrMember(queryKey);
+    if (statusEl) statusEl.textContent = "";
+  } else {
+    if (statusEl) {
+      statusEl.style.color = "#dc2626";
+      statusEl.textContent = "Search backend engine connecting...";
+    }
+  }
+}
+
+/**
+ * Triggers dedicated A4 Profile Print
+ */
+function triggerProfilePrint() {
+  window.print();
+}
+
+/**
+ * Collects Profile Form inputs and prepares review workflow
+ */
+function handleProfileReview() {
+  const fullName = document.getElementById("profFullName") ? document.getElementById("profFullName").value.trim() : "";
+  const mobile   = document.getElementById("profMobile") ? document.getElementById("profMobile").value.trim() : "";
+  
+  if (!fullName || !mobile) {
+    alert("Please fill in required fields: Full Name and Mobile Number.");
+    return;
+  }
+
+  // Update Profile Header Card display elements
+  const dispName = document.getElementById("profDisplayFullName");
+  if (dispName) dispName.textContent = fullName;
+
+  const empIdVal = document.getElementById("profEmployeeId") ? document.getElementById("profEmployeeId").value : "N/A";
+  const dispEmp  = document.getElementById("profDisplayEmpId");
+  if (dispEmp) dispEmp.textContent = empIdVal;
+
+  const desigVal = document.getElementById("profDesignation") ? document.getElementById("profDesignation").value : "Member";
+  const dispDes  = document.getElementById("profDisplayDesignation");
+  if (dispDes) dispDes.textContent = desigVal;
+
+  const stationVal = document.getElementById("profStation") ? document.getElementById("profStation").value : "APGENCO";
+  const dispStn    = document.getElementById("profDisplayStation");
+  if (dispStn) dispStn.textContent = stationVal;
+
+  alert("✔ Profile data verified! Ready for Review & Final OTP Submission.");
+}
+
+/* ==========================================================
+   VISHWAKARMA SANKET SUBSCRIPTION TOGGLE HANDLER
+   ========================================================== */
+
+/**
+ * Toggles visibility or focus for Vishwakarma Sanket subscription link
+ * @param {HTMLSelectElement} selectEl - Subscription status dropdown
+ */
+function toggleVishwakarmaLink(selectEl) {
+  const btnBox = document.getElementById("vishwakarmaBtnBox");
+  if (!btnBox) return;
+
+  if (selectEl && selectEl.value === "Yes") {
+    btnBox.style.opacity = "0.6";
+  } else {
+    btnBox.style.opacity = "1";
+  }
+}
+
+/* ==========================================================
+   RSS / SANGH PARIVAR DATA COLLECTION HANDLER
+   ========================================================== */
+
+/**
+ * Collects RSS / Sangh Parivar association details from Profile form
+ * @returns {Object} RSS background data object
+ */
+function getRssBackgroundData() {
+  return {
+    association:    document.getElementById("profRssAssociation") ? document.getElementById("profRssAssociation").value : "Associated",
+    training:       document.getElementById("profRssTraining") ? document.getElementById("profRssTraining").value : "None",
+    responsibility: document.getElementById("profRssResponsibility") ? document.getElementById("profRssResponsibility").value : "No Responsibility",
+    shakha:         document.getElementById("profRssShakha") ? document.getElementById("profRssShakha").value : "Occasional"
+  };
+}
+
+/* ==========================================================
+   DIGITAL PROFILE DATA COLLECTOR & REVIEW ENGINE
+   ========================================================== */
+
+/**
+ * Collects all input values across all Profile cards into a unified JSON object
+ * @returns {Object} Complete Digital Profile Data Payload
+ */
+function collectDigitalProfileData() {
+  const getVal = (id) => document.getElementById(id) ? document.getElementById(id).value.trim() : "";
+
+  // 1. Collect Checked Organisational Talents (Card 6)
+  const selectedTalents = [];
+  document.querySelectorAll(".prof-talent-chk:checked").forEach(chk => selectedTalents.push(chk.value));
+
+  // 2. Collect Checked Technical & Digital Skills (Card 7)
+  const selectedSkills = [];
+  document.querySelectorAll(".prof-skill-chk:checked").forEach(chk => selectedSkills.push(chk.value));
+
+  // 3. Collect Checked Languages (Card 8) - Declared BEFORE object return!
+  const selectedLanguages = [];
+  document.querySelectorAll(".prof-lang-chk:checked").forEach(chk => selectedLanguages.push(chk.value));
+
+  return {
+    // 1. Personal Info
+    fullName:      getVal("profFullName"),
+    fatherHusband: getVal("profFatherHusband"),
+    dob:           getVal("profDob"),
+    calculatedAge: getVal("profAge"),
+    gender:        getVal("profGender"),
+    bloodGroup:    getVal("profBloodGroup"),
+    aadhaar:       getVal("profAadhaar").replace(/\s/g, ""),
+
+    // 2. Contact Info
+    mobile:        getVal("profMobile"),
+    whatsapp:      getVal("profWhatsapp"),
+    altMobile:     getVal("profAltMobile"),
+    email:         getVal("profEmail"),
+
+    // 3. Residential Address Details
+    permanentAddress: {
+      doorNo:     getVal("profPermDoorNo"),
+      street:     getVal("profPermStreet"),
+      village:    getVal("profPermVillage"),
+      mandal:     getVal("profPermMandal"),
+      district:   getVal("profPermDistrict"),
+      state:      getVal("profPermState"),
+      pincode:    getVal("profPermPincode"),
+      postOffice: getVal("profPermPostOffice")
+    },
+    presentAddress: {
+      doorNo:     getVal("profPresDoorNo"),
+      street:     getVal("profPresStreet"),
+      village:    getVal("profPresVillage"),
+      mandal:     getVal("profPresMandal"),
+      district:   getVal("profPresDistrict"),
+      state:      getVal("profPresState"),
+      pincode:    getVal("profPresPincode"),
+      postOffice: getVal("profPresPostOffice")
+    },
+
+    // 4. Employment Master Data
+    employment: {
+      company:     getVal("profCompany"),
+      station:     getVal("profStation"),
+      stage:       getVal("profStage"),
+      circle:      getVal("profCircle"),
+      division:    getVal("profDivision"),
+      subDivision: getVal("profSubDivision"),
+      subStation:  getVal("profSubStation"),
+      section:     getVal("profSection"),
+      location:    getVal("profLocation"),
+      designation: getVal("profDesignation"),
+      employeeId:  getVal("profEmployeeId"),
+      doj:         getVal("profDoj")
+    },
+
+    // 5. ARPEU & BMS Responsibility
+    organisationRole: {
+      arpeuLevel:        getVal("profArpeuLevel"),
+      arpeuDesignation:  getVal("profArpeuDesignation"),
+      bmsResponsibility: getVal("profBmsResponsibility")
+    },
+
+    // 6 & 7. Talents & Technical Skills
+    talents: selectedTalents,
+    skills:  selectedSkills,
+
+    // 8. Languages Known
+    languages: selectedLanguages,
+
+    // 9. Training & Development
+    trainingAttended:       getVal("profTrainingAttended"),
+    futureTrainingInterest: getVal("profFutureTrainingInterest"),
+
+    // 10. Service & Availability
+    serviceInterest:      getVal("profServeInterest"),
+    officeBearerInterest: getVal("profOfficeBearerInterest"),
+    dailyAvailability:    getVal("profDailyTimeAvailability"),
+    weeklyAvailability:   getVal("profWeeklyTimeAvailability"),
+    travelAvailability:   getVal("profTravelAvailability"),
+
+    // 11. Vishwakarma Sanket Journal
+    vishwakarmaStatus: getVal("profVishwakarmaSubscriber"),
+
+    // 12. RSS Association
+    rssBackground: {
+      association:    getVal("profRssAssociation"),
+      training:       getVal("profRssTraining"),
+      responsibility: getVal("profRssResponsibility"),
+      shakha:         getVal("profRssShakha")
+    },
+
+    // 13. Emergency & Blood Info
+    emergencyInfo: {
+      willingBloodDonate: getVal("profWillingBloodDonate"),
+      contactName:        getVal("profEmergencyName"),
+      contactMobile:      getVal("profEmergencyMobile"),
+      contactRelation:    getVal("profEmergencyRelation")
+    }
+  };
+}
+
+/**
+ * Handles Profile Form Validation & Review Trigger
+ */
+function handleProfileReview() {
+  const profileData = collectDigitalProfileData();
+
+  if (!profileData.fullName || !profileData.mobile) {
+    alert("Please fill in mandatory fields: Full Name and Mobile Number.");
+    return;
+  }
+
+  // Live Update Summary Header Card
+  const dispName  = document.getElementById("profDisplayFullName");
+  const dispEmp   = document.getElementById("profDisplayEmpId");
+  const dispDes   = document.getElementById("profDisplayDesignation");
+  const dispStn   = document.getElementById("profDisplayStation");
+  const dispRole  = document.getElementById("profDisplayRole");
+
+  if (dispName) dispName.textContent = profileData.fullName;
+  if (dispEmp)  dispEmp.textContent  = profileData.employment.employeeId || "N/A";
+  if (dispDes)  dispDes.textContent  = profileData.employment.designation || "Member";
+  if (dispStn)  dispStn.textContent  = profileData.employment.station || profileData.employment.company || "APGENCO";
+  if (dispRole) dispRole.textContent = profileData.organisationRole.arpeuDesignation || "Active Member";
+
+  console.log("Collected Digital Profile Payload:", profileData);
+  alert("✔ Digital Profile Verified! Ready for Save & Review.");
 }

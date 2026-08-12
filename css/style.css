@@ -4814,131 +4814,345 @@ NEW QUICK LINKS INTEGRATED CARD STYLES
     }
 }
 
-/* ==========================================
-   ARPEU PROFILE PRINT (EXACT HTML CLASS MATCH)
-   ========================================== */
 
-@page {
-    size: A4 portrait;
-    margin: 8mm;
+/* ==========================================================
+   DCMF PROFESSIONAL DIGITAL PROFILE MODULE STYLES (BALANCED)
+   ========================================================== */
+
+#profileSection {
+  width: 100%;
+  padding: 10px 12px 25px 12px !important; /* Balanced Equal Left & Right 12px Padding */
+  box-sizing: border-box;
+  margin: 0 auto;
 }
+
+#profileSection .main-page-container {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Profile Title Banner Bar */
+.profile-title-banner {
+  background: linear-gradient(135deg, #003366 0%, #002244 100%);
+  color: #ffffff;
+  padding: 18px 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.profile-title-banner h2 {
+  margin: 0 0 5px 0;
+  font-size: 20px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.profile-title-banner p {
+  margin: 0;
+  font-size: 13px;
+  opacity: 0.85;
+}
+
+/* Universal Profile Search Card */
+.profile-search-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 16px 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.profile-search-header h4 {
+  margin: 0 0 4px 0;
+  font-size: 15px;
+  color: #003366;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.profile-search-header span {
+  font-size: 12px;
+  color: #64748b;
+  display: block;
+  margin-bottom: 12px;
+}
+
+.profile-search-input-group {
+  display: flex;
+  gap: 10px;
+}
+
+/* Profile Section Card Containers */
+.profile-section-card {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+}
+
+.card-section-header {
+  font-size: 16px;
+  font-weight: 700;
+  color: #003366;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #e2e8f0;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sub-section-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #334155;
+  margin: 15px 0 10px 0;
+}
+
+/* Responsive 2-Column Grid Layout */
+.profile-grid-2col {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 15px 20px;
+}
+
+.form-group.full-width {
+  grid-column: 1 / -1;
+}
+
+/* Profile Form Inputs & Select Elements */
+.profile-input,
+.profile-select {
+  width: 100%;
+  padding: 9px 12px;
+  font-size: 13.5px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  box-sizing: border-box;
+  color: #1e293b;
+  background-color: #ffffff;
+  transition: border-color 0.2s ease;
+}
+
+.profile-input:focus,
+.profile-select:focus {
+  border-color: #003366;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0, 51, 102, 0.1);
+}
+
+.required {
+  color: #dc2626;
+  font-weight: bold;
+}
+
+/* Profile Summary Header Card Balance */
+.profile-summary-card {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 20px;
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.profile-avatar-box {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  flex-shrink: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.profile-avatar-img {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 2px solid #003366;
+  background: #f8fafc;
+}
+
+.profile-upload-label {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 51, 102, 0.88);
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 700;
+  text-align: center;
+  padding: 4px 0;
+  cursor: pointer;
+  border-bottom-left-radius: 6px;
+  border-bottom-right-radius: 6px;
+}
+
+.profile-summary-details {
+  flex: 1;
+  min-width: 0;
+}
+
+.profile-summary-details h3 {
+  margin: 0 0 4px 0;
+  font-size: 17px;
+  color: #0f172a;
+  word-break: break-word;
+}
+
+.prof-sub-line {
+  margin: 3px 0;
+  font-size: 13px;
+  color: #475569;
+}
+
+/* Address Copy Checkbox Row */
+.address-copy-row {
+  background: #f8fafc;
+  border: 1px dashed #cbd5e1;
+  padding: 10px 15px;
+  border-radius: 6px;
+  margin: 15px 0;
+  font-size: 13px;
+  color: #1e293b;
+  font-weight: 600;
+}
+
+/* Skills Checkbox Chips Grid */
+.skills-checkbox-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.chip-checkbox {
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  padding: 8px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  user-select: none;
+  transition: all 0.2s ease;
+}
+
+.chip-checkbox:hover {
+  background: #e2e8f0;
+}
+
+/* Profile Action Buttons Bar */
+.profile-actions-bar {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin: 25px 0 40px 0;
+}
+
+.profile-btn {
+  padding: 10px 22px;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: background-color 0.2s ease;
+}
+
+.profile-btn-primary,
+.profile-btn-submit {
+  background-color: #003366;
+  color: #ffffff;
+}
+
+.profile-btn-primary:hover,
+.profile-btn-submit:hover {
+  background-color: #002244;
+}
+
+.profile-btn-print {
+  background-color: #0284c7;
+  color: #ffffff;
+}
+
+.profile-btn-print:hover {
+  background-color: #0369a1;
+}
+
+
+/* ==========================================================
+   PROFILE A4 DEDICATED PRINT MEDIA STYLES (@media print)
+   ========================================================== */
 
 @media print {
-    body * {
-        visibility: hidden !important;
-    }
+  @page {
+    size: A4 portrait;
+    margin: 10mm 12mm 10mm 10mm;
+  }
 
-    .no-print, nav, header, footer, .navbar, .btn, button {
-        display: none !important;
-    }
+  body * {
+    visibility: hidden !important;
+  }
 
-    /* ప్రింట్‌లో రిసిప్ట్ మరియు ప్రొఫైల్ చూపించడం */
-    #receiptContainer, #receiptContainer *,
-    #profileSection, #profileSection * {
-        visibility: visible !important;
-    }
+  #profileSection,
+  #profileSection * {
+    visibility: visible !important;
+  }
 
-    #profileSection {
-        position: absolute !important;
-        left: 0 !important;
-        top: 0 !important;
-        width: 100% !important;
-        margin: 0 !important;
-        padding: 0 !important;
-    }
+  #profileSection {
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+  }
 
-    /* మెయిన్ 2 కాలమ్‌ల కార్డ్ గ్రిడ్ */
-    #profileContent,
-    #profileSection .profile-cards-container {
-        display: grid !important;
-        grid-template-columns: 1fr 1fr !important; /* 2 Main Cards */
-        gap: 12px !important;
-        width: 100% !important;
-    }
+  .profile-search-card,
+  .profile-actions-bar,
+  .profile-upload-label,
+  .no-print {
+    display: none !important;
+  }
 
-    #profileSection .prof-card {
-        padding: 10px 12px !important;
-        margin-bottom: 0 !important;
-        border: 1px solid #d0d0d0 !important;
-        box-shadow: none !important;
-        page-break-inside: avoid !important;
-        border-radius: 6px !important;
-    }
+  .profile-section-card,
+  .profile-summary-card {
+    border: 1px solid #94a3b8 !important;
+    box-shadow: none !important;
+    page-break-inside: avoid;
+  }
 
-    /* 📌 1. కార్డ్ లోపల నిలువుగా పాయింట్లు రన్ అవ్వడం */
-    #profileSection .prof-grid-2 {
-        display: flex !important;
-        flex-direction: column !important;
-        width: 100% !important;
-        gap: 4px !important;
-    }
-
-    /* 📌 2. ప్రతీ ఫీల్డ్: టేబులర్ అలైన్‌మెంట్ (Left Start) */
-    #profileSection .prof-item {
-        display: flex !important;
-        flex-direction: row !important;
-        justify-content: flex-start !important; /* ఎడమనుండి ప్రారంభమవుతుంది */
-        align-items: center !important;
-        width: 100% !important;
-        padding: 3px 0 !important;
-        border-bottom: 1px dashed #e0e0e0 !important;
-        box-sizing: border-box !important;
-    }
-
-    /* 📌 3. లేబుల్స్ కి ఫిక్స్డ్ వెడల్పు (అన్ని కోలన్‌లు ఒకే లైన్‌లో రావడం కోసం) */
-    #profileSection .prof-item label {
-        text-align: left !important;
-        font-weight: 600 !important;
-        color: #444444 !important;
-        font-size: 11px !important;
-        width: 125px !important;       /* ఫిక్స్డ్ లేబుల్ వెడల్పు */
-        min-width: 125px !important;   /* కోలన్లు నేరుగా ఒకే వర్టికల్ లైన్‌లో రావడానికి */
-        margin: 0 !important;
-        position: relative !important;
-    }
-
-    /* లేబుల్ పక్కన కోలన్ : ని పర్ఫెక్ట్‌గా అమర్చడం */
-    #profileSection .prof-item label::after {
-        content: " :" !important;
-        font-weight: 700 !important;
-        color: #333333 !important;
-        float: right !important;
-        padding-right: 5px !important;
-    }
-
-    /* 📌 4. ఫీల్డ్ వాల్యూస్ (కోలన్ పక్కనే ఎడమవైపు నుండి ప్రారంభమవుతాయి) */
-    #profileSection .prof-item span {
-        text-align: left !important;    /* Left Aligned Value */
-        font-weight: 700 !important;
-        color: #111111 !important;
-        font-size: 11px !important;
-        margin: 0 !important;
-        padding-left: 5px !important;  /* కోలన్ తర్వాత 5px చిన్న గ్యాప్ */
-        flex: 1 !important;
-        word-break: break-all !important; /* ఇమెయిల్ కట్ అవ్వకుండా ఉంచడానికి */
-    }
-
-    /* మెంబర్‌షిప్ హిస్టరీ కార్డ్ హాఫ్-విడ్త్ */
-    #profileSection .history-card,
-    #profileSection .history-section,
-    #profileSection .full-width {
-        grid-column: span 1 !important;
-    }
-
-    #profileSection .history-metrics,
-    #profileSection .history-grid {
-        display: grid !important;
-        grid-template-columns: 1fr 1fr !important;
-        gap: 4px !important;
-    }
-
-    #profileSection .profile-avatar img,
-    #pMemberPhoto {
-        width: 65px !important;
-        height: 65px !important;
-    }
+  .card-section-header {
+    color: #003366 !important;
+    border-bottom: 2px solid #003366 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
 }
-
 
 /* ==========================================================
    RECEIPT CONTAINER & PRINT STYLES

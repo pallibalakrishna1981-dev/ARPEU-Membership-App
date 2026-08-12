@@ -1700,132 +1700,646 @@
 
 </div>
 
-<!-- =========================================
-     MEMBER DIGITAL PROFILE SECTION
-========================================= -->
-<section id="profileSection" class="profile-page" style="display:none;">
 
-   <!-- Profile Top Action Buttons (Home, Print Profile, Close) -->
-    <div class="profile-actions-top no-print">
-        <button type="button" class="profile-btn home-btn" onclick="closeProfileAndGoHome()">
-            <i class="fas fa-house"></i> Home
+<!-- ==========================================================
+     DCMF PROFESSIONAL DIGITAL PROFILE MODULE (#profileSection)
+     ========================================================== -->
+<section id="profileSection" class="main-page-section" style="display: none;">
+  <div class="main-page-container">
+    
+    <!-- PROFILE PAGE HEADER TITLE BAR -->
+    <div class="profile-title-banner">
+      <h2><i class="fas fa-id-card"></i> DCMF Professional Digital Profile</h2>
+      <p>Single Organisational Identity & Digital Skill Repository</p>
+    </div>
+
+    <!-- UNIVERSAL PROFILE SEARCH BAR -->
+    <div class="profile-search-card">
+      <div class="profile-search-header">
+        <h4><i class="fas fa-search"></i> Universal Profile Search</h4>
+        <span>Search existing record using Mobile, Aadhaar, Employee ID or Membership ID</span>
+      </div>
+      <div class="profile-search-input-group">
+        <input type="text" id="profileSearchQuery" class="profile-input" placeholder="Enter Mobile / Aadhaar / Employee ID / Membership ID..." />
+        <button type="button" class="profile-btn profile-btn-primary" onclick="searchUniversalProfile()">
+          <i class="fas fa-search"></i> Search Profile
         </button>
-        <button type="button" class="profile-btn print-btn" onclick="window.print()">
-            <i class="fas fa-print"></i> Print Profile
+      </div>
+      <div id="profileSearchStatus" class="profile-status-msg"></div>
+    </div>
+    
+<!-- PASSPORT SIZE PHOTO UPLOAD CARD (ISOLATED UNIQUE IDS) -->
+      <div class="profile-section-card">
+        <div class="card-section-header">
+          <i class="fas fa-camera"></i> Passport Size Photo
+        </div>
+        <div class="photo-upload-container">
+          <div class="photo-upload-section">
+            <label>Passport Size Photo <span class="required">*</span></label>
+            <div class="upload-row">
+              <input type="file" id="profPhotoInput" accept="image/*" onchange="showProfPhoto(this)" hidden />
+              <button type="button" class="photo-btn" onclick="document.getElementById('profPhotoInput').click();">Upload Photo</button>
+              <input type="text" id="profPhotoNameBox" class="photo-file-name" value="No file selected" readonly />
+            </div>
+            <div class="photo-info">JPG • PNG • WEBP &nbsp; | &nbsp; Max Size : 4 MB</div>
+            <button type="button" class="take-photo-btn" onclick="document.getElementById('profPhotoInput').click();">📷 Take Photo</button>
+          </div>
+          <div class="photo-preview" style="position: relative;">
+            <img id="profPhotoImg" src="" alt="" style="display:none; width:100%; height:100%; object-fit:cover; position:absolute; top:0; left:0; z-index:10;" />
+            <span id="profPhotoTxt" class="preview-text" style="position:relative; z-index:1;">No Photo<br>Selected</span>
+          </div>
+        </div>
+      </div>
+
+    <!-- 1. PERSONAL INFORMATION (COMPACT 1-LINE ROWS) -->
+      <div class="profile-section-card">
+        <div class="card-section-header">
+          <i class="fas fa-user"></i> 1. Personal Information
+        </div>
+        
+        <!-- Full Name -->
+        <div class="form-group full-width" style="margin-bottom: 12px;">
+          <label for="profFullName">Full Name <span class="required">*</span></label>
+          <input type="text" id="profFullName" class="profile-input" required placeholder="Full Name as per records" />
+        </div>
+
+        <!-- Father / Husband Name -->
+        <div class="form-group full-width" style="margin-bottom: 12px;">
+          <label for="profFatherHusband">Father / Husband Name</label>
+          <input type="text" id="profFatherHusband" class="profile-input" placeholder="Father or Husband Name" />
+        </div>
+        
+        <!-- Line 1: Date of Birth + Calculated Age (Side-by-Side on 1 Line) -->
+        <div class="dob-age-grid">
+          <div class="form-group">
+            <label for="profDob">Date of Birth <span class="required">*</span></label>
+            <div class="dt-box-wrap">
+              <input type="text" id="profDob" class="profile-input dt-field-final" placeholder="Select Date" readonly required />
+              <i class="fas fa-calendar-alt dt-icon-right"></i>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="profAge">Calculated Age</label>
+            <input type="text" id="profAge" class="profile-input" style="background:#f9f9f9;" placeholder="0Y 0M 0D" readonly />
+          </div>
+        </div>
+
+        <!-- Line 2: Gender + Blood Group (Side-by-Side on 1 Line) -->
+        <div class="dob-age-grid">
+          <div class="form-group">
+            <label for="profGender">Gender <span class="required">*</span></label>
+            <select id="profGender" class="profile-select" required>
+              <option value="">Select Gender</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="profBloodGroup">Blood Group <span class="required">*</span></label>
+            <select id="profBloodGroup" class="profile-select" required>
+              <option value="">Select Blood Group</option>
+              <option value="A+">A+</option><option value="A-">A-</option>
+              <option value="B+">B+</option><option value="B-">B-</option>
+              <option value="AB+">AB+</option><option value="AB-">AB-</option>
+              <option value="O+">O+</option><option value="O-">O-</option>
+              <option value="Unknown">Unknown</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Aadhaar Number -->
+        <div class="form-group full-width">
+          <label for="profAadhaar">Aadhaar Number (Optional)</label>
+          <input type="text" id="profAadhaar" class="profile-input" maxlength="14" placeholder="12-Digit Aadhaar Number" />
+        </div>
+      </div>
+
+
+      <!-- 2. CONTACT INFORMATION -->
+      <div class="profile-section-card">
+        <div class="card-section-header">
+          <i class="fas fa-address-book"></i> 2. Contact Information
+        </div>
+        <div class="profile-grid-2col">
+          <div class="form-group">
+            <label>Registered Mobile <span class="required">*</span></label>
+            <input type="tel" id="profMobile" class="profile-input" required maxlength="10" placeholder="10-Digit Mobile" />
+          </div>
+          <div class="form-group">
+            <label>WhatsApp Mobile Number</label>
+            <input type="tel" id="profWhatsapp" class="profile-input" maxlength="10" placeholder="WhatsApp Mobile" />
+          </div>
+          <div class="form-group">
+            <label>Alternate Mobile</label>
+            <input type="tel" id="profAltMobile" class="profile-input" maxlength="10" placeholder="Alternate Mobile" />
+          </div>
+          <div class="form-group">
+            <label>Email Address</label>
+            <input type="email" id="profEmail" class="profile-input" placeholder="Email Address" />
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. ADDRESS DETAILS (EXACT MATCH WITH MEMBERSHIP ADDRESS CARD) -->
+      <div class="profile-section-card">
+        <div class="card-section-header">
+          <i class="fas fa-home"></i> 3. Residential Address Details
+        </div>
+        
+        <!-- Permanent Address -->
+        <h5 class="sub-section-title">Permanent Address</h5>
+        <div class="profile-grid-2col">
+          <div class="form-group">
+            <label for="profPermDoorNo">Door / House No.</label>
+            <input type="text" id="profPermDoorNo" class="profile-input" placeholder="Enter Door / House No." />
+          </div>
+          <div class="form-group">
+            <label for="profPermStreet">Street / Area</label>
+            <input type="text" id="profPermStreet" class="profile-input" placeholder="Enter Street / Area" />
+          </div>
+          <div class="form-group">
+            <label for="profPermVillage">Village / Town / City <span class="required">*</span></label>
+            <input type="text" id="profPermVillage" class="profile-input" placeholder="Enter Village / Town / City" required />
+          </div>
+          <div class="form-group">
+            <label for="profPermMandal">Mandal <span class="required">*</span></label>
+            <input type="text" id="profPermMandal" class="profile-input" placeholder="Enter Mandal" required />
+          </div>
+          <div class="form-group">
+            <label for="profPermDistrict">District <span class="required">*</span></label>
+            <select id="profPermDistrict" class="profile-select" required>
+              <option value="">Select District</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="profPermState">State <span class="required">*</span></label>
+            <input type="text" id="profPermState" class="profile-input" value="Andhra Pradesh" readonly />
+          </div>
+          <div class="form-group">
+            <label for="profPermPincode">PIN Code <span class="required">*</span></label>
+            <input type="text" id="profPermPincode" class="profile-input" maxlength="6" placeholder="Enter PIN Code" required />
+          </div>
+          <div class="form-group">
+            <label for="profPermPostOffice">Post Office <span class="required">*</span></label>
+            <input type="text" id="profPermPostOffice" class="profile-input" placeholder="Enter Post Office" required />
+          </div>
+        </div>
+
+        <!-- Present Address Toggle Checkbox -->
+        <div class="address-copy-row">
+          <label class="checkbox-container">
+            <input type="checkbox" id="chkSameAddress" onchange="copyPermanentAddress(this)" />
+            <span class="checkmark"></span>
+            Present Address is same as Permanent Address
+          </label>
+        </div>
+
+        <!-- Present Address -->
+        <h5 class="sub-section-title">Present Address</h5>
+        <div class="profile-grid-2col">
+          <div class="form-group">
+            <label for="profPresDoorNo">Door / House No.</label>
+            <input type="text" id="profPresDoorNo" class="profile-input" placeholder="Enter Door / House No." />
+          </div>
+          <div class="form-group">
+            <label for="profPresStreet">Street / Area</label>
+            <input type="text" id="profPresStreet" class="profile-input" placeholder="Enter Street / Area" />
+          </div>
+          <div class="form-group">
+            <label for="profPresVillage">Village / Town / City</label>
+            <input type="text" id="profPresVillage" class="profile-input" placeholder="Enter Village / Town / City" />
+          </div>
+          <div class="form-group">
+            <label for="profPresMandal">Mandal</label>
+            <input type="text" id="profPresMandal" class="profile-input" placeholder="Enter Mandal" />
+          </div>
+          <div class="form-group">
+            <label for="profPresDistrict">District</label>
+            <select id="profPresDistrict" class="profile-select">
+              <option value="">Select District</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="profPresState">State</label>
+            <input type="text" id="profPresState" class="profile-input" value="Andhra Pradesh" readonly />
+          </div>
+          <div class="form-group">
+            <label for="profPresPincode">PIN Code</label>
+            <input type="text" id="profPresPincode" class="profile-input" maxlength="6" placeholder="Enter PIN Code" />
+          </div>
+          <div class="form-group">
+            <label for="profPresPostOffice">Post Office</label>
+            <input type="text" id="profPresPostOffice" class="profile-input" placeholder="Enter Post Office" />
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. EMPLOYMENT MASTER DATA (EXACT MATCH WITH MEMBERSHIP LINE 765-1107) -->
+      <div class="profile-section-card">
+        <div class="card-section-header">
+          <i class="fas fa-building"></i> 4. Employment Details
+        </div>
+        <div class="profile-grid-2col">
+          
+          <!-- Company -->
+          <div class="form-group">
+            <label for="profCompany">Company <span class="required">*</span></label>
+            <select id="profCompany" class="profile-select" required>
+              <option value="">Select Company</option>
+              <option value="APGENCO">APGENCO</option>
+              <option value="APTRANSCO">APTRANSCO</option>
+              <option value="APSPDCL">APSPDCL</option>
+              <option value="APCPDCL">APCPDCL</option>
+              <option value="APEPDCL">APEPDCL</option>
+            </select>
+          </div>
+
+          <!-- APGENCO Station -->
+          <div class="form-group" id="profStationGroup" style="display:none;">
+            <label for="profStation">Station <span class="required">*</span></label>
+            <select id="profStation" class="profile-select">
+              <option value="">Select Station</option>
+            </select>
+          </div>
+
+          <!-- APGENCO Stage -->
+          <div class="form-group" id="profStageGroup" style="display:none;">
+            <label for="profStage">Stage <span class="required">*</span></label>
+            <select id="profStage" class="profile-select">
+              <option value="">Select Stage</option>
+            </select>
+          </div>
+
+          <!-- Circle -->
+          <div class="form-group" id="profCircleGroup">
+            <label for="profCircle">Circle <span class="required">*</span></label>
+            <select id="profCircle" class="profile-select">
+              <option value="">Select Circle</option>
+            </select>
+          </div>
+
+          <!-- Division -->
+          <div class="form-group" id="profDivisionGroup">
+            <label for="profDivision">Division <span class="required">*</span></label>
+            <select id="profDivision" class="profile-select">
+              <option value="">Select Division</option>
+            </select>
+          </div>
+
+          <!-- Sub Division -->
+          <div class="form-group" id="profSubDivisionGroup">
+            <label for="profSubDivision">Sub Division <span class="required">*</span></label>
+            <select id="profSubDivision" class="profile-select">
+              <option value="">Select Sub Division</option>
+            </select>
+          </div>
+
+          <!-- Sub Station -->
+          <div class="form-group" id="profSubStationGroup">
+            <label for="profSubStation">Sub Station</label>
+            <input type="text" id="profSubStation" class="profile-input" placeholder="Enter Sub Station" autocomplete="off" />
+          </div>
+
+          <!-- Section -->
+          <div class="form-group" id="profSectionGroup">
+            <label for="profSection">Section</label>
+            <input type="text" id="profSection" class="profile-input" placeholder="Enter Section" autocomplete="off" />
+          </div>
+
+          <!-- Location (APGENCO Only) -->
+          <div class="form-group" id="profLocationGroup" style="display:none;">
+            <label for="profLocation">Location <span class="optional">(Optional)</span></label>
+            <input type="text" id="profLocation" class="profile-input" placeholder="Enter Location" autocomplete="off" />
+          </div>
+
+          <!-- Designation -->
+          <div class="form-group" id="profDesignationGroup">
+            <label for="profDesignation">Designation <span class="required">*</span></label>
+            <select id="profDesignation" class="profile-select">
+              <option value="">Select Designation</option>
+            </select>
+          </div>
+
+          <!-- Employee ID -->
+          <div class="form-group">
+            <label for="profEmployeeId">Employee ID <span class="required">*</span></label>
+            <input type="text" id="profEmployeeId" class="profile-input" required placeholder="Enter Employee ID" autocomplete="off" />
+          </div>
+
+          <!-- Date of Joining -->
+          <div class="form-group">
+            <label for="profDoj">Date of Joining</label>
+            <input type="text" id="profDoj" class="profile-input" placeholder="Select Date" readonly />
+          </div>
+
+        </div>
+      </div>
+
+      <!-- 5. ARPEU UNION OFFICE-BEARER & BMS RESPONSIBILITY -->
+      <div class="profile-section-card">
+        <div class="card-section-header">
+          <i class="fas fa-sitemap"></i> 5. ARPEU & BMS Responsibility
+        </div>
+        <div class="profile-grid-2col">
+          
+          <!-- ARPEU Office-Bearer Level -->
+          <div class="form-group">
+            <label for="profArpeuLevel">ARPEU Office-Bearer Level</label>
+            <select id="profArpeuLevel" class="profile-select">
+              <option value="Active Member">Active Member</option>
+              <option value="State Body">State Body</option>
+              <option value="Company / Circle Body">Company / Circle Body</option>
+              <option value="Division / Regional Body">Division / Regional Body</option>
+              <option value="Sub-Division / Branch Body">Sub-Division / Branch Body</option>
+              <option value="Core Committee Member">Core Committee Member</option>
+              <option value="Executive Committee Member">Executive Committee Member (EC)</option>
+            </select>
+          </div>
+
+          <!-- ARPEU Current Designation (With Working President) -->
+          <div class="form-group">
+            <label for="profArpeuDesignation">ARPEU Position / Designation</label>
+            <select id="profArpeuDesignation" class="profile-select">
+              <option value="Active Member">Active Member</option>
+              <option value="President">President</option>
+              <option value="General Secretary">General Secretary</option>
+              <option value="Treasurer">Treasurer</option>
+              <option value="Working President">Working President</option>
+              <option value="Organising Secretary">Organising Secretary</option>
+              <option value="Vice President">Vice President</option>
+              <option value="Assistant General Secretary">Assistant General Secretary</option>
+              <option value="Secretary">Secretary</option>
+              <option value="Joint Secretary">Joint Secretary</option>
+              <option value="Assistant Secretary">Assistant Secretary</option>
+              <option value="Office Secretary">Office Secretary</option>
+              <option value="Core Committee Member">Core Committee Member</option>
+              <option value="EC Member">EC Member</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+
+          <!-- Responsibility in BMS -->
+          <div class="form-group full-width">
+            <label for="profBmsResponsibility">Responsibility in BMS (Bharatiya Mazdoor Sangh)</label>
+            <select id="profBmsResponsibility" class="profile-select">
+              <option value="No BMS Responsibility">No BMS Responsibility</option>
+              <option value="BMS State Office Bearer">BMS State Office Bearer</option>
+              <option value="BMS District Office Bearer">BMS District Office Bearer</option>
+              <option value="BMS State Social Media Incharge">BMS State Social Media Incharge</option>
+              <option value="BMS District Social Media Incharge">BMS District Social Media Incharge</option>
+              <option value="BMS State EC Member">BMS State EC Member</option>
+              <option value="BMS District EC Member">BMS District EC Member</option>
+              <option value="BMS Industrial Federation">BMS Industrial Federation Responsibility</option>
+              <option value="BMS Member / Activist">BMS Member / Activist</option>
+            </select>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- 6. PERSONAL & ORGANISATIONAL TALENTS (BALANCED 4 + 4 GRID) -->
+      <div class="profile-section-card">
+        <div class="card-section-header">
+          <i class="fas fa-bullhorn"></i> 6. Personal & Organisational Talents
+        </div>
+        <p class="section-help-text">Select all personal & organizational capabilities applicable to you:</p>
+        <div class="skills-checkbox-grid">
+          <label class="chip-checkbox"><input type="checkbox" value="Public Speaking" class="prof-talent-chk" /> Public Speaking</label>
+          <label class="chip-checkbox"><input type="checkbox" value="Article & Content Writing" class="prof-talent-chk" /> Article & Content Writing</label>
+          <label class="chip-checkbox"><input type="checkbox" value="Patriotic & Union Songs" class="prof-talent-chk" /> Patriotic & Union Songs</label>
+          <label class="chip-checkbox"><input type="checkbox" value="Letter Drafting & Documentation" class="prof-talent-chk" /> Letter Drafting & Documentation</label>
+          <label class="chip-checkbox"><input type="checkbox" value="Legal & Labour Laws Assistance" class="prof-talent-chk" /> Legal & Labour Laws Assistance</label>
+          <label class="chip-checkbox"><input type="checkbox" value="Membership Drive & Organising" class="prof-talent-chk" /> Membership Drive & Organising</label>
+          <label class="chip-checkbox"><input type="checkbox" value="Leadership & Mentoring" class="prof-talent-chk" /> Leadership & Mentoring</label>
+          <label class="chip-checkbox"><input type="checkbox" value="Slogans & Rally Chanting" class="prof-talent-chk" /> Slogans & Rally Chanting</label>
+        </div>
+      </div>
+
+      <!-- 7. TECHNICAL & DIGITAL SKILLS -->
+      <div class="profile-section-card">
+        <div class="card-section-header">
+          <i class="fas fa-laptop-code"></i> 7. Technical & Digital Skills
+        </div>
+        <p class="section-help-text">Select all technical & digital software skills applicable to you:</p>
+        <div class="skills-checkbox-grid">
+          <label class="chip-checkbox"><input type="checkbox" value="Graphic Design (Photoshop / Canva)" class="prof-skill-chk" /> Graphic Design (Photoshop / Canva)</label>
+          <label class="chip-checkbox"><input type="checkbox" value="Video & Photo Editing" class="prof-skill-chk" /> Video & Photo Editing</label>
+          <label class="chip-checkbox"><input type="checkbox" value="MS Office / Excel / Word" class="prof-skill-chk" /> MS Office / Excel / Word</label>
+          <label class="chip-checkbox"><input type="checkbox" value="Social Media Management" class="prof-skill-chk" /> Social Media Management</label>
+          <label class="chip-checkbox"><input type="checkbox" value="IT & Website Support" class="prof-skill-chk" /> IT & Website Support</label>
+          <label class="chip-checkbox"><input type="checkbox" value="CorelDRAW / Desktop Publishing" class="prof-skill-chk" /> CorelDRAW / Desktop Publishing</label>
+        </div>
+      </div>
+
+      <!-- 8. LANGUAGES KNOWN & COMMUNICATION PROFICIENCY -->
+      <div class="profile-section-card">
+        <div class="card-section-header">
+          <i class="fas fa-language"></i> 8. Languages Known & Proficiency
+        </div>
+        <p class="section-help-text">Select all languages you can Speak, Read, or Write fluently:</p>
+        <div class="skills-checkbox-grid">
+          <label class="chip-checkbox"><input type="checkbox" value="Telugu (Speak / Read / Write)" class="prof-lang-chk" checked /> Telugu (తెలుగు)</label>
+          <label class="chip-checkbox"><input type="checkbox" value="English (Speak / Read / Write)" class="prof-lang-chk" /> English (ఇంగ్లీష్)</label>
+          <label class="chip-checkbox"><input type="checkbox" value="Hindi (Speak / Read / Write)" class="prof-lang-chk" /> Hindi (హిందీ)</label>
+          <label class="chip-checkbox"><input type="checkbox" value="Tamil" class="prof-lang-chk" /> Tamil (తమిళం)</label>
+          <label class="chip-checkbox"><input type="checkbox" value="Kannada" class="prof-lang-chk" /> Kannada (కన్నడ)</label>
+          <label class="chip-checkbox"><input type="checkbox" value="Malayalam" class="prof-lang-chk" /> Malayalam (మలయాళం)</label>
+          <label class="chip-checkbox"><input type="checkbox" value="Other Languages" class="prof-lang-chk" /> Other Languages</label>
+        </div>
+      </div>
+
+      <!-- 9. TRAINING & DEVELOPMENT -->
+      <div class="profile-section-card">
+        <div class="card-section-header">
+          <i class="fas fa-graduation-cap"></i> 9. Training & Development
+        </div>
+        <div class="profile-grid-2col">
+          <div class="form-group">
+            <label for="profTrainingAttended">Training Programmes / Workshops Attended</label>
+            <select id="profTrainingAttended" class="profile-select">
+              <option value="None">None</option>
+              <option value="National Level Training / Workshops">National Level Training / Workshops</option>
+              <option value="State Level Study Classes">State Level Study Classes (అభ్యాస వర్గాలు)</option>
+              <option value="District / Zilla Workshops">District / Local Workshops</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="profFutureTrainingInterest">Interested in attending future Training Programmes?</label>
+            <select id="profFutureTrainingInterest" class="profile-select">
+              <option value="Yes">Yes</option>
+              <option value="No">No</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- 10. ORGANISATIONAL SERVICE INTEREST & TIME AVAILABILITY -->
+      <div class="profile-section-card">
+        <div class="card-section-header">
+          <i class="fas fa-hands-helping"></i> 10. Organisational Service Interest
+        </div>
+        <div class="profile-grid-2col">
+          <div class="form-group">
+            <label for="profServeInterest">Interested in serving beyond regular membership?</label>
+            <select id="profServeInterest" class="profile-select">
+              <option value="Yes">Yes</option>
+              <option value="No">No</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="profOfficeBearerInterest">Interested in taking Office-Bearer responsibility?</label>
+            <select id="profOfficeBearerInterest" class="profile-select">
+              <option value="Yes">Yes</option>
+              <option value="No">No</option>
+              <option value="Interested in Future">Interested in Future</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="profDailyTimeAvailability">Daily Time Availability</label>
+            <select id="profDailyTimeAvailability" class="profile-select">
+              <option value="Flexible">Flexible</option>
+              <option value="30 Minutes">30 Minutes</option>
+              <option value="1 Hour">1 Hour</option>
+              <option value="2 Hours">2 Hours</option>
+              <option value="4 Hours">4 Hours</option>
+              <option value="5+ Hours">5+ Hours</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="profWeeklyTimeAvailability">Weekly Time Availability</label>
+            <select id="profWeeklyTimeAvailability" class="profile-select">
+              <option value="Flexible">Flexible</option>
+              <option value="5-10 Hours">5-10 Hours</option>
+              <option value="10-20 Hours">10-20 Hours</option>
+              <option value="20+ Hours">20+ Hours</option>
+            </select>
+          </div>
+          <div class="form-group full-width">
+            <label for="profTravelAvailability">Travel Availability</label>
+            <select id="profTravelAvailability" class="profile-select">
+              <option value="District Level">District Level</option>
+              <option value="Organisation Level">Organisation Level</option>
+              <option value="State Level">State Level</option>
+              <option value="National Level">National Level</option>
+              <option value="Local Only">Local Only</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- 11. VISHWAKARMA SANKET MAGAZINE SUBSCRIPTION -->
+      <div class="profile-section-card">
+        <div class="card-section-header">
+          <i class="fas fa-book"></i> 11. Vishwakarma Sanket Subscription
+        </div>
+        <div class="profile-grid-2col">
+          <div class="form-group">
+            <label for="profVishwakarmaSubscriber">Are you a subscriber of Vishwakarma Sanket Journal?</label>
+            <select id="profVishwakarmaSubscriber" class="profile-select" onchange="toggleVishwakarmaLink(this)">
+              <option value="No">No</option>
+              <option value="Yes">Yes (Already Subscribed)</option>
+              <option value="Interested">Interested to Subscribe</option>
+            </select>
+          </div>
+          <div class="form-group" id="vishwakarmaBtnBox">
+            <label>Subscribe Online (BMS Official Portal)</label>
+            <a href="https://www.bms.org.in/product/vishwakarma-sanket-1-year-subscription/" target="_blank" class="profile-btn profile-btn-primary" style="text-decoration: none; justify-content: center; height: 38px; box-sizing: border-box;">
+              <i class="fas fa-external-link-alt"></i> Subscribe to Vishwakarma Sanket
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- 12. RSS / SANGH PARIVAR ASSOCIATION & TRAINING -->
+      <div class="profile-section-card">
+        <div class="card-section-header">
+          <i class="fas fa-flag"></i> 12. RSS / Sangh Parivar Association
+        </div>
+        <div class="profile-grid-2col">
+          <div class="form-group">
+            <label for="profRssAssociation">RSS Association Status</label>
+            <select id="profRssAssociation" class="profile-select">
+              <option value="Associated">Associated / Well Wisher</option>
+              <option value="Active Swayamsevak">Active Swayamsevak (Swayamsevak)</option>
+              <option value="Not Associated">Not Associated</option>
+              <option value="Interested to Join">Interested to Join RSS</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="profRssTraining">Sangh Shiksha Varga Training</label>
+            <select id="profRssTraining" class="profile-select">
+              <option value="None">None</option>
+              <option value="Prathamika Varga">Prathamika Varga</option>
+              <option value="Prathama Varsha">Prathama Varsha (1st Year)</option>
+              <option value="Dwitiya Varsha">Dwitiya Varsha (2nd Year)</option>
+              <option value="Tritiya Varsha">Tritiya Varsha - Nagpur (3rd Year)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="profRssResponsibility">Current / Past RSS Responsibility</label>
+            <select id="profRssResponsibility" class="profile-select">
+              <option value="No Responsibility">No Responsibility</option>
+              <option value="Shakha / Mandal Karyavah">Shakha / Mandal Karyavah</option>
+              <option value="Nagar / Zilla Responsibility">Nagar / Zilla Responsibility</option>
+              <option value="Vibhag / Prant / Kshetra">Vibhag / Prant / Kshetra Responsibility</option>
+              <option value="Pracharak / Vistaarak">Pracharak / Vistaarak</option>
+              <option value="Other">Other Responsibility</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="profRssShakha">Shakha / Milan Attendance</label>
+            <select id="profRssShakha" class="profile-select">
+              <option value="Occasional">Occasional / Events Only</option>
+              <option value="Daily Shakha">Daily Shakha (Dina Shakha)</option>
+              <option value="Saptahik Milan">Saptahik Milan (Weekly)</option>
+              <option value="Masik Milan">Masik Milan (Monthly)</option>
+              <option value="Not Attending">Not Attending</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- 13. EMERGENCY & BLOOD INFORMATION -->
+      <div class="profile-section-card">
+        <div class="card-section-header">
+          <i class="fas fa-heartbeat"></i> 13. Emergency & Blood Donation Info
+        </div>
+        <div class="profile-grid-2col">
+          <div class="form-group">
+            <label for="profWillingBloodDonate">Willing to Donate Blood in Emergency?</label>
+            <select id="profWillingBloodDonate" class="profile-select">
+              <option value="Yes">Yes</option>
+              <option value="No">No</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="profEmergencyName">Emergency Contact Name</label>
+            <input type="text" id="profEmergencyName" class="profile-input" placeholder="Emergency Contact Name" />
+          </div>
+          <div class="form-group">
+            <label for="profEmergencyMobile">Emergency Contact Mobile</label>
+            <input type="tel" id="profEmergencyMobile" class="profile-input" maxlength="10" placeholder="Emergency Contact Mobile" />
+          </div>
+          <div class="form-group">
+            <label for="profEmergencyRelation">Emergency Contact Relationship</label>
+            <input type="text" id="profEmergencyRelation" class="profile-input" placeholder="e.g. Spouse, Brother, Father" />
+          </div>
+        </div>
+      </div>
+
+      <!-- FORM ACTION BUTTONS BAR -->
+      <div class="profile-actions-bar">
+        <button type="button" class="profile-btn profile-btn-print no-print" onclick="triggerProfilePrint()">
+          <i class="fas fa-print"></i> Print Profile (A4)
         </button>
-        <button type="button" class="profile-btn close-btn" onclick="closeProfile()">
-            <i class="fas fa-times"></i> Close
+        <button type="submit" class="profile-btn profile-btn-submit">
+          <i class="fas fa-check-circle"></i> Review & Submit Profile
         </button>
-    </div>
+      </div>
 
-    <!-- Profile Header Card -->
-    <div class="profile-header-card">
-        <div class="profile-avatar-box">
-            <img id="pMemberPhoto" src="images/arpeu-logo.png" alt="Member Photo">
-            <span id="pStatusBadge" class="status-active-badge">ACTIVE MEMBER</span>
-        </div>
-        <h2 id="pFullName" class="profile-name">Loading...</h2>
-        <div class="profile-id-pill">
-            <span>Membership ID:</span>
-            <strong id="pMembershipId">-</strong>
-        </div>
-        <div class="profile-union-tag">ANDHRA RASTRA POWER EMPLOYEES UNION</div>
-    </div>
-
-    <!-- Loading Spinner -->
-    <div id="profileLoader" class="profile-loading-box">
-        <i class="fas fa-spinner fa-spin"></i>
-        <p>Fetching Digital Member Profile...</p>
-    </div>
-
-    <!-- Profile Cards Grid -->
-    <div id="profileContent" class="profile-cards-container" style="display:none;">
-
-        <!-- Card 1: Membership Overview -->
-        <div class="prof-card">
-            <div class="prof-card-title"><i class="fas fa-id-card"></i> Membership Overview</div>
-            <div class="prof-grid-2">
-                <div class="prof-item"><label>Receipt Number</label><span id="pReceiptNo">-</span></div>
-                <div class="prof-item"><label>Date of Joining</label><span id="pJoinedDate">-</span></div>
-                <div class="prof-item"><label>Current Validity</label><span id="pValidity" class="highlight-val">-</span></div>
-                <div class="prof-item"><label>Membership Status</label><span id="pStatusText" class="text-success">-</span></div>
-            </div>
-        </div>
-
-        <!-- Card 2: Personal Information -->
-        <div class="prof-card">
-            <div class="prof-card-title"><i class="fas fa-user"></i> Personal Details</div>
-            <div class="prof-grid-2">
-                <div class="prof-item"><label>Full Name</label><span id="pNameVal">-</span></div>
-                <div class="prof-item"><label>Mobile Number</label><span id="pMobileVal">-</span></div>
-                <div class="prof-item"><label>Email ID</label><span id="pEmailVal">-</span></div>
-                <div class="prof-item"><label>Aadhaar Number</label><span id="pAadhaarVal" class="masked-text">-</span></div>
-            </div>
-        </div>
-
-        <!-- Card 3: Employment Information -->
-        <div class="prof-card">
-            <div class="prof-card-title"><i class="fas fa-building"></i> Employment Details</div>
-            <div class="prof-grid-2">
-                <div class="prof-item"><label>Company</label><span id="pCompanyVal">-</span></div>
-                <div class="prof-item"><label>Employee ID</label><span id="pEmpIdVal" class="highlight-val">-</span></div>
-                <div class="prof-item"><label>Station / Circle</label><span id="pStationVal">-</span></div>
-                <div class="prof-item"><label>Region / Division</label><span id="pDivisionVal">-</span></div>
-                <div class="prof-item"><label>Sub Division</label><span id="pSubDivVal">-</span></div>
-                <div class="prof-item"><label>Stage / Section</label><span id="pStageVal">-</span></div>
-            </div>
-        </div>
-
-        <!-- Card 4: Payment Summary -->
-        <div class="prof-card">
-            <div class="prof-card-title"><i class="fas fa-receipt"></i> Payment Details</div>
-            <div class="prof-grid-2">
-                <div class="prof-item"><label>Admission Fee</label><span>₹<span id="pAdmFee">100</span></span></div>
-                <div class="prof-item"><label>Annual Subscription</label><span>₹<span id="pAnnSub">360</span></span></div>
-                <div class="prof-item"><label>Donation</label><span>₹<span id="pDonation">0</span></span></div>
-                <div class="prof-item"><label>Total Amount Paid</label><strong class="total-text">₹<span id="pTotalPaid">460</span></strong></div>
-                <div class="prof-item"><label>Payment Mode</label><span id="pPayMode">UPI</span></div>
-                <div class="prof-item"><label>Transaction ID / UTR</label><span id="pTxnId" class="utr-code">-</span></div>
-            </div>
-        </div>
-
-        <!-- Card 5: Membership History & Association -->
-        <div class="prof-card history-card">
-            <div class="prof-card-title"><i class="fas fa-history"></i> ARPEU Membership History</div>
-            <div class="history-metrics-grid">
-                <div class="metric-box">
-                    <span class="metric-val" id="hStartYear">2026</span>
-                    <span class="metric-lbl">Started Year</span>
-                </div>
-                <div class="metric-box highlight-metric">
-                    <span class="metric-val" id="hYearsUnion">1 Year</span>
-                    <span class="metric-lbl">Years in ARPEU</span>
-                </div>
-                <div class="metric-box">
-                    <span class="metric-val" id="hTotalRenewals">0</span>
-                    <span class="metric-lbl">Total Renewals</span>
-                </div>
-                <div class="metric-box">
-                    <span class="metric-val">₹<span id="hTotalSub">460</span></span>
-                    <span class="metric-lbl">Total Paid</span>
-                </div>
-            </div>
-
-            <!-- Timeline -->
-            <div class="timeline-wrapper">
-                <div class="timeline-title">Membership Timeline</div>
-                <div class="timeline-item active-tl">
-                    <div class="tl-dot"><i class="fas fa-check"></i></div>
-                    <div class="tl-info">
-                        <strong>Registered as Digital Member</strong>
-                        <small id="tlDate">2026</small>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-    </div>
-
+    </form>
+  </div>
 </section>
 
 <!-- =========================================
