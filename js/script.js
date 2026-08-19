@@ -677,84 +677,59 @@ function showPage(page) {
 }
 
 
-/* =========================================================
-   INITIALIZE NAVIGATION
-========================================================= */
+/* ==========================================================
+   INITIALIZE PORTAL TOP NAVIGATION ENGINE
+   ========================================================== */
 
 function initializeNavigation() {
+  if (navHome) {
+    navHome.addEventListener("click", function (e) {
+      e.preventDefault();
+      showPage("home");
+    });
+  }
 
-    if (navHome) {
+  if (navMembership) {
+    navMembership.addEventListener("click", function (e) {
+      e.preventDefault();
+      setMembershipMode("new");
+      showPage("membership");
+    });
+  }
 
-        navHome.addEventListener("click", function (e) {
+  // Donations Navigation Listener
+  const navDonations = document.getElementById("navDonations");
+  if (navDonations) {
+    navDonations.addEventListener("click", function (e) {
+      e.preventDefault();
+      showPage("donations");
+    });
+  }
 
-            e.preventDefault();
+  if (navStatistics) {
+    navStatistics.addEventListener("click", function (e) {
+      e.preventDefault();
+      showPage("statistics");
+    });
+  }
 
-            showPage("home");
+  if (navContact) {
+    navContact.addEventListener("click", function (e) {
+      e.preventDefault();
+      showPage("contact");
+      const moreDropdown = document.getElementById("moreDropdown");
+      if (moreDropdown) moreDropdown.classList.remove("show");
+    });
+  }
 
-        });
-
-    }
-
-    if (navMembership) {
-
-        navMembership.addEventListener("click", function (e) {
-
-            e.preventDefault();
-
-            setMembershipMode("new");
-
-            showPage("membership");
-
-        });
-
-    }
-
-    if (navStatistics) {
-
-        navStatistics.addEventListener("click", function (e) {
-
-            e.preventDefault();
-
-            showPage("statistics");
-
-        });
-
-    }
-
-    if (navContact) {
-
-        navContact.addEventListener("click", function (e) {
-
-            e.preventDefault();
-
-            showPage("contact");
-
-            const moreDropdown = document.getElementById("moreDropdown");
-            if (moreDropdown) {
-                moreDropdown.classList.remove("show");
-            }
-
-        });
-
-    }
-
-    if (navAbout) {
-
-        navAbout.addEventListener("click", function (e) {
-
-            e.preventDefault();
-
-            showPage("about");
-
-            const moreDropdown = document.getElementById("moreDropdown");
-            if (moreDropdown) {
-             moreDropdown.classList.remove("show");
-           }
-
-        });
-
-    }
-
+  if (typeof navAbout !== "undefined" && navAbout) {
+    navAbout.addEventListener("click", function (e) {
+      e.preventDefault();
+      showPage("about");
+      const moreDropdown = document.getElementById("moreDropdown");
+      if (moreDropdown) moreDropdown.classList.remove("show");
+    });
+  }
 }
 
 /* =========================================================
@@ -889,21 +864,115 @@ function setMembershipMode(mode) {
 
 
 /* ==========================================================
-   UNIVERSAL PHOTO UPLOAD & CROPPER ENGINE (WHATSAPP STYLE)
-   Single Engine for Membership & Profile Photo Uploads
+   UNIVERSAL PHOTO UPLOAD & CROPPER ENGINE (ORIGINAL MATCH)
+   Seamless Cropping & Instant Preview for Membership & Profile
    ========================================================== */
 
-/* ==========================================================
-   APPLY PHOTO CROPPER RESULT (DIRECT UNCONDITIONAL PREVIEW)
-   ========================================================== */
+let cropperInstance = null;
+window.croppedPhotoFile = null;
+let activePhotoSource = "membership"; // Tracks active upload source: 'membership' or 'profile'
 
 /**
- * Applies cropped photo result and updates ALL preview elements unconditionally
+ * Binds photo upload listeners and sets active target source
+ */
+function initializePhotoPreview() {
+  const membInput = document.getElementById("memberPhoto");
+  const profInput = document.getElementById("profilePhotoUpload") || document.getElementById("profPhotoInput");
+
+  if (membInput) {
+    membInput.addEventListener("change", function () {
+      if (!this.files || !this.files[0]) return;
+      activePhotoSource = "membership"; // Set source to Membership
+      processSelectedPhoto(this.files[0]);
+    });
+  }
+
+  if (profInput) {
+    profInput.addEventListener("change", function () {
+      if (!this.files || !this.files[0]) return;
+      activePhotoSource = "profile"; // Set source to Profile
+      processSelectedPhoto(this.files[0]);
+    });
+  }
+}
+
+/**
+ * Validates format and opens Cropper Modal
+ * @param {File} file - Selected image file
+ */
+function processSelectedPhoto(file) {
+  const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+  if (!allowedTypes.includes(file.type)) {
+    alert("Invalid file format.\nOnly JPG, PNG and WEBP files are allowed.");
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = function (e) {
+    openCropperModal(e.target.result);
+  };
+  reader.readAsDataURL(file);
+}
+
+/**
+ * Opens WhatsApp-style Cropper Modal with 3:4 Passport Aspect Ratio
+ * @param {string} imageSrc - Base64 image URL
+ */
+function openCropperModal(imageSrc) {
+  const modal = document.getElementById("cropperModal");
+  const cropImg = document.getElementById("cropperImage");
+  if (!modal || !cropImg) return;
+
+  cropImg.src = imageSrc;
+  modal.style.display = "flex";
+
+  if (cropperInstance) {
+    cropperInstance.destroy();
+  }
+
+  cropperInstance = new Cropper(cropImg, {
+    aspectRatio: 3 / 4,
+    viewMode: 1,
+    dragMode: 'move',
+    autoCropArea: 0.9,
+    responsive: true,
+    restore: false,
+    guides: true,
+    center: true,
+    highlight: false,
+    cropBoxMovable: true,
+    cropBoxResizable: true,
+    toggleDragOnDblclick: false
+  });
+}
+
+function cropperZoom(delta) {
+  if (cropperInstance) cropperInstance.zoom(delta);
+}
+
+function cropperRotate(degree) {
+  if (cropperInstance) cropperInstance.rotate(degree);
+}
+
+function cropperReset() {
+  if (cropperInstance) cropperInstance.reset();
+}
+
+function closeCropperModal() {
+  const modal = document.getElementById("cropperModal");
+  if (modal) modal.style.display = "none";
+  if (cropperInstance) {
+    cropperInstance.destroy();
+    cropperInstance = null;
+  }
+}
+
+/**
+ * Applies Cropped Photo ONLY to the active targeted page (Page Isolation)
  */
 function applyPhotoCrop() {
   if (!cropperInstance) return;
 
-  // High quality cropped canvas (300x400 Passport Specs)
   const canvas = cropperInstance.getCroppedCanvas({
     width: 300,
     height: 400,
@@ -917,36 +986,45 @@ function applyPhotoCrop() {
     const croppedFile = new File([blob], "cropped-passport-photo.jpg", { type: "image/jpeg" });
     window.croppedPhotoFile = croppedFile;
 
-    // 1. Update Membership Photo Preview Elements
-    const photoPreview  = document.getElementById("photoPreview");
-    const previewText   = document.querySelector(".preview-text");
-    const photoFileName = document.getElementById("photoFileName");
+    // ISOLATION LOGIC: Update ONLY the active page target
+    if (activePhotoSource === "profile") {
+      // 1. Update Profile Photo Preview Box ONLY
+      const profPreview = document.getElementById("profilePhotoPreview") || document.getElementById("profPhotoImg");
+      const profText    = document.getElementById("profPreviewText") || document.getElementById("profPhotoTxt");
+      const profName    = document.getElementById("profPhotoFileName") || document.getElementById("profPhotoNameBox");
 
-    if (photoPreview) {
-      photoPreview.src = dataUrl;
-      photoPreview.style.setProperty("display", "block", "important");
-    }
-    if (previewText) {
-      previewText.style.setProperty("display", "none", "important");
-    }
-    if (photoFileName) {
-      photoFileName.value = "Photo Cropped & Adjusted ✔";
-    }
+      if (profPreview) {
+        profPreview.src = dataUrl;
+        profPreview.style.setProperty("display", "block", "important");
+      }
+      if (profText) {
+        profText.style.setProperty("display", "none", "important");
+      }
+      if (profName) {
+        profName.value = "Photo Cropped & Adjusted ✔";
+      }
 
-    // 2. Update Profile Photo Preview Elements
-    const profPreview     = document.getElementById("profilePhotoPreview");
-    const profPreviewText = document.getElementById("profPreviewText");
-    const profFileName    = document.getElementById("profPhotoFileName");
+      // Update Profile Header Avatar Image
+      const headerAvatar = document.getElementById("profileAvatarHeaderImg");
+      if (headerAvatar) {
+        headerAvatar.src = dataUrl;
+      }
+    } else {
+      // 2. Update Membership Photo Preview Box ONLY
+      const photoPreview  = document.getElementById("photoPreview");
+      const previewText   = document.querySelector("#membershipPage .preview-text");
+      const photoFileName = document.getElementById("photoFileName");
 
-    if (profPreview) {
-      profPreview.src = dataUrl;
-      profPreview.style.setProperty("display", "block", "important");
-    }
-    if (profPreviewText) {
-      profPreviewText.style.setProperty("display", "none", "important");
-    }
-    if (profFileName) {
-      profFileName.value = "Photo Cropped & Adjusted ✔";
+      if (photoPreview) {
+        photoPreview.src = dataUrl;
+        photoPreview.style.setProperty("display", "block", "important");
+      }
+      if (previewText) {
+        previewText.style.setProperty("display", "none", "important");
+      }
+      if (photoFileName) {
+        photoFileName.value = "Photo Cropped & Adjusted ✔";
+      }
     }
 
     closeCropperModal();
@@ -1738,12 +1816,12 @@ const PaymentModuleV25 = {
 
 
 /* ==========================================================
-   FLATPICKR DATE PICKERS ENGINE (WITH PROFILE OVERLAY FIX)
+   FLATPICKR DATE & TIME PICKERS ENGINE (WITH CLICK FIX)
    ========================================================== */
 
 /**
- * Initializes Flatpickr on all date inputs including Profile DOB and DOJ
- * Ensures pickers close cleanly without leaving blocking overlays.
+ * Initializes Flatpickr on all date and time inputs across Membership, Profile and Donations
+ * Ensures clicking visible time display boxes opens time picker instantly.
  */
 function initializeDatePickers() {
   const base = { 
@@ -1752,17 +1830,17 @@ function initializeDatePickers() {
     clickOpens: true, 
     animate: true, 
     position: "above", 
-    static: false 
+    static: true // Anchors popup inside parent box
   };
 
-  // 1. Personal, Employment & Profile Dates (DOB, Joining Date, Profile DOB, Profile DOJ)
-  ["#dob", "#joiningDate", "#profDob", "#profDoj"].forEach(id => {
+  // 1. Universal Date Inputs (Membership, Profile & Donations)
+  ["#dob", "#joiningDate", "#profDob", "#profDoj", "#payNowDate", "#manualDate", "#donDate", "#donPayNowDate"].forEach(id => {
     const el = document.querySelector(id);
     if (el && typeof flatpickr === "function") {
       flatpickr(el, { 
         ...base, 
         dateFormat: "d-m-Y",
-        position: "above",
+        maxDate: (id.includes("payNow") || id.includes("manual") || id.includes("don")) ? "today" : null,
         monthSelectorType: "dropdown",
         onReady: function(selectedDates, dateStr, instance) {
           const yearInput = instance.calendarContainer.querySelector(".numInput.cur-year");
@@ -1774,63 +1852,47 @@ function initializeDatePickers() {
           el.value = dateStr;
           el.dispatchEvent(new Event('input', { bubbles: true }));
           el.dispatchEvent(new Event('change', { bubbles: true }));
-          if (instance) instance.close(); // Cleanly close picker to prevent overlay blocking
+          if (instance) instance.close();
         }
       });
     }
   });
 
-  // 2. Pay Now Date (Today only)
-  const payNowEl = document.querySelector("#payNowDate");
-  if (payNowEl && typeof flatpickr === "function") {
-    flatpickr(payNowEl, { 
-      ...base, 
-      dateFormat: "d-m-Y", 
-      minDate: "today", 
-      maxDate: "today", 
-      position: "above", 
-      onChange: (selectedDates, dateStr, instance) => {
-        payNowEl.dispatchEvent(new Event('input', { bubbles: true }));
-        payNowEl.dispatchEvent(new Event('change', { bubbles: true }));
-        if (instance) instance.close();
-      }
-    });
-  }
+  // 2. Universal Time Pickers (Membership & Donations)
+  const timePickers = [
+    { native: "#payNowTimeNative", display: "#payNowTimeDisplay" },
+    { native: "#manualTimeNative", display: "#manualTimeDisplay" },
+    { native: "#donTimeNative", display: "#donTimeDisplay" },
+    { native: "#donPayNowTimeNative", display: "#donPayNowTimeDisplay" }
+  ];
 
-  // 3. Already Paid Date (Up to today)
-  const manualDateEl = document.querySelector("#manualDate");
-  if (manualDateEl && typeof flatpickr === "function") {
-    flatpickr(manualDateEl, { 
-      ...base, 
-      dateFormat: "d-m-Y", 
-      maxDate: "today",
-      onChange: (selectedDates, dateStr, instance) => {
-        manualDateEl.dispatchEvent(new Event('input', { bubbles: true }));
-        manualDateEl.dispatchEvent(new Event('change', { bubbles: true }));
-        if (instance) instance.close();
-      }
-    });
-  }
+  timePickers.forEach(item => {
+    const nativeEl  = document.querySelector(item.native);
+    const displayEl = document.querySelector(item.display);
 
-  // 4. Native Payment Time Pickers
-  ["#payNowTimeNative", "#manualTimeNative"].forEach(id => {
-    const el = document.querySelector(id);
-    if (el && typeof flatpickr === "function") {
-      const fp = flatpickr(el, { 
+    if (nativeEl && typeof flatpickr === "function") {
+      const fp = flatpickr(nativeEl, { 
         ...base, 
         enableTime: true, 
         noCalendar: true, 
         dateFormat: "H:i",
         position: "above",
-        onChange: () => el.dispatchEvent(new Event('input', { bubbles: true })) 
+        onChange: (selectedDates, dateStr) => {
+          if (displayEl && dateStr) {
+            let [hours, mins] = dateStr.split(':');
+            hours = parseInt(hours, 10);
+            let ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12 || 12;
+            displayEl.value = `${hours.toString().padStart(2, '0')}:${mins} ${ampm}`;
+            displayEl.dispatchEvent(new Event('input', { bubbles: true }));
+            displayEl.dispatchEvent(new Event('change', { bubbles: true }));
+          }
+        }
       });
-      
-      const formatSelector = id === "#payNowTimeNative" ? document.getElementById("payNowTimeFormat") : document.getElementById("manualTimeFormat");
-      if (formatSelector) {
-        formatSelector.addEventListener("change", () => {
-          const is24 = formatSelector.value === "24";
-          fp.set("time_24hr", is24);
-        });
+
+      // CLICK FIX: Opens time picker when clicking visible time box
+      if (displayEl) {
+        displayEl.addEventListener("click", () => fp.open());
       }
     }
   });
@@ -2121,33 +2183,64 @@ function initializeValidations() {
     });
   }
 
-  /* 4. TRANSACTION ID (Check on Blur & Timeout) */
-  const transactionIdInput = document.getElementById("payNowTransactionId");
-  if (transactionIdInput) {
-    transactionIdInput.addEventListener("input", function () {
+ /* ==========================================================
+   UNIVERSAL UTR / TRANSACTION ID DUPLICATE CHECK ENGINE
+   Single Engine for Membership, Donations & All Payment Forms
+   ========================================================== */
+
+/**
+ * Universal Real-Time UTR / Reference No Duplicate Check Engine.
+ * Automatically binds to all payment transaction ID inputs across Membership & Donations.
+ */
+function initializeUniversalUtrCheckEngine() {
+  const utrInputs = document.querySelectorAll(
+    '#payNowTransactionId, #manualTransactionId, #donUpiTxnId, #donPayNowTxnId, #donBankRefNo, .utr-field, input[id*="TransactionId"], input[id*="TxnId"], input[id*="RefNo"]'
+  );
+
+  utrInputs.forEach(utrInput => {
+    if (!utrInput) return;
+
+    // Real-time Input Event Listener
+    utrInput.addEventListener("input", function () {
+      // Force uppercase alphanumeric input
+      this.value = this.value.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
       const val = this.value.trim();
-      const status = document.getElementById("transactionIdStatus");
+
+      const statusEl = document.getElementById("transactionIdStatus") || 
+                       document.getElementById("donorMobileStatus");
 
       clearTimeout(debounceTimers.transactionid);
 
       if (val.length < 5) {
-        if (status) { status.className = "field-status"; status.innerHTML = ""; }
+        if (statusEl && statusEl.classList && statusEl.classList.contains("field-status")) {
+          statusEl.className = "field-status";
+          statusEl.innerHTML = "";
+        }
         return;
       }
 
+      if (statusEl) {
+        statusEl.className = "field-status checking";
+        statusEl.style.color = "#003366";
+        statusEl.innerHTML = "🔍 Checking UTR...";
+      }
+
       debounceTimers.transactionid = setTimeout(() => {
-        executeDuplicateCheck("transactionid", val, "transactionIdStatus");
-      }, 1000);
+        executeDuplicateCheck("transactionid", val, statusEl ? statusEl.id : "donorMobileStatus");
+      }, 800);
     });
 
-    transactionIdInput.addEventListener("blur", function() {
+    // Blur Event Listener
+    utrInput.addEventListener("blur", function () {
       const val = this.value.trim();
       if (val.length >= 5) {
+        const statusEl = document.getElementById("transactionIdStatus") || document.getElementById("donorMobileStatus");
         clearTimeout(debounceTimers.transactionid);
-        executeDuplicateCheck("transactionid", val, "transactionIdStatus");
+        executeDuplicateCheck("transactionid", val, statusEl ? statusEl.id : "donorMobileStatus");
       }
     });
-  }
+  });
+}
 }
 
 
@@ -2626,11 +2719,10 @@ table:"event"
 
 };
 
-/* ==========================================================
-   LOCKED RECEIPT MODULE ENGINE
-========================================================== */
+/* =========================================================
+   LOCKED RECEIPT MODULE ENGINE - NUMBER TO WORDS CONVERTER
+========================================================= */
 
-// నంబర్లను మాటల్లోకి మార్చే ఫంక్షన్ (Number to Words Converter)
 function numberToWords(num) {
     if (!num || isNaN(num)) return "Zero Only";
     num = parseInt(num, 10);
@@ -2651,135 +2743,150 @@ function numberToWords(num) {
     return (inWords(num).trim() + " Only");
 }
 
-function collectReceiptData() {
-    const isPayNow = document.getElementById("payNowOption")?.checked;
-    const payNowAmt = parseInt(document.getElementById("payNowAmount")?.value) || 460;
-    const manualAmt = parseInt(document.getElementById("manualAmount")?.value) || 460;
-    const totalAmount = isPayNow ? payNowAmt : manualAmt;
+/* ==========================================================
+   MASTER UNIVERSAL DIGITAL RECEIPT GENERATOR ENGINE
+   Single Reusable Engine for Membership, Donations & All Funds
+   ========================================================== */
 
-    const admissionFee = 100;
-    const annualSub = 360;
-    const donation = Math.max(0, totalAmount - 460);
-    const others = 0;
+/**
+ * Universal Receipt Config Mapping for All Portal Modules
+ */
+const MasterReceiptConfig = {
+  membership:           { title: "MEMBERSHIP RECEIPT",          color: "#0B4EA2" },
+  renewal:              { title: "MEMBERSHIP RENEWAL RECEIPT",  color: "#FF6600" },
+  donation:             { title: "DONATION RECEIPT",            color: "#F57C00" },
+  diaryAdvertisement:   { title: "DIARY ADVERTISEMENT RECEIPT", color: "#F57C00" },
+  diaryFund:            { title: "DIARY FUND RECEIPT",          color: "#2E7D32" },
+  welfareFund:          { title: "WELFARE FUND RECEIPT",        color: "#2E7D32" },
+  reliefFund:           { title: "RELIEF FUND RECEIPT",         color: "#d32f2f" },
+  buildingFund:         { title: "BUILDING FUND RECEIPT",       color: "#0B4EA2" },
+  trainingFund:         { title: "TRAINING FUND RECEIPT",       color: "#0284c7" },
+  eventSponsorship:     { title: "EVENT SPONSORSHIP RECEIPT",   color: "#7b1fa2" },
+  default:              { title: "RECEIPT",                     color: "#0B4EA2" }
+};
 
-    const transactionId = isPayNow
-        ? (document.getElementById("payNowTransactionId")?.value || "")
-        : (document.getElementById("manualTransactionId")?.value || "");
+/**
+ * Single Universal Digital Receipt Generator for Entire Portal
+ * @param {Object} data - Receipt Payload Object
+ */
+function generateUniversalReceipt(data) {
+  if (!data) return;
 
-    const receiptDate = isPayNow
-        ? (document.getElementById("payNowDate")?.value || "")
-        : (document.getElementById("manualDate")?.value || "");
+  // 1. Determine Receipt Type & Styling Config
+  const typeKey = data.type || (data.donationType ? data.donationType.toLowerCase().replace(/\s+/g, '') : 'default');
+  const config  = MasterReceiptConfig[typeKey] || MasterReceiptConfig[data.type] || {
+    title: (data.donationType ? `${data.donationType.toUpperCase()} RECEIPT` : "RECEIPT"),
+    color: "#F57C00"
+  };
 
-    const now = new Date();
-    const hrs = String(now.getHours() % 12 || 12).padStart(2, '0');
-    const mins = String(now.getMinutes()).padStart(2, '0');
-    const secs = String(now.getSeconds()).padStart(2, '0');
-    const ms = String(Math.floor(now.getMilliseconds() / 10)).padStart(2, '0');
-    const ampm = now.getHours() >= 12 ? 'PM' : 'AM';
+  // 2. Set Dynamic Title & Ribbon Color
+  const titlePill = document.getElementById("receiptTitle");
+  if (titlePill) {
+    titlePill.textContent = config.title;
+    titlePill.style.backgroundColor = config.color;
+  }
 
-    const receiptTime = `${hrs}:${mins}:${secs}:${ms} ${ampm}`;
-    const companyVal = document.getElementById("company")?.value || "";
-    const currentYear = new Date().getFullYear();
+  // 3. Helper to Safely Set Text
+  const setVal = (id, val) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = val || "-";
+  };
 
-    return {
-        receiptNumber: window.lastReceiptNo || (`ARPEU/${currentYear}/1`),
-        membershipId: window.lastMembershipId || "ARPEU00001",
-        receiptDate: receiptDate || new Date().toLocaleDateString('en-GB'),
-        receiptTime: receiptTime,
-        memberName: document.getElementById("employeeName")?.value || "",
-        employeeId: document.getElementById("employeeId")?.value || "",
-        mobile: document.getElementById("mobile")?.value || "",
-        company: companyVal,
-        circle: companyVal !== "APGENCO" ? (document.getElementById("circle")?.value || "") : "",
-        station: companyVal === "APGENCO" ? (document.getElementById("station")?.value || "") : "",
-        stage: companyVal === "APGENCO" ? (document.getElementById("stage")?.value || "") : "",
-        division: document.getElementById("division")?.value || "",
-        subDivision: document.getElementById("subDivision")?.value || "", // 👈 సబ్ డివిజన్
-        location: document.getElementById("location")?.value || "",       // 👈 లొకేషన్
-        admissionFee,
-        annualSub,
-        donation,
-        others,
-        totalAmount,
-        totalInWords: numberToWords(totalAmount),
-        paymentMode: "UPI",
-        transactionId: transactionId || "N/A",
-        paymentStatus: "SUCCESSFUL / PAID"
-    };
-}
+  // 4. Set Metadata Values
+  setVal("rReceiptNo",    data.receiptNo || data.receiptNumber || "ARPEU/2026/1");
+  setVal("rMembershipId", data.membershipId || data.donationId || "ARPEU00001");
+  setVal("rDate",         data.receiptDate || data.paymentDate || new Date().toLocaleDateString('en-GB'));
+  setVal("rTime",         data.receiptTime || new Date().toLocaleTimeString('en-US'));
 
-function loadReceiptPreview() {
-    const data = collectReceiptData();
+  setVal("rMemberName",   data.memberName || data.donorName || "Valued Supporter");
+  setVal("rEmpId",        data.employeeId || data.donorType || "Member");
+  setVal("rMobile",       data.mobile || data.donorMobile || "-");
+  setVal("rCompany",      data.company || data.organization || "ARPEU");
+  setVal("rStation",      data.station || data.address || "-");
+  setVal("rStage",        data.stage || "-");
+  setVal("rDivision",     data.division || "-");
 
-    document.getElementById("rReceiptNo").textContent = data.receiptNumber;
-    document.getElementById("rMembershipId").textContent = data.membershipId;
-    document.getElementById("rDate").textContent = data.receiptDate;
-    document.getElementById("rTime").textContent = data.receiptTime;
+  // 5. Populate Particulars Table Dynamically
+  const tableBody = document.querySelector("#receiptContainer .receipt-table tbody");
+  let totalAmount = data.totalAmount || data.amount || 0;
 
-    document.getElementById("rMemberName").textContent = data.memberName;
-    document.getElementById("rEmpId").textContent = data.employeeId;
-    document.getElementById("rMobile").textContent = data.mobile;
-    document.getElementById("rCompany").textContent = data.company;
-    document.getElementById("rCircle").textContent = data.circle || "-";
-    document.getElementById("rStation").textContent = data.station || "-";
-    document.getElementById("rStage").textContent = data.stage || "-";
-    document.getElementById("rDivision").textContent = data.division || "-";
+  if (tableBody && Array.isArray(data.particulars) && data.particulars.length > 0) {
+    let rowsHtml = "";
+    totalAmount = 0;
 
-    // Sub Division Logic (డేటా ఉంటే చూపిస్తుంది, లేకపోతే హైడ్ చేస్తుంది)
-    const subDivEl = document.getElementById("rSubDivision");
-    if (subDivEl) {
-        subDivEl.textContent = data.subDivision || "";
-        const parentField = subDivEl.closest(".meta-field");
-        if (parentField) parentField.style.display = data.subDivision ? "flex" : "none";
-    }
-
-    // Location Logic (డేటా ఉంటే చూపిస్తుంది, లేకపోతే హైడ్ చేస్తుంది)
-    const locEl = document.getElementById("rLocation");
-    if (locEl) {
-        locEl.textContent = data.location || "";
-        const parentField = locEl.closest(".meta-field");
-        if (parentField) parentField.style.display = data.location ? "flex" : "none";
-    }
-
-    document.getElementById("rAdmissionFee").textContent = data.admissionFee;
-    document.getElementById("rAnnualSub").textContent = data.annualSub;
-    document.getElementById("rDonation").textContent = data.donation;
-    document.getElementById("rOthers").textContent = data.others;
-    document.getElementById("rTotal").textContent = data.totalAmount;
-    document.getElementById("rTotalInWords").textContent = data.totalInWords;
-
-    document.getElementById("rPaymentMode").textContent = data.paymentMode;
-    document.getElementById("rTransactionId").textContent = data.transactionId;
-    document.getElementById("rPaymentStatus").textContent = data.paymentStatus;
-
-    generateReceiptQR(data);
-}
-
-
-function generateReceiptQR(data) {
-    const qrContainer = document.getElementById("receiptQrCode");
-    if (!qrContainer) return;
-    qrContainer.innerHTML = "";
-
-    const currentDomain = window.location.origin + window.location.pathname;
-    const profileUrl = `${currentDomain}?id=${encodeURIComponent(data.membershipId)}`;
-
-    new QRCode(qrContainer, {
-        text: profileUrl,
-        width: 85,
-        height: 85,
-        colorDark: "#000000",
-        colorLight: "#ffffff",
-        correctLevel: QRCode.CorrectLevel.M
+    data.particulars.forEach(item => {
+      const amt = parseFloat(item.amount) || 0;
+      totalAmount += amt;
+      rowsHtml += `
+        <tr>
+          <td>${item.label || 'Particulars'}</td>
+          <td class="amt-col">Rs. ${amt}</td>
+        </tr>
+      `;
     });
 
-    // 📌 CLICK TO PREVIEW PROFILE (QR కోడ్ క్లిక్ చేయగానే ప్రొఫైల్ ఓపెన్ అవుతుంది)
-    qrContainer.style.cursor = "pointer";
-    qrContainer.title = "Click here to Preview Member Digital Profile";
-    qrContainer.onclick = function () {
-        loadMemberProfile(data.membershipId);
-    };
+    rowsHtml += `
+      <tr class="total-row">
+        <td class="total-lbl">Total Received</td>
+        <td class="amt-col total-val">Rs. ${totalAmount}</td>
+      </tr>
+      <tr class="words-row">
+        <td colspan="2">
+          <span class="lbl-dark">Total in Words: Rupees</span>
+          <span id="rTotalInWords" class="val-bold">${typeof numberToWords === 'function' ? numberToWords(totalAmount) : totalAmount + ' Only'}</span>
+        </td>
+      </tr>
+    `;
+
+    tableBody.innerHTML = rowsHtml;
+  } else {
+    // Default fallback row binding
+    setVal("rAdmissionFee", data.admissionFee || 100);
+    setVal("rAnnualSub",    data.annualSub || 360);
+    setVal("rDonation",     data.donation || data.amount || 0);
+    setVal("rTotal",        totalAmount);
+    setVal("rTotalInWords", typeof numberToWords === 'function' ? numberToWords(totalAmount) : totalAmount + ' Only');
+  }
+
+  // 6. Set Payment Method Info
+  setVal("rPaymentMode",   data.paymentMode || "UPI");
+  setVal("rTransactionId", data.transactionId || "N/A");
+  setVal("rPaymentStatus", data.paymentStatus || "SUCCESSFUL / PAID");
+
+  // 7. Generate Universal Receipt QR Code
+  const qrBox = document.getElementById("receiptQrCode");
+  if (qrBox && typeof QRCode === "function") {
+    qrBox.innerHTML = "";
+    const currentDomain = window.location.origin + window.location.pathname;
+    const verifyUrl = `${currentDomain}?verifyReceipt=${encodeURIComponent(data.receiptNo || data.membershipId || '1')}`;
+
+    new QRCode(qrBox, {
+      text: verifyUrl,
+      width: 85,
+      height: 85,
+      colorDark: "#000000",
+      colorLight: "#ffffff",
+      correctLevel: QRCode.CorrectLevel.M
+    });
+  }
+
+  // 8. Unhide Universal Receipt View
+  const rc = document.getElementById("receiptContainer");
+  if (rc) {
+    rc.style.display = "block";
+    rc.setAttribute("data-active", "true");
+  }
+
+  window.scrollTo({ top: 0, behavior: "smooth" });
 }
+
+function openReceipt() {
+  // Simple wrapper calling Universal Engine
+  const data = typeof collectReceiptData === "function" ? collectReceiptData() : {};
+  data.type = "membership";
+  generateUniversalReceipt(data);
+}
+
 
 /* ==========================================================
    MEMBER DIGITAL PROFILE LOADER ENGINE
@@ -3157,232 +3264,182 @@ function showDownloadsToast(message) {
     }, 3000);
 }
 
-/* =========================================================
-   ARPEU DONATION MODULE & UNIVERSAL AUTO-FILL ENGINE
-========================================================= */
+/* ==========================================================
+   DONATION PAYMENT MODULE (MIRRORED FROM PaymentModuleV25)
+   ========================================================== */
 
-document.addEventListener("DOMContentLoaded", function () {
-    initializeDonationModule();
-});
+const DonationPaymentModule = {
+  init() {
+    this.cacheDOM();
+    this.bindEvents();
+    this.reset();
+  },
 
-// Hook into showPage safely
-if (typeof showPage === "function") {
-    const originalShowPage = showPage;
-    showPage = function (page) {
-        document.querySelectorAll(".navbar .nav-item").forEach(el => el.classList.remove("active"));
-
-        const donSec = document.getElementById("donationsSection");
-        if (donSec) donSec.style.display = "none";
-        const donRc = document.getElementById("donationReceiptContainer");
-        if (donRc) donRc.style.display = "none";
-
-        originalShowPage(page);
-
-        if (page === "donations") {
-            if (donSec) donSec.style.display = "block";
-            const navDonations = document.getElementById("navDonations");
-            if (navDonations) navDonations.classList.add("active");
-            const moreDropdown = document.getElementById("moreDropdown");
-            if (moreDropdown) moreDropdown.classList.remove("show");
-            window.scrollTo({ top: 0, behavior: "smooth" });
-        }
+  cacheDOM() {
+    this.dom = {
+      payNowOpt:      document.getElementById("donPayNowOption"),
+      alreadyPaidOpt: document.getElementById("donAlreadyPaidOption"),
+      payNowSec:      document.getElementById("donPayNowSection"),
+      alreadyPaidSec: document.getElementById("donAlreadyPaidSection"),
+      payNowFields:   document.getElementById("donPayNowFields"),
+      completedBtn:   document.getElementById("donPayCompletedBtn")
     };
-}
+  },
 
-function initializeDonationModule() {
-    const navDonations = document.getElementById("navDonations");
-    if (navDonations) {
-        navDonations.addEventListener("click", function (e) {
-            e.preventDefault();
-            showPage("donations");
-        });
+  reset() {
+    if (this.dom.payNowSec)      this.dom.payNowSec.style.display      = "none";
+    if (this.dom.alreadyPaidSec) this.dom.alreadyPaidSec.style.display = "none";
+    if (this.dom.payNowFields)   this.dom.payNowFields.style.display   = "none";
+    if (this.dom.payNowOpt)      this.dom.payNowOpt.checked           = false;
+    if (this.dom.alreadyPaidOpt) this.dom.alreadyPaidOpt.checked       = false;
+  },
+
+  bindEvents() {
+    if (this.dom.payNowOpt) {
+      this.dom.payNowOpt.addEventListener("click", () => {
+        if (this.dom.payNowSec)      this.dom.payNowSec.style.display      = "block";
+        if (this.dom.alreadyPaidSec) this.dom.alreadyPaidSec.style.display = "none";
+        if (this.dom.payNowFields)   this.dom.payNowFields.style.display   = "none";
+      });
     }
 
-    // 1. Mobile Auto-search (Enhanced Real-Time Search)
-    const mobileInput = document.getElementById("donorMobile");
-    const statusEl = document.getElementById("donorMobileStatus");
-
-    if (mobileInput) {
-        let lastSearchedVal = "";
-
-        const triggerSearch = function () {
-            const val = mobileInput.value.replace(/\D/g, "").slice(0, 10);
-            mobileInput.value = val;
-
-            if (val.length === 10) {
-                if (val !== lastSearchedVal) {
-                    lastSearchedVal = val;
-                    if (statusEl) {
-                        statusEl.className = "field-status checking";
-                        statusEl.style.color = "#0B4EA2";
-                        statusEl.innerHTML = "🔍 Searching Database...";
-                    }
-                    searchDonorOrMember(val);
-                }
-            } else {
-                lastSearchedVal = "";
-                if (statusEl) {
-                    statusEl.className = "field-status";
-                    statusEl.innerHTML = "";
-                }
-            }
-        };
-
-        mobileInput.addEventListener("input", triggerSearch);
-        mobileInput.addEventListener("change", triggerSearch);
-        mobileInput.addEventListener("blur", triggerSearch);
+    if (this.dom.alreadyPaidOpt) {
+      this.dom.alreadyPaidOpt.addEventListener("click", () => {
+        if (this.dom.alreadyPaidSec) this.dom.alreadyPaidSec.style.display = "block";
+        if (this.dom.payNowSec)      this.dom.payNowSec.style.display      = "none";
+      });
     }
 
-    const autoFillBtn = document.getElementById("confirmAutoFillBtn");
-    if (autoFillBtn) {
-        autoFillBtn.addEventListener("click", applyAutoFillData);
+    if (this.dom.completedBtn) {
+      this.dom.completedBtn.addEventListener("click", () => {
+        if (this.dom.payNowFields) this.dom.payNowFields.style.display = "block";
+      });
     }
 
-    // 2. Conditional Donation Type
-    const donationType = document.getElementById("donationType");
-    const diaryAdvtBox = document.getElementById("diaryAdvtBox");
-    const diaryDonationBox = document.getElementById("diaryDonationBox");
-    const donationAmount = document.getElementById("donationAmount");
-    const advtSize = document.getElementById("advtSize");
-    const diaryCount = document.getElementById("diaryCount");
-    const diaryRate = document.getElementById("diaryRate");
-
-    if (donationType) {
-        donationType.addEventListener("change", function () {
-            const val = this.value;
-            diaryAdvtBox.style.display = "none";
-            diaryDonationBox.style.display = "none";
-            donationAmount.readOnly = false;
-
-            if (val === "Diary Advertisement") {
-                diaryAdvtBox.style.display = "block";
-                donationAmount.readOnly = true;
-                updateAdvtAmount();
-            } else if (val === "Diary Donation") {
-                diaryDonationBox.style.display = "block";
-                donationAmount.readOnly = true;
-                calcDiaryTotal();
-            } else {
-                donationAmount.value = "";
-            }
-        });
-    }
-
-    if (advtSize) {
-        advtSize.addEventListener("change", updateAdvtAmount);
-    }
-
-    function updateAdvtAmount() {
-        if (!advtSize) return;
-        if (advtSize.value === "Full Page Colour") {
-            donationAmount.value = 10000;
-        } else if (advtSize.value === "Half Page Colour") {
-            donationAmount.value = 5000;
-        } else {
-            donationAmount.value = "";
-        }
-        updateDonationQR();
-    }
-
-    if (diaryCount && diaryRate) {
-        diaryCount.addEventListener("input", calcDiaryTotal);
-        diaryRate.addEventListener("input", calcDiaryTotal);
-    }
-
-    function calcDiaryTotal() {
-        const qty = parseInt(diaryCount.value) || 0;
-        const rate = parseInt(diaryRate.value) || 0;
-        donationAmount.value = qty * rate;
-        updateDonationQR();
-    }
-
-    if (donationAmount) {
-        donationAmount.addEventListener("input", updateDonationQR);
-    }
-
-    function updateDonationQR() {
-        const amt = donationAmount.value || 0;
-        const qrImg = document.getElementById("donDynamicQR");
-        if (qrImg) {
-            qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=andhrarastrapowerempunion@sbi%26pn=ARPEU%26am=${amt}%26cu=INR`;
-        }
-    }
-
-    // 3. Payment Mode Sub-sections
+    // Payment Mode Sub-sections Switcher
     const payModes = document.querySelectorAll('input[name="donPayMode"]');
     payModes.forEach(radio => {
-        radio.addEventListener("change", function () {
-            document.getElementById("donUpiSection").style.display = "none";
-            document.getElementById("donBankSection").style.display = "none";
-            document.getElementById("donCashSection").style.display = "none";
-            document.getElementById("donChequeSection").style.display = "none";
+      radio.addEventListener("change", function () {
+        const upiSec   = document.getElementById("donUpiSection");
+        const bankSec  = document.getElementById("donBankSection");
+        const cashSec  = document.getElementById("donCashSection");
+        const chqSec   = document.getElementById("donChequeSection");
 
-            if (this.value === "UPI") document.getElementById("donUpiSection").style.display = "block";
-            if (this.value === "Bank Transfer") document.getElementById("donBankSection").style.display = "block";
-            if (this.value === "Cash") document.getElementById("donCashSection").style.display = "block";
-            if (this.value === "Cheque") document.getElementById("donChequeSection").style.display = "block";
-        });
+        if (upiSec)  upiSec.style.display  = "none";
+        if (bankSec) bankSec.style.display = "none";
+        if (cashSec) cashSec.style.display = "none";
+        if (chqSec)  chqSec.style.display  = "none";
+
+        if (this.value === "UPI" && upiSec)           upiSec.style.display  = "block";
+        if (this.value === "Bank Transfer" && bankSec) bankSec.style.display = "block";
+        if (this.value === "Cash" && cashSec)          cashSec.style.display = "block";
+        if (this.value === "Cheque" && chqSec)        chqSec.style.display  = "block";
+      });
     });
 
-    // 4. Date Pickers Init
-    ["#donUpiDate", "#donBankDate", "#donCashDate", "#donChequeDate"].forEach(id => {
-        const el = document.querySelector(id);
-        if (el && typeof flatpickr === "function") {
-            flatpickr(el, { dateFormat: "d-m-Y", maxDate: "today", disableMobile: true });
-        }
+    // Date Pickers Binding
+    ["#donDate", "#donPayNowDate"].forEach(id => {
+      const el = document.querySelector(id);
+      if (el && typeof flatpickr === "function") {
+        flatpickr(el, { dateFormat: "d-m-Y", maxDate: "today", disableMobile: true, position: "above" });
+      }
     });
+  }
+};
 
-    // 5. Submit Donation Button
-    const submitBtn = document.getElementById("submitDonationBtn");
-    if (submitBtn) {
-        submitBtn.addEventListener("click", submitDonationForm);
-    }
-}
+// Initialize on DOM Load
+document.addEventListener("DOMContentLoaded", function () {
+  DonationPaymentModule.init();
+});
 
-// ---------------------------------------------------------
-// SEARCH BACKEND API FOR DONOR / MEMBER
-// ---------------------------------------------------------
-let foundSearchRecord = null;
-
-async function searchDonorOrMember(queryKey) {
-    const statusEl = document.getElementById("donorMobileStatus");
-    if (!queryKey || typeof BACKEND_URL === "undefined") {
-        if (statusEl) { statusEl.className = "field-status"; statusEl.innerHTML = ""; }
-        return;
-    }
-
-    try {
-        const url = `${BACKEND_URL}?action=searchDonorOrMember&query=${encodeURIComponent(queryKey)}`;
-        const response = await fetch(url);
-        const result = await response.json();
-
-        if (result && result.success && result.found) {
-            if (statusEl) {
-                statusEl.className = "field-status success";
-                statusEl.style.color = "#16A34A";
-                statusEl.innerHTML = "✔ Existing Record Found";
-            }
-            foundSearchRecord = result.data;
-            showDonorSearchModal(result.data);
-        } else {
-            if (statusEl) {
-                statusEl.className = "field-status";
-                statusEl.style.color = "#666";
-                statusEl.innerHTML = "ℹ New Record (No previous data found)";
-            }
-        }
-    } catch (e) {
-        console.log("Donor search error:", e);
-        if (statusEl) {
-            statusEl.className = "field-status";
-            statusEl.innerHTML = "";
-        }
-    }
-}
 
 /* ==========================================================
-   UNIVERSAL DONOR / MEMBER AUTO-FILL SEARCH HANDLERS
+   UNIVERSAL SEARCH ENGINE FOR DONATION & PROFILE
    ========================================================== */
+
+const PORTAL_BACKEND_URL = "https://script.google.com/macros/s/AKfycbyoBv4TQ28mb7HIsTQ42iEe7P-3Yqs-7lR5tHhHqk0RqCQOShGrLBVPvD4j2ZUV1Q/exec";
+
+let lastDonorSearchedMobile = "";
+let foundSearchRecord = null;
+
+/**
+ * Real-time Mobile Input Handler for Donations
+ * Triggers automatic database search on entering 10 digits.
+ * @param {HTMLInputElement} inputEl - Mobile input element reference
+ */
+function handleDonorMobileInput(inputEl) {
+  if (!inputEl) return;
+
+  const val = inputEl.value.replace(/\D/g, "").slice(0, 10);
+  inputEl.value = val;
+
+  const statusEl = document.getElementById("donorMobileStatus");
+
+  if (val.length === 10) {
+    if (val !== lastDonorSearchedMobile) {
+      lastDonorSearchedMobile = val;
+
+      if (statusEl) {
+        statusEl.className = "field-status checking";
+        statusEl.style.color = "#003366";
+        statusEl.innerHTML = "🔍 Searching Database...";
+      }
+
+      // Execute Universal Search Engine Immediately
+      searchDonorOrMember(val);
+    }
+  } else {
+    lastDonorSearchedMobile = "";
+    if (statusEl) {
+      statusEl.className = "field-status";
+      statusEl.innerHTML = "";
+    }
+  }
+}
+
+/**
+ * Universal Search API Trigger
+ * Searches Members and Donors in Google Sheets Backend
+ * @param {string} queryKey - Mobile number or Identifier
+ */
+async function searchDonorOrMember(queryKey) {
+  const statusEl = document.getElementById("donorMobileStatus") || document.getElementById("profileSearchStatus");
+  if (!queryKey) return;
+
+  const targetUrl = typeof BACKEND_URL !== "undefined" ? BACKEND_URL : PORTAL_BACKEND_URL;
+
+  try {
+    const url = `${targetUrl}?action=searchDonorOrMember&query=${encodeURIComponent(queryKey)}`;
+    const response = await fetch(url);
+    const result = await response.json();
+
+    console.log("Search Result:", result);
+
+    if (result && result.success && result.found) {
+      if (statusEl) {
+        statusEl.className = "field-status success";
+        statusEl.style.color = "#16A34A";
+        statusEl.innerHTML = "✔ Existing Record Found";
+      }
+      foundSearchRecord = result.data;
+      showDonorSearchModal(result.data); // Opens RECORD FOUND confirmation modal
+    } else {
+      if (statusEl) {
+        statusEl.className = "field-status";
+        statusEl.style.color = "#666";
+        statusEl.innerHTML = "ℹ New Record (No previous data found)";
+      }
+    }
+  } catch (e) {
+    console.error("Universal Search Error:", e);
+    if (statusEl) {
+      statusEl.className = "field-status success";
+      statusEl.style.color = "#16A34A";
+      statusEl.innerHTML = "ℹ Ready for Entry";
+    }
+  }
+}
+
 
 /**
  * Displays the search detection modal with detected member/donor details.
@@ -3428,31 +3485,38 @@ function closeDonorSearchModal() {
 }
 
 /**
- * Auto-fills form fields with detected record data and notifies user in English.
+ * Auto-fills detected record details into both Donation and Profile forms
  */
 function applyAutoFillData() {
   if (typeof foundSearchRecord === "undefined" || !foundSearchRecord) return;
   const d = foundSearchRecord;
 
-  if (d.donorType && document.getElementById("donorType")) document.getElementById("donorType").value = d.donorType;
-  if (d.name && document.getElementById("donorName")) document.getElementById("donorName").value = d.name;
-  if (d.mobile && document.getElementById("donorMobile")) document.getElementById("donorMobile").value = d.mobile;
-  if (d.email && document.getElementById("donorEmail")) document.getElementById("donorEmail").value = d.email;
-  
+  // 1. Donation Form Auto-Fill
+  if (d.donorType && document.getElementById("donorType"))           document.getElementById("donorType").value = d.donorType;
+  if (d.name && document.getElementById("donorName"))               document.getElementById("donorName").value = d.name;
+  if (d.mobile && document.getElementById("donorMobile"))           document.getElementById("donorMobile").value = d.mobile;
+  if (d.email && document.getElementById("donorEmail"))             document.getElementById("donorEmail").value = d.email;
   if ((d.organization || d.station) && document.getElementById("donorOrganization")) {
     document.getElementById("donorOrganization").value = d.organization || d.station || "";
   }
-  
-  if (d.address && document.getElementById("donorAddress")) document.getElementById("donorAddress").value = d.address;
-  if (d.pan && document.getElementById("donorPan")) document.getElementById("donorPan").value = d.pan;
+  if (d.address && document.getElementById("donorAddress"))         document.getElementById("donorAddress").value = d.address;
+  if (d.pan && document.getElementById("donorPan"))                 document.getElementById("donorPan").value = d.pan;
 
-  // Hide search modal element
+  // 2. Profile Form Auto-Fill
+  if (d.name && document.getElementById("profFullName"))            document.getElementById("profFullName").value = d.name;
+  if (d.mobile && document.getElementById("profMobile"))            document.getElementById("profMobile").value = d.mobile;
+  if (d.email && document.getElementById("profEmail"))              document.getElementById("profEmail").value = d.email;
+  if (d.employeeId && document.getElementById("profEmployeeId"))    document.getElementById("profEmployeeId").value = d.employeeId;
+  if (d.organization && document.getElementById("profCompany"))     document.getElementById("profCompany").value = d.organization;
+
+  // Dismiss confirmation modal
   const modal = document.getElementById("donorSearchModal");
   if (modal) modal.style.display = "none";
 
-  // Professional English notification message
-  alert("✔ Details successfully auto-filled from database!");
+  // English Notification
+  alert("✔ Details successfully auto-filled from ARPEU Database!");
 }
+
 
 // ---------------------------------------------------------
 // SUBMIT DONATION FORM TO BACKEND
@@ -3979,3 +4043,4 @@ function handleProfileReview() {
   console.log("Collected Digital Profile Payload:", profileData);
   alert("✔ Digital Profile Verified! Ready for Save & Review.");
 }
+

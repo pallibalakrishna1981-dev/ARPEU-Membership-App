@@ -77,7 +77,7 @@
         <span>Membership</span>
     </a>
 
-    <a href="#" class="nav-item" id="navDonations">
+    <a href="#" class="nav-item" id="navDonations" onclick="showPage('donations'); return false;">
         <i class="fas fa-hand-holding-heart"></i>
         <span>Donations</span>
     </a>
@@ -1713,18 +1713,21 @@
       <p>Single Organisational Identity & Digital Skill Repository</p>
     </div>
 
-    <!-- UNIVERSAL PROFILE SEARCH BAR -->
+    <!-- UNIVERSAL PROFILE SEARCH BAR (SLEEK MOCKUP MATCH) -->
     <div class="profile-search-card">
       <div class="profile-search-header">
         <h4><i class="fas fa-search"></i> Universal Profile Search</h4>
         <span>Search existing record using Mobile, Aadhaar, Employee ID or Membership ID</span>
       </div>
-      <div class="profile-search-input-group">
-        <input type="text" id="profileSearchQuery" class="profile-input" placeholder="Enter Mobile / Aadhaar / Employee ID / Membership ID..." />
-        <button type="button" class="profile-btn profile-btn-primary" onclick="searchUniversalProfile()">
-          <i class="fas fa-search"></i> Search Profile
+      
+      <!-- Sleek Integrated Search Box Container -->
+      <div class="profile-search-wrapper">
+        <input type="text" id="profileSearchQuery" class="profile-search-input" placeholder="Enter Mobile / Aadhaar / Emp ID / Member ID..." />
+        <button type="button" class="profile-search-btn" onclick="searchUniversalProfile()">
+          <i class="fas fa-search"></i> Search
         </button>
       </div>
+
       <div id="profileSearchStatus" class="profile-status-msg"></div>
     </div>
     
@@ -3495,7 +3498,7 @@
            <!-- 2. Mobile Number (Triggers Universal Search) -->
             <div class="form-group">
                 <label for="donorMobile">Mobile Number / Registered No. <span class="required">*</span></label>
-                <input type="tel" id="donorMobile" maxlength="10" placeholder="Enter 10 Digit Mobile Number" autocomplete="off">
+                <input type="tel" id="donorMobile" maxlength="10" placeholder="Enter 10 Digit Mobile Number" autocomplete="off" oninput="handleDonorMobileInput(this)" onblur="handleDonorMobileInput(this)">
                 <div id="donorMobileStatus" class="field-status"></div>
             </div>
 
@@ -3596,60 +3599,174 @@
         </div>
     </div>
 
-    <!-- 3. Payment Method Card -->
+   <!-- 3. PAYMENT METHOD CARD (MIRRORED FROM MEMBERSHIP PaymentModuleV25) -->
     <div class="form-card">
         <div class="card-header">
-            <span class="card-icon">💳</span>
-            <span class="card-title">Payment Method</span>
+            <i class="fas fa-credit-card"></i> PAYMENT DETAILS
         </div>
         <div class="card-body">
-            <div class="form-group">
-                <label>Select Payment Mode <span class="required">*</span></label>
-                <div class="payment-method-row">
-                    <label class="compact-method-btn" for="donPayUpi">
-                        <input type="radio" name="donPayMode" id="donPayUpi" value="UPI" checked>
-                        <span>UPI</span>
-                    </label>
-                    <label class="compact-method-btn" for="donPayBank">
-                        <input type="radio" name="donPayMode" id="donPayBank" value="Bank Transfer">
-                        <span>Bank Transfer</span>
-                    </label>
-                    <label class="compact-method-btn" for="donPayCash">
-                        <input type="radio" name="donPayMode" id="donPayCash" value="Cash">
-                        <span>Cash</span>
-                    </label>
-                    <label class="compact-method-btn" for="donPayCheque">
-                        <input type="radio" name="donPayMode" id="donPayCheque" value="Cheque">
-                        <span>Cheque</span>
-                    </label>
-                </div>
+            
+            <!-- Step 1: Initial Option Buttons Only (Neither Checked Initially) -->
+            <div class="don-method-selection-bar">
+                <label class="don-large-option-btn" for="donPayNowOption">
+                    <input type="radio" name="donPaymentMethod" id="donPayNowOption" value="payNow">
+                    <span>Pay Now (Online)</span>
+                </label>
+                <label class="don-large-option-btn" for="donAlreadyPaidOption">
+                    <input type="radio" name="donPaymentMethod" id="donAlreadyPaidOption" value="alreadyPaid">
+                    <span>Already Paid</span>
+                </label>
             </div>
 
-            <!-- UPI Payment Details -->
-            <div id="donUpiSection" class="payment-sub-section">
+            <!-- STEP 2A: PAY NOW SECTION (HIDDEN INITIALLY) -->
+            <div id="donPayNowSection" style="display: none; margin-top: 15px;">
                 <div class="upi-box-large">
                     <div class="qr-container">
                         <img id="donDynamicQR" src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=andhrarastrapowerempunion@sbi%26pn=ARPEU%26cu=INR" alt="Scan QR">
                         <p style="font-size: 10px; font-weight: 700; margin-top: 5px;">SCAN QR</p>
                     </div>
                     <div class="apps-container">
-                        <p style="font-size: 11px; font-weight: 700; color: #333;">UPI ID: <span style="color:#0b4ea2;">andhrarastrapowerempunion@sbi</span></p>
+                        <p style="font-size: 11px; font-weight: 700; color: #333;">UPI ID: <span style="color:#0b4ea2; word-break: break-all;">andhrarastrapowerempunion@sbi</span></p>
                         <div class="large-icon-grid">
                             <img src="https://upload.wikimedia.org/wikipedia/commons/f/f2/Google_Pay_Logo.svg" alt="GPay">
                             <img src="https://upload.wikimedia.org/wikipedia/commons/7/71/PhonePe_Logo.png" alt="PhonePe">
                         </div>
                     </div>
                 </div>
-                <div class="form-group" style="margin-top:15px;">
-                    <label>UPI Transaction ID / UTR No <span class="required">*</span></label>
-                    <input type="text" id="donUpiTxnId" placeholder="Enter 12 Digit UTR Number">
-                </div>
-                <div class="form-group">
-                    <label>Payment Date <span class="required">*</span></label>
-                    <input type="text" id="donUpiDate" class="dt-field-final" placeholder="Select Date" readonly>
+
+                <button type="button" id="donPayCompletedBtn" class="completed-btn" style="margin-top: 15px;">
+                    I HAVE COMPLETED PAYMENT
+                </button>
+
+                <!-- Fields Shown After Pay Now Completed Button Click -->
+                <div id="donPayNowFields" style="display: none; margin-top: 15px;">
+                    <div class="dt-container-final">
+                        <div class="dt-header-labels">
+                            <label class="dt-label-main">Payment Date & Time *</label>
+                        </div>
+                        <div class="dt-input-grid">
+                            <div class="dt-box-wrap">
+                                <input type="text" id="donPayNowDate" class="dt-field-final" placeholder="Select Date" readonly>
+                                <i class="fas fa-calendar-alt dt-icon-right"></i>
+                            </div>
+                            <div class="dt-box-wrap">
+                                <input type="text" id="donPayNowTimeDisplay" class="dt-field-final" placeholder="Set Time" readonly>
+                                <input type="text" id="donPayNowTimeNative" class="native-picker-overlay" readonly>
+                                <i class="fas fa-clock dt-icon-right"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group" style="margin-top:12px;">
+                        <label>Transaction ID / UTR No <span class="required">*</span></label>
+                        <input type="text" id="donPayNowTxnId" class="utr-field" placeholder="Enter UTR Number">
+                    </div>
+                    <div class="form-group" style="margin-top:12px;">
+                        <label>Upload Payment Receipt / Proof <span class="required">*</span></label>
+                        <input type="file" id="donPayNowProof" accept="image/*,.pdf">
+                    </div>
                 </div>
             </div>
 
+            <!-- STEP 2B: ALREADY PAID SECTION (HIDDEN INITIALLY) -->
+            <div id="donAlreadyPaidSection" style="display: none; margin-top: 15px;">
+                
+                <!-- Payment Mode Selection -->
+                <div class="form-group">
+                    <label>Select Payment Mode <span class="required">*</span></label>
+                    <div class="payment-method-row">
+                        <label class="compact-method-btn" for="donPayUpi">
+                            <input type="radio" name="donPayMode" id="donPayUpi" value="UPI" checked>
+                            <span>UPI</span>
+                        </label>
+                        <label class="compact-method-btn" for="donPayBank">
+                            <input type="radio" name="donPayMode" id="donPayBank" value="Bank Transfer">
+                            <span>Bank Transfer</span>
+                        </label>
+                        <label class="compact-method-btn" for="donPayCash">
+                            <input type="radio" name="donPayMode" id="donPayCash" value="Cash">
+                            <span>Cash</span>
+                        </label>
+                        <label class="compact-method-btn" for="donPayCheque">
+                            <input type="radio" name="donPayMode" id="donPayCheque" value="Cheque">
+                            <span>Cheque</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Side-by-Side Date & Time Container -->
+                <div class="dt-container-final" style="margin-top: 12px;">
+                    <div class="dt-header-labels">
+                        <label class="dt-label-main">Payment Date & Time *</label>
+                    </div>
+                    <div class="dt-input-grid">
+                        <div class="dt-box-wrap">
+                            <input type="text" id="donDate" class="dt-field-final" placeholder="Select Date" readonly>
+                            <i class="fas fa-calendar-alt dt-icon-right"></i>
+                        </div>
+                        <div class="dt-box-wrap">
+                            <input type="text" id="donTimeDisplay" class="dt-field-final" placeholder="Set Time" readonly>
+                            <input type="text" id="donTimeNative" class="native-picker-overlay" readonly>
+                            <i class="fas fa-clock dt-icon-right"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dynamic Sub-sections Based on Selected Payment Mode -->
+                <div id="donUpiSection" class="payment-sub-section" style="margin-top: 12px;">
+                    <div class="form-group">
+                        <label>Transaction ID / UTR No / Ref No <span class="required">*</span></label>
+                        <input type="text" id="donUpiTxnId" class="utr-field" placeholder="Enter UTR / Ref Number">
+                    </div>
+                </div>
+
+                <div id="donBankSection" class="payment-sub-section" style="display:none; margin-top: 12px;">
+                    <div class="form-group">
+                        <label>Transfer Mode <span class="required">*</span></label>
+                        <select id="donBankMode">
+                            <option value="NEFT">NEFT</option>
+                            <option value="RTGS">RTGS</option>
+                            <option value="IMPS">IMPS</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Bank Name <span class="required">*</span></label>
+                        <input type="text" id="donBankName" placeholder="Enter Bank Name">
+                    </div>
+                    <div class="form-group">
+                        <label>Reference Number / UTR <span class="required">*</span></label>
+                        <input type="text" id="donBankRefNo" placeholder="Enter Reference / UTR No">
+                    </div>
+                </div>
+
+                <div id="donCashSection" class="payment-sub-section" style="display:none; margin-top: 12px;">
+                    <div class="form-group">
+                        <label>Cash Received By (Representative Name) <span class="required">*</span></label>
+                        <input type="text" id="donCashRecBy" placeholder="Enter Representative Name">
+                    </div>
+                </div>
+
+                <div id="donChequeSection" class="payment-sub-section" style="display:none; margin-top: 12px;">
+                    <div class="form-group">
+                        <label>Cheque Number <span class="required">*</span></label>
+                        <input type="text" id="donChequeNo" placeholder="Enter 6 Digit Cheque No">
+                    </div>
+                    <div class="form-group">
+                        <label>Bank Name & Branch <span class="required">*</span></label>
+                        <input type="text" id="donChequeBank" placeholder="Enter Bank & Branch Name">
+                    </div>
+                </div>
+
+                <!-- Upload Receipt -->
+                <div class="form-group" style="margin-top:12px;">
+                    <label>Upload Payment Receipt / Proof <span class="required">*</span></label>
+                    <input type="file" id="donReceiptProof" accept="image/*,.pdf">
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    
             <!-- Bank Transfer Details -->
             <div id="donBankSection" class="payment-sub-section" style="display:none;">
                 <div class="form-group">
@@ -3706,24 +3823,21 @@
                 </div>
             </div>
 
-            <!-- Receipt/Screenshot Upload -->
-            <div class="form-group" style="margin-top:12px;">
-                <label>Upload Payment Receipt / Proof <span class="optional">(Optional)</span></label>
-                <input type="file" id="donReceiptProof" accept="image/*,.pdf">
-            </div>
+        
         </div>
     </div>
 
-    <!-- Submit Section -->
-    <div style="margin-top: 20px;">
+   <!-- 4. DONATION SUBMISSION CARD (GUARANTEED VISIBLE) -->
+    <div id="donSubmitCard" class="form-card" style="display: block !important; margin-top: 20px;">
         <div class="declaration-box">
             <label class="declaration-label">
                 <input type="checkbox" id="donDeclarationCheck">
                 <span>I hereby declare that this donation/contribution is made voluntarily out of my lawful funds to support ARPEU activities and welfare.</span>
             </label>
         </div>
-        <button type="button" id="submitDonationBtn" class="submit-btn" style="background:#F57C00; height:50px;">
-            SUBMIT DONATION
+
+        <button type="button" id="submitDonationBtn" class="submit-btn" onclick="submitDonationForm()" style="display: block !important; background:#F57C00; height:50px; margin-top: 15px;">
+            <i class="fas fa-paper-plane"></i> SUBMIT DONATION
         </button>
     </div>
 
