@@ -1972,6 +1972,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
     initializeValidations();
 
+    initializeUniversalUtrCheckEngine();
+
     initializeAadhaarFormatting();
 
     initializeAgeCalculation();
@@ -1983,23 +1985,20 @@ document.addEventListener("DOMContentLoaded", function () {
     initializeDatePickers();
 
     if (typeof initializeRenewalOtp === "function") {
-
         initializeRenewalOtp();
-
     }
 
     if (typeof PaymentModuleV25 !== "undefined") {
-
         PaymentModuleV25.init();
-
         PaymentModuleV25.restrictDates();
+    }
 
+    if (typeof DonationPaymentModule !== "undefined") {
+        DonationPaymentModule.init();
     }
 
     if (submitMembershipBtn) {
-
         submitMembershipBtn.addEventListener("click", submitMembership);
-
     }
 
     showPage("home");
@@ -2122,7 +2121,10 @@ function initializeValidations() {
       clearTimeout(debounceTimers.mobile);
 
       if (val.length !== 10) {
-        if (status && selector === "#mobile") { status.className = "field-status"; status.innerHTML = ""; }
+        if (status && selector === "#mobile") { 
+          status.className = "field-status"; 
+          status.innerHTML = ""; 
+        }
         return;
       }
 
@@ -2145,7 +2147,10 @@ function initializeValidations() {
       clearTimeout(debounceTimers.aadhaar);
 
       if (rawAadhaar.length !== 12) {
-        if (status && selector === "#aadhaar") { status.className = "field-status"; status.innerHTML = ""; }
+        if (status && selector === "#aadhaar") { 
+          status.className = "field-status"; 
+          status.innerHTML = ""; 
+        }
         return;
       }
 
@@ -2165,7 +2170,10 @@ function initializeValidations() {
       clearTimeout(debounceTimers.employeeid);
 
       if (val.length < 3) {
-        if (status) { status.className = "field-status"; status.innerHTML = ""; }
+        if (status) { 
+          status.className = "field-status"; 
+          status.innerHTML = ""; 
+        }
         return;
       }
 
@@ -2174,7 +2182,7 @@ function initializeValidations() {
       }, 1000);
     });
 
-    employeeIdInput.addEventListener("blur", function() {
+    employeeIdInput.addEventListener("blur", function () {
       const val = this.value.trim();
       if (val.length >= 3) {
         clearTimeout(debounceTimers.employeeid);
@@ -2182,8 +2190,9 @@ function initializeValidations() {
       }
     });
   }
+}
 
- /* ==========================================================
+/* ==========================================================
    UNIVERSAL UTR / TRANSACTION ID DUPLICATE CHECK ENGINE
    Single Engine for Membership, Donations & All Payment Forms
    ========================================================== */
@@ -2202,12 +2211,13 @@ function initializeUniversalUtrCheckEngine() {
 
     // Real-time Input Event Listener
     utrInput.addEventListener("input", function () {
-      // Force uppercase alphanumeric input
       this.value = this.value.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
       const val = this.value.trim();
 
-      const statusEl = document.getElementById("transactionIdStatus") || 
-                       document.getElementById("donorMobileStatus");
+      // Dynamically select correct status container for Membership or Donations
+      let statusEl = document.getElementById("donUpiTxnStatus") || 
+                     document.getElementById("transactionIdStatus") || 
+                     document.getElementById("donorMobileStatus");
 
       clearTimeout(debounceTimers.transactionid);
 
@@ -2226,7 +2236,7 @@ function initializeUniversalUtrCheckEngine() {
       }
 
       debounceTimers.transactionid = setTimeout(() => {
-        executeDuplicateCheck("transactionid", val, statusEl ? statusEl.id : "donorMobileStatus");
+        executeDuplicateCheck("transactionid", val, statusEl ? statusEl.id : "transactionIdStatus");
       }, 800);
     });
 
@@ -2234,15 +2244,15 @@ function initializeUniversalUtrCheckEngine() {
     utrInput.addEventListener("blur", function () {
       const val = this.value.trim();
       if (val.length >= 5) {
-        const statusEl = document.getElementById("transactionIdStatus") || document.getElementById("donorMobileStatus");
+        const statusEl = document.getElementById("donUpiTxnStatus") || 
+                         document.getElementById("transactionIdStatus") || 
+                         document.getElementById("donorMobileStatus");
         clearTimeout(debounceTimers.transactionid);
-        executeDuplicateCheck("transactionid", val, statusEl ? statusEl.id : "donorMobileStatus");
+        executeDuplicateCheck("transactionid", val, statusEl ? statusEl.id : "transactionIdStatus");
       }
     });
   });
 }
-}
-
 
 
 /* ============================================
@@ -3265,92 +3275,110 @@ function showDownloadsToast(message) {
 }
 
 /* ==========================================================
-   DONATION PAYMENT MODULE (MIRRORED FROM PaymentModuleV25)
+   DONATION PAYMENT MODULE & DIRECT SUBMIT UNHIDE ENGINE
    ========================================================== */
 
 const DonationPaymentModule = {
-  init() {
+  init: function () {
     this.cacheDOM();
     this.bindEvents();
     this.reset();
   },
 
-  cacheDOM() {
-    this.dom = {
-      payNowOpt:      document.getElementById("donPayNowOption"),
-      alreadyPaidOpt: document.getElementById("donAlreadyPaidOption"),
-      payNowSec:      document.getElementById("donPayNowSection"),
-      alreadyPaidSec: document.getElementById("donAlreadyPaidSection"),
-      payNowFields:   document.getElementById("donPayNowFields"),
-      completedBtn:   document.getElementById("donPayCompletedBtn")
-    };
+  cacheDOM: function () {
+    this.payNowOpt      = document.getElementById("donPayNowOption");
+    this.alreadyPaidOpt = document.getElementById("donAlreadyPaidOption");
+    this.payNowSec      = document.getElementById("donPayNowSection");
+    this.alreadyPaidSec = document.getElementById("donAlreadyPaidSection");
+    this.payNowFields   = document.getElementById("donPayNowFields");
+    this.completedBtn   = document.getElementById("donPayCompletedBtn");
+    this.submitCard     = document.getElementById("donSubmitCard");
   },
 
-  reset() {
-    if (this.dom.payNowSec)      this.dom.payNowSec.style.display      = "none";
-    if (this.dom.alreadyPaidSec) this.dom.alreadyPaidSec.style.display = "none";
-    if (this.dom.payNowFields)   this.dom.payNowFields.style.display   = "none";
-    if (this.dom.payNowOpt)      this.dom.payNowOpt.checked           = false;
-    if (this.dom.alreadyPaidOpt) this.dom.alreadyPaidOpt.checked       = false;
+  reset: function () {
+    if (this.payNowSec)      this.payNowSec.style.display      = "none";
+    if (this.alreadyPaidSec) this.alreadyPaidSec.style.display = "none";
+    if (this.payNowFields)   this.payNowFields.style.display   = "none";
+    if (this.submitCard)     this.submitCard.style.display     = "none";
   },
 
-  bindEvents() {
-    if (this.dom.payNowOpt) {
-      this.dom.payNowOpt.addEventListener("click", () => {
-        if (this.dom.payNowSec)      this.dom.payNowSec.style.display      = "block";
-        if (this.dom.alreadyPaidSec) this.dom.alreadyPaidSec.style.display = "none";
-        if (this.dom.payNowFields)   this.dom.payNowFields.style.display   = "none";
+  bindEvents: function () {
+    const self = this;
+
+    // 1. Pay Now Selection Toggle
+    if (this.payNowOpt) {
+      this.payNowOpt.addEventListener("change", function () {
+        if (this.checked) {
+          if (self.payNowSec)      self.payNowSec.style.display      = "block";
+          if (self.alreadyPaidSec) self.alreadyPaidSec.style.display = "none";
+          if (self.payNowFields)   self.payNowFields.style.display   = "none";
+          if (self.submitCard)     self.submitCard.style.display     = "none";
+        }
       });
     }
 
-    if (this.dom.alreadyPaidOpt) {
-      this.dom.alreadyPaidOpt.addEventListener("click", () => {
-        if (this.dom.alreadyPaidSec) this.dom.alreadyPaidSec.style.display = "block";
-        if (this.dom.payNowSec)      this.dom.payNowSec.style.display      = "none";
+    // 2. Already Paid Selection Toggle
+    if (this.alreadyPaidOpt) {
+      this.alreadyPaidOpt.addEventListener("change", function () {
+        if (this.checked) {
+          if (self.alreadyPaidSec) self.alreadyPaidSec.style.display = "block";
+          if (self.payNowSec)      self.payNowSec.style.display      = "none";
+          if (self.submitCard)     self.submitCard.style.display     = "none";
+        }
       });
     }
 
-    if (this.dom.completedBtn) {
-      this.dom.completedBtn.addEventListener("click", () => {
-        if (this.dom.payNowFields) this.dom.payNowFields.style.display = "block";
+    // 3. Click Handler for "I HAVE COMPLETED PAYMENT"
+    if (this.completedBtn) {
+      this.completedBtn.addEventListener("click", function () {
+        if (self.payNowFields) self.payNowFields.style.display = "block";
       });
     }
 
-    // Payment Mode Sub-sections Switcher
-    const payModes = document.querySelectorAll('input[name="donPayMode"]');
-    payModes.forEach(radio => {
+    // 4. Mode Switchers in Already Paid (UPI, Bank, Cash, Cheque)
+    const modeRadios = document.querySelectorAll('input[name="donPayMode"]');
+    modeRadios.forEach(function (radio) {
       radio.addEventListener("change", function () {
-        const upiSec   = document.getElementById("donUpiSection");
-        const bankSec  = document.getElementById("donBankSection");
-        const cashSec  = document.getElementById("donCashSection");
-        const chqSec   = document.getElementById("donChequeSection");
+        const upiSec  = document.getElementById("donUpiSection");
+        const bankSec = document.getElementById("donBankSection");
+        const cashSec = document.getElementById("donCashSection");
+        const chqSec  = document.getElementById("donChequeSection");
 
-        if (upiSec)  upiSec.style.display  = "none";
-        if (bankSec) bankSec.style.display = "none";
-        if (cashSec) cashSec.style.display = "none";
-        if (chqSec)  chqSec.style.display  = "none";
-
-        if (this.value === "UPI" && upiSec)           upiSec.style.display  = "block";
-        if (this.value === "Bank Transfer" && bankSec) bankSec.style.display = "block";
-        if (this.value === "Cash" && cashSec)          cashSec.style.display = "block";
-        if (this.value === "Cheque" && chqSec)        chqSec.style.display  = "block";
+        if (upiSec)  upiSec.style.display  = (this.value === "UPI") ? "block" : "none";
+        if (bankSec) bankSec.style.display = (this.value === "Bank Transfer") ? "block" : "none";
+        if (cashSec) cashSec.style.display = (this.value === "Cash") ? "block" : "none";
+        if (chqSec)  chqSec.style.display  = (this.value === "Cheque") ? "block" : "none";
       });
     });
 
-    // Date Pickers Binding
-    ["#donDate", "#donPayNowDate"].forEach(id => {
-      const el = document.querySelector(id);
-      if (el && typeof flatpickr === "function") {
-        flatpickr(el, { dateFormat: "d-m-Y", maxDate: "today", disableMobile: true, position: "above" });
-      }
-    });
+    // 5. DIRECT RECEIPT FILE UPLOAD HANDLER -> INSTANTLY SHOWS SUBMIT CARD
+    const receiptProofInput = document.getElementById("donReceiptProof");
+    if (receiptProofInput) {
+      receiptProofInput.addEventListener("change", function () {
+        if (this.files && this.files.length > 0) {
+          const submitCardEl = document.getElementById("donSubmitCard");
+          if (submitCardEl) {
+            submitCardEl.style.setProperty("display", "block", "important");
+            submitCardEl.scrollIntoView({ behavior: "smooth", block: "nearest" });
+          }
+        }
+      });
+    }
+
+    const payNowProofInput = document.getElementById("donPayNowProof");
+    if (payNowProofInput) {
+      payNowProofInput.addEventListener("change", function () {
+        if (this.files && this.files.length > 0) {
+          const submitCardEl = document.getElementById("donSubmitCard");
+          if (submitCardEl) {
+            submitCardEl.style.setProperty("display", "block", "important");
+            submitCardEl.scrollIntoView({ behavior: "smooth", block: "nearest" });
+          }
+        }
+      });
+    }
   }
 };
-
-// Initialize on DOM Load
-document.addEventListener("DOMContentLoaded", function () {
-  DonationPaymentModule.init();
-});
 
 
 /* ==========================================================

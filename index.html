@@ -1286,7 +1286,6 @@
 
 
 
-
 </section>
 
 <!-- =========================================================
@@ -3599,26 +3598,26 @@
         </div>
     </div>
 
-   <!-- 3. PAYMENT METHOD CARD (MIRRORED FROM MEMBERSHIP PaymentModuleV25) -->
+<!-- 3. PAYMENT DETAILS CARD (EXACT MEMBERSHIP CARD PATTERN) -->
     <div class="form-card">
         <div class="card-header">
             <i class="fas fa-credit-card"></i> PAYMENT DETAILS
         </div>
         <div class="card-body">
             
-            <!-- Step 1: Initial Option Buttons Only (Neither Checked Initially) -->
-            <div class="don-method-selection-bar">
-                <label class="don-large-option-btn" for="donPayNowOption">
+            <!-- Selection Option Buttons -->
+            <div class="payment-method-row">
+                <label class="compact-method-btn" for="donPayNowOption">
                     <input type="radio" name="donPaymentMethod" id="donPayNowOption" value="payNow">
                     <span>Pay Now (Online)</span>
                 </label>
-                <label class="don-large-option-btn" for="donAlreadyPaidOption">
+                <label class="compact-method-btn" for="donAlreadyPaidOption">
                     <input type="radio" name="donPaymentMethod" id="donAlreadyPaidOption" value="alreadyPaid">
                     <span>Already Paid</span>
                 </label>
             </div>
 
-            <!-- STEP 2A: PAY NOW SECTION (HIDDEN INITIALLY) -->
+            <!-- SECTION 1: PAY NOW -->
             <div id="donPayNowSection" style="display: none; margin-top: 15px;">
                 <div class="upi-box-large">
                     <div class="qr-container">
@@ -3638,7 +3637,6 @@
                     I HAVE COMPLETED PAYMENT
                 </button>
 
-                <!-- Fields Shown After Pay Now Completed Button Click -->
                 <div id="donPayNowFields" style="display: none; margin-top: 15px;">
                     <div class="dt-container-final">
                         <div class="dt-header-labels">
@@ -3651,7 +3649,6 @@
                             </div>
                             <div class="dt-box-wrap">
                                 <input type="text" id="donPayNowTimeDisplay" class="dt-field-final" placeholder="Set Time" readonly>
-                                <input type="text" id="donPayNowTimeNative" class="native-picker-overlay" readonly>
                                 <i class="fas fa-clock dt-icon-right"></i>
                             </div>
                         </div>
@@ -3659,6 +3656,7 @@
                     <div class="form-group" style="margin-top:12px;">
                         <label>Transaction ID / UTR No <span class="required">*</span></label>
                         <input type="text" id="donPayNowTxnId" class="utr-field" placeholder="Enter UTR Number">
+                        <div id="donPayNowTxnStatus" class="field-status"></div>
                     </div>
                     <div class="form-group" style="margin-top:12px;">
                         <label>Upload Payment Receipt / Proof <span class="required">*</span></label>
@@ -3667,10 +3665,9 @@
                 </div>
             </div>
 
-            <!-- STEP 2B: ALREADY PAID SECTION (HIDDEN INITIALLY) -->
+            <!-- SECTION 2: ALREADY PAID -->
             <div id="donAlreadyPaidSection" style="display: none; margin-top: 15px;">
                 
-                <!-- Payment Mode Selection -->
                 <div class="form-group">
                     <label>Select Payment Mode <span class="required">*</span></label>
                     <div class="payment-method-row">
@@ -3693,7 +3690,6 @@
                     </div>
                 </div>
 
-                <!-- Side-by-Side Date & Time Container -->
                 <div class="dt-container-final" style="margin-top: 12px;">
                     <div class="dt-header-labels">
                         <label class="dt-label-main">Payment Date & Time *</label>
@@ -3705,17 +3701,16 @@
                         </div>
                         <div class="dt-box-wrap">
                             <input type="text" id="donTimeDisplay" class="dt-field-final" placeholder="Set Time" readonly>
-                            <input type="text" id="donTimeNative" class="native-picker-overlay" readonly>
                             <i class="fas fa-clock dt-icon-right"></i>
                         </div>
                     </div>
                 </div>
 
-                <!-- Dynamic Sub-sections Based on Selected Payment Mode -->
                 <div id="donUpiSection" class="payment-sub-section" style="margin-top: 12px;">
                     <div class="form-group">
                         <label>Transaction ID / UTR No / Ref No <span class="required">*</span></label>
                         <input type="text" id="donUpiTxnId" class="utr-field" placeholder="Enter UTR / Ref Number">
+                        <div id="donUpiTxnStatus" class="field-status"></div>
                     </div>
                 </div>
 
@@ -3734,7 +3729,8 @@
                     </div>
                     <div class="form-group">
                         <label>Reference Number / UTR <span class="required">*</span></label>
-                        <input type="text" id="donBankRefNo" placeholder="Enter Reference / UTR No">
+                        <input type="text" id="donBankRefNo" class="utr-field" placeholder="Enter Reference / UTR No">
+                        <div id="donBankRefStatus" class="field-status"></div>
                     </div>
                 </div>
 
@@ -3756,89 +3752,34 @@
                     </div>
                 </div>
 
-                <!-- Upload Receipt -->
                 <div class="form-group" style="margin-top:12px;">
                     <label>Upload Payment Receipt / Proof <span class="required">*</span></label>
                     <input type="file" id="donReceiptProof" accept="image/*,.pdf">
                 </div>
             </div>
 
-        </div>
-    </div>
+            <!-- GLOBAL FINAL SUBMIT (INSIDE FORM CARD) -->
+            <div id="donSubmitCard" style="display: none; margin-top: 25px;">
+                <div class="declaration-box">
+                    <label class="declaration-label">
+                        <input type="checkbox" id="donDeclarationCheck">
+                        <span>
+                            I hereby declare that this donation/contribution is made voluntarily out of my lawful funds to support ARPEU activities and welfare.
+                        </span>
+                    </label>
+                </div>
 
-    
-            <!-- Bank Transfer Details -->
-            <div id="donBankSection" class="payment-sub-section" style="display:none;">
-                <div class="form-group">
-                    <label>Transfer Mode <span class="required">*</span></label>
-                    <select id="donBankMode">
-                        <option value="NEFT">NEFT</option>
-                        <option value="RTGS">RTGS</option>
-                        <option value="IMPS">IMPS</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Bank Name <span class="required">*</span></label>
-                    <input type="text" id="donBankName" placeholder="Enter Bank Name">
-                </div>
-                <div class="form-group">
-                    <label>Reference Number / UTR <span class="required">*</span></label>
-                    <input type="text" id="donBankRefNo" placeholder="Enter Reference / UTR No">
-                </div>
-                <div class="form-group">
-                    <label>Transfer Date <span class="required">*</span></label>
-                    <input type="text" id="donBankDate" class="dt-field-final" placeholder="Select Date" readonly>
-                </div>
+                <button
+                    type="button"
+                    id="submitDonationBtn"
+                    class="submit-btn"
+                    onclick="submitDonationForm()"
+                    style="background:#F57C00; height:50px;">
+                    SUBMIT DONATION
+                </button>
             </div>
 
-            <!-- Cash Payment Details -->
-            <div id="donCashSection" class="payment-sub-section" style="display:none;">
-                <div class="form-group">
-                    <label>Cash Received By (Representative Name) <span class="required">*</span></label>
-                    <input type="text" id="donCashRecBy" placeholder="Enter Representative Name">
-                </div>
-                <div class="form-group">
-                    <label>Cash Received Date <span class="required">*</span></label>
-                    <input type="text" id="donCashDate" class="dt-field-final" placeholder="Select Date" readonly>
-                </div>
-            </div>
-
-            <!-- Cheque Payment Details -->
-            <div id="donChequeSection" class="payment-sub-section" style="display:none;">
-                <div class="form-group">
-                    <label>Cheque Number <span class="required">*</span></label>
-                    <input type="text" id="donChequeNo" placeholder="Enter 6 Digit Cheque No">
-                </div>
-                <div class="form-group">
-                    <label>Cheque Date <span class="required">*</span></label>
-                    <input type="text" id="donChequeDate" class="dt-field-final" placeholder="Select Cheque Date" readonly>
-                </div>
-                <div class="form-group">
-                    <label>Bank Name & Branch <span class="required">*</span></label>
-                    <input type="text" id="donChequeBank" placeholder="Enter Bank & Branch Name">
-                </div>
-                <div class="form-group">
-                    <label>Cheque Received By <span class="required">*</span></label>
-                    <input type="text" id="donChequeRecBy" placeholder="Enter Representative Name">
-                </div>
-            </div>
-
-        
         </div>
-    </div>
-
-   <!-- 4. DONATION SUBMISSION CARD (GUARANTEED VISIBLE) -->
-    <div id="donSubmitCard" class="form-card" style="display: block !important; margin-top: 20px;">
-        <div class="declaration-box">
-            <label class="declaration-label">
-                <input type="checkbox" id="donDeclarationCheck">
-                <span>I hereby declare that this donation/contribution is made voluntarily out of my lawful funds to support ARPEU activities and welfare.</span>
-            </label>
-        </div>
-
-        <button type="button" id="submitDonationBtn" class="submit-btn" onclick="submitDonationForm()" style="display: block !important; background:#F57C00; height:50px; margin-top: 15px;">
-            <i class="fas fa-paper-plane"></i> SUBMIT DONATION
-        </button>
     </div>
 
 </section>
