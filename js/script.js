@@ -3402,6 +3402,21 @@ let foundSearchRecord = null;
  * Triggers automatic database search on entering 10 digits.
  * @param {HTMLInputElement} inputEl - Mobile input element reference
  */
+/* ==========================================================
+   DONOR TYPE CONDITIONAL FIELDS TOGGLE ENGINE
+   ========================================================== */
+
+function toggleDonorTypeFields(selectedType) {
+  const memberBox = document.getElementById("donorMemberDetailsBox");
+  if (!memberBox) return;
+
+  if (selectedType === "ARPEU Member" || selectedType === "Electricity Employee" || selectedType === "Retired Employee") {
+    memberBox.style.display = "block";
+  } else {
+    memberBox.style.display = "none";
+  }
+}
+
 function handleDonorMobileInput(inputEl) {
   if (!inputEl) return;
 

@@ -1115,14 +1115,14 @@
 <div id="paymentModuleCard" class="form-card">
     <div class="card-header"><i class="fas fa-credit-card"></i> PAYMENT DETAILS</div>
 
-    <!-- 1. Selection Options -->
-    <div class="payment-method-row">
-        <label class="compact-method-btn" for="payNowOption">
+    <!-- 1. Selection Options (Centered & Wide 50-50 Split) -->
+    <div class="main-payment-toggle-row">
+        <label class="main-method-btn" for="payNowOption">
             <input type="radio" name="paymentMethod" id="payNowOption" value="payNow">
             <span>Pay Now (Online)</span>
         </label>
-        <label class="compact-method-btn" for="alreadyPaidOption">
-            <input type="radio" name="paymentMethod" id="alreadyPaidOption" value="alreadyPaid">
+        <label class="main-method-btn" for="alreadyPaidOption">
+            <input type="radio" name="alreadyPaidOption" id="alreadyPaidOption" value="alreadyPaid">
             <span>Already Paid</span>
         </label>
     </div>
@@ -1150,11 +1150,19 @@
                     <img id="dynamicQR" src="" alt="Scan QR">
                     <p style="font-size: 10px; font-weight: 700; margin-top: 5px;">SCAN QR</p>
                 </div>
-                <div class="apps-container">
-                    <p style="font-size: 11px; font-weight: 700; color: #333;">UPI ID: <span style="color:#0b4ea2; word-break: break-all;">andhrarastrapowerempunion@sbi</span></p>
+               <div class="apps-container">
+                    <p class="upi-id-single-line">UPI ID: <span>andhrarastrapowerempunion@sbi</span></p>
                     <div class="large-icon-grid">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/f/f2/Google_Pay_Logo.svg">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/7/71/PhonePe_Logo.png">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/f/f2/Google_Pay_Logo.svg" alt="Google Pay" class="app-icon-gpay">
+                        
+                        <!-- OFFICIAL PHONEPE VECTOR SVG WITH FULL BRANDING -->
+                        <svg class="app-icon-phonepe" viewBox="0 0 160 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect width="36" height="36" rx="8" fill="#5F259F" y="2"/>
+                            <path d="M25.5 16C25.5 12.1 22.6 9 18.7 9H13.3C12.7 9 12.2 9.5 12.2 10.1V27.9C12.2 28.5 12.7 29 13.3 29H16C16.6 29 17.1 28.5 17.1 27.9V22.9H18.7C22.6 22.9 25.5 19.9 25.5 16ZM20.5 18.1H17.1V13.9H20.5C21.7 13.9 22.6 14.8 22.6 16C22.6 17.2 21.7 18.1 20.5 18.1Z" fill="white"/>
+                            <text x="44" y="26" font-family="'Poppins', sans-serif" font-size="18" font-weight="800" fill="#5F259F" letter-spacing="-0.5">PhonePe</text>
+                        </svg>
+
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/2/24/Paytm_Logo_%28standalone%29.svg" alt="Paytm" class="app-icon-paytm">
                     </div>
                 </div>
             </div>
@@ -3472,17 +3480,17 @@
         </div>
     </div>
 
-    <!-- 1. Donor Information Card (Reordered Order) -->
+    <!-- 1. Donor Information Card -->
     <div class="form-card">
         <div class="card-header">
             <span class="card-icon">🤝</span>
             <span class="card-title">Donor Details</span>
         </div>
         <div class="card-body">
-            <!-- 1. Donor Type (First) -->
+            <!-- 1. Donor Type -->
             <div class="form-group">
                 <label for="donorType">Donor Type <span class="required">*</span></label>
-                <select id="donorType" name="donorType">
+                <select id="donorType" name="donorType" onchange="toggleDonorTypeFields(this.value)">
                     <option value="">Select Donor Type</option>
                     <option value="ARPEU Member">ARPEU Member</option>
                     <option value="Electricity Employee">Electricity Employee</option>
@@ -3493,42 +3501,84 @@
                 </select>
             </div>
 
-        
-           <!-- 2. Mobile Number (Triggers Universal Search) -->
+            <!-- 2. Mobile Number -->
             <div class="form-group">
-                <label for="donorMobile">Mobile Number / Registered No. <span class="required">*</span></label>
+                <label for="donorMobile">Mobile Number <span class="required">*</span></label>
                 <input type="tel" id="donorMobile" maxlength="10" placeholder="Enter 10 Digit Mobile Number" autocomplete="off" oninput="handleDonorMobileInput(this)" onblur="handleDonorMobileInput(this)">
                 <div id="donorMobileStatus" class="field-status"></div>
             </div>
 
-            <!-- 3. Donor Name (Third) -->
+            <!-- 3. Donor Name -->
             <div class="form-group">
                 <label for="donorName">Donor Name / Firm Name <span class="required">*</span></label>
                 <input type="text" id="donorName" placeholder="Enter Full Name or Firm Name" autocomplete="off">
             </div>
 
-            <!-- 4. Email ID -->
-            <div class="form-group">
-                <label for="donorEmail">Email ID <span class="optional">(Optional)</span></label>
-                <input type="email" id="donorEmail" placeholder="Enter Email Address">
-            </div>
-
-            <!-- 5. Organization / Shop Name -->
+            <!-- 4. Organization / Shop Name (Right below Donor Name) -->
             <div class="form-group">
                 <label for="donorOrganization">Organization / Shop Name <span class="optional">(Optional)</span></label>
                 <input type="text" id="donorOrganization" placeholder="Enter Organization or Shop Name">
             </div>
 
-            <!-- 6. Address -->
+            <!-- 5. CONDITIONAL ARPEU MEMBER FIELDS (Shown only for ARPEU Member / Electricity Employee) -->
+            <div id="donorMemberDetailsBox" style="display:none; background:#f8fafc; border:1px dashed #0B4EA2; padding:12px; border-radius:10px; margin-bottom:10px;">
+                <div class="form-group" style="margin-bottom:10px;">
+                    <label for="donorCompany">Company Name</label>
+                    <select id="donorCompany">
+                        <option value="">Select Company</option>
+                        <option value="APGENCO">APGENCO</option>
+                        <option value="APTRANSCO">APTRANSCO</option>
+                        <option value="APSPDCL">APSPDCL</option>
+                        <option value="APCPDCL">APCPDCL</option>
+                        <option value="APEPDCL">APEPDCL</option>
+                    </select>
+                </div>
+                <div class="dob-age-grid">
+                    <div class="form-group">
+                        <label for="donorEmpId">Employee ID</label>
+                        <input type="text" id="donorEmpId" placeholder="Enter Employee ID">
+                    </div>
+                    <div class="form-group">
+                        <label for="donorMemberId">Membership ID</label>
+                        <input type="text" id="donorMemberId" placeholder="e.g. ARPEU00001">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 6. Email ID -->
             <div class="form-group">
-                <label for="donorAddress">Address <span class="optional">(Optional)</span></label>
-                <input type="text" id="donorAddress" placeholder="Enter Address / City">
+                <label for="donorEmail">Email ID <span class="optional">(Optional)</span></label>
+                <input type="email" id="donorEmail" placeholder="Enter Email Address">
             </div>
 
             <!-- 7. PAN Number -->
             <div class="form-group">
                 <label for="donorPan">PAN Number <span class="optional">(Optional)</span></label>
                 <input type="text" id="donorPan" placeholder="Enter PAN Card Number (10 Alphanumeric)" style="text-transform: uppercase;">
+            </div>
+
+            <!-- 8. Address Details (Line 1, Line 2, District & State Grid) -->
+            <div class="form-group">
+                <label for="donorAddressLine1">Address Line 1 <span class="optional">(Door No / Street / Area)</span></label>
+                <input type="text" id="donorAddressLine1" placeholder="Enter Door No, Street or Area">
+            </div>
+            <div class="form-group">
+                <label for="donorAddressLine2">Address Line 2 <span class="optional">(Village / Town / Mandal)</span></label>
+                <input type="text" id="donorAddressLine2" placeholder="Enter Village, Town or Mandal">
+            </div>
+
+            <!-- District & State Side-by-Side Grid -->
+            <div class="dob-age-grid">
+                <div class="form-group">
+                    <label for="donorDistrict">District <span class="required">*</span></label>
+                    <select id="donorDistrict" name="donorDistrict">
+                        <option value="">Select District</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="donorState">State</label>
+                    <input type="text" id="donorState" value="Andhra Pradesh" readonly style="background:#f9f9f9;">
+                </div>
             </div>
         </div>
     </div>
@@ -3605,13 +3655,13 @@
         </div>
         <div class="card-body">
             
-            <!-- Selection Option Buttons -->
-            <div class="payment-method-row">
-                <label class="compact-method-btn" for="donPayNowOption">
+           <!-- Main Selection Option Buttons -->
+            <div class="main-payment-toggle-row">
+                <label class="main-method-btn" for="donPayNowOption">
                     <input type="radio" name="donPaymentMethod" id="donPayNowOption" value="payNow">
                     <span>Pay Now (Online)</span>
                 </label>
-                <label class="compact-method-btn" for="donAlreadyPaidOption">
+                <label class="main-method-btn" for="donAlreadyPaidOption">
                     <input type="radio" name="donPaymentMethod" id="donAlreadyPaidOption" value="alreadyPaid">
                     <span>Already Paid</span>
                 </label>
@@ -3625,12 +3675,20 @@
                         <p style="font-size: 10px; font-weight: 700; margin-top: 5px;">SCAN QR</p>
                     </div>
                     <div class="apps-container">
-                        <p style="font-size: 11px; font-weight: 700; color: #333;">UPI ID: <span style="color:#0b4ea2; word-break: break-all;">andhrarastrapowerempunion@sbi</span></p>
-                        <div class="large-icon-grid">
-                            <img src="https://upload.wikimedia.org/wikipedia/commons/f/f2/Google_Pay_Logo.svg" alt="GPay">
-                            <img src="https://upload.wikimedia.org/wikipedia/commons/7/71/PhonePe_Logo.png" alt="PhonePe">
-                        </div>
+                    <p class="upi-id-single-line">UPI ID: <span>andhrarastrapowerempunion@sbi</span></p>
+                    <div class="large-icon-grid">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/f/f2/Google_Pay_Logo.svg" alt="Google Pay" class="app-icon-gpay">
+                        
+                        <!-- OFFICIAL PHONEPE VECTOR SVG WITH FULL BRANDING -->
+                        <svg class="app-icon-phonepe" viewBox="0 0 160 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect width="36" height="36" rx="8" fill="#5F259F" y="2"/>
+                            <path d="M25.5 16C25.5 12.1 22.6 9 18.7 9H13.3C12.7 9 12.2 9.5 12.2 10.1V27.9C12.2 28.5 12.7 29 13.3 29H16C16.6 29 17.1 28.5 17.1 27.9V22.9H18.7C22.6 22.9 25.5 19.9 25.5 16ZM20.5 18.1H17.1V13.9H20.5C21.7 13.9 22.6 14.8 22.6 16C22.6 17.2 21.7 18.1 20.5 18.1Z" fill="white"/>
+                            <text x="44" y="26" font-family="'Poppins', sans-serif" font-size="18" font-weight="800" fill="#5F259F" letter-spacing="-0.5">PhonePe</text>
+                        </svg>
+
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/2/24/Paytm_Logo_%28standalone%29.svg" alt="Paytm" class="app-icon-paytm">
                     </div>
+                </div>
                 </div>
 
                 <button type="button" id="donPayCompletedBtn" class="completed-btn" style="margin-top: 15px;">

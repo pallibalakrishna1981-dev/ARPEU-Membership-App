@@ -1498,35 +1498,101 @@ margin-top:15px;
 }
 
 
+/* ==========================================================
+   MAIN PAYMENT TOGGLE BUTTONS (CENTERED & WIDE 50-50)
+   ========================================================== */
+
+.main-payment-toggle-row {
+    display: flex !important;
+    justify-content: space-between !important;
+    gap: 12px !important;
+    width: 100% !important;
+    margin: 8px 0 16px 0 !important;
+    box-sizing: border-box !important;
+}
+
+.main-method-btn {
+    flex: 1 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    height: 48px !important;
+    border: 1.5px solid #cbd5e1 !important;
+    border-radius: 12px !important;
+    background: #ffffff !important;
+    cursor: pointer !important;
+    font-weight: 700 !important;
+    font-size: 13px !important;
+    color: #334155 !important;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.04) !important;
+    transition: all 0.25s ease !important;
+    box-sizing: border-box !important;
+}
+
+.main-method-btn input[type="radio"] {
+    margin-right: 8px !important;
+    width: 16px !important;
+    height: 16px !important;
+    cursor: pointer !important;
+}
+
+.main-method-btn:has(input:checked) {
+    border-color: #0B4EA2 !important;
+    background: #eef5ff !important;
+    color: #0B4EA2 !important;
+    box-shadow: 0 4px 10px rgba(11, 78, 162, 0.15) !important;
+}
+
 /* =========================================================
    PAYMENT MODULE V24 - FINAL COMPACT & FIXED GRID
    Compatibility: Mobile, Tablet & Desktop (PWA Ready)
 ========================================================= */
 
 /* 1. Method Selection Buttons */
-.payment-method-row {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
+.payment-method-row,
+.don-method-selection-bar {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important; /* Equal 50% + 50% width */
+    gap: 12px !important;
+    width: 100% !important;
+    margin: 8px 0 16px 0 !important;
+    box-sizing: border-box;
 }
 
-.compact-method-btn {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 46px;
-    border: 2px solid var(--border);
-    border-radius: 12px;
-    background: #fff;
-    cursor: pointer;
-    font-weight: 600;
-    font-size: 13px;
-    transition: 0.3s;
+.compact-method-btn,
+.don-large-option-btn {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    height: 46px !important; /* Perfect sleek height */
+    width: 100% !important;
+    border: 1.5px solid #cbd5e1 !important;
+    border-radius: 12px !important;
+    background: #ffffff !important;
+    cursor: pointer !important;
+    font-weight: 700 !important;
+    font-size: 12.5px !important;
+    color: #334155 !important;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.04) !important;
+    transition: all 0.25s ease !important;
+    box-sizing: border-box;
 }
 
-.compact-method-btn input[type="radio"] {
-    margin-right: 8px;
+.compact-method-btn input[type="radio"],
+.don-large-option-btn input[type="radio"] {
+    margin-right: 8px !important;
+    width: 16px !important;
+    height: 16px !important;
+    cursor: pointer !important;
+}
+
+/* Active Highlight Style */
+.compact-method-btn:has(input:checked),
+.don-large-option-btn:has(input:checked) {
+    border-color: #0B4EA2 !important;
+    background: #eef5ff !important;
+    color: #0B4EA2 !important;
+    box-shadow: 0 4px 10px rgba(11, 78, 162, 0.15) !important;
 }
 
 .compact-method-btn:has(input:checked) {
@@ -1636,61 +1702,96 @@ margin-top:15px;
     margin-top: 8px;
 }
 
-/* 6. UPI & Icons Layout (Side by Side) */
+/* ==========================================================
+   UPI QR & APPS CONTAINER (COMPACT GAP & FULL BRANDING)
+   ========================================================== */
+
 .upi-box-large {
     display: flex !important;
     flex-direction: row !important;
-    align-items: center;
-    justify-content: space-between;
-    gap: 15px;
-    padding: 15px;
-    border: 1px solid #eee;
-    border-radius: 15px;
-    background: #fff;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-    width: 100%;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 12px !important;
+    padding: 10px 12px !important;
+    border: 1.5px solid #e2e8f0 !important;
+    border-radius: 14px !important;
+    background: #ffffff !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04) !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
 }
 
 .qr-container {
-    flex: 0 0 90px;
-    text-align: center;
-    border-right: 1px solid #f0f0f0;
-    padding-right: 10px;
+    flex: 0 0 95px !important;
+    text-align: center !important;
+    border-right: 1.5px dashed #e2e8f0 !important;
+    padding-right: 10px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
 }
 
 .qr-container img {
-    width: 100%;
-    height: auto;
+    width: 95px !important;
+    height: 95px !important;
+    object-fit: contain !important;
+    display: block !important;
 }
 
 .apps-container {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    gap: 8px !important; /* Tight clean gap removing excess vertical space */
+    padding-left: 4px !important;
 }
 
+/* UPI ID: Bigger, Crisp and Perfectly Proportioned */
+.upi-id-single-line {
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    color: #1e293b !important;
+    margin: 0 !important;
+    line-height: 1.2 !important;
+    text-align: left !important;
+    white-space: nowrap !important;
+}
+
+.upi-id-single-line span {
+    color: #0B4EA2 !important;
+    font-weight: 800 !important;
+    font-size: 11.5px !important;
+    letter-spacing: 0.2px !important;
+}
+
+/* 3 Logos in a Balanced Row */
 .large-icon-grid {
     display: flex !important;
     flex-direction: row !important;
-    gap: 12px;
-    margin-top: 8px;
-    flex-wrap: nowrap;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 8px !important;
+    width: 100% !important;
 }
 
-.large-icon-grid img {
-    height: 28px;
-    max-width: 50px;
-    object-fit: contain;
+.app-icon-gpay {
+    height: 24px !important;
+    max-width: 48px !important;
+    object-fit: contain !important;
 }
 
-/* Inline Pay Box (Already Paid) */
-.inline-pay-box {
-    border: 2px solid #ffa39e;
-    padding: 15px;
-    border-radius: 18px;
-    background: #fffaf9;
-    margin-top: 15px;
+.app-icon-phonepe {
+    height: 28px !important;
+    max-width: 82px !important;
+    display: block !important;
+}
+
+.app-icon-paytm {
+    height: 20px !important;
+    max-width: 48px !important;
+    object-fit: contain !important;
 }
 
 /* =========================================================
