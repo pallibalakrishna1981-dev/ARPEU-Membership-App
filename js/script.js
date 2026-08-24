@@ -521,6 +521,7 @@ function showPage(page) {
   const cntSec  = document.getElementById("contactSection") || document.getElementById("contactPage") || document.getElementById("contactUsSection");
   const dwnSec  = document.getElementById("downloadsSection") || document.getElementById("downloadsPage");
   const profSec = document.getElementById("profileSection") || document.getElementById("profilePage") || document.getElementById("myProfileSection");
+  const admSec  = document.getElementById("adminSection");
 
   // Placeholder section for under-development modules
   let placeholderSec = document.getElementById("underDevPlaceholderSection");
@@ -547,8 +548,7 @@ function showPage(page) {
     mainContentArea.appendChild(placeholderSec);
   }
 
-  // 3. Hide ALL sections completely
-  if (rc) rc.style.display = "none";
+  // 3. Hide ALL sections completely (Bypasses active receipts)
   if (homeSec) homeSec.style.display = "none";
   if (membSec) membSec.style.display = "none";
   if (donSec) donSec.style.display = "none";
@@ -557,6 +557,7 @@ function showPage(page) {
   if (cntSec) cntSec.style.display = "none";
   if (dwnSec) dwnSec.style.display = "none";
   if (profSec) profSec.style.display = "none";
+  if (admSec) admSec.style.display = "none";
   if (placeholderSec) placeholderSec.style.display = "none";
 
   // 4. Remove 'active' highlight class from all navigation links
@@ -598,7 +599,14 @@ function showPage(page) {
       break;
 
     case "membership":
-      if (membSec) membSec.style.display = "block";
+      const isMembReceiptOpen = rc && (rc.getAttribute("data-membership-active") === "true");
+      if (isMembReceiptOpen) {
+        if (membSec) membSec.style.display = "none";
+        if (rc) rc.style.display = "block"; // Retains and displays the active membership receipt
+      } else {
+        if (membSec) membSec.style.display = "block"; // Shows fresh membership form only if closed
+        if (rc) rc.style.display = "none";
+      }
       break;
 
     case "donations":
@@ -664,10 +672,13 @@ function showPage(page) {
       showUnderDevelopmentCard("Settings");
       break;
 
-    case "adminlogin":
+   case "adminlogin":
     case "admin":
     case "admin-login":
-      showUnderDevelopmentCard("Admin Login");
+      if (admSec) admSec.style.display = "block";
+      if (typeof checkAdminSession === "function") {
+        checkAdminSession();
+      }
       break;
 
     default:
@@ -693,7 +704,13 @@ function initializeNavigation() {
   if (navMembership) {
     navMembership.addEventListener("click", function (e) {
       e.preventDefault();
-      setMembershipMode("new");
+      const rc = document.getElementById("receiptContainer");
+      const isMembReceiptOpen = rc && (rc.getAttribute("data-membership-active") === "true");
+
+      /* Switch mode to new member only if receipt is not actively open */
+      if (!isMembReceiptOpen) {
+        setMembershipMode("new");
+      }
       showPage("membership");
     });
   }
@@ -1653,167 +1670,212 @@ function initializeEmploymentModule() {
 }
 
 /* ==========================================================
-   ARPEU PAYMENT MODULE V25 - Final Robust Logic
-========================================================== */
+   MEMBERSHIP PAYMENT MODULE (STRICT STEP-BY-STEP UNHIDE)
+   ========================================================== */
 
 const PaymentModuleV25 = {
-    currentTime24: { payNow: "", manual: "" },
+  init: function () {
+    const payNowOpt = document.getElementById("payNowOption");
+    const alreadyPaidOpt = document.getElementById("alreadyPaidOption");
+    const payNowSec = document.getElementById("payNowSection");
+    const alreadyPaidSec = document.getElementById("alreadyPaidSection");
+    const payNowAmt = document.getElementById("payNowAmount");
+    const contBtn = document.getElementById("continueToPayBtn");
+    const doneBtn = document.getElementById("payNowCompletedBtn");
+    const manualAmt = document.getElementById("manualAmount");
+    const payBalBtn = document.getElementById("payBalanceBtn");
+    const inlineDoneBtn = document.getElementById("inlinePaidDoneBtn");
+    const finalSec = document.getElementById("finalSubmitSection");
 
-    init() {
-        this.cacheDOM();
-        this.restrictDates();
-        this.bindEvents();
-    },
+    /* Strict Checker: Unhides Submit card ONLY after Receipt File is chosen */
+    function syncMembershipSubmitVisibility() {
+      if (!finalSec) return;
+      let isReady = false;
 
-    cacheDOM() {
-        this.dom = {
-            payNowOpt: document.getElementById("payNowOption"),
-            alreadyPaidOpt: document.getElementById("alreadyPaidOption"),
-            payNowSec: document.getElementById("payNowSection"),
-            alreadyPaidSec: document.getElementById("alreadyPaidSection"),
-            finalSec: document.getElementById("finalSubmitSection"),
-            
-            // Time Elements
-            pTimeDisp: document.getElementById("payNowTimeDisplay"),
-            pTimeNative: document.getElementById("payNowTimeNative"),
-            pFormat: document.getElementById("payNowTimeFormat"),
-            mTimeDisp: document.getElementById("manualTimeDisplay"),
-            mTimeNative: document.getElementById("manualTimeNative"),
-            mFormat: document.getElementById("manualTimeFormat"),
-            
-            payNowAmt: document.getElementById("payNowAmount"),
-            contBtn: document.getElementById("continueToPayBtn"),
-            doneBtn: document.getElementById("payNowCompletedBtn"),
-            manualAmt: document.getElementById("manualAmount"),
-            payBalBtn: document.getElementById("payBalanceBtn"),
-            manualFields: document.getElementById("manualFields"),
-            utrFields: document.querySelectorAll(".utr-field"),
-            allInputs: document.querySelectorAll(".final-val")
-        };
-    },
-
-    formatTime(time24, format) {
-        if (!time24) return "";
-        let [hours, mins] = time24.split(':');
-        hours = parseInt(hours);
-        if (format === "24") return `${hours.toString().padStart(2, '0')}:${mins}`;
-        let ampm = hours >= 12 ? 'PM' : 'AM';
-        hours = hours % 12 || 12;
-        return `${hours.toString().padStart(2, '0')}:${mins} ${ampm}`;
-    },
-
-    autoFillPayNowDT() {
-        const now = new Date();
-        const day = String(now.getDate()).padStart(2, '0');
-        const month = String(now.getMonth() + 1).padStart(2, '0');
-        const year = now.getFullYear();
-        const dStr = `${day}-${month}-${year}`;
-        
-        const t24 = now.toTimeString().split(' ')[0].substring(0, 5);
-        this.currentTime24.payNow = t24;
-        
-        PortalSync(document.getElementById("payNowDate"), dStr, ["input", "change"]);
-        PortalSync(this.dom.pTimeNative, t24, "input");
-        this.dom.pTimeDisp.value = this.formatTime(t24, this.dom.pFormat.value);
-    },
-
-    restrictDates() {
-        const today = new Date();
-        const pDate = document.getElementById("payNowDate");
-        if (pDate) { PortalSync(pDate, today, ["input", "change"]); }
-    },
-
-    evaluateFinalSubmit() {
-        const method = this.dom.payNowOpt.checked ? "payNow" : "alreadyPaid";
-        let isValid = false;
-        if (method === "payNow") {
-            const time = this.dom.pTimeDisp.value;
-            const id = document.getElementById("payNowTransactionId").value.trim();
-            const file = document.getElementById("payNowReceipt").files.length > 0;
-            if (time && id && file && document.getElementById("payNowStep3").style.display === "block") isValid = true;
-        } else if (this.dom.alreadyPaidOpt.checked) {
-            const date = document.getElementById("manualDate").value;
-            const time = this.dom.mTimeDisp.value;
-            const id = document.getElementById("manualTransactionId").value.trim();
-            const file = document.getElementById("manualReceipt").files.length > 0;
-            if (this.dom.manualFields.style.display === "block" && date && time && id && file) isValid = true;
+      if (payNowOpt && payNowOpt.checked) {
+        const dateVal = document.getElementById("payNowDate") ? document.getElementById("payNowDate").value.trim() : "";
+        const txnVal  = document.getElementById("payNowTransactionId") ? document.getElementById("payNowTransactionId").value.trim() : "";
+        const fileInp = document.getElementById("payNowReceipt");
+        const hasFile = fileInp && fileInp.files && fileInp.files.length > 0;
+        if (dateVal !== "" && txnVal !== "" && hasFile) {
+          isReady = true;
         }
-        this.dom.finalSec.style.display = isValid ? "block" : "none";
-    },
+      } else if (alreadyPaidOpt && alreadyPaidOpt.checked) {
+        const dateVal = document.getElementById("manualDate") ? document.getElementById("manualDate").value.trim() : "";
+        const txnVal  = document.getElementById("manualTransactionId") ? document.getElementById("manualTransactionId").value.trim() : "";
+        const fileInp = document.getElementById("manualReceipt");
+        const hasFile = fileInp && fileInp.files && fileInp.files.length > 0;
+        if (dateVal !== "" && txnVal !== "" && hasFile) {
+          isReady = true;
+        }
+      }
 
-    bindEvents() {
-        this.dom.payNowOpt.addEventListener("click", () => { this.dom.payNowSec.style.display = "block"; this.dom.alreadyPaidSec.style.display = "none"; this.evaluateFinalSubmit(); });
-        this.dom.alreadyPaidOpt.addEventListener("click", () => { this.dom.alreadyPaidSec.style.display = "block"; this.dom.payNowSec.style.display = "none"; this.evaluateFinalSubmit(); });
-
-        // Time Picker Event Listeners
-        this.dom.pTimeNative.addEventListener("input", (e) => {
-            this.currentTime24.payNow = e.target.value;
-            this.dom.pTimeDisp.value = this.formatTime(e.target.value, this.dom.pFormat.value);
-            this.evaluateFinalSubmit();
-        });
-
-        this.dom.mTimeNative.addEventListener("input", (e) => {
-            this.currentTime24.manual = e.target.value;
-            this.dom.mTimeDisp.value = this.formatTime(e.target.value, this.dom.mFormat.value);
-            this.evaluateFinalSubmit();
-        });
-
-        // Format Switchers
-        this.dom.pFormat.addEventListener("change", () => {
-            if (this.currentTime24.payNow) this.dom.pTimeDisp.value = this.formatTime(this.currentTime24.payNow, this.dom.pFormat.value);
-        });
-
-        this.dom.mFormat.addEventListener("change", () => {
-            if (this.currentTime24.manual) this.dom.mTimeDisp.value = this.formatTime(this.currentTime24.manual, this.dom.mFormat.value);
-        });
-
-        this.dom.doneBtn.addEventListener("click", () => { document.getElementById("payNowStep3").style.display = "block"; this.autoFillPayNowDT(); this.evaluateFinalSubmit(); });
-        this.dom.utrFields.forEach(el => { el.addEventListener("input", () => { el.value = el.value.replace(/[^a-zA-Z0-9]/g, ''); this.evaluateFinalSubmit(); }); });
-
-        this.dom.payNowAmt.addEventListener("input", (e) => {
-            let val = parseInt(e.target.value) || 0;
-            this.updateUI(val, "payNow");
-            document.getElementById("payNowBreakdown").style.display = val > 0 ? "block" : "none";
-            this.dom.contBtn.style.display = (val >= 460) ? "flex" : "none";
-            this.evaluateFinalSubmit();
-        });
-
-        this.dom.contBtn.addEventListener("click", () => {
-            document.getElementById("payNowStep2").style.display = "block";
-            document.getElementById("dynamicQR").src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=andhrarastrapowerempunion@sbi%26pn=ARPEU%26am=${this.dom.payNowAmt.value}%26cu=INR`;
-        });
-
-        this.dom.manualAmt.addEventListener("input", (e) => {
-            let val = parseInt(e.target.value) || 0;
-            this.updateUI(val, "manual");
-            document.getElementById("manualBreakdown").style.display = val > 0 ? "block" : "none";
-            if (val >= 460) { this.dom.payBalBtn.style.display = "none"; this.dom.manualFields.style.display = "block"; } 
-            else if (val > 0) { this.dom.payBalBtn.style.display = "flex"; this.dom.manualFields.style.display = "none"; document.getElementById("balanceAmtDisp").innerText = "₹" + (460 - val); }
-            this.evaluateFinalSubmit();
-        });
-
-        this.dom.payBalBtn.addEventListener("click", () => {
-            let bal = 460 - (parseInt(this.dom.manualAmt.value) || 0);
-            document.getElementById("inlineQR").src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=andhrarastrapowerempunion@sbi%26pn=ARPEU%26am=${bal}%26cu=INR`;
-            document.getElementById("inlineBalanceBox").style.display = "block";
-        });
-
-        document.getElementById("inlinePaidDoneBtn").addEventListener("click", () => { document.getElementById("inlineBalanceBox").style.display = "none"; this.dom.manualFields.style.display = "block"; this.evaluateFinalSubmit(); });
-        this.dom.allInputs.forEach(el => { el.addEventListener("change", () => this.evaluateFinalSubmit()); el.addEventListener("input", () => this.evaluateFinalSubmit()); });
-    },
-
-    updateUI(amt, prefix) {
-        const required = 460;
-        const total = document.getElementById(prefix + "Total");
-        if (total) total.innerText = "₹" + amt;
-        const balRow = document.getElementById(prefix + "BalRow");
-        const donRow = document.getElementById(prefix + "DonRow");
-        if (amt > 0 && amt < required) { if (balRow) balRow.style.display = "flex"; if (document.getElementById(prefix + "BalVal")) document.getElementById(prefix + "BalVal").innerText = "₹" + (required - amt); if (donRow) donRow.style.display = "none"; } 
-        else if (amt > required) { if (balRow) balRow.style.display = "none"; if (donRow) donRow.style.display = "flex"; if (document.getElementById(prefix + "DonVal")) document.getElementById(prefix + "DonVal").innerText = "₹" + (amt - required); } 
-        else { if (balRow) balRow.style.display = "none"; if (donRow) donRow.style.display = "none"; }
+      finalSec.style.display = isReady ? "block" : "none";
     }
-};
 
+    // Toggle Payment Options (Pay Now / Already Paid)
+    if (payNowOpt) {
+      payNowOpt.addEventListener("change", function () {
+        if (this.checked) {
+          if (payNowSec) payNowSec.style.display = "block";
+          if (alreadyPaidSec) alreadyPaidSec.style.display = "none";
+          if (finalSec) finalSec.style.display = "none";
+        }
+      });
+    }
+
+    if (alreadyPaidOpt) {
+      alreadyPaidOpt.addEventListener("change", function () {
+        if (this.checked) {
+          if (alreadyPaidSec) alreadyPaidSec.style.display = "block";
+          if (payNowSec) payNowSec.style.display = "none";
+          if (finalSec) finalSec.style.display = "none";
+        }
+      });
+    }
+
+    // Pay Now Amount Breakdown
+    if (payNowAmt) {
+      payNowAmt.addEventListener("input", function () {
+        const val = parseInt(this.value, 10) || 0;
+        const breakdown = document.getElementById("payNowBreakdown");
+        const total = document.getElementById("payNowTotal");
+        const donRow = document.getElementById("payNowDonRow");
+        const donVal = document.getElementById("payNowDonVal");
+
+        if (breakdown) breakdown.style.display = val > 0 ? "block" : "none";
+        if (total) total.innerText = "₹" + val;
+        if (contBtn) contBtn.style.display = val >= 460 ? "inline-flex" : "none";
+
+        if (val > 460) {
+          if (donRow) donRow.style.display = "flex";
+          if (donVal) donVal.innerText = "₹" + (val - 460);
+        } else {
+          if (donRow) donRow.style.display = "none";
+        }
+      });
+    }
+
+    // Continue to Payment -> Shows QR Code
+    if (contBtn) {
+      contBtn.addEventListener("click", function () {
+        const step2 = document.getElementById("payNowStep2");
+        if (step2) step2.style.display = "block";
+        const qr = document.getElementById("dynamicQR");
+        if (qr && payNowAmt) {
+          qr.src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=andhrarastrapowerempunion@sbi%26pn=ARPEU%26am=${payNowAmt.value}%26cu=INR`;
+        }
+      });
+    }
+
+    // "I HAVE COMPLETED PAYMENT" Click -> Shows Step 3 & Auto-fills Date/Time
+    if (doneBtn) {
+      doneBtn.addEventListener("click", function () {
+        const step3 = document.getElementById("payNowStep3");
+        if (step3) step3.style.display = "block";
+
+        const now = new Date();
+        const dStr = `${String(now.getDate()).padStart(2, '0')}-${String(now.getMonth() + 1).padStart(2, '0')}-${now.getFullYear()}`;
+        let hours = now.getHours();
+        const mins = String(now.getMinutes()).padStart(2, '0');
+        const ampm = hours >= 12 ? 'PM' : 'AM';
+        hours = hours % 12 || 12;
+        const tStr = `${String(hours).padStart(2, '0')}:${mins} ${ampm}`;
+
+        const pDate = document.getElementById("payNowDate");
+        const pTime = document.getElementById("payNowTimeDisplay");
+        if (pDate) pDate.value = dStr;
+        if (pTime) pTime.value = tStr;
+
+        syncMembershipSubmitVisibility();
+      });
+    }
+
+    // Manual Amount Input for Already Paid
+    if (manualAmt) {
+      manualAmt.addEventListener("input", function () {
+        const val = parseInt(this.value, 10) || 0;
+        const breakdown = document.getElementById("manualBreakdown");
+        const mFields = document.getElementById("manualFields");
+        const total = document.getElementById("manualTotal");
+        const donRow = document.getElementById("manualDonRow");
+        const donVal = document.getElementById("manualDonVal");
+        const balRow = document.getElementById("manualBalRow");
+        const balVal = document.getElementById("manualBalVal");
+
+        if (breakdown) breakdown.style.display = val > 0 ? "block" : "none";
+        if (total) total.innerText = "₹" + val;
+
+        if (val > 460) {
+          if (donRow) donRow.style.display = "flex";
+          if (donVal) donVal.innerText = "₹" + (val - 460);
+          if (balRow) balRow.style.display = "none";
+          if (payBalBtn) payBalBtn.style.display = "none";
+          if (mFields) mFields.style.display = "block";
+        } else if (val === 460) {
+          if (donRow) donRow.style.display = "none";
+          if (balRow) balRow.style.display = "none";
+          if (payBalBtn) payBalBtn.style.display = "none";
+          if (mFields) mFields.style.display = "block";
+        } else if (val > 0 && val < 460) {
+          if (donRow) donRow.style.display = "none";
+          if (balRow) balRow.style.display = "flex";
+          if (balVal) balVal.innerText = "₹" + (460 - val);
+          if (payBalBtn) payBalBtn.style.display = "inline-flex";
+          if (mFields) mFields.style.display = "none";
+          const balDisp = document.getElementById("balanceAmtDisp");
+          if (balDisp) balDisp.innerText = "₹" + (460 - val);
+        } else {
+          if (donRow) donRow.style.display = "none";
+          if (balRow) balRow.style.display = "none";
+          if (payBalBtn) payBalBtn.style.display = "none";
+          if (mFields) mFields.style.display = "none";
+        }
+
+        syncMembershipSubmitVisibility();
+      });
+    }
+
+    // Pay Balance Click
+    if (payBalBtn) {
+      payBalBtn.addEventListener("click", function () {
+        const val = parseInt(manualAmt ? manualAmt.value : 0, 10) || 0;
+        const bal = 460 - val;
+        const inlineBox = document.getElementById("inlineBalanceBox");
+        const inlineQR = document.getElementById("inlineQR");
+        if (inlineQR) {
+          inlineQR.src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=andhrarastrapowerempunion@sbi%26pn=ARPEU%26am=${bal}%26cu=INR`;
+        }
+        if (inlineBox) inlineBox.style.display = "block";
+      });
+    }
+
+    // Inline Balance Paid Done Click
+    if (inlineDoneBtn) {
+      inlineDoneBtn.addEventListener("click", function () {
+        const inlineBox = document.getElementById("inlineBalanceBox");
+        const mFields = document.getElementById("manualFields");
+        if (inlineBox) inlineBox.style.display = "none";
+        if (mFields) mFields.style.display = "block";
+        syncMembershipSubmitVisibility();
+      });
+    }
+
+    // Real-time watchers for membership receipt file and UTR inputs
+    const watchMembershipInputs = [
+      "#payNowReceipt", "#manualReceipt", 
+      "#payNowTransactionId", "#manualTransactionId", "#payNowDate", "#manualDate"
+    ];
+
+    watchMembershipInputs.forEach(function (sel) {
+      const el = document.querySelector(sel);
+      if (el) {
+        el.addEventListener("change", syncMembershipSubmitVisibility);
+        el.addEventListener("input", syncMembershipSubmitVisibility);
+      }
+    });
+  }
+};
 
 
 /* ==========================================================
@@ -2027,43 +2089,38 @@ async function fetchDuplicateCheck(field, value) {
     }
 }
 
-// Real-time Clean GET Checker
-// Real-time Fail-Safe GET Checker
+/* ==========================================================
+   REAL-TIME FAIL-SAFE DUPLICATE CHECK ENGINE
+   ========================================================== */
+
 async function executeDuplicateCheck(field, value, statusElementId) {
-    const statusEl = document.getElementById(statusElementId);
-    if (!statusEl) return;
+  const statusEl = document.getElementById(statusElementId);
+  if (!statusEl) return;
 
-    statusEl.className = "field-status checking";
-    statusEl.innerHTML = "Checking...";
+  statusEl.className = "field-status checking";
+  statusEl.style.color = "#0B4EA2";
+  statusEl.innerHTML = "Checking availability...";
 
-    try {
-        const url = `${BACKEND_URL}?action=checkDuplicate&field=${encodeURIComponent(field)}&value=${encodeURIComponent(value)}`;
-        const response = await fetch(url);
-        const rawText = await response.text();
-        let result;
+  try {
+    const url = `${BACKEND_URL}?action=checkDuplicate&field=${encodeURIComponent(field)}&value=${encodeURIComponent(value.toString().trim())}`;
+    const response = await fetch(url);
+    const result = await response.json();
 
-        try {
-            result = JSON.parse(rawText);
-        } catch (e) {
-            // సర్వర్ వార్మప్ వల్ల రెస్పాన్స్ లేట్ అయితే యూజర్‌ని ఆపకుండా సురక్షితంగా ప్రొసీడ్ చేస్తుంది
-            statusEl.className = "field-status success";
-            statusEl.innerHTML = "✔ Available";
-            return;
-        }
-
-        if (result && result.success && result.exists) {
-            statusEl.className = "field-status error";
-            statusEl.innerHTML = "✖ Already Registered";
-        } else {
-            statusEl.className = "field-status success";
-            statusEl.innerHTML = "✔ Available";
-        }
-
-    } catch (error) {
-        console.error(`[${field}] Error:`, error);
-        statusEl.className = "field-status success";
-        statusEl.innerHTML = "✔ Available";
+    if (result && result.success && result.exists) {
+      statusEl.className = "field-status error";
+      statusEl.style.color = "#DC2626";
+      statusEl.innerHTML = "✖ Already Registered";
+    } else {
+      statusEl.className = "field-status success";
+      statusEl.style.color = "#16A34A";
+      statusEl.innerHTML = "✔ Available";
     }
+  } catch (error) {
+    console.error(`[${field}] Duplicate Check Error:`, error);
+    // If network fails, do not falsely show available
+    statusEl.className = "field-status";
+    statusEl.innerHTML = "";
+  }
 }
 
 // Submit Check Wrappers
@@ -2180,35 +2237,32 @@ function initializeValidations() {
 
 /* ==========================================================
    UNIVERSAL UTR / TRANSACTION ID DUPLICATE CHECK ENGINE
-   Single Engine for Membership, Donations & All Payment Forms
+   Seamless real-time check for Membership & Donation UTR inputs.
    ========================================================== */
 
-/**
- * Universal Real-Time UTR / Reference No Duplicate Check Engine.
- * Automatically binds to all payment transaction ID inputs across Membership & Donations.
- */
 function initializeUniversalUtrCheckEngine() {
   const utrInputs = document.querySelectorAll(
-    '#payNowTransactionId, #manualTransactionId, #donUpiTxnId, #donPayNowTxnId, #donBankRefNo, .utr-field, input[id*="TransactionId"], input[id*="TxnId"], input[id*="RefNo"]'
+    '#payNowTransactionId, #manualTransactionId, #donUpiTxnId, #donPayNowTxnId, #donBankRefNo, .utr-field'
   );
 
-  utrInputs.forEach(utrInput => {
+  utrInputs.forEach(function (utrInput) {
     if (!utrInput) return;
 
-    // Real-time Input Event Listener
     utrInput.addEventListener("input", function () {
       this.value = this.value.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
       const val = this.value.trim();
 
-      // Dynamically select correct status container for Membership or Donations
-      let statusEl = document.getElementById("donUpiTxnStatus") || 
-                     document.getElementById("transactionIdStatus") || 
-                     document.getElementById("donorMobileStatus");
+      /* Auto-detect corresponding status container */
+      let statusEl = document.getElementById(this.id + "Status") || 
+                     document.getElementById("donUpiTxnStatus") || 
+                     document.getElementById("donPayNowTxnStatus") || 
+                     document.getElementById("manualTransactionIdStatus") || 
+                     document.getElementById("transactionIdStatus");
 
       clearTimeout(debounceTimers.transactionid);
 
       if (val.length < 5) {
-        if (statusEl && statusEl.classList && statusEl.classList.contains("field-status")) {
+        if (statusEl) {
           statusEl.className = "field-status";
           statusEl.innerHTML = "";
         }
@@ -2217,29 +2271,30 @@ function initializeUniversalUtrCheckEngine() {
 
       if (statusEl) {
         statusEl.className = "field-status checking";
-        statusEl.style.color = "#003366";
-        statusEl.innerHTML = "🔍 Checking UTR...";
+        statusEl.style.color = "#0B4EA2";
+        statusEl.innerHTML = "Checking availability...";
       }
 
-      debounceTimers.transactionid = setTimeout(() => {
+      debounceTimers.transactionid = setTimeout(function () {
         executeDuplicateCheck("transactionid", val, statusEl ? statusEl.id : "transactionIdStatus");
       }, 800);
     });
 
-    // Blur Event Listener
     utrInput.addEventListener("blur", function () {
-      const val = this.value.trim();
+    
       if (val.length >= 5) {
-        const statusEl = document.getElementById("donUpiTxnStatus") || 
-                         document.getElementById("transactionIdStatus") || 
-                         document.getElementById("donorMobileStatus");
+        let statusEl = document.getElementById(this.id + "Status") || 
+                       document.getElementById("donUpiTxnStatus") || 
+                       document.getElementById("donPayNowTxnStatus") || 
+                       document.getElementById("manualTransactionIdStatus") || 
+                       document.getElementById("transactionIdStatus");
+
         clearTimeout(debounceTimers.transactionid);
         executeDuplicateCheck("transactionid", val, statusEl ? statusEl.id : "transactionIdStatus");
       }
     });
   });
 }
-
 
 /* ============================================
    ARPEU Backend Configuration
@@ -2867,10 +2922,11 @@ function generateUniversalReceipt(data) {
   }
 
   // 8. Unhide Universal Receipt View
-  const rc = document.getElementById("receiptContainer");
+ const rc = document.getElementById("receiptContainer");
   if (rc) {
     rc.style.display = "block";
-    rc.setAttribute("data-active", "true");
+    rc.setAttribute("data-membership-active", "true"); /* Locks active membership receipt */
+    rc.removeAttribute("data-donation-active");
   }
 
   window.scrollTo({ top: 0, behavior: "smooth" });
@@ -2911,8 +2967,13 @@ async function loadMemberProfile(memberId) {
     if (homeSection) homeSection.style.display = "none";
     if (membershipPage) membershipPage.style.display = "none";
     if (statisticsSection) statisticsSection.style.display = "none";
-    const rc = document.getElementById("receiptContainer");
-    if (rc) rc.style.display = "none";
+    if (rc) {
+    rc.style.display = "none";
+    rc.removeAttribute("data-donation-active");
+    rc.removeAttribute("data-membership-active"); // Clears membership active state on explicit close
+    rc.removeAttribute("data-receipt-open");
+    rc.removeAttribute("data-active");
+  }
 
     const profSec = document.getElementById("profileSection");
     const loader = document.getElementById("profileLoader");
@@ -3000,65 +3061,148 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 /* ==========================================================
-   RECEIPT DISPLAY & CLOSE HANDLERS
+   MEMBERSHIP DIGITAL RECEIPT GENERATOR & FORM ISOLATION
    ========================================================== */
 
 function openReceipt() {
-  loadReceiptPreview();
+  // 1. Text Content Setter Helper
+  const setVal = (id, val) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = val || "-";
+  };
 
-  if (typeof membershipPage !== 'undefined' && membershipPage) membershipPage.style.display = "none";
-  if (typeof homeSection !== 'undefined' && homeSection) homeSection.style.display = "none";
-  if (typeof statisticsSection !== 'undefined' && statisticsSection) statisticsSection.style.display = "none";
-
-  const rc = document.getElementById("receiptContainer");
-  if (rc) {
-    rc.style.display = "block";
-    rc.setAttribute("data-active", "true"); // Locks receipt view active status
-  }
-
-  window.scrollTo({ top: 0, behavior: "smooth" });
-
-  // Reset membership form automatically upon receipt generation
-  if (typeof resetMembershipForm === 'function') {
-    resetMembershipForm();
-  }
-}
-
-/**
- * Universal Receipt Close Engine for Membership and Donations.
- * Handles clean close and redirects to the correct active form.
- */
-function closeReceipt() {
-  const rc = document.getElementById("receiptContainer");
-  const wasDonation = rc && (rc.getAttribute("data-donation-active") === "true");
-
-  if (rc) {
-    rc.style.display = "none";
-    rc.removeAttribute("data-donation-active");
-    rc.removeAttribute("data-receipt-open");
-    rc.removeAttribute("data-active");
-  }
-
+  // 2. Set Header Ribbon to Blue Membership Receipt
   const titlePill = document.getElementById("receiptTitle");
   if (titlePill) {
     titlePill.textContent = "MEMBERSHIP RECEIPT";
     titlePill.style.backgroundColor = "#0B4EA2";
   }
 
-  if (wasDonation) {
-    if (typeof resetDonationForm === "function") {
-      resetDonationForm();
-    }
-    if (typeof showPage === "function") {
-      showPage("donations");
-    }
+  // 3. Metadata Setup from Form Fields
+  const currentYear = new Date().getFullYear();
+  const empName = document.getElementById("employeeName") ? document.getElementById("employeeName").value.trim() : "Member";
+  const empId   = document.getElementById("employeeId") ? document.getElementById("employeeId").value.trim() : "-";
+  const mob     = document.getElementById("mobile") ? document.getElementById("mobile").value.trim() : "-";
+  const comp    = document.getElementById("company") ? document.getElementById("company").value : "APGENCO";
+  const stn     = document.getElementById("station") ? document.getElementById("station").value : (document.getElementById("circle") ? document.getElementById("circle").value : "-");
+  const stg     = document.getElementById("stage") ? document.getElementById("stage").value : "-";
+  const div     = document.getElementById("division") ? document.getElementById("division").value : "-";
+  const subDiv  = document.getElementById("subDivision") ? document.getElementById("subDivision").value : "-";
+  const loc     = document.getElementById("location") ? document.getElementById("location").value : "-";
+
+  setVal("rReceiptNo", window.lastReceiptNo || `ARPEU/${currentYear}/1`);
+  setVal("rMembershipId", window.lastMembershipId || "ARPEU00001");
+  setVal("rDate", new Date().toLocaleDateString('en-GB'));
+  setVal("rTime", new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }));
+
+  setVal("rMemberName", empName);
+  setVal("rEmpId", empId);
+  setVal("rMobile", mob);
+  setVal("rCompany", comp);
+  setVal("rStation", stn);
+  setVal("rStage", stg);
+  setVal("rDivision", div);
+  setVal("rSubDivision", subDiv);
+  setVal("rLocation", loc);
+
+  // Genco vs Discom layout toggle
+  const gencoFields = document.getElementById("gencoReceiptFields");
+  const discomFields = document.getElementById("discomReceiptFields");
+  if (comp === "APGENCO") {
+    if (gencoFields) gencoFields.style.display = "flex";
+    if (discomFields) discomFields.style.display = "none";
   } else {
-    if (typeof resetMembershipForm === "function") {
-      resetMembershipForm();
+    if (gencoFields) gencoFields.style.display = "none";
+    if (discomFields) discomFields.style.display = "flex";
+  }
+
+  // 4. Particulars Table (Standard Membership Format)
+  const isPayNow = document.getElementById("payNowOption") && document.getElementById("payNowOption").checked;
+  let enteredAmt = isPayNow 
+    ? parseFloat(document.getElementById("payNowAmount") ? document.getElementById("payNowAmount").value : 460) 
+    : parseFloat(document.getElementById("manualAmount") ? document.getElementById("manualAmount").value : 460);
+  
+  if (isNaN(enteredAmt) || enteredAmt < 460) enteredAmt = 460;
+  const donAmt = enteredAmt > 460 ? (enteredAmt - 460) : 0;
+
+  const tableBody = document.querySelector("#receiptContainer .receipt-table tbody");
+  if (tableBody) {
+    tableBody.innerHTML = `
+      <tr>
+        <td>Admission Fee</td>
+        <td class="amt-col">Rs. 100</td>
+      </tr>
+      <tr>
+        <td>Annual Subscription</td>
+        <td class="amt-col">Rs. 360</td>
+      </tr>
+      <tr>
+        <td>Donation</td>
+        <td class="amt-col">Rs. ${donAmt}</td>
+      </tr>
+      <tr>
+        <td>Others</td>
+        <td class="amt-col">Rs. 0</td>
+      </tr>
+      <tr class="total-row">
+        <td class="total-lbl">Total</td>
+        <td class="amt-col total-val">Rs. ${enteredAmt}</td>
+      </tr>
+      <tr class="words-row">
+        <td colspan="2">
+          <span class="lbl-dark">Total in Words: Rupees</span>
+          <span id="rTotalInWords" class="val-bold">${typeof numberToWords === 'function' ? numberToWords(enteredAmt) : enteredAmt + ' Only'}</span>
+        </td>
+      </tr>
+    `;
+  }
+
+  // 5. Payment Details
+  const txn = isPayNow 
+    ? (document.getElementById("payNowTransactionId") ? document.getElementById("payNowTransactionId").value.trim() : "VERIFIED")
+    : (document.getElementById("manualTransactionId") ? document.getElementById("manualTransactionId").value.trim() : "VERIFIED");
+
+  setVal("rPaymentMode", "UPI");
+  setVal("rTransactionId", txn || "VERIFIED");
+  setVal("rPaymentStatus", "SUCCESSFUL / PAID");
+
+  // 6. QR Code
+  const qrBox = document.getElementById("receiptQrCode");
+  if (qrBox && typeof QRCode === "function") {
+    qrBox.innerHTML = "";
+    new QRCode(qrBox, {
+      text: `ARPEU MEMBERSHIP | ID: ${window.lastMembershipId || 'ARPEU00001'} | Name: ${empName}`,
+      width: 85,
+      height: 85,
+      colorDark: "#000000",
+      colorLight: "#ffffff",
+      correctLevel: QRCode.CorrectLevel.M
+    });
+  }
+
+  // 7. CRITICAL FIX: Hide Form Sections completely and show ONLY Receipt Container at Top
+  const membPage = document.getElementById("membershipPage");
+  const homeSec  = document.getElementById("homeSection");
+  const donSec   = document.getElementById("donationsSection");
+  
+  if (membPage) membPage.style.display = "none";
+  if (homeSec)  homeSec.style.display  = "none";
+  if (donSec)   donSec.style.display   = "none";
+
+  const rc = document.getElementById("receiptContainer");
+    if (rc) {
+      rc.style.display = "block";
+      rc.setAttribute("data-membership-active", "true"); /* Locks active membership receipt */
+      rc.removeAttribute("data-donation-active");
     }
-    if (typeof showPage === "function") {
-      showPage("home");
-    }
+
+  // Scroll smoothly to top
+  const contentArea = document.getElementById("contentArea") || window;
+  contentArea.scrollTo({ top: 0, behavior: "smooth" });
+
+  // Reset membership form cleanly
+  if (typeof resetMembershipForm === "function") {
+    resetMembershipForm();
   }
 }
 
@@ -3282,7 +3426,30 @@ function showDownloadsToast(message) {
 }
 
 /* ==========================================================
-   DONATION PAYMENT MODULE & DIRECT SUBMIT UNHIDE ENGINE
+   DIRECT DONATION PAYMENT METHOD TOGGLE FUNCTION
+   ========================================================== */
+
+function switchDonationPaymentMethod(method) {
+  const payNowSec = document.getElementById("donPayNowSection");
+  const alreadyPaidSec = document.getElementById("donAlreadyPaidSection");
+  const payNowFields = document.getElementById("donPayNowFields");
+  const submitCard = document.getElementById("donSubmitCard");
+
+  if (method === "payNow") {
+    if (payNowSec) payNowSec.style.setProperty("display", "block", "important");
+    if (alreadyPaidSec) alreadyPaidSec.style.setProperty("display", "none", "important");
+    if (payNowFields) payNowFields.style.setProperty("display", "none", "important");
+    if (submitCard) submitCard.style.setProperty("display", "none", "important");
+  } else if (method === "alreadyPaid") {
+    if (alreadyPaidSec) alreadyPaidSec.style.setProperty("display", "block", "important");
+    if (payNowSec) payNowSec.style.setProperty("display", "none", "important");
+    if (submitCard) submitCard.style.setProperty("display", "none", "important");
+  }
+}
+
+
+/* ==========================================================
+   DONATION PAYMENT MODULE (PERFECT RELIABLE TOGGLE)
    ========================================================== */
 
 const DonationPaymentModule = {
@@ -3312,7 +3479,7 @@ const DonationPaymentModule = {
   bindEvents: function () {
     const self = this;
 
-    // 1. Pay Now Selection Toggle
+    // Direct toggle triggers on radio change
     if (this.payNowOpt) {
       this.payNowOpt.addEventListener("change", function () {
         if (this.checked) {
@@ -3324,7 +3491,6 @@ const DonationPaymentModule = {
       });
     }
 
-    // 2. Already Paid Selection Toggle
     if (this.alreadyPaidOpt) {
       this.alreadyPaidOpt.addEventListener("change", function () {
         if (this.checked) {
@@ -3335,14 +3501,40 @@ const DonationPaymentModule = {
       });
     }
 
-    // 3. Click Handler for "I HAVE COMPLETED PAYMENT"
+    // Direct click listeners on parent label buttons (Guaranteed Mobile/Desktop trigger)
+    const payNowLbl = document.querySelector('label[for="donPayNowOption"]');
+    if (payNowLbl) {
+      payNowLbl.addEventListener("click", function () {
+        if (self.payNowOpt) {
+          self.payNowOpt.checked = true;
+          if (self.payNowSec)      self.payNowSec.style.display      = "block";
+          if (self.alreadyPaidSec) self.alreadyPaidSec.style.display = "none";
+          if (self.payNowFields)   self.payNowFields.style.display   = "none";
+          if (self.submitCard)     self.submitCard.style.display     = "none";
+        }
+      });
+    }
+
+    const alreadyPaidLbl = document.querySelector('label[for="donAlreadyPaidOption"]');
+    if (alreadyPaidLbl) {
+      alreadyPaidLbl.addEventListener("click", function () {
+        if (self.alreadyPaidOpt) {
+          self.alreadyPaidOpt.checked = true;
+          if (self.alreadyPaidSec) self.alreadyPaidSec.style.display = "block";
+          if (self.payNowSec)      self.payNowSec.style.display      = "none";
+          if (self.submitCard)     self.submitCard.style.display     = "none";
+        }
+      });
+    }
+
+    // "I HAVE COMPLETED PAYMENT" button click
     if (this.completedBtn) {
       this.completedBtn.addEventListener("click", function () {
         if (self.payNowFields) self.payNowFields.style.display = "block";
       });
     }
 
-    // 4. Mode Switchers in Already Paid (UPI, Bank, Cash, Cheque)
+    // Sub-mode switchers inside Already Paid (UPI, Bank, Cash, Cheque)
     const modeRadios = document.querySelectorAll('input[name="donPayMode"]');
     modeRadios.forEach(function (radio) {
       radio.addEventListener("change", function () {
@@ -3358,7 +3550,7 @@ const DonationPaymentModule = {
       });
     });
 
-    // 5. DIRECT RECEIPT FILE UPLOAD HANDLER -> INSTANTLY SHOWS SUBMIT CARD
+    // Unhide Submit Card automatically when Receipt Proof is selected
     const receiptProofInput = document.getElementById("donReceiptProof");
     if (receiptProofInput) {
       receiptProofInput.addEventListener("change", function () {
@@ -3900,6 +4092,87 @@ function resetDonationForm() {
   contentArea.scrollTo({ top: 0, behavior: "smooth" });
 }
 
+/* ==========================================================
+   COMPLETE MEMBERSHIP FORM RESET ENGINE
+   Cleans all fields, resets payment sub-boxes and hides submit card.
+   ========================================================== */
+
+function resetMembershipForm() {
+  const membPage = document.getElementById("membershipPage");
+  if (!membPage) return;
+
+  // 1. Reset all Text, Number, Tel, Email, File and Select inputs
+  membPage.querySelectorAll("input, select").forEach(function (el) {
+    if (el.type === "checkbox" || el.type === "radio") {
+      el.checked = false;
+    } else {
+      el.value = "";
+    }
+  });
+
+  // 2. Clear Uploaded Passport Photo Preview
+  const photoPreview = document.getElementById("photoPreview");
+  if (photoPreview) {
+    photoPreview.removeAttribute("src");
+    photoPreview.style.display = "none";
+  }
+
+  const previewText = document.querySelector("#membershipPage .preview-text");
+  if (previewText) {
+    previewText.style.display = "block";
+  }
+
+  const photoFileName = document.getElementById("photoFileName");
+  if (photoFileName) {
+    photoFileName.value = "No file selected";
+  }
+
+  // 3. Hide all Payment Sub-Sections, Breakdowns & Inline Pay Boxes
+  const hidePaymentElements = [
+    "payNowSection", "alreadyPaidSection", "payNowBreakdown", "payNowStep2", "payNowStep3",
+    "manualBreakdown", "inlineBalanceBox", "manualFields", "finalSubmitSection"
+  ];
+
+  hidePaymentElements.forEach(function (id) {
+    const el = document.getElementById(id);
+    if (el) {
+      el.style.display = "none";
+    }
+  });
+
+  // 4. Hide Dynamic Employment Groups
+  const hideEmpGroups = [
+    "stationGroup", "stageGroup", "circleGroup", "divisionGroup", 
+    "subDivisionGroup", "subStationGroup", "sectionGroup", "locationGroup", "designationGroup"
+  ];
+
+  hideEmpGroups.forEach(function (id) {
+    const el = document.getElementById(id);
+    if (el) {
+      el.style.display = "none";
+    }
+  });
+
+  // 5. Clear Real-Time Validation Status Messages
+  const statusIds = [
+    "mobileStatus", "employeeIdStatus", "aadhaarStatus", 
+    "transactionIdStatus", "manualTransactionIdStatus"
+  ];
+
+  statusIds.forEach(function (id) {
+    const el = document.getElementById(id);
+    if (el) {
+      el.className = "field-status";
+      el.innerHTML = "";
+    }
+  });
+
+  // 6. Reset Mode to New Member and Smooth Scroll to Top
+  setMembershipMode("new");
+  const contentArea = document.getElementById("contentArea") || window;
+  contentArea.scrollTo({ top: 0, behavior: "smooth" });
+}
+
 // ==========================================
 // FILE TO BASE64 CONVERTER HELPER
 // ==========================================
@@ -4251,3 +4524,421 @@ function handleProfileReview() {
   alert("✔ Digital Profile Verified! Ready for Save & Review.");
 }
 
+/* ==========================================================
+   ARPEU ADMIN ENGINE (AUTH, TABS & REVIEW QUEUES)
+   ========================================================== */
+
+// Demo Admin Session Check
+function checkAdminSession() {
+  const token = sessionStorage.getItem("arpeu_admin_token");
+  const loginCard = document.getElementById("adminLoginCard");
+  const dashboardView = document.getElementById("adminDashboardView");
+
+  if (token) {
+    if (loginCard) loginCard.style.display = "none";
+    if (dashboardView) dashboardView.style.display = "block";
+    loadAdminDashboardMetrics();
+  } else {
+    if (loginCard) loginCard.style.display = "block";
+    if (dashboardView) dashboardView.style.display = "none";
+  }
+}
+
+// Admin Login Handler
+function handleAdminLogin() {
+  const user = document.getElementById("adminUsername").value.trim();
+  const pass = document.getElementById("adminPassword").value.trim();
+  const statusEl = document.getElementById("adminLoginStatus");
+
+  if (!user || !pass) {
+    if (statusEl) {
+      statusEl.className = "field-status error";
+      statusEl.innerHTML = "Please enter Admin ID and Password.";
+    }
+    return;
+  }
+
+  // Pre-configured Super Admin Access (Demo & Phase 3 Verification)
+  if ((user === "admin" || user === "9642788786") && pass === "arpeu2026") {
+    sessionStorage.setItem("arpeu_admin_token", "SESSION_SUPER_ADMIN_2026");
+    sessionStorage.setItem("arpeu_admin_name", "Sri P. Balakrishna (Treasurer)");
+    sessionStorage.setItem("arpeu_admin_role", "SUPER ADMIN");
+
+    if (statusEl) statusEl.innerHTML = "";
+    checkAdminSession();
+  } else {
+    if (statusEl) {
+      statusEl.className = "field-status error";
+      statusEl.innerHTML = "✖ Invalid Credentials. Please check ID/Passkey.";
+    }
+  }
+}
+
+// Admin Logout Handler
+function handleAdminLogout() {
+  sessionStorage.removeItem("arpeu_admin_token");
+  sessionStorage.removeItem("arpeu_admin_name");
+  sessionStorage.removeItem("arpeu_admin_role");
+  checkAdminSession();
+}
+
+/* ==========================================================
+   ADMIN DOCUMENT VERIFICATION QUEUE & ACTION HANDLERS
+   ========================================================== */
+
+async function loadAdminPendingDocuments() {
+  const container = document.getElementById("admDocsQueueContainer");
+  if (!container) return;
+
+  container.innerHTML = `<p style="font-size:12px; color:#0B4EA2; text-align:center; padding:15px;"><i class="fa-solid fa-spinner fa-spin"></i> Loading pending documents...</p>`;
+
+  try {
+    const url = `${BACKEND_URL}?action=getPendingDocuments`;
+    const res = await fetch(url);
+    const result = await res.json();
+
+    if (result && result.success && result.documents && result.documents.length > 0) {
+      let html = "";
+      result.documents.forEach(doc => {
+        html += `
+          <div class="diff-box-card" id="docCard_${doc.docId}">
+            <div class="diff-header">
+              <span><i class="fa-solid fa-file-lines"></i> ${doc.docType}</span>
+              <span style="font-size:10px; color:#64748b;">${doc.uploadDate}</span>
+            </div>
+            
+            <div style="font-size:11.5px; color:#1e293b; margin-bottom:8px;">
+              <strong>${doc.fullName}</strong> (ID: ${doc.memberId} | Mob: ${doc.mobile})
+            </div>
+
+            <div style="margin-bottom:10px;">
+              <a href="${doc.docUrl}" target="_blank" class="dl-btn btn-preview" style="display:inline-flex; width:auto; padding:4px 14px; text-decoration:none;">
+                <i class="fa-solid fa-eye"></i> View / Preview Document
+              </a>
+            </div>
+
+            <div class="diff-actions-row">
+              <button type="button" class="adm-btn-approve" onclick="handleDocDecision('${doc.docId}', 'verify')">
+                <i class="fa-solid fa-check"></i> Verify
+              </button>
+              <button type="button" class="adm-btn-reject" onclick="handleDocDecision('${doc.docId}', 'reject')">
+                <i class="fa-solid fa-xmark"></i> Reject
+              </button>
+            </div>
+          </div>
+        `;
+      });
+      container.innerHTML = html;
+      
+      const countEl = document.getElementById("admPendingDocs");
+      const badgeEl = document.getElementById("admDocsBadge");
+      if (countEl) countEl.textContent = result.documents.length;
+      if (badgeEl) {
+        badgeEl.textContent = result.documents.length;
+        badgeEl.style.display = result.documents.length > 0 ? "inline-block" : "none";
+      }
+    } else {
+      container.innerHTML = `<p style="font-size:12px; color:#64748b; text-align:center; padding:15px;"><i class="fa-solid fa-circle-check" style="color:#16a34a;"></i> All supporting documents are verified!</p>`;
+      const countEl = document.getElementById("admPendingDocs");
+      const badgeEl = document.getElementById("admDocsBadge");
+      if (countEl) countEl.textContent = "0";
+      if (badgeEl) badgeEl.style.display = "none";
+    }
+  } catch (e) {
+    container.innerHTML = `<p style="font-size:12px; color:#64748b; text-align:center; padding:15px;">All supporting documents are verified.</p>`;
+  }
+}
+
+async function handleDocDecision(docId, decision) {
+  const card = document.getElementById(`docCard_${docId}`);
+  let reason = "";
+
+  if (decision === "reject") {
+    reason = prompt("Please enter reason for document rejection:") || "Unclear Document";
+  }
+
+  if (card) {
+    card.style.opacity = "0.5";
+    card.style.pointerEvents = "none";
+  }
+
+  try {
+    const adminId = sessionStorage.getItem("arpeu_admin_name") || "SUPER_ADMIN";
+    const action = decision === "verify" ? "verifyDocument" : "rejectDocument";
+    const url = `${BACKEND_URL}?action=${action}&docId=${encodeURIComponent(docId)}&adminId=${encodeURIComponent(adminId)}&reason=${encodeURIComponent(reason)}`;
+
+    const res = await fetch(url);
+    const result = await res.json();
+
+    if (result && result.success) {
+      alert(`✔ Document ${docId} successfully ${decision === 'verify' ? 'verified' : 'rejected'}!`);
+      loadAdminPendingDocuments(); // Refresh Queue
+    } else {
+      alert("Action failed: " + (result.message || "Server error"));
+      if (card) { card.style.opacity = "1"; card.style.pointerEvents = "auto"; }
+    }
+  } catch (err) {
+    alert("Connection error while updating document.");
+    if (card) { card.style.opacity = "1"; card.style.pointerEvents = "auto"; }
+  }
+}
+
+
+// Switch between Admin Hub Tabs
+function switchAdminTab(tabName) {
+  const tabs = ["profiles", "docs", "search", "audit"];
+  tabs.forEach(t => {
+    const btn = document.getElementById(`admTabBtn${t.charAt(0).toUpperCase() + t.slice(1)}`);
+    const content = document.getElementById(`admTab${t.charAt(0).toUpperCase() + t.slice(1)}`);
+    if (btn) btn.classList.remove("active");
+    if (content) content.style.display = "none";
+  });
+
+  const activeBtn = document.getElementById(`admTabBtn${tabName.charAt(0).toUpperCase() + tabName.slice(1)}`);
+  const activeContent = document.getElementById(`admTab${tabName.charAt(0).toUpperCase() + tabName.slice(1)}`);
+  if (activeBtn) activeBtn.classList.add("active");
+  if (activeContent) activeContent.style.display = "block";
+
+  if (tabName === "profiles") {
+    loadAdminProfileRequests();
+  }
+}
+
+// Load Dashboard Metrics
+function loadAdminDashboardMetrics() {
+  const role = sessionStorage.getItem("arpeu_admin_role") || "SUPER ADMIN";
+  const name = sessionStorage.getItem("arpeu_admin_name") || "Sri P. Balakrishna";
+  
+  const roleBadge = document.getElementById("adminRoleBadge");
+  const nameEl = document.getElementById("adminDisplayName");
+  if (roleBadge) roleBadge.textContent = role;
+  if (nameEl) nameEl.textContent = name;
+
+  // Sync with live counters if available
+  const totalMemb = document.getElementById("totalMembers") ? document.getElementById("totalMembers").textContent : "1,248";
+  if (document.getElementById("admTotalMembers")) document.getElementById("admTotalMembers").textContent = totalMemb;
+  if (document.getElementById("admPendingProfiles")) document.getElementById("admPendingProfiles").textContent = "3";
+  if (document.getElementById("admPendingDocs")) document.getElementById("admPendingDocs").textContent = "2";
+  if (document.getElementById("admTotalDonations")) document.getElementById("admTotalDonations").textContent = "₹48,500";
+}
+
+/* ==========================================================
+   ADMIN UNIVERSAL CADRE SEARCH & 360-DEGREE PROFILE VIEW
+   ========================================================== */
+
+async function executeAdminCadreSearch() {
+  const queryInput = document.getElementById("admSearchQuery");
+  const container = document.getElementById("admSearchResultsContainer");
+  if (!queryInput || !container) return;
+
+  const queryVal = queryInput.value.trim();
+  if (!queryVal) {
+    alert("Please enter Mobile, Aadhaar, Employee ID or Membership ID.");
+    queryInput.focus();
+    return;
+  }
+
+  container.innerHTML = `<p style="font-size:12px; color:#0B4EA2; text-align:center; padding:15px;"><i class="fa-solid fa-spinner fa-spin"></i> Searching unified cadre records...</p>`;
+
+  try {
+    const url = `${BACKEND_URL}?action=searchDonorOrMember&query=${encodeURIComponent(queryVal)}`;
+    const res = await fetch(url);
+    const result = await res.json();
+
+    if (result && result.success && result.found && result.data) {
+      const d = result.data;
+      container.innerHTML = `
+        <div class="diff-box-card" style="border: 1.5px solid #0B4EA2; background: #ffffff;">
+          <div class="diff-header" style="background:#eef4ff; margin:-12px -12px 10px -12px; padding:10px 12px; border-radius:8px 8px 0 0;">
+            <span><i class="fa-solid fa-user-shield"></i> ${d.name}</span>
+            <span class="admin-role-pill">${d.donorType || 'Member'}</span>
+          </div>
+
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; font-size:11.5px; margin-bottom:10px;">
+            <div><strong style="color:#64748b; font-size:10px;">Mobile Number:</strong><br>${d.mobile || '-'}</div>
+            <div><strong style="color:#64748b; font-size:10px;">Membership ID:</strong><br><span style="color:#0B4EA2; font-weight:800;">${d.membershipId || 'N/A'}</span></div>
+            <div><strong style="color:#64748b; font-size:10px;">Employee ID:</strong><br>${d.employeeId || '-'}</div>
+            <div><strong style="color:#64748b; font-size:10px;">Organization / Station:</strong><br>${d.organization || '-'}</div>
+          </div>
+
+          <div style="background:#f8fafc; border:1px dashed #cbd5e1; border-radius:8px; padding:8px; margin-bottom:10px; font-size:11px;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+              <span><i class="fa-solid fa-shield-halved" style="color:#16a34a;"></i> Membership Status:</span>
+              <strong style="color:#16a34a;">ACTIVE (Valid 2026)</strong>
+            </div>
+            <div style="display:flex; justify-content:space-between;">
+              <span><i class="fa-solid fa-file-check" style="color:#0B4EA2;"></i> Document Status:</span>
+              <strong style="color:#0B4EA2;">VERIFIED</strong>
+            </div>
+          </div>
+
+          <button type="button" class="profile-btn profile-btn-primary" onclick="openReceipt()" style="width:100%; justify-content:center; height:38px; font-size:11.5px;">
+            <i class="fa-solid fa-print"></i> View & Print Digital Receipt
+          </button>
+        </div>
+      `;
+    } else {
+      container.innerHTML = `
+        <div style="text-align:center; padding:20px; color:#64748b;">
+          <i class="fa-solid fa-circle-question" style="font-size:28px; color:#94a3b8; margin-bottom:6px;"></i>
+          <p style="font-size:12px; margin:0;">No cadre record found matching "<strong>${queryVal}</strong>".</p>
+        </div>
+      `;
+    }
+  } catch (err) {
+    container.innerHTML = `<p style="font-size:12px; color:#dc2626; text-align:center; padding:15px;">Error fetching records. Please check connection.</p>`;
+  }
+}
+
+
+/* ==========================================================
+   ADMIN PROFILE APPROVALS & DIFF RENDERING ENGINE
+   ========================================================== */
+
+async function loadAdminProfileRequests() {
+  const container = document.getElementById("admProfileQueueContainer");
+  if (!container) return;
+
+  container.innerHTML = `<p style="font-size:12px; color:#0B4EA2; text-align:center; padding:15px;"><i class="fa-solid fa-spinner fa-spin"></i> Loading pending requests...</p>`;
+
+  try {
+    const url = `${BACKEND_URL}?action=getProfileRequests`;
+    const res = await fetch(url);
+    const result = await res.json();
+
+    if (result && result.success && result.requests && result.requests.length > 0) {
+      let html = "";
+      result.requests.forEach(req => {
+        html += `
+          <div class="diff-box-card" id="reqCard_${req.requestId}">
+            <div class="diff-header">
+              <span><i class="fa-solid fa-user-pen"></i> ${req.fullName} (${req.memberId})</span>
+              <span style="font-size:10px; color:#64748b;">${req.requestDate}</span>
+            </div>
+            
+            <div class="diff-row changed">
+              <div>
+                <strong style="display:block; font-size:10px; color:#475569;">Field: ${req.fieldName}</strong>
+                <span class="diff-old">Old: ${req.currentValue}</span>
+              </div>
+              <div style="text-align:right;">
+                <strong style="display:block; font-size:10px; color:#16a34a;">Requested Change</strong>
+                <span class="diff-new">New: ${req.requestedValue}</span>
+              </div>
+            </div>
+
+            <div class="diff-actions-row">
+              <button type="button" class="adm-btn-approve" onclick="handleProfileDecision('${req.requestId}', 'approve')">
+                <i class="fa-solid fa-check"></i> Approve
+              </button>
+              <button type="button" class="adm-btn-reject" onclick="handleProfileDecision('${req.requestId}', 'reject')">
+                <i class="fa-solid fa-xmark"></i> Reject
+              </button>
+            </div>
+          </div>
+        `;
+      });
+      container.innerHTML = html;
+      
+      const countEl = document.getElementById("admPendingProfiles");
+    if (countEl) countEl.textContent = result.requests.length;
+
+    // 🔴 Red Badge Live Update (Shows count when pending > 0)
+    const badgeEl = document.getElementById("admProfilesBadge");
+    if (badgeEl) {
+      badgeEl.textContent = result.requests.length;
+      badgeEl.style.display = result.requests.length > 0 ? "inline-block" : "none";
+    }
+  } else {
+    container.innerHTML = `<p style="font-size:12px; color:#64748b; text-align:center; padding:15px;"><i class="fa-solid fa-circle-check" style="color:#16a34a;"></i> All profile requests are up to date!</p>`;
+    const countEl = document.getElementById("admPendingProfiles");
+    if (countEl) countEl.textContent = "0";
+
+    // ⚪ Hide Red Badge when pending count is 0
+    const badgeEl = document.getElementById("admProfilesBadge");
+    if (badgeEl) badgeEl.style.display = "none";
+  }
+      
+    
+  } catch (e) {
+    container.innerHTML = `<p style="font-size:12px; color:#64748b; text-align:center; padding:15px;">No pending profile requests at this moment.</p>`;
+  }
+}
+
+async function handleProfileDecision(requestId, decision) {
+  const card = document.getElementById(`reqCard_${requestId}`);
+  let reason = "";
+
+  if (decision === "reject") {
+    reason = prompt("Please enter reason for rejection:") || "Details mismatch";
+  }
+
+  if (card) {
+    card.style.opacity = "0.5";
+    card.style.pointerEvents = "none";
+  }
+
+  try {
+    const adminId = sessionStorage.getItem("arpeu_admin_name") || "SUPER_ADMIN";
+    const action = decision === "approve" ? "approveProfileRequest" : "rejectProfileRequest";
+    const url = `${BACKEND_URL}?action=${action}&requestId=${encodeURIComponent(requestId)}&adminId=${encodeURIComponent(adminId)}&reason=${encodeURIComponent(reason)}`;
+
+    const res = await fetch(url);
+    const result = await res.json();
+
+    if (result && result.success) {
+      alert(`✔ Request ${requestId} successfully ${decision}d!`);
+      loadAdminProfileRequests(); // Refresh Queue
+    } else {
+      alert("Action failed: " + (result.message || "Server error"));
+      if (card) { card.style.opacity = "1"; card.style.pointerEvents = "auto"; }
+    }
+  } catch (err) {
+    alert("Connection error while updating request.");
+    if (card) { card.style.opacity = "1"; card.style.pointerEvents = "auto"; }
+  }
+}
+
+/* ==========================================================
+   GLOBAL BULLET-PROOF RECEIPT CLOSE ENGINE
+   ========================================================== */
+
+window.closeReceipt = function () {
+  const rc = document.getElementById("receiptContainer");
+  const wasDonation = rc && (rc.getAttribute("data-donation-active") === "true");
+
+  /* 1. Force Hide Receipt Container & Remove All Flags */
+  if (rc) {
+    rc.style.setProperty("display", "none", "important");
+    rc.removeAttribute("data-membership-active");
+    rc.removeAttribute("data-donation-active");
+    rc.removeAttribute("data-receipt-open");
+    rc.removeAttribute("data-active");
+  }
+
+  /* 2. Reset Title Ribbon to Default Membership Blue */
+  const titlePill = document.getElementById("receiptTitle");
+  if (titlePill) {
+    titlePill.textContent = "MEMBERSHIP RECEIPT";
+    titlePill.style.backgroundColor = "#0B4EA2";
+  }
+
+  /* 3. Clean Redirection to Fresh Form */
+  if (wasDonation) {
+    if (typeof resetDonationForm === "function") {
+      resetDonationForm();
+    }
+    showPage("donations");
+  } else {
+    if (typeof resetMembershipForm === "function") {
+      resetMembershipForm();
+    }
+    setMembershipMode("new");
+    showPage("membership");
+  }
+};
+
+/* Alias function */
+function closeReceipt() {
+  window.closeReceipt();
+}

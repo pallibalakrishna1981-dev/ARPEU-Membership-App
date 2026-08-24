@@ -141,7 +141,7 @@
                 <span>Settings</span>
             </a>
 
-            <a href="#" id="navAdmin">
+            <a href="#" id="navAdmin" onclick="showPage('admin'); return false;">
                 <i class="fa-solid fa-user-shield"></i>
                 <span>Admin Login</span>
             </a>
@@ -1172,20 +1172,15 @@
         <div id="payNowStep3" style="display: none; margin-top: 20px;">
             <div class="dt-container-final">
                 <div class="dt-header-labels">
-                    <label class="dt-label-main">Date & Time *</label>
-                    <select id="payNowTimeFormat" class="dt-format-box">
-                        <option value="12" selected>12 Hours Format</option>
-                        <option value="24">24 Hours Format</option>
-                    </select>
+                    <label class="dt-label-main">Payment Date & Time *</label>
                 </div>
                 <div class="dt-input-grid">
                     <div class="dt-box-wrap">
                        <input type="text" id="payNowDate" class="dt-field-final final-val" placeholder="Select Date" readonly>
                         <i class="fas fa-calendar-alt dt-icon-right"></i>
                     </div>
-                    <div class="dt-box-wrap">
+                   <div class="dt-box-wrap">
                         <input type="text" id="payNowTimeDisplay" class="dt-field-final final-val" placeholder="Set Time" readonly>
-                        <input type="text" id="payNowTimeNative" class="native-picker-overlay" readonly>
                         <i class="fas fa-clock dt-icon-right"></i>
                     </div>
                 </div>
@@ -1232,11 +1227,7 @@
         <div id="manualFields" style="display: none; margin-top: 15px;">
             <div class="dt-container-final">
                 <div class="dt-header-labels">
-                    <label class="dt-label-main">Date & Time *</label>
-                    <select id="manualTimeFormat" class="dt-format-box">
-                        <option value="12" selected>12 Hours Format</option>
-                        <option value="24">24 Hours Format</option>
-                    </select>
+                    <label class="dt-label-main">Payment Date & Time *</label>
                 </div>
                 <div class="dt-input-grid">
                     <div class="dt-box-wrap">
@@ -1245,7 +1236,6 @@
                     </div>
                     <div class="dt-box-wrap">
                         <input type="text" id="manualTimeDisplay" class="dt-field-final final-val" placeholder="Set Time" readonly>
-                        <input type="text" id="manualTimeNative" class="native-picker-overlay" readonly>
                         <i class="fas fa-clock dt-icon-right"></i>
                     </div>
                 </div>
@@ -1253,6 +1243,7 @@
             <div class="form-group" style="margin-top:15px;">
                 <label>Transaction ID / UTR No / Reference No <span class="required">*</span></label>
                 <input type="text" id="manualTransactionId" placeholder="Alphanumeric Only" class="final-val utr-field">
+                <div id="manualTransactionIdStatus" class="field-status"></div>
             </div>
             <div class="form-group"><label>Upload Receipt <span class="required">*</span></label><input type="file" id="manualReceipt" class="final-val"></div>
         </div>
@@ -3657,11 +3648,11 @@
             
            <!-- Main Selection Option Buttons -->
             <div class="main-payment-toggle-row">
-                <label class="main-method-btn" for="donPayNowOption">
+                <label class="main-method-btn" for="donPayNowOption" onclick="switchDonationPaymentMethod('payNow')">
                     <input type="radio" name="donPaymentMethod" id="donPayNowOption" value="payNow">
                     <span>Pay Now (Online)</span>
                 </label>
-                <label class="main-method-btn" for="donAlreadyPaidOption">
+                <label class="main-method-btn" for="donAlreadyPaidOption" onclick="switchDonationPaymentMethod('alreadyPaid')">
                     <input type="radio" name="donPaymentMethod" id="donAlreadyPaidOption" value="alreadyPaid">
                     <span>Already Paid</span>
                 </label>
@@ -3965,7 +3956,150 @@
      DONATION MODULE & UNIVERSAL AUTO-FILL SECTION (END)
 ========================================================= -->
 
+<!-- =========================================================
+     ARPEU ADMIN PANEL & MANAGEMENT MODULE (START)
+========================================================= -->
+<section id="adminSection" class="admin-page" style="display:none;">
 
+    <!-- 1. ADMIN LOGIN VIEW -->
+    <div id="adminLoginCard" class="form-card" style="max-width: 440px; margin: 15px auto;">
+        <div class="card-header" style="justify-content: center; text-align: center;">
+            <i class="fa-solid fa-user-shield" style="font-size: 22px; color: #0B4EA2;"></i>
+            <span class="card-title" style="font-size: 17px;">ADMIN PORTAL LOGIN</span>
+        </div>
+        <div class="card-body">
+            <p style="font-size: 11.5px; color: #64748b; text-align: center; margin: 0 0 12px 0;">
+                Authorized access for ARPEU State, District & Circle Office Bearers.
+            </p>
+            <div class="form-group">
+                <label for="adminUsername">Admin ID / Registered Mobile <span class="required">*</span></label>
+                <input type="text" id="adminUsername" placeholder="Enter Admin ID or Mobile" autocomplete="off">
+            </div>
+            <div class="form-group">
+                <label for="adminPassword">Security Passkey / Password <span class="required">*</span></label>
+                <input type="password" id="adminPassword" placeholder="Enter Password">
+            </div>
+            <div id="adminLoginStatus" class="field-status" style="text-align: center;"></div>
+            <button type="button" id="adminLoginBtn" class="submit-btn" onclick="handleAdminLogin()" style="background:#0B4EA2; height:48px; margin-top: 10px;">
+                <i class="fa-solid fa-right-to-bracket"></i> SECURE LOGIN
+            </button>
+        </div>
+    </div>
+
+    <!-- 2. ADMIN DASHBOARD & WORKFLOW VIEW (Shown after Login) -->
+    <div id="adminDashboardView" style="display: none; padding: 0 4px 20px 4px;">
+        
+        <!-- Admin Header Bar -->
+        <div class="admin-top-bar">
+            <div class="admin-badge-info">
+                <span class="admin-role-pill" id="adminRoleBadge">SUPER ADMIN</span>
+                <span class="admin-user-name" id="adminDisplayName">Sri P. Balakrishna</span>
+            </div>
+            <button type="button" class="admin-logout-btn" onclick="handleAdminLogout()">
+                <i class="fa-solid fa-power-off"></i> Logout
+            </button>
+        </div>
+
+        <!-- Metric Counter Grid -->
+        <div class="admin-metrics-grid">
+            <div class="admin-metric-card" onclick="switchAdminTab('profiles')">
+                <span class="m-val" id="admPendingProfiles">0</span>
+                <span class="m-lbl"><i class="fa-solid fa-clock-rotate-left"></i> Pending Profiles</span>
+            </div>
+            <div class="admin-metric-card" onclick="switchAdminTab('docs')">
+                <span class="m-val" id="admPendingDocs">0</span>
+                <span class="m-lbl"><i class="fa-solid fa-file-circle-question"></i> Pending Docs</span>
+            </div>
+            <div class="admin-metric-card" onclick="switchAdminTab('members')">
+                <span class="m-val" id="admTotalMembers">0</span>
+                <span class="m-lbl"><i class="fa-solid fa-users"></i> Total Members</span>
+            </div>
+            <div class="admin-metric-card" onclick="switchAdminTab('donations')">
+                <span class="m-val" id="admTotalDonations">₹0</span>
+                <span class="m-lbl"><i class="fa-solid fa-hand-holding-heart"></i> Total Donations</span>
+            </div>
+        </div>
+
+        <!-- Navigation Action Hub Tabs -->
+        <div class="admin-tabs-row">
+            <button type="button" class="adm-tab-btn active" id="admTabBtnProfiles" onclick="switchAdminTab('profiles')">
+                <i class="fa-solid fa-user-check"></i> Profile Approvals
+                <span id="admProfilesBadge" class="adm-badge-count" style="display:none;">0</span>
+            </button>
+            <button type="button" class="adm-tab-btn" id="admTabBtnDocs" onclick="switchAdminTab('docs')">
+                <i class="fa-solid fa-id-card-clip"></i> Documents
+                <span id="admDocsBadge" class="adm-badge-count" style="display:none;">0</span>
+            </button>
+            <button type="button" class="adm-tab-btn" id="admTabBtnSearch" onclick="switchAdminTab('search')">
+                <i class="fa-solid fa-magnifying-glass"></i> Cadre Search
+            </button>
+            <button type="button" class="adm-tab-btn" id="admTabBtnAudit" onclick="switchAdminTab('audit')">
+                <i class="fa-solid fa-shield-halved"></i> Audit Logs
+            </button>
+        </div>
+
+        <!-- TAB 1: PROFILE APPROVALS (DIFF COMPARISON VIEW) -->
+        <div id="admTabProfiles" class="adm-tab-content">
+            <div class="form-card">
+                <div class="card-header">
+                    <i class="fa-solid fa-clock"></i>
+                    <span class="card-title">Pending Profile Update Requests</span>
+                </div>
+                <div id="admProfileQueueContainer" class="adm-queue-list">
+                    <p style="font-size:12px; color:#64748b; text-align:center; padding:15px;">No pending profile requests at this moment.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: DOCUMENT VERIFICATION HUB -->
+        <div id="admTabDocs" class="adm-tab-content" style="display: none;">
+            <div class="form-card">
+                <div class="card-header">
+                    <i class="fa-solid fa-file-shield"></i>
+                    <span class="card-title">Document Verification Queue</span>
+                </div>
+                <div id="admDocsQueueContainer" class="adm-queue-list">
+                    <p style="font-size:12px; color:#64748b; text-align:center; padding:15px;">All supporting documents are verified.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: UNIFIED CADRE SEARCH -->
+        <div id="admTabSearch" class="adm-tab-content" style="display: none;">
+            <div class="form-card">
+                <div class="card-header">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <span class="card-title">Universal Cadre Search</span>
+                </div>
+                <div class="profile-search-wrapper" style="margin-bottom:12px;">
+                    <input type="text" id="admSearchQuery" class="profile-search-input" placeholder="Search Mobile / Aadhaar / Emp ID / Member ID...">
+                    <button type="button" class="profile-search-btn" onclick="executeAdminCadreSearch()">
+                        <i class="fas fa-search"></i> Search
+                    </button>
+                </div>
+                <div id="admSearchResultsContainer"></div>
+            </div>
+        </div>
+
+        <!-- TAB 4: AUDIT LOGS -->
+        <div id="admTabAudit" class="adm-tab-content" style="display: none;">
+            <div class="form-card">
+                <div class="card-header">
+                    <i class="fa-solid fa-shield-halved"></i>
+                    <span class="card-title">Security & Action Audit Trail</span>
+                </div>
+                <div id="admAuditLogsContainer" style="overflow-x:auto;">
+                    <p style="font-size:12px; color:#64748b; text-align:center; padding:15px;">Audit logs will load here.</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</section>
+<!-- =========================================================
+     ARPEU ADMIN PANEL & MANAGEMENT MODULE (END)
+========================================================= -->
 
 </main>
 
