@@ -3625,6 +3625,107 @@ let foundSearchRecord = null;
  * Triggers automatic database search on entering 10 digits.
  * @param {HTMLInputElement} inputEl - Mobile input element reference
  */
+
+
+
+/* ==========================================================
+   ARPEU RESPONSIBILITY TIER SELECTION ENGINE
+   ========================================================== */
+
+/* Handles General Member toggle */
+function handleTierGeneralMemberSelect(genChk) {
+  if (genChk && genChk.checked) {
+    document.querySelectorAll(".prof-tier-chk").forEach(function (chk) {
+      if (chk !== genChk) {
+        chk.checked = false;
+      }
+    });
+  }
+}
+
+/* Handles Body tier selection (State, Company, Division) */
+function handleTierBodySelect(bodyChk) {
+  const genChk = document.querySelector('.prof-tier-chk[value="General Member"]');
+  
+  if (bodyChk && bodyChk.checked) {
+    if (genChk) {
+      genChk.checked = false;
+    }
+  } else {
+    const anyBodyChecked = Array.from(document.querySelectorAll(".prof-tier-chk")).some(function (chk) {
+      return chk.value !== "General Member" && chk.checked;
+    });
+    if (!anyBodyChecked) {
+      if (genChk) {
+        genChk.checked = true;
+      }
+    }
+  }
+}
+
+/* ==========================================================
+   ARPEU GOVERNANCE HIERARCHY & PROTOCOL RULES ENGINE
+   ========================================================== */
+
+/* Handles General Member toggle */
+function handleTierGeneralMemberSelect(genChk) {
+  const postBox = document.getElementById("arpeuExecutivePostsBox");
+  if (genChk && genChk.checked) {
+    document.querySelectorAll(".prof-tier-chk").forEach(function (chk) {
+      if (chk !== genChk) chk.checked = false;
+    });
+    if (postBox) postBox.style.display = "none";
+  }
+}
+
+/* Handles Body tier selection (State, Company, Division) */
+function handleTierBodySelect(bodyChk) {
+  const genChk = document.querySelector('.prof-tier-chk[value="General Member"]');
+  const postBox = document.getElementById("arpeuExecutivePostsBox");
+  
+  if (bodyChk && bodyChk.checked) {
+    if (genChk) genChk.checked = false;
+    if (postBox) postBox.style.display = "block";
+  } else {
+    const anyBodyChecked = Array.from(document.querySelectorAll(".prof-tier-chk")).some(chk => chk.value !== "General Member" && chk.checked);
+    if (!anyBodyChecked) {
+      if (genChk) genChk.checked = true;
+      if (postBox) postBox.style.display = "none";
+    }
+  }
+}
+
+/* Enforces Single Primary Post & Core Committee Eligibility for Top 5 Posts */
+function handlePrimaryDesignationSelect(currentCheckbox, isCoreEligible) {
+  const coreLabel = document.getElementById("coreCommitteeLabel");
+  const coreChk   = document.getElementById("chkCoreCommittee");
+  const otherBox  = document.getElementById("otherDesignationInputBox");
+
+  if (currentCheckbox && currentCheckbox.checked) {
+    document.querySelectorAll(".prof-primary-desig-chk").forEach(function (chk) {
+      if (chk !== currentCheckbox) chk.checked = false;
+    });
+
+    /* Toggle Other Input Box */
+    if (otherBox) {
+      otherBox.style.display = (currentCheckbox.value === "Other") ? "block" : "none";
+    }
+
+    /* Core Committee is strictly enabled ONLY for Top 5 Protocol Posts */
+    if (isCoreEligible) {
+      if (coreLabel) { coreLabel.style.opacity = "1"; coreLabel.style.pointerEvents = "auto"; }
+      if (coreChk) { coreChk.disabled = false; }
+    } else {
+      if (coreLabel) { coreLabel.style.opacity = "0.5"; coreLabel.style.pointerEvents = "none"; }
+      if (coreChk) { coreChk.disabled = true; coreChk.checked = false; }
+    }
+  } else {
+    if (otherBox) otherBox.style.display = "none";
+    if (coreLabel) { coreLabel.style.opacity = "0.5"; coreLabel.style.pointerEvents = "none"; }
+    if (coreChk) { coreChk.disabled = true; coreChk.checked = false; }
+  }
+}
+
 /* ==========================================================
    DONOR TYPE CONDITIONAL FIELDS TOGGLE ENGINE
    ========================================================== */
@@ -3640,6 +3741,7 @@ function toggleDonorTypeFields(selectedType) {
   }
 }
 
+/* Real-time Mobile Input Handler for Donations */
 function handleDonorMobileInput(inputEl) {
   if (!inputEl) return;
 
@@ -4427,6 +4529,36 @@ function collectDigitalProfileData() {
   const selectedLanguages = [];
   document.querySelectorAll(".prof-lang-chk:checked").forEach(chk => selectedLanguages.push(chk.value));
 
+// 4. Collect Multi-select ARPEU Responsibility Levels
+  const selectedArpeuLevels = [];
+  document.querySelectorAll(".prof-arpeu-level-chk:checked").forEach(chk => selectedArpeuLevels.push(chk.value));
+
+  // 5. Collect Multi-select Training Attended
+  const selectedTrainings = [];
+  document.querySelectorAll(".prof-training-chk:checked").forEach(chk => selectedTrainings.push(chk.value));
+  // Collect Primary Post + Committee Add-ons
+  const selectedPositions = [];
+  document.querySelectorAll(".prof-primary-desig-chk:checked, .prof-addon-desig-chk:checked").forEach(function (chk) {
+    selectedPositions.push(chk.value);
+  });
+
+  // Collect Tiers, Primary Designation, Other Text & Addon Committees
+  const selectedTiers = [];
+  document.querySelectorAll(".prof-tier-chk:checked").forEach(chk => selectedTiers.push(chk.value));
+
+  let finalDesig = "";
+  const primaryChk = document.querySelector(".prof-primary-desig-chk:checked");
+  if (primaryChk) {
+    if (primaryChk.value === "Other") {
+      finalDesig = document.getElementById("profOtherDesignationText") ? document.getElementById("profOtherDesignationText").value.trim() || "Other" : "Other";
+    } else {
+      finalDesig = primaryChk.value;
+    }
+  }
+
+  const selectedAddons = [];
+  document.querySelectorAll(".prof-addon-desig-chk:checked").forEach(chk => selectedAddons.push(chk.value));
+
   return {
     // 1. Personal Info
     fullName:      getVal("profFullName"),
@@ -4482,9 +4614,9 @@ function collectDigitalProfileData() {
     },
 
     // 5. ARPEU & BMS Responsibility
-    organisationRole: {
-      arpeuLevel:        getVal("profArpeuLevel"),
-      arpeuDesignation:  getVal("profArpeuDesignation"),
+   organisationRole: {
+      arpeuLevel:        selectedTiers.join(", ") || "General Member",
+      arpeuDesignation:  [finalDesig, ...selectedAddons].filter(Boolean).join(", ") || "General Member",
       bmsResponsibility: getVal("profBmsResponsibility")
     },
 
@@ -4496,7 +4628,7 @@ function collectDigitalProfileData() {
     languages: selectedLanguages,
 
     // 9. Training & Development
-    trainingAttended:       getVal("profTrainingAttended"),
+    trainingAttended: selectedTrainings.join(", ") || "None",
     futureTrainingInterest: getVal("profFutureTrainingInterest"),
 
     // 10. Service & Availability

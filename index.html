@@ -2047,66 +2047,79 @@
         </div>
       </div>
 
-      <!-- 5. ARPEU UNION OFFICE-BEARER & BMS RESPONSIBILITY -->
+      <!-- 5. ARPEU UNION STRUCTURE & BMS RESPONSIBILITY -->
       <div class="profile-section-card">
         <div class="card-section-header">
           <i class="fas fa-sitemap"></i> 5. ARPEU & BMS Responsibility
         </div>
-        <div class="profile-grid-2col">
-          
-          <!-- ARPEU Office-Bearer Level -->
-          <div class="form-group">
-            <label for="profArpeuLevel">ARPEU Office-Bearer Level</label>
-            <select id="profArpeuLevel" class="profile-select">
-              <option value="Active Member">Active Member</option>
-              <option value="State Body">State Body</option>
-              <option value="Company / Circle Body">Company / Circle Body</option>
-              <option value="Division / Regional Body">Division / Regional Body</option>
-              <option value="Sub-Division / Branch Body">Sub-Division / Branch Body</option>
-              <option value="Core Committee Member">Core Committee Member</option>
-              <option value="Executive Committee Member">Executive Committee Member (EC)</option>
-            </select>
+        
+        <!-- 1. ARPEU Responsibility Level (Multi-Select Level Chips) -->
+        <div class="form-group full-width" style="margin-bottom: 14px;">
+          <label>ARPEU Office-Bearer Level (Select all applicable tiers)</label>
+          <div class="skills-checkbox-grid" style="margin-top:6px;">
+            <label class="chip-checkbox"><input type="checkbox" value="General Member" class="prof-tier-chk" onchange="handleTierGeneralMemberSelect(this)" checked /> General Member</label>
+            <label class="chip-checkbox"><input type="checkbox" value="State Body" class="prof-tier-chk" onchange="handleTierBodySelect(this)" /> State Body</label>
+            <label class="chip-checkbox"><input type="checkbox" value="Company / Circle Body" class="prof-tier-chk" onchange="handleTierBodySelect(this)" /> Company / Circle Body</label>
+            <label class="chip-checkbox"><input type="checkbox" value="Division / Regional Body" class="prof-tier-chk" onchange="handleTierBodySelect(this)" /> Division / Regional Body</label>
           </div>
-
-          <!-- ARPEU Current Designation (With Working President) -->
-          <div class="form-group">
-            <label for="profArpeuDesignation">ARPEU Position / Designation</label>
-            <select id="profArpeuDesignation" class="profile-select">
-              <option value="Active Member">Active Member</option>
-              <option value="President">President</option>
-              <option value="General Secretary">General Secretary</option>
-              <option value="Treasurer">Treasurer</option>
-              <option value="Working President">Working President</option>
-              <option value="Organising Secretary">Organising Secretary</option>
-              <option value="Vice President">Vice President</option>
-              <option value="Assistant General Secretary">Assistant General Secretary</option>
-              <option value="Secretary">Secretary</option>
-              <option value="Joint Secretary">Joint Secretary</option>
-              <option value="Assistant Secretary">Assistant Secretary</option>
-              <option value="Office Secretary">Office Secretary</option>
-              <option value="Core Committee Member">Core Committee Member</option>
-              <option value="EC Member">EC Member</option>
-              <option value="Other">Other</option>
-            </select>
-          </div>
-
-          <!-- Responsibility in BMS -->
-          <div class="form-group full-width">
-            <label for="profBmsResponsibility">Responsibility in BMS (Bharatiya Mazdoor Sangh)</label>
-            <select id="profBmsResponsibility" class="profile-select">
-              <option value="No BMS Responsibility">No BMS Responsibility</option>
-              <option value="BMS State Office Bearer">BMS State Office Bearer</option>
-              <option value="BMS District Office Bearer">BMS District Office Bearer</option>
-              <option value="BMS State Social Media Incharge">BMS State Social Media Incharge</option>
-              <option value="BMS District Social Media Incharge">BMS District Social Media Incharge</option>
-              <option value="BMS State EC Member">BMS State EC Member</option>
-              <option value="BMS District EC Member">BMS District EC Member</option>
-              <option value="BMS Industrial Federation">BMS Industrial Federation Responsibility</option>
-              <option value="BMS Member / Activist">BMS Member / Activist</option>
-            </select>
-          </div>
-
         </div>
+
+         <!-- 2. Primary Executive Posts in Protocol Order (Single-Select) -->
+        <div id="arpeuExecutivePostsBox" class="form-group full-width" style="display:none; margin-bottom: 14px; background:#f8fafc; border:1px solid #e2e8f0; padding:12px; border-radius:12px;">
+          <label style="color:#0B4EA2; font-weight:700;">Primary Executive Designation (Select one)</label>
+          <div class="skills-checkbox-grid" style="margin-top:8px;">
+            <!-- Top 5 Core Protocol Posts -->
+            <label class="chip-checkbox"><input type="checkbox" value="President" class="prof-primary-desig-chk" onchange="handlePrimaryDesignationSelect(this, true)" /> President</label>
+            <label class="chip-checkbox"><input type="checkbox" value="General Secretary" class="prof-primary-desig-chk" onchange="handlePrimaryDesignationSelect(this, true)" /> General Secretary</label>
+            <label class="chip-checkbox"><input type="checkbox" value="Treasurer" class="prof-primary-desig-chk" onchange="handlePrimaryDesignationSelect(this, true)" /> Treasurer</label>
+            <label class="chip-checkbox"><input type="checkbox" value="Working President" class="prof-primary-desig-chk" onchange="handlePrimaryDesignationSelect(this, true)" /> Working President</label>
+            <label class="chip-checkbox"><input type="checkbox" value="Organising Secretary" class="prof-primary-desig-chk" onchange="handlePrimaryDesignationSelect(this, true)" /> Organising Secretary</label>
+
+            <!-- Other Executive Posts -->
+            <label class="chip-checkbox"><input type="checkbox" value="Vice President" class="prof-primary-desig-chk" onchange="handlePrimaryDesignationSelect(this, false)" /> Vice President</label>
+            <label class="chip-checkbox"><input type="checkbox" value="Assistant General Secretary" class="prof-primary-desig-chk" onchange="handlePrimaryDesignationSelect(this, false)" /> Assistant General Secretary</label>
+            <label class="chip-checkbox"><input type="checkbox" value="Secretary" class="prof-primary-desig-chk" onchange="handlePrimaryDesignationSelect(this, false)" /> Secretary</label>
+            <label class="chip-checkbox"><input type="checkbox" value="Joint Secretary" class="prof-primary-desig-chk" onchange="handlePrimaryDesignationSelect(this, false)" /> Joint Secretary</label>
+            <label class="chip-checkbox"><input type="checkbox" value="Assistant Secretary" class="prof-primary-desig-chk" onchange="handlePrimaryDesignationSelect(this, false)" /> Assistant Secretary</label>
+            <label class="chip-checkbox"><input type="checkbox" value="Office Secretary" class="prof-primary-desig-chk" onchange="handlePrimaryDesignationSelect(this, false)" /> Office Secretary</label>
+            <label class="chip-checkbox"><input type="checkbox" value="Other" class="prof-primary-desig-chk" onchange="handlePrimaryDesignationSelect(this, false)" /> Other</label>
+          </div>
+
+          <!-- Other Custom Designation Text Input -->
+          <div id="otherDesignationInputBox" style="display:none; margin-top:10px;">
+            <input type="text" id="profOtherDesignationText" class="profile-input" placeholder="Specify your designation..." />
+          </div>
+
+          <!-- 3. High-Power Add-on Committees -->
+          <div style="margin-top: 14px; border-top:1px dashed #cbd5e1; padding-top:10px;">
+            <label style="font-size:11.5px; color:#475569; font-weight:700;">Additional Committee Memberships (Eligible Add-ons)</label>
+            <div class="skills-checkbox-grid" style="margin-top:6px;">
+              <label id="coreCommitteeLabel" class="chip-checkbox" style="background:#eff6ff; border-color:#93c5fd; opacity:0.5; pointer-events:none;">
+                <input type="checkbox" value="Core Committee Member" id="chkCoreCommittee" class="prof-addon-desig-chk" disabled /> Core Committee Member (Top 5 Only)
+              </label>
+              <label class="chip-checkbox" style="background:#eff6ff; border-color:#93c5fd;">
+                <input type="checkbox" value="EC Member" class="prof-addon-desig-chk" /> EC Member (Executive Committee)
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Responsibility in BMS -->
+        <div class="form-group full-width">
+          <label for="profBmsResponsibility">Responsibility in BMS (Bharatiya Mazdoor Sangh)</label>
+          <select id="profBmsResponsibility" class="profile-select">
+            <option value="No BMS Responsibility">No BMS Responsibility</option>
+            <option value="BMS State Office Bearer">BMS State Office Bearer</option>
+            <option value="BMS District Office Bearer">BMS District Office Bearer</option>
+            <option value="BMS State Social Media Incharge">BMS State Social Media Incharge</option>
+            <option value="BMS District Social Media Incharge">BMS District Social Media Incharge</option>
+            <option value="BMS State EC Member">BMS State EC Member</option>
+            <option value="BMS District EC Member">BMS District EC Member</option>
+            <option value="BMS Industrial Federation">BMS Industrial Federation Responsibility</option>
+            <option value="BMS Member / Activist">BMS Member / Activist</option>
+          </select>
+        </div>
+
       </div>
 
       <!-- 6. PERSONAL & ORGANISATIONAL TALENTS (BALANCED 4 + 4 GRID) -->
@@ -2150,12 +2163,12 @@
         </div>
         <p class="section-help-text">Select all languages you can Speak, Read, or Write fluently:</p>
         <div class="skills-checkbox-grid">
-          <label class="chip-checkbox"><input type="checkbox" value="Telugu (Speak / Read / Write)" class="prof-lang-chk" checked /> Telugu (తెలుగు)</label>
-          <label class="chip-checkbox"><input type="checkbox" value="English (Speak / Read / Write)" class="prof-lang-chk" /> English (ఇంగ్లీష్)</label>
-          <label class="chip-checkbox"><input type="checkbox" value="Hindi (Speak / Read / Write)" class="prof-lang-chk" /> Hindi (హిందీ)</label>
-          <label class="chip-checkbox"><input type="checkbox" value="Tamil" class="prof-lang-chk" /> Tamil (తమిళం)</label>
-          <label class="chip-checkbox"><input type="checkbox" value="Kannada" class="prof-lang-chk" /> Kannada (కన్నడ)</label>
-          <label class="chip-checkbox"><input type="checkbox" value="Malayalam" class="prof-lang-chk" /> Malayalam (మలయాళం)</label>
+          <label class="chip-checkbox"><input type="checkbox" value="Telugu (Speak / Read / Write)" class="prof-lang-chk" checked /> Telugu </label>
+          <label class="chip-checkbox"><input type="checkbox" value="English (Speak / Read / Write)" class="prof-lang-chk" /> English </label>
+          <label class="chip-checkbox"><input type="checkbox" value="Hindi (Speak / Read / Write)" class="prof-lang-chk" /> Hindi </label>
+          <label class="chip-checkbox"><input type="checkbox" value="Tamil" class="prof-lang-chk" /> Tamil </label>
+          <label class="chip-checkbox"><input type="checkbox" value="Kannada" class="prof-lang-chk" /> Kannada </label>
+          <label class="chip-checkbox"><input type="checkbox" value="Malayalam" class="prof-lang-chk" /> Malayalam </label>
           <label class="chip-checkbox"><input type="checkbox" value="Other Languages" class="prof-lang-chk" /> Other Languages</label>
         </div>
       </div>
@@ -2165,23 +2178,25 @@
         <div class="card-section-header">
           <i class="fas fa-graduation-cap"></i> 9. Training & Development
         </div>
-        <div class="profile-grid-2col">
-          <div class="form-group">
-            <label for="profTrainingAttended">Training Programmes / Workshops Attended</label>
-            <select id="profTrainingAttended" class="profile-select">
-              <option value="None">None</option>
-              <option value="National Level Training / Workshops">National Level Training / Workshops</option>
-              <option value="State Level Study Classes">State Level Study Classes (అభ్యాస వర్గాలు)</option>
-              <option value="District / Zilla Workshops">District / Local Workshops</option>
-            </select>
+        
+        <div class="form-group full-width" style="margin-bottom: 15px;">
+          <label>Training Programmes / Workshops Attended (Select all applicable)</label>
+          <div class="skills-checkbox-grid" style="margin-top:6px;">
+            <label class="chip-checkbox"><input type="checkbox" value="National Level Training / Workshops" class="prof-training-chk" /> National Level Workshops</label>
+            <label class="chip-checkbox"><input type="checkbox" value="State Level Study Classes" class="prof-training-chk" /> State Study Classes </label>
+            <label class="chip-checkbox"><input type="checkbox" value="District / Zilla Workshops" class="prof-training-chk" /> District / Local Workshops</label>
+            <label class="chip-checkbox"><input type="checkbox" value="Other Training" class="prof-training-chk" /> Other Training Programmes</label>
+            <label class="chip-checkbox"><input type="checkbox" value="None" class="prof-training-chk" /> None </label>
           </div>
-          <div class="form-group">
-            <label for="profFutureTrainingInterest">Interested in attending future Training Programmes?</label>
-            <select id="profFutureTrainingInterest" class="profile-select">
-              <option value="Yes">Yes</option>
-              <option value="No">No</option>
-            </select>
-          </div>
+        </div>
+
+        <div class="form-group full-width">
+          <label for="profFutureTrainingInterest">Interested in attending future Training Programmes?</label>
+          <select id="profFutureTrainingInterest" class="profile-select">
+            <option value="">Select Yes or No</option>
+            <option value="Yes">Yes</option>
+            <option value="No">No</option>
+          </select>
         </div>
       </div>
 
@@ -2193,7 +2208,8 @@
         <div class="profile-grid-2col">
           <div class="form-group">
             <label for="profServeInterest">Interested in serving beyond regular membership?</label>
-            <select id="profServeInterest" class="profile-select">
+             <select id="profServeInterest" class="profile-select">
+              <option value="">Select Yes or No</option>
               <option value="Yes">Yes</option>
               <option value="No">No</option>
             </select>
@@ -2201,6 +2217,7 @@
           <div class="form-group">
             <label for="profOfficeBearerInterest">Interested in taking Office-Bearer responsibility?</label>
             <select id="profOfficeBearerInterest" class="profile-select">
+              <option value="">Select Yes or No</option>
               <option value="Yes">Yes</option>
               <option value="No">No</option>
               <option value="Interested in Future">Interested in Future</option>
@@ -2319,7 +2336,8 @@
         <div class="profile-grid-2col">
           <div class="form-group">
             <label for="profWillingBloodDonate">Willing to Donate Blood in Emergency?</label>
-            <select id="profWillingBloodDonate" class="profile-select">
+             <select id="profWillingBloodDonate" class="profile-select">
+              <option value="">Select Yes or No</option>
               <option value="Yes">Yes</option>
               <option value="No">No</option>
             </select>
