@@ -903,21 +903,43 @@ let activePhotoSource = "membership"; // Tracks active upload source: 'membershi
  * Binds photo upload listeners and sets active target source
  */
 function initializePhotoPreview() {
-  const membInput = document.getElementById("memberPhoto");
-  const profInput = document.getElementById("profilePhotoUpload") || document.getElementById("profPhotoInput");
+  const membGallery = document.getElementById("memberPhoto");
+  const membCamera  = document.getElementById("memberCameraPhoto");
+  const profGallery = document.getElementById("profPhotoInput");
+  const profCamera  = document.getElementById("profCameraPhotoInput");
 
-  if (membInput) {
-    membInput.addEventListener("change", function () {
+  /* 1. Membership Gallery Upload */
+  if (membGallery) {
+    membGallery.addEventListener("change", function () {
       if (!this.files || !this.files[0]) return;
-      activePhotoSource = "membership"; // Set source to Membership
+      activePhotoSource = "membership";
       processSelectedPhoto(this.files[0]);
     });
   }
 
-  if (profInput) {
-    profInput.addEventListener("change", function () {
+  /* 2. Membership Direct Live Camera */
+  if (membCamera) {
+    membCamera.addEventListener("change", function () {
       if (!this.files || !this.files[0]) return;
-      activePhotoSource = "profile"; // Set source to Profile
+      activePhotoSource = "membership";
+      processSelectedPhoto(this.files[0]);
+    });
+  }
+
+  /* 3. Profile Gallery Upload */
+  if (profGallery) {
+    profGallery.addEventListener("change", function () {
+      if (!this.files || !this.files[0]) return;
+      activePhotoSource = "profile";
+      processSelectedPhoto(this.files[0]);
+    });
+  }
+
+  /* 4. Profile Direct Live Camera */
+  if (profCamera) {
+    profCamera.addEventListener("change", function () {
+      if (!this.files || !this.files[0]) return;
+      activePhotoSource = "profile";
       processSelectedPhoto(this.files[0]);
     });
   }

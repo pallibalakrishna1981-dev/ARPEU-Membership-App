@@ -1041,32 +1041,29 @@
 <div class="photo-upload-container">
 
     <!-- Left Side -->
-    <div class="photo-upload-section">
-
-        <label for="memberPhoto">
-            Passport Size Photo
-            <span class="required">*</span>
-        </label>
-
-        <div class="upload-row">
-
-            <!-- Hidden File Input -->
+    <div class="upload-row">
+            <!-- Hidden File Input for Gallery -->
             <input
                 type="file"
                 id="memberPhoto"
                 name="memberPhoto"
-                accept=".jpg,.jpeg,.png,.webp,image/*"
+                accept="image/*"
+                hidden>
+
+            <!-- Hidden File Input for Direct Camera -->
+            <input
+                type="file"
+                id="memberCameraPhoto"
+                accept="image/*"
                 capture="environment"
                 hidden>
 
-            <!-- Upload Button -->
+            <!-- Upload Button (Gallery) -->
             <button
                 type="button"
                 class="photo-btn"
                 onclick="document.getElementById('memberPhoto').click();">
-
                 Upload Photo
-
             </button>
 
             <!-- Selected File Name -->
@@ -1076,20 +1073,19 @@
                 class="photo-file-name"
                 value="No file selected"
                 readonly>
-
         </div>
 
         <div class="photo-info">
             JPG • PNG • WEBP &nbsp; | &nbsp; Max Size : 4 MB
         </div>
 
+        <!-- Take Photo Button (Camera) -->
         <button
             type="button"
             id="takePhotoBtn"
-            class="take-photo-btn">
-
+            class="take-photo-btn"
+            onclick="document.getElementById('memberCameraPhoto').click();">
             📷 Take Photo
-
         </button>
 
     </div>
@@ -1129,7 +1125,7 @@
             <span>Pay Now (Online)</span>
         </label>
         <label class="main-method-btn" for="alreadyPaidOption">
-            <input type="radio" name="alreadyPaidOption" id="alreadyPaidOption" value="alreadyPaid">
+            <input type="radio" name="paymentMethod" id="alreadyPaidOption" value="alreadyPaid">
             <span>Already Paid</span>
         </label>
     </div>
@@ -1744,13 +1740,20 @@
         <div class="photo-upload-container">
           <div class="photo-upload-section">
             <label>Passport Size Photo <span class="required">*</span></label>
-            <div class="upload-row">
-              <input type="file" id="profPhotoInput" accept="image/*" onchange="showProfPhoto(this)" hidden />
+            <<div class="upload-row">
+              <!-- Gallery Storage Input for Profile -->
+              <input type="file" id="profPhotoInput" accept="image/*" hidden />
+
+              <!-- Direct Camera Input for Profile -->
+              <input type="file" id="profCameraPhotoInput" accept="image/*" capture="environment" hidden />
+
               <button type="button" class="photo-btn" onclick="document.getElementById('profPhotoInput').click();">Upload Photo</button>
               <input type="text" id="profPhotoNameBox" class="photo-file-name" value="No file selected" readonly />
             </div>
             <div class="photo-info">JPG • PNG • WEBP &nbsp; | &nbsp; Max Size : 4 MB</div>
-            <button type="button" class="take-photo-btn" onclick="document.getElementById('profPhotoInput').click();">📷 Take Photo</button>
+
+            <!-- Direct Camera Trigger -->
+            <button type="button" class="take-photo-btn" onclick="document.getElementById('profCameraPhotoInput').click();">📷 Take Photo</button>
           </div>
           <div class="photo-preview" style="position: relative;">
             <img id="profPhotoImg" src="" alt="" style="display:none; width:100%; height:100%; object-fit:cover; position:absolute; top:0; left:0; z-index:10;" />
