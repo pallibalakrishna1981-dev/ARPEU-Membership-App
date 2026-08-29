@@ -3664,54 +3664,43 @@ function handleTierBodySelect(bodyChk) {
 }
 
 /* ==========================================================
-   ARPEU GOVERNANCE HIERARCHY & PROTOCOL RULES ENGINE
+   ARPEU LEVEL-BY-LEVEL GOVERNANCE & PROTOCOL RULES ENGINE
    ========================================================== */
 
-/* Handles General Member toggle */
-function handleTierGeneralMemberSelect(genChk) {
-  const postBox = document.getElementById("arpeuExecutivePostsBox");
-  if (genChk && genChk.checked) {
-    document.querySelectorAll(".prof-tier-chk").forEach(function (chk) {
-      if (chk !== genChk) chk.checked = false;
-    });
-    if (postBox) postBox.style.display = "none";
-  }
-}
+/* Unhides only the specific boxes corresponding to checked tiers */
+function handleTierSelect() {
+  const genChk   = document.querySelector('.prof-tier-chk[value="General Member"]');
+  const stateChk = document.querySelector('.prof-tier-chk[value="State Body"]');
+  const compChk  = document.querySelector('.prof-tier-chk[value="Company / Circle Body"]');
+  const divChk   = document.querySelector('.prof-tier-chk[value="Division / Regional Body"]');
 
-/* Handles Body tier selection (State, Company, Division) */
-function handleTierBodySelect(bodyChk) {
-  const genChk = document.querySelector('.prof-tier-chk[value="General Member"]');
-  const postBox = document.getElementById("arpeuExecutivePostsBox");
-  
-  if (bodyChk && bodyChk.checked) {
+  const stateBox = document.getElementById("stateBodyPostsBox");
+  const compBox  = document.getElementById("companyBodyPostsBox");
+  const divBox   = document.getElementById("divisionBodyPostsBox");
+
+  const anyTierChecked = (stateChk && stateChk.checked) || (compChk && compChk.checked) || (divChk && divChk.checked);
+
+  if (anyTierChecked) {
     if (genChk) genChk.checked = false;
-    if (postBox) postBox.style.display = "block";
   } else {
-    const anyBodyChecked = Array.from(document.querySelectorAll(".prof-tier-chk")).some(chk => chk.value !== "General Member" && chk.checked);
-    if (!anyBodyChecked) {
-      if (genChk) genChk.checked = true;
-      if (postBox) postBox.style.display = "none";
-    }
+    if (genChk) genChk.checked = true;
   }
+
+  if (stateBox) stateBox.style.display = (stateChk && stateChk.checked) ? "block" : "none";
+  if (compBox)  compBox.style.display  = (compChk && compChk.checked) ? "block" : "none";
+  if (divBox)   divBox.style.display   = (divChk && divChk.checked) ? "block" : "none";
 }
 
-/* Enforces Single Primary Post & Core Committee Eligibility for Top 5 Posts */
-function handlePrimaryDesignationSelect(currentCheckbox, isCoreEligible) {
+/* Enforces Single Primary Post & Core Committee Eligibility for State Top 5 */
+function handleStateDesigSelect(currentCheckbox, isCoreEligible) {
   const coreLabel = document.getElementById("coreCommitteeLabel");
   const coreChk   = document.getElementById("chkCoreCommittee");
-  const otherBox  = document.getElementById("otherDesignationInputBox");
 
   if (currentCheckbox && currentCheckbox.checked) {
-    document.querySelectorAll(".prof-primary-desig-chk").forEach(function (chk) {
+    document.querySelectorAll(".prof-state-desig-chk").forEach(function (chk) {
       if (chk !== currentCheckbox) chk.checked = false;
     });
 
-    /* Toggle Other Input Box */
-    if (otherBox) {
-      otherBox.style.display = (currentCheckbox.value === "Other") ? "block" : "none";
-    }
-
-    /* Core Committee is strictly enabled ONLY for Top 5 Protocol Posts */
     if (isCoreEligible) {
       if (coreLabel) { coreLabel.style.opacity = "1"; coreLabel.style.pointerEvents = "auto"; }
       if (coreChk) { coreChk.disabled = false; }
@@ -3720,9 +3709,26 @@ function handlePrimaryDesignationSelect(currentCheckbox, isCoreEligible) {
       if (coreChk) { coreChk.disabled = true; coreChk.checked = false; }
     }
   } else {
-    if (otherBox) otherBox.style.display = "none";
     if (coreLabel) { coreLabel.style.opacity = "0.5"; coreLabel.style.pointerEvents = "none"; }
     if (coreChk) { coreChk.disabled = true; coreChk.checked = false; }
+  }
+}
+
+/* Enforces Single Post for Company Body */
+function handleCompDesigSelect(currentCheckbox) {
+  if (currentCheckbox && currentCheckbox.checked) {
+    document.querySelectorAll(".prof-comp-desig-chk").forEach(function (chk) {
+      if (chk !== currentCheckbox && chk.value !== "Company EC Member") chk.checked = false;
+    });
+  }
+}
+
+/* Enforces Single Post for Division Body */
+function handleDivDesigSelect(currentCheckbox) {
+  if (currentCheckbox && currentCheckbox.checked) {
+    document.querySelectorAll(".prof-div-desig-chk").forEach(function (chk) {
+      if (chk !== currentCheckbox && chk.value !== "Division EC Member") chk.checked = false;
+    });
   }
 }
 
@@ -4525,36 +4531,23 @@ function collectDigitalProfileData() {
   const selectedSkills = [];
   document.querySelectorAll(".prof-skill-chk:checked").forEach(chk => selectedSkills.push(chk.value));
 
-  // 3. Collect Checked Languages (Card 8) - Declared BEFORE object return!
+  // 3. Collect Checked Languages (Card 8)
   const selectedLanguages = [];
   document.querySelectorAll(".prof-lang-chk:checked").forEach(chk => selectedLanguages.push(chk.value));
 
-// 4. Collect Multi-select ARPEU Responsibility Levels
-  const selectedArpeuLevels = [];
-  document.querySelectorAll(".prof-arpeu-level-chk:checked").forEach(chk => selectedArpeuLevels.push(chk.value));
-
-  // 5. Collect Multi-select Training Attended
+  // 4. Collect Multi-select Training Attended (Card 9)
   const selectedTrainings = [];
   document.querySelectorAll(".prof-training-chk:checked").forEach(chk => selectedTrainings.push(chk.value));
-  // Collect Primary Post + Committee Add-ons
-  const selectedPositions = [];
-  document.querySelectorAll(".prof-primary-desig-chk:checked, .prof-addon-desig-chk:checked").forEach(function (chk) {
-    selectedPositions.push(chk.value);
-  });
 
-  // Collect Tiers, Primary Designation, Other Text & Addon Committees
+  // 5. Collect Multi-select ARPEU Responsibility Tiers (Card 5)
   const selectedTiers = [];
   document.querySelectorAll(".prof-tier-chk:checked").forEach(chk => selectedTiers.push(chk.value));
 
-  let finalDesig = "";
-  const primaryChk = document.querySelector(".prof-primary-desig-chk:checked");
-  if (primaryChk) {
-    if (primaryChk.value === "Other") {
-      finalDesig = document.getElementById("profOtherDesignationText") ? document.getElementById("profOtherDesignationText").value.trim() || "Other" : "Other";
-    } else {
-      finalDesig = primaryChk.value;
-    }
-  }
+  // 6. Collect All Designations Across State, Company & Division Bodies (Card 5)
+  const allPositions = [];
+  document.querySelectorAll(".prof-state-desig-chk:checked, .prof-state-addon-chk:checked, .prof-comp-desig-chk:checked, .prof-div-desig-chk:checked").forEach(function (chk) {
+    allPositions.push(chk.value);
+  });
 
   const selectedAddons = [];
   document.querySelectorAll(".prof-addon-desig-chk:checked").forEach(chk => selectedAddons.push(chk.value));
@@ -4614,9 +4607,9 @@ function collectDigitalProfileData() {
     },
 
     // 5. ARPEU & BMS Responsibility
-   organisationRole: {
+     organisationRole: {
       arpeuLevel:        selectedTiers.join(", ") || "General Member",
-      arpeuDesignation:  [finalDesig, ...selectedAddons].filter(Boolean).join(", ") || "General Member",
+      arpeuDesignation:  allPositions.join(", ") || "General Member",
       bmsResponsibility: getVal("profBmsResponsibility")
     },
 

@@ -2047,64 +2047,89 @@
         </div>
       </div>
 
-      <!-- 5. ARPEU UNION STRUCTURE & BMS RESPONSIBILITY -->
+      <<!-- 5. ARPEU UNION STRUCTURE & BMS RESPONSIBILITY -->
       <div class="profile-section-card">
         <div class="card-section-header">
           <i class="fas fa-sitemap"></i> 5. ARPEU & BMS Responsibility
         </div>
         
-        <!-- 1. ARPEU Responsibility Level (Multi-Select Level Chips) -->
+        <!-- 1. Responsibility Tier (Multi-Select Level Chips) -->
         <div class="form-group full-width" style="margin-bottom: 14px;">
           <label>ARPEU Office-Bearer Level (Select all applicable tiers)</label>
           <div class="skills-checkbox-grid" style="margin-top:6px;">
-            <label class="chip-checkbox"><input type="checkbox" value="General Member" class="prof-tier-chk" onchange="handleTierGeneralMemberSelect(this)" checked /> General Member</label>
-            <label class="chip-checkbox"><input type="checkbox" value="State Body" class="prof-tier-chk" onchange="handleTierBodySelect(this)" /> State Body</label>
-            <label class="chip-checkbox"><input type="checkbox" value="Company / Circle Body" class="prof-tier-chk" onchange="handleTierBodySelect(this)" /> Company / Circle Body</label>
-            <label class="chip-checkbox"><input type="checkbox" value="Division / Regional Body" class="prof-tier-chk" onchange="handleTierBodySelect(this)" /> Division / Regional Body</label>
+            <label class="chip-checkbox"><input type="checkbox" value="General Member" class="prof-tier-chk" onchange="handleTierSelect()" checked /> General Member</label>
+            <label class="chip-checkbox"><input type="checkbox" value="State Body" class="prof-tier-chk" onchange="handleTierSelect()" /> State Body</label>
+            <label class="chip-checkbox"><input type="checkbox" value="Company / Circle Body" class="prof-tier-chk" onchange="handleTierSelect()" /> Company / Circle Body</label>
+            <label class="chip-checkbox"><input type="checkbox" value="Division / Regional Body" class="prof-tier-chk" onchange="handleTierSelect()" /> Division / Regional Body</label>
           </div>
         </div>
 
-         <!-- 2. Primary Executive Posts in Protocol Order (Single-Select) -->
-        <div id="arpeuExecutivePostsBox" class="form-group full-width" style="display:none; margin-bottom: 14px; background:#f8fafc; border:1px solid #e2e8f0; padding:12px; border-radius:12px;">
-          <label style="color:#0B4EA2; font-weight:700;">Primary Executive Designation (Select one)</label>
+        <!-- 2. STATE BODY DESIGNATION BOX (Opens when State Body is selected) -->
+        <div id="stateBodyPostsBox" class="form-group full-width" style="display:none; margin-bottom: 14px; background:#f8fafc; border:1px solid #0B4EA2; padding:12px; border-radius:12px;">
+          <label style="color:#0B4EA2; font-weight:700;">State Body Designation </label>
           <div class="skills-checkbox-grid" style="margin-top:8px;">
-            <!-- Top 5 Core Protocol Posts -->
-            <label class="chip-checkbox"><input type="checkbox" value="President" class="prof-primary-desig-chk" onchange="handlePrimaryDesignationSelect(this, true)" /> President</label>
-            <label class="chip-checkbox"><input type="checkbox" value="General Secretary" class="prof-primary-desig-chk" onchange="handlePrimaryDesignationSelect(this, true)" /> General Secretary</label>
-            <label class="chip-checkbox"><input type="checkbox" value="Treasurer" class="prof-primary-desig-chk" onchange="handlePrimaryDesignationSelect(this, true)" /> Treasurer</label>
-            <label class="chip-checkbox"><input type="checkbox" value="Working President" class="prof-primary-desig-chk" onchange="handlePrimaryDesignationSelect(this, true)" /> Working President</label>
-            <label class="chip-checkbox"><input type="checkbox" value="Organising Secretary" class="prof-primary-desig-chk" onchange="handlePrimaryDesignationSelect(this, true)" /> Organising Secretary</label>
-
-            <!-- Other Executive Posts -->
-            <label class="chip-checkbox"><input type="checkbox" value="Vice President" class="prof-primary-desig-chk" onchange="handlePrimaryDesignationSelect(this, false)" /> Vice President</label>
-            <label class="chip-checkbox"><input type="checkbox" value="Assistant General Secretary" class="prof-primary-desig-chk" onchange="handlePrimaryDesignationSelect(this, false)" /> Assistant General Secretary</label>
-            <label class="chip-checkbox"><input type="checkbox" value="Secretary" class="prof-primary-desig-chk" onchange="handlePrimaryDesignationSelect(this, false)" /> Secretary</label>
-            <label class="chip-checkbox"><input type="checkbox" value="Joint Secretary" class="prof-primary-desig-chk" onchange="handlePrimaryDesignationSelect(this, false)" /> Joint Secretary</label>
-            <label class="chip-checkbox"><input type="checkbox" value="Assistant Secretary" class="prof-primary-desig-chk" onchange="handlePrimaryDesignationSelect(this, false)" /> Assistant Secretary</label>
-            <label class="chip-checkbox"><input type="checkbox" value="Office Secretary" class="prof-primary-desig-chk" onchange="handlePrimaryDesignationSelect(this, false)" /> Office Secretary</label>
-            <label class="chip-checkbox"><input type="checkbox" value="Other" class="prof-primary-desig-chk" onchange="handlePrimaryDesignationSelect(this, false)" /> Other</label>
+            <label class="chip-checkbox"><input type="checkbox" value="State President" class="prof-state-desig-chk" onchange="handleStateDesigSelect(this, true)" /> President</label>
+            <label class="chip-checkbox"><input type="checkbox" value="State General Secretary" class="prof-state-desig-chk" onchange="handleStateDesigSelect(this, true)" /> General Secretary</label>
+            <label class="chip-checkbox"><input type="checkbox" value="State Treasurer" class="prof-state-desig-chk" onchange="handleStateDesigSelect(this, true)" /> Treasurer</label>
+            <label class="chip-checkbox"><input type="checkbox" value="State Working President" class="prof-state-desig-chk" onchange="handleStateDesigSelect(this, true)" /> Working President</label>
+            <label class="chip-checkbox"><input type="checkbox" value="State Organising Secretary" class="prof-state-desig-chk" onchange="handleStateDesigSelect(this, true)" /> Organising Secretary</label>
+            <label class="chip-checkbox"><input type="checkbox" value="State Vice President" class="prof-state-desig-chk" onchange="handleStateDesigSelect(this, false)" /> Vice President</label>
+            <label class="chip-checkbox"><input type="checkbox" value="State Asst. General Secretary" class="prof-state-desig-chk" onchange="handleStateDesigSelect(this, false)" /> Asst. General Secretary</label>
+            <label class="chip-checkbox"><input type="checkbox" value="State Joint Secretary" class="prof-state-desig-chk" onchange="handleStateDesigSelect(this, false)" /> Joint Secretary</label>
+            <label class="chip-checkbox"><input type="checkbox" value="State Office Secretary" class="prof-state-desig-chk" onchange="handleStateDesigSelect(this, false)" /> Office Secretary</label>
+            <label class="chip-checkbox"><input type="checkbox" value="State Other" class="prof-state-desig-chk" onchange="handleStateDesigSelect(this, false)" /> Other</label>
           </div>
 
-          <!-- Other Custom Designation Text Input -->
-          <div id="otherDesignationInputBox" style="display:none; margin-top:10px;">
-            <input type="text" id="profOtherDesignationText" class="profile-input" placeholder="Specify your designation..." />
-          </div>
-
-          <!-- 3. High-Power Add-on Committees -->
-          <div style="margin-top: 14px; border-top:1px dashed #cbd5e1; padding-top:10px;">
-            <label style="font-size:11.5px; color:#475569; font-weight:700;">Additional Committee Memberships (Eligible Add-ons)</label>
-            <div class="skills-checkbox-grid" style="margin-top:6px;">
+          <!-- State Add-on Committees -->
+          <div style="margin-top: 10px; border-top:1px dashed #cbd5e1; padding-top:8px;">
+            <div class="skills-checkbox-grid">
               <label id="coreCommitteeLabel" class="chip-checkbox" style="background:#eff6ff; border-color:#93c5fd; opacity:0.5; pointer-events:none;">
-                <input type="checkbox" value="Core Committee Member" id="chkCoreCommittee" class="prof-addon-desig-chk" disabled /> Core Committee Member (Top 5 Only)
+                <input type="checkbox" value="Core Committee Member" id="chkCoreCommittee" class="prof-state-addon-chk" disabled /> Core Committee Member 
               </label>
               <label class="chip-checkbox" style="background:#eff6ff; border-color:#93c5fd;">
-                <input type="checkbox" value="EC Member" class="prof-addon-desig-chk" /> EC Member (Executive Committee)
+                <input type="checkbox" value="State EC Member" class="prof-state-addon-chk" /> State EC Member
               </label>
             </div>
           </div>
         </div>
 
-        <!-- Responsibility in BMS -->
+        <!-- 3. COMPANY / CIRCLE BODY DESIGNATION BOX (Opens when Company Body is selected) -->
+        <div id="companyBodyPostsBox" class="form-group full-width" style="display:none; margin-bottom: 14px; background:#f8fafc; border:1px solid #f57c00; padding:12px; border-radius:12px;">
+          <label style="color:#f57c00; font-weight:700;">Company / Circle Body Designation </label>
+          <div class="skills-checkbox-grid" style="margin-top:8px;">
+            <label class="chip-checkbox"><input type="checkbox" value="Company President" class="prof-comp-desig-chk" onchange="handleCompDesigSelect(this)" /> President</label>
+            <label class="chip-checkbox"><input type="checkbox" value="Company Secretary" class="prof-comp-desig-chk" onchange="handleCompDesigSelect(this)" /> Secretary</label>
+            <label class="chip-checkbox"><input type="checkbox" value="Company Treasurer" class="prof-comp-desig-chk" onchange="handleCompDesigSelect(this)" /> Treasurer</label>
+            <label class="chip-checkbox"><input type="checkbox" value="Company Working President" class="prof-comp-desig-chk" onchange="handleCompDesigSelect(this)" /> Working President</label>
+            <label class="chip-checkbox"><input type="checkbox" value="Company Organising Secretary" class="prof-comp-desig-chk" onchange="handleCompDesigSelect(this)" /> Organising Secretary</label>
+            <label class="chip-checkbox"><input type="checkbox" value="Company Vice President" class="prof-comp-desig-chk" onchange="handleCompDesigSelect(this)" /> Vice President</label>
+            <label class="chip-checkbox"><input type="checkbox" value="Company Joint Secretary" class="prof-comp-desig-chk" onchange="handleCompDesigSelect(this)" /> Joint Secretary</label>
+            <label class="chip-checkbox"><input type="checkbox" value="Company Asst. Secretary" class="prof-comp-desig-chk" onchange="handleCompDesigSelect(this)" /> Asst. Secretary</label>
+            <label class="chip-checkbox"><input type="checkbox" value="Company Office Secretary" class="prof-comp-desig-chk" onchange="handleCompDesigSelect(this)" /> Office Secretary</label>
+            <label class="chip-checkbox"><input type="checkbox" value="Company EC Member" class="prof-comp-desig-chk" /> Company EC Member</label>
+            <label class="chip-checkbox"><input type="checkbox" value="Company Other" class="prof-comp-desig-chk" onchange="handleCompDesigSelect(this)" /> Other</label>
+          </div>
+        </div>
+
+        <!-- 4. DIVISION / REGIONAL BODY DESIGNATION BOX (Opens when Division Body is selected) -->
+        <div id="divisionBodyPostsBox" class="form-group full-width" style="display:none; margin-bottom: 14px; background:#f8fafc; border:1px solid #16a34a; padding:12px; border-radius:12px;">
+          <label style="color:#16a34a; font-weight:700;">Division / Regional Body Designation </label>
+          <div class="skills-checkbox-grid" style="margin-top:8px;">
+            <label class="chip-checkbox"><input type="checkbox" value="Division President" class="prof-div-desig-chk" onchange="handleDivDesigSelect(this)" /> President</label>
+            <label class="chip-checkbox"><input type="checkbox" value="Division Secretary" class="prof-div-desig-chk" onchange="handleDivDesigSelect(this)" /> Secretary</label>
+            <label class="chip-checkbox"><input type="checkbox" value="Division Treasurer" class="prof-div-desig-chk" onchange="handleDivDesigSelect(this)" /> Treasurer</label>
+            <label class="chip-checkbox"><input type="checkbox" value="Division Working President" class="prof-div-desig-chk" onchange="handleDivDesigSelect(this)" /> Working President</label>
+            <label class="chip-checkbox"><input type="checkbox" value="Division Organising Secretary" class="prof-div-desig-chk" onchange="handleDivDesigSelect(this)" /> Organising Secretary</label>
+            <label class="chip-checkbox"><input type="checkbox" value="Division Vice President" class="prof-div-desig-chk" onchange="handleDivDesigSelect(this)" /> Vice President</label>
+            <label class="chip-checkbox"><input type="checkbox" value="Division Joint Secretary" class="prof-div-desig-chk" onchange="handleDivDesigSelect(this)" /> Joint Secretary</label>
+            <label class="chip-checkbox"><input type="checkbox" value="Division Asst. Secretary" class="prof-div-desig-chk" onchange="handleDivDesigSelect(this)" /> Asst. Secretary</label>
+            <label class="chip-checkbox"><input type="checkbox" value="Division Office Secretary" class="prof-div-desig-chk" onchange="handleDivDesigSelect(this)" /> Office Secretary</label>
+            <label class="chip-checkbox"><input type="checkbox" value="Division EC Member" class="prof-div-desig-chk" /> Division EC Member</label>
+            <label class="chip-checkbox"><input type="checkbox" value="Division Other" class="prof-div-desig-chk" onchange="handleDivDesigSelect(this)" /> Other</label>
+          </div>
+        </div>
+
+        <!-- 5. Responsibility in BMS -->
         <div class="form-group full-width">
           <label for="profBmsResponsibility">Responsibility in BMS (Bharatiya Mazdoor Sangh)</label>
           <select id="profBmsResponsibility" class="profile-select">
@@ -2121,7 +2146,6 @@
         </div>
 
       </div>
-
       <!-- 6. PERSONAL & ORGANISATIONAL TALENTS (BALANCED 4 + 4 GRID) -->
       <div class="profile-section-card">
         <div class="card-section-header">
