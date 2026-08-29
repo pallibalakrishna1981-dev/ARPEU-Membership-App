@@ -12,6 +12,12 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
+<link rel="manifest" href="manifest.json">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#0B4EA2">
+<meta name="apple-mobile-web-app-title" content="ARPEU Portal">
+
 <link rel="stylesheet" href="css/style.css?v=2026">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
@@ -131,12 +137,13 @@
                 <span>Downloads</span>
             </a>
 
-            <a href="#" id="navNotifications">
+            <a href="#" id="navNotifications" onclick="showPage('notifications'); return false;">
                 <i class="fa-solid fa-bell"></i>
                 <span>Notifications</span>
+                <span id="navNotificationsBadge" class="adm-badge-count" style="display:none;">0</span>
             </a>
 
-            <a href="#" id="navSettings">
+            <a href="#" id="navSettings" onclick="showPage('settings'); return false;">
                 <i class="fa-solid fa-gear"></i>
                 <span>Settings</span>
             </a>
@@ -3955,6 +3962,188 @@
 <!-- =========================================================
      DONATION MODULE & UNIVERSAL AUTO-FILL SECTION (END)
 ========================================================= -->
+
+
+
+<!-- =========================================================
+     SETTINGS & SYSTEM PREFERENCES MODULE (START)
+========================================================= -->
+<section id="settingsSection" class="main-page-section" style="display:none; padding: 10px 12px 30px 12px; max-width: 480px; margin: 0 auto; box-sizing: border-box;">
+
+    <!-- Settings Header Banner -->
+    <div class="profile-title-banner" style="background: linear-gradient(135deg, #0B4EA2 0%, #1565C0 100%); margin-bottom: 15px;">
+        <h2><i class="fa-solid fa-gear"></i> Settings & Preferences</h2>
+        <p>Customize app display, alerts & system cache controls</p>
+    </div>
+
+    <!-- 1. Display & Font Sizing Card -->
+    <div class="form-card" style="margin-bottom: 12px;">
+        <div class="card-header">
+            <i class="fa-solid fa-palette"></i>
+            <span class="card-title">Display & Appearance</span>
+        </div>
+        <div class="card-body" style="gap: 12px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <strong style="font-size: 12.5px; color: #1e293b; display: block;">Portal Font Scaling</strong>
+                    <span style="font-size: 10px; color: #64748b;">Adjust readability across all forms</span>
+                </div>
+                <div style="display: flex; gap: 4px;">
+                    <button type="button" class="adm-tab-btn" style="height: 30px; padding: 0 10px; font-size: 10.5px;" onclick="setPortalFontSize('small')">A-</button>
+                    <button type="button" class="adm-tab-btn active" id="fontBtnNormal" style="height: 30px; padding: 0 10px; font-size: 10.5px;" onclick="setPortalFontSize('normal')">Default</button>
+                    <button type="button" class="adm-tab-btn" style="height: 30px; padding: 0 10px; font-size: 10.5px;" onclick="setPortalFontSize('large')">A+</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. Notification Preferences Card -->
+    <div class="form-card" style="margin-bottom: 12px;">
+        <div class="card-header">
+            <i class="fa-solid fa-bell"></i>
+            <span class="card-title">Notification Controls</span>
+        </div>
+        <div class="card-body" style="gap: 12px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <strong style="font-size: 12.5px; color: #1e293b; display: block;">Union Circulars & GO Alerts</strong>
+                    <span style="font-size: 10px; color: #64748b;">Receive updates on wage & PRC news</span>
+                </div>
+                <input type="checkbox" id="setNotifCirculars" checked style="width: 18px; height: 18px; cursor: pointer;">
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #f1f5f9; padding-top: 10px;">
+                <div>
+                    <strong style="font-size: 12.5px; color: #1e293b; display: block;">BMS Agitations & Strike Calls</strong>
+                    <span style="font-size: 10px; color: #64748b;">Emergency protest & dharna notices</span>
+                </div>
+                <input type="checkbox" id="setNotifStrikes" checked style="width: 18px; height: 18px; cursor: pointer;">
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #f1f5f9; padding-top: 10px;">
+                <div>
+                    <strong style="font-size: 12.5px; color: #1e293b; display: block;">Membership Renewal Reminders</strong>
+                    <span style="font-size: 10px; color: #64748b;">Alerts before annual membership expiry</span>
+                </div>
+                <input type="checkbox" id="setNotifRenewals" checked style="width: 18px; height: 18px; cursor: pointer;">
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. System Storage & Mobile App Card -->
+    <div class="form-card" style="margin-bottom: 12px;">
+        <div class="card-header">
+            <i class="fa-solid fa-microchip"></i>
+            <span class="card-title">System & Storage Controls</span>
+        </div>
+        <div class="card-body" style="gap: 10px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; background: #f8fafc; padding: 10px; border-radius: 8px; border: 1px dashed #cbd5e1;">
+                <div>
+                    <strong style="font-size: 12px; color: #1e293b; display: block;">Local Session Cache</strong>
+                    <span style="font-size: 10px; color: #64748b;">Temporary offline data & assets</span>
+                </div>
+                <button type="button" class="dl-btn btn-preview" style="height: 30px; padding: 0 12px;" onclick="clearPortalCache()">
+                    <i class="fa-solid fa-rotate"></i> Clear & Reload
+                </button>
+            </div>
+
+            <button type="button" class="submit-btn" style="background: #0B4EA2; height: 44px; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 12px;" onclick="promptAppInstallation()">
+                <i class="fa-solid fa-mobile-screen"></i> Install App to Mobile Home Screen
+            </button>
+        </div>
+    </div>
+
+    <!-- 4. Portal Information & Credits Card -->
+    <div class="form-card" style="text-align: center; background: #f8fafc; border: 1px solid #e2e8f0;">
+        <img src="images/arpeu-logo.png" alt="ARPEU Logo" style="width: 48px; height: 48px; margin: 0 auto 6px auto; object-fit: contain;">
+        <h4 style="font-size: 13px; font-weight: 800; color: #0B4EA2; margin: 0;">ARPEU DIGITAL MEMBERSHIP PORTAL</h4>
+        <p style="font-size: 10.5px; color: #64748b; margin: 2px 0 6px 0;">Version 1.0 (2026 Build) • Affiliated to BMS & ABVMM</p>
+        <div style="font-size: 10px; font-weight: 700; color: #1e293b; border-top: 1px solid #e2e8f0; padding-top: 6px; margin-top: 4px;">
+            Developed by <strong>Sri P. Balakrishna</strong> | State Treasurer
+        </div>
+    </div>
+
+</section>
+<!-- =========================================================
+     SETTINGS & SYSTEM PREFERENCES MODULE (END)
+========================================================= -->
+
+
+
+
+<!-- =========================================================
+     NOTIFICATIONS & LIVE ALERTS MODULE (START)
+========================================================= -->
+<section id="notificationsSection" class="main-page-section" style="display:none; padding: 10px 12px 25px 12px; max-width: 480px; margin: 0 auto; box-sizing: border-box;">
+
+    <!-- Notifications Header Banner -->
+    <div class="profile-title-banner" style="background: linear-gradient(135deg, #0B4EA2 0%, #1565C0 100%); margin-bottom: 15px;">
+        <h2><i class="fa-solid fa-bell"></i> Notifications & Alerts</h2>
+        <p>Real-time union updates, circulars & administrative queues</p>
+    </div>
+
+    <!-- Live Notification Cards Container -->
+    <div id="notificationsListContainer" style="display: flex; flex-direction: column; gap: 10px;">
+        
+        <!-- Card 1: Live Profile Update Requests (Dynamic Admin Shortcut) -->
+        <div class="diff-box-card" style="background: #fff8f0; border: 1.5px solid #ffcc80; cursor: pointer;" onclick="openNotificationTarget('profiles')">
+            <div class="diff-header" style="color: #f57c00; border-bottom: 1px dashed #ffe0b2;">
+                <span><i class="fa-solid fa-user-pen"></i> Profile Update Requests</span>
+                <span class="adm-badge-count" id="notifProfilesCount" style="background: #f57c00 !important;">0</span>
+            </div>
+            <p style="font-size: 11.5px; color: #334155; margin: 6px 0 8px 0; line-height: 1.35;">
+                Member profile modification requests waiting for verification & approval.
+            </p>
+            <div style="font-size: 11px; font-weight: 700; color: #0B4EA2; display: flex; align-items: center; gap: 4px;">
+                <i class="fa-solid fa-lock"></i> Review in Admin Panel <i class="fa-solid fa-arrow-right"></i>
+            </div>
+        </div>
+
+        <!-- Card 2: Live Document Verification (Dynamic Admin Shortcut) -->
+        <div class="diff-box-card" style="background: #f0fdf4; border: 1.5px solid #bbf7d0; cursor: pointer;" onclick="openNotificationTarget('docs')">
+            <div class="diff-header" style="color: #16a34a; border-bottom: 1px dashed #dcfce7;">
+                <span><i class="fa-solid fa-file-circle-check"></i> Document Verification</span>
+                <span class="adm-badge-count" id="notifDocsCount" style="background: #16a34a !important;">0</span>
+            </div>
+            <p style="font-size: 11.5px; color: #334155; margin: 6px 0 8px 0; line-height: 1.35;">
+                Aadhaar, Payslip and identity document uploads pending verification.
+            </p>
+            <div style="font-size: 11px; font-weight: 700; color: #0B4EA2; display: flex; align-items: center; gap: 4px;">
+                <i class="fa-solid fa-lock"></i> Verify in Admin Panel <i class="fa-solid fa-arrow-right"></i>
+            </div>
+        </div>
+
+        <!-- Card 3: Statewide Membership Drive Notice -->
+        <div class="diff-box-card" style="background: #ffffff; border: 1px solid #e2e8f0; cursor: pointer;" onclick="showPage('membership')">
+            <div class="diff-header" style="color: #0B4EA2;">
+                <span><i class="fa-solid fa-id-card"></i> Digital Membership Drive 2026</span>
+                <span class="news-deadline-pill" style="font-size: 8.5px; padding: 1px 6px;">Active</span>
+            </div>
+            <p style="font-size: 11.5px; color: #334155; margin: 6px 0 8px 0; line-height: 1.35;">
+                Statewide digital membership drive is active for all electricity employees across APGENCO, APTRANSCO & DISCOMs.
+            </p>
+            <div style="font-size: 11px; font-weight: 700; color: #0B4EA2; display: flex; align-items: center; gap: 4px;">
+                Register / Renew Membership <i class="fa-solid fa-arrow-right"></i>
+            </div>
+        </div>
+
+        <!-- Card 4: Official BMS Nationwide Strike & Protest Notice -->
+        <div class="diff-box-card" style="background: #ffffff; border: 1px solid #e2e8f0;">
+            <div class="diff-header" style="color: #dc2626;">
+                <span><i class="fa-solid fa-flag"></i> BMS National Call & Agitation</span>
+                <span style="font-size: 9.5px; color: #64748b;">Notice</span>
+            </div>
+            <p style="font-size: 11.5px; color: #334155; margin: 6px 0 0 0; line-height: 1.35;">
+                Central BMS call for nationwide protest program and dharna at all district headquarters demanding power worker rights.
+            </p>
+        </div>
+
+    </div>
+
+</section>
+<!-- =========================================================
+     NOTIFICATIONS & LIVE ALERTS MODULE (END)
+========================================================= -->
+
+
 
 <!-- =========================================================
      ARPEU ADMIN PANEL & MANAGEMENT MODULE (START)

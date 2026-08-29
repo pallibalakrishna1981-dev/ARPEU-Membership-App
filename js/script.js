@@ -522,6 +522,8 @@ function showPage(page) {
   const dwnSec  = document.getElementById("downloadsSection") || document.getElementById("downloadsPage");
   const profSec = document.getElementById("profileSection") || document.getElementById("profilePage") || document.getElementById("myProfileSection");
   const admSec  = document.getElementById("adminSection");
+  const notifSec = document.getElementById("notificationsSection");
+  const setSec   = document.getElementById("settingsSection");
 
   // Placeholder section for under-development modules
   let placeholderSec = document.getElementById("underDevPlaceholderSection");
@@ -558,6 +560,8 @@ function showPage(page) {
   if (dwnSec) dwnSec.style.display = "none";
   if (profSec) profSec.style.display = "none";
   if (admSec) admSec.style.display = "none";
+  if (notifSec) notifSec.style.display = "none";
+  if (setSec) setSec.style.display = "none";
   if (placeholderSec) placeholderSec.style.display = "none";
 
   // 4. Remove 'active' highlight class from all navigation links
@@ -665,11 +669,16 @@ function showPage(page) {
       break;
 
     case "notifications":
-      showUnderDevelopmentCard("Notifications");
+    case "notification":
+      if (notifSec) notifSec.style.display = "block";
+      if (typeof syncLiveNotificationCounts === "function") {
+        syncLiveNotificationCounts();
+      }
       break;
 
     case "settings":
-      showUnderDevelopmentCard("Settings");
+    case "setting":
+      if (setSec) setSec.style.display = "block";
       break;
 
    case "adminlogin":
@@ -4941,4 +4950,108 @@ window.closeReceipt = function () {
 /* Alias function */
 function closeReceipt() {
   window.closeReceipt();
+}
+
+
+/* ==========================================================
+   NOTIFICATIONS ENGINE & SMART ADMIN REDIRECTION
+   ========================================================== */
+
+/* Syncs live pending counts onto Notification cards & Top Menu Badge */
+async function syncLiveNotificationCounts() {
+  try {
+    const resProf = await fetch(`${BACKEND_URL}?action=getProfileRequests`);
+    const dataProf = await resProf.json();
+    const pCount = (dataProf && dataProf.success && dataProf.requests) ? dataProf.requests.length : 0;
+
+    const notifProfEl = document.getElementById("notifProfilesCount");
+    if (notifProfEl) notifProfEl.textContent = pCount;
+
+    const resDocs = await fetch(`${BACKEND_URL}?action=getPendingDocuments`);
+    const dataDocs = await resDocs.json();
+    const dCount = (dataDocs && dataDocs.success && dataDocs.documents) ? dataDocs.documents.length : 0;
+
+    const notifDocsEl = document.getElementById("notifDocsCount");
+    if (notifDocsEl) notifDocsEl.textContent = dCount;
+
+    const totalAlerts = pCount + dCount;
+    const topBadge = document.getElementById("navNotificationsBadge");
+    if (topBadge) {
+      topBadge.textContent = totalAlerts;
+      topBadge.style.display = totalAlerts > 0 ? "inline-block" : "none";
+    }
+  } catch (e) {
+    console.warn("Notifications count sync skipped:", e);
+  }
+}
+
+/* Smart router that redirects directly to specific Admin Queue after verifying session */
+function openNotificationTarget(targetTab) {
+  const token = sessionStorage.getItem("arpeu_admin_token");
+  showPage("admin");
+
+  if (token) {
+    switchAdminTab(targetTab);
+  } else {
+    // If not logged in, prompt user and then redirect to requested tab upon successful login
+    sessionStorage.setItem("arpeu_redirect_tab", targetTab);
+  }
+}
+
+/* Auto sync notification alerts on initial load */
+document.addEventListener("DOMContentLoaded", function () {
+  setTimeout(function () {
+    if (typeof syncLiveNotificationCounts === "function") {
+      syncLiveNotificationCounts();
+    }
+  }, 1500);
+});
+
+/* ==========================================================
+   SETTINGS & USER PREFERENCES ENGINE
+   ========================================================== */
+
+/* Adjusts dynamic font scaling across portal */
+function setPortalFontSize(size) {
+  const content = document.getElementById("contentArea");
+  if (!content) return;
+
+  if (size === "small") {
+    content.style.fontSize = "12px";
+  } else if (size === "large") {
+    content.style.fontSize = "15px";
+  } else {
+    content.style.fontSize = "";
+  }
+  alert(`Portal text scale set to: ${size.toUpperCase()}`);
+}
+
+/* Clears local cached items and smoothly reloads page */
+function clearPortalCache() {
+  if (confirm("Clear local cache and reload fresh ARPEU portal data?")) {
+    sessionStorage.clear();
+    localStorage.removeItem("arpeu_cached_data");
+    window.location.reload();
+  }
+}
+
+/* PWA App installation prompt */
+function promptAppInstallation() {
+  alert("To install this portal as an App on your Mobile:\n\n1. Tap the 3 dots (⋮) menu in Chrome.\n2. Select 'Add to Home screen' or 'Install app'.");
+}
+
+/* ==========================================================
+   PWA SERVICE WORKER AUTO-REGISTRATION
+   ========================================================== */
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function () {
+    navigator.serviceWorker.register('./sw.js')
+      .then(function (reg) {
+        console.log('ARPEU PWA Service Worker Registered Successfully:', reg.scope);
+      })
+      .catch(function (err) {
+        console.warn('PWA Service Worker Registration Failed:', err);
+      });
+  });
 }
