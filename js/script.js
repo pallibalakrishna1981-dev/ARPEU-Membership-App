@@ -3247,18 +3247,6 @@ function openReceipt() {
    HOME PAGE ENHANCEMENTS ENGINE
 ========================================================== */
 
-function dismissHomeBanner() {
-    const banner = document.getElementById("homeBannerContainer");
-    if (banner) {
-        banner.style.opacity = "0";
-        banner.style.transform = "translateY(-20px)";
-        banner.style.maxHeight = "0px";
-        banner.style.marginBottom = "0px";
-        banner.style.padding = "0px";
-        banner.style.overflow = "hidden";
-    }
-}
-
 // 📌 6 సెకన్ల తర్వాత ఆటోమేటిక్‌గా వెల్‌కమ్ బ్యానర్ దాగిపోతుంది (Auto Disappear)
 setTimeout(function () {
     dismissHomeBanner();
@@ -5225,13 +5213,26 @@ if ('serviceWorker' in navigator) {
 
 /* ==========================================================
    APP SPLASH SCREEN CONTROLLER
-   Handles automatic smooth fade-out transition after launch
+   Smooth auto-dismissal with animation timing
    ========================================================== */
-window.addEventListener("DOMContentLoaded", function () {
+function hideAppSplash() {
     setTimeout(function () {
         const splash = document.getElementById("appSplashScreen");
         if (splash) {
-            splash.classList.add("splash-hidden");
+            splash.style.opacity = "0";
+            splash.style.visibility = "hidden";
+            splash.style.pointerEvents = "none";
+            
+            setTimeout(function () {
+                splash.style.display = "none";
+            }, 650);
         }
-    }, 1800); // 1.8 seconds smooth display
-});
+    }, 2400); // 2.4 seconds duration for complete animation
+}
+
+if (document.readyState === "complete" || document.readyState === "interactive") {
+    hideAppSplash();
+} else {
+    window.addEventListener("DOMContentLoaded", hideAppSplash);
+    window.addEventListener("load", hideAppSplash);
+}
