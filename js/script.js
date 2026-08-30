@@ -1799,7 +1799,7 @@ const PaymentModuleV25 = {
       });
     }
 
-    // "I HAVE COMPLETED PAYMENT" Click -> Shows Step 3 & Auto-fills Date/Time
+    // "I HAVE COMPLETED PAYMENT" Click -> Shows Step 3 & Auto-fills Today's Live Date/Time
     if (doneBtn) {
       doneBtn.addEventListener("click", function () {
         const step3 = document.getElementById("payNowStep3");
@@ -1815,7 +1815,13 @@ const PaymentModuleV25 = {
 
         const pDate = document.getElementById("payNowDate");
         const pTime = document.getElementById("payNowTimeDisplay");
-        if (pDate) pDate.value = dStr;
+        if (pDate) {
+          pDate.value = dStr;
+          // Locks Pay Now calendar strictly to Today's date only
+          if (typeof flatpickr === "function") {
+            flatpickr(pDate, { dateFormat: "d-m-Y", minDate: "today", maxDate: "today", disableMobile: true });
+          }
+        }
         if (pTime) pTime.value = tStr;
 
         syncMembershipSubmitVisibility();
@@ -2327,6 +2333,53 @@ function initializeUniversalUtrCheckEngine() {
   });
 }
 
+
+/* ==========================================================
+   UNIVERSAL UTR / TRANSACTION ID DUPLICATE CHECK ENGINE
+   ========================================================== */
+
+function initializeUniversalUtrCheckEngine() {
+  const utrInputs = document.querySelectorAll(
+    '#payNowTransactionId, #manualTransactionId, #donUpiTxnId, #donPayNowTxnId, #donBankRefNo, .utr-field'
+  );
+
+  utrInputs.forEach(function (utrInput) {
+    if (!utrInput) return;
+
+    utrInput.addEventListener("input", function () {
+      this.value = this.value.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+      const val = this.value.trim();
+
+      // Find exact status div below this specific input box
+      let statusEl = document.getElementById(this.id + "Status") || 
+                     document.getElementById("transactionIdStatus") || 
+                     document.getElementById("manualTransactionIdStatus") || 
+                     document.getElementById("donUpiTxnStatus");
+
+      clearTimeout(debounceTimers.transactionid);
+
+      if (val.length < 5) {
+        if (statusEl) {
+          statusEl.className = "field-status";
+          statusEl.innerHTML = "";
+        }
+        return;
+      }
+
+      if (statusEl) {
+        statusEl.className = "field-status checking";
+        statusEl.style.color = "#0B4EA2";
+        statusEl.innerHTML = "Checking UTR availability...";
+      }
+
+      debounceTimers.transactionid = setTimeout(function () {
+        executeDuplicateCheck("transactionid", val, statusEl ? statusEl.id : "transactionIdStatus");
+      }, 600);
+    });
+  });
+}
+
+
 /* ============================================
    ARPEU Backend Configuration
 ============================================ */
@@ -2365,316 +2418,269 @@ async function testBackendConnection() {
 }
 
 
-/* =========================================================
-   SUBMIT MEMBERSHIP (WITH AUTO-RESET & DRIVE BASE64 INTEGRATION)
-========================================================= */
+/* ==========================================================
+   STRICT MEMBERSHIP SUBMISSION & FIELD-FOCUS VALIDATION ENGINE
+   ========================================================== */
 
-async function submitMembership(){
+async function submitMembership() {
+  const submitBtn = document.getElementById("submitMembershipBtn");
+  const originalButtonText = submitBtn ? submitBtn.innerHTML : "SUBMIT MEMBERSHIP APPLICATION";
 
-    const submitBtn=document.getElementById("submitMembershipBtn");
-    const originalButtonText=submitBtn.innerHTML;
-
-    submitBtn.disabled=true;
-    submitBtn.innerHTML="Submitting...";
-
-    /* ------------------------------
-       DECLARATION VALIDATION
-    ------------------------------ */
-
-    if(!document.getElementById("declarationCheck").checked){
-        alert("Please accept the Declaration before submitting your Membership Application.");
-        document.getElementById("declarationCheck").focus();
-        submitBtn.disabled=false;
-        submitBtn.innerHTML=originalButtonText;
-        return;
+  // Helper function to show alert and smoothly scroll to the empty field
+  function validateField(id, message) {
+    const el = document.getElementById(id);
+    if (!el || !el.value.trim()) {
+      alert(message);
+      if (el) {
+        el.focus();
+        el.scrollIntoView({ behavior: "smooth", block: "center" });
+        el.style.borderColor = "#dc2626";
+        setTimeout(() => { el.style.borderColor = ""; }, 3000);
+      }
+      return false;
     }
+    return true;
+  }
 
-    /* ------------------------------
-       PHOTO VALIDATION
-    ------------------------------ */
+  // 1. Mandatory Personal Information Validation
+  if (!validateField("employeeName", "Please enter Employee Name.")) return;
+  if (!validateField("gender", "Please select Gender.")) return;
+  if (!validateField("dob", "Please select Date of Birth.")) return;
 
-    const memberPhotoFile=document.getElementById("memberPhoto");
+  // 2. Mandatory Address Details Validation
+  if (!validateField("village", "Please enter Village / Town / City.")) return;
+  if (!validateField("mandal", "Please enter Mandal.")) return;
+  if (!validateField("district", "Please select District.")) return;
+  
+  const pincode = document.getElementById("pincode") ? document.getElementById("pincode").value.trim() : "";
+  if (!pincode || pincode.length !== 6) {
+    alert("Please enter a valid 6-digit PIN Code.");
+    document.getElementById("pincode").focus();
+    return;
+  }
+  if (!validateField("postOffice", "Please enter Post Office.")) return;
 
-    if(!memberPhotoFile.files||memberPhotoFile.files.length===0){
-        alert("Please upload or capture your passport-size photograph before submitting the Membership Application.");
-        memberPhotoFile.focus();
-        submitBtn.disabled=false;
-        submitBtn.innerHTML=originalButtonText;
-        return;
+  // 3. Mandatory Contact & Identity Validation
+  const mobile = document.getElementById("mobile") ? document.getElementById("mobile").value.trim() : "";
+  if (!mobile || mobile.length !== 10) {
+    alert("Please enter a valid 10-digit Mobile Number.");
+    document.getElementById("mobile").focus();
+    return;
+  }
+
+  const aadhaar = document.getElementById("aadhaar") ? document.getElementById("aadhaar").value.replace(/\s/g, "").trim() : "";
+  if (!aadhaar || aadhaar.length !== 12) {
+    alert("Please enter a valid 12-digit Aadhaar Number.");
+    document.getElementById("aadhaar").focus();
+    return;
+  }
+
+  // 4. Mandatory Employment Validation
+  const company = document.getElementById("company") ? document.getElementById("company").value : "";
+  if (!validateField("company", "Please select Company.")) return;
+
+  if (company === "APGENCO") {
+    if (!validateField("station", "Please select Station.")) return;
+    if (!validateField("stage", "Please select Stage.")) return;
+  } else {
+    if (!validateField("circle", "Please select Circle.")) return;
+    if (!validateField("division", "Please select Division.")) return;
+    if (!validateField("subDivision", "Please select Sub Division.")) return;
+  }
+
+  if (!validateField("designation", "Please select Designation.")) return;
+  if (!validateField("employeeId", "Please enter Employee ID.")) return;
+
+  // 5. Mandatory Photo Validation
+  const memberPhotoFile  = document.getElementById("memberPhoto");
+  const memberCameraFile = document.getElementById("memberCameraPhoto");
+  const hasPhoto = (memberPhotoFile && memberPhotoFile.files.length > 0) || (memberCameraFile && memberCameraFile.files.length > 0) || window.croppedPhotoFile;
+
+  if (!hasPhoto) {
+    alert("Please upload or capture your passport-size photograph.");
+    const photoBox = document.querySelector(".photo-upload-container");
+    if (photoBox) photoBox.scrollIntoView({ behavior: "smooth", block: "center" });
+    return;
+  }
+
+  // 6. Mandatory Declaration Check
+  const declCheck = document.getElementById("declarationCheck");
+  if (!declCheck || !declCheck.checked) {
+    alert("Please accept the declaration before submitting your application.");
+    if (declCheck) {
+      declCheck.focus();
+      declCheck.scrollIntoView({ behavior: "smooth", block: "center" });
     }
+    return;
+  }
 
-    /* ------------------------------
-       DUPLICATE VALIDATION
-    ------------------------------ */
-
-    const mobile = document.getElementById("mobile").value.trim();
-    const employeeId = document.getElementById("employeeId").value.trim();
-    const aadhaar = document.getElementById("aadhaar").value.replace(/\s/g, "").trim();
-
-    const transactionId =
-    document.getElementById("payNowOption") && document.getElementById("payNowOption").checked
-    ? document.getElementById("payNowTransactionId").value.trim()
+  // 7. Payment Mode & Transaction ID Validation
+  const isPayNow = document.getElementById("payNowOption") && document.getElementById("payNowOption").checked;
+  const transactionId = isPayNow
+    ? (document.getElementById("payNowTransactionId") ? document.getElementById("payNowTransactionId").value.trim() : "")
     : (document.getElementById("manualTransactionId") ? document.getElementById("manualTransactionId").value.trim() : "");
 
+  if (!transactionId) {
+    alert("Please enter a valid Transaction ID / UTR Number.");
+    const utrInput = isPayNow ? document.getElementById("payNowTransactionId") : document.getElementById("manualTransactionId");
+    if (utrInput) utrInput.focus();
+    return;
+  }
 
-    if (mobile === "") {
-        alert("Please Enter Mobile Number");
-        document.getElementById("mobile").focus();
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = originalButtonText;
-        return;
+  // 🚀 SPINNER ANIMATION ON BUTTON (Live Processing Feedback)
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin" style="margin-right: 8px;"></i> Submitting Application...';
+  }
+
+  /* ---------------------------------------------------------
+     BACKEND DUPLICATE CHECKS
+  --------------------------------------------------------- */
+  const mobileDup = await checkMobileDuplicate(mobile);
+  if (mobileDup && mobileDup.exists) {
+    if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = originalButtonText; }
+    alert(`Mobile Number Already Registered:\n\nMobile: ${mobile}`);
+    return;
+  }
+
+  const empDup = await checkEmployeeIdDuplicate(document.getElementById("employeeId").value.trim());
+  if (empDup && empDup.exists) {
+    if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = originalButtonText; }
+    alert(`Employee ID Already Registered:\n\nEmployee ID: ${document.getElementById("employeeId").value.trim()}`);
+    return;
+  }
+
+  const aadhaarDup = await checkAadhaarDuplicate(aadhaar);
+  if (aadhaarDup && aadhaarDup.exists) {
+    if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = originalButtonText; }
+    alert(`Aadhaar Number Already Registered:\n\nAadhaar: ${aadhaar}`);
+    return;
+  }
+
+  const txnDup = await checkTransactionIdDuplicate(transactionId);
+  if (txnDup && txnDup.exists) {
+    if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = originalButtonText; }
+    alert(`Transaction ID Already Registered:\n\nTransaction ID: ${transactionId}`);
+    return;
+  }
+
+  /* ---------------------------------------------------------
+     PAYLOAD DATA PREPARATION & BASE64 CONVERSION
+  --------------------------------------------------------- */
+  const admissionFee = 100;
+  const annualSubscription = 360;
+  const rawAmt = isPayNow
+    ? parseFloat(document.getElementById("payNowAmount") ? document.getElementById("payNowAmount").value : 460)
+    : parseFloat(document.getElementById("manualAmount") ? document.getElementById("manualAmount").value : 460);
+
+  const totalAmount = isNaN(rawAmt) || rawAmt < 460 ? 460 : rawAmt;
+  const donation = totalAmount > 460 ? (totalAmount - 460) : 0;
+
+  const data = {
+    employeeId: document.getElementById("employeeId").value.trim(),
+    fullName: document.getElementById("employeeName").value.trim(),
+    gender: document.getElementById("gender").value,
+    dob: document.getElementById("dob").value.trim(),
+    doorNo: document.getElementById("doorNo") ? document.getElementById("doorNo").value.trim() : "",
+    street: document.getElementById("street") ? document.getElementById("street").value.trim() : "",
+    village: document.getElementById("village").value.trim(),
+    mandal: document.getElementById("mandal").value.trim(),
+    district: document.getElementById("district").value,
+    state: "Andhra Pradesh",
+    pincode: pincode,
+    postOffice: document.getElementById("postOffice").value.trim(),
+    mobile: mobile,
+    email: document.getElementById("email") ? document.getElementById("email").value.trim() : "",
+    aadhaar: aadhaar,
+    company: company,
+    stationCircle: (document.getElementById("station") ? document.getElementById("station").value : "") || (document.getElementById("circle") ? document.getElementById("circle").value : ""),
+    divisionRegion: document.getElementById("division") ? document.getElementById("division").value : "",
+    subDivision: document.getElementById("subDivision") ? document.getElementById("subDivision").value : "",
+    designation: document.getElementById("designation").value,
+    admissionFee: admissionFee,
+    annualSubscription: annualSubscription,
+    donation: donation,
+    totalAmount: totalAmount,
+    paymentMode: "UPI",
+    transactionId: transactionId,
+    paymentStatus: "Paid",
+    photoBase64: "",
+    photoType: "",
+    receiptBase64: "",
+    receiptType: ""
+  };
+
+  // Convert Cropped Photo to Base64
+  if (window.croppedPhotoFile) {
+    data.photoType = window.croppedPhotoFile.type;
+    data.photoBase64 = await new Promise(resolve => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result.split(",")[1]);
+      reader.onerror = () => resolve("");
+      reader.readAsDataURL(window.croppedPhotoFile);
+    });
+  } else if (memberPhotoFile && memberPhotoFile.files && memberPhotoFile.files[0]) {
+    const pFile = memberPhotoFile.files[0];
+    data.photoType = pFile.type;
+    data.photoBase64 = await new Promise(resolve => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result.split(",")[1]);
+      reader.onerror = () => resolve("");
+      reader.readAsDataURL(pFile);
+    });
+  }
+
+  // Convert Receipt to Base64
+  const receiptInput = document.getElementById("payNowReceipt") || document.getElementById("manualReceipt");
+  if (receiptInput && receiptInput.files && receiptInput.files[0]) {
+    const rFile = receiptInput.files[0];
+    data.receiptType = rFile.type;
+    data.receiptBase64 = await new Promise(resolve => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result.split(",")[1]);
+      reader.onerror = () => resolve("");
+      reader.readAsDataURL(rFile);
+    });
+  }
+
+  /* ---------------------------------------------------------
+     SUBMIT TO BACKEND & GENERATE RECEIPT
+  --------------------------------------------------------- */
+  try {
+    const targetUrl = typeof BACKEND_URL !== "undefined" ? BACKEND_URL : "https://script.google.com/macros/s/AKfycbyoBv4TQ28mb7HIsTQ42iEe7P-3Yqs-7lR5tHhHqk0RqCQOShGrLBVPvD4j2ZUV1Q/exec";
+
+    const response = await fetch(targetUrl, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify({ action: "saveMember", data: data })
+    });
+
+    const raw = await response.text();
+    const result = JSON.parse(raw);
+
+    if (result && (result.success || result.status === "success")) {
+      const resData = result.result || result;
+      window.lastMembershipId = resData.membershipId || "ARPEU00001";
+      window.lastReceiptNo = resData.receiptNo || "ARPEU/2026/1";
+
+      openReceipt();
+
+      if (typeof resetMembershipForm === "function") {
+        resetMembershipForm();
+      }
+    } else {
+      alert(result.message || "Submission Failed. Please try again.");
     }
-
-    if (aadhaar === "") {
-        alert("Please Enter Aadhaar Number");
-        document.getElementById("aadhaar").focus();
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = originalButtonText;
-        return;
+  } catch (error) {
+    console.error("Submission Error:", error);
+    alert("Connection error while submitting application: " + error);
+  } finally {
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = originalButtonText;
     }
-
-
-    /* ------------------------------
-       MOBILE DUPLICATE
-    ------------------------------ */
-
-    const mobileDuplicate = await checkMobileDuplicate(mobile);
-    console.log("Mobile Result :", mobileDuplicate);
-
-    if (mobileDuplicate && mobileDuplicate.exists) {
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = originalButtonText;
-        alert(
-            "Mobile Number Already Registered\n\n" +
-            "Mobile Number : " + mobile + "\n" +
-            "Membership ID : " + (mobileDuplicate.member ? mobileDuplicate.member.membershipId : "") + "\n" +
-            "Member Name : " + (mobileDuplicate.member ? mobileDuplicate.member.fullName : "")
-        );
-        return;
-    }
-
-
-    /* ------------------------------
-       EMPLOYEE ID DUPLICATE
-    ------------------------------ */
-
-    const employeeDuplicate = await checkEmployeeIdDuplicate(employeeId);
-    console.log("Employee Result :", employeeDuplicate);
-
-    if (employeeDuplicate && employeeDuplicate.exists) {
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = originalButtonText;
-        alert(
-            "Employee ID Already Registered\n\n" +
-            "Employee ID : " + employeeId + "\n" +
-            "Membership ID : " + (employeeDuplicate.member ? employeeDuplicate.member.membershipId : "") + "\n" +
-            "Member Name : " + (employeeDuplicate.member ? employeeDuplicate.member.fullName : "")
-        );
-        return;
-    }
-
-
-    /* ------------------------------
-       AADHAAR DUPLICATE
-    ------------------------------ */
-
-    const aadhaarDuplicate = await checkAadhaarDuplicate(aadhaar);
-    console.log("Aadhaar Result :", aadhaarDuplicate);
-
-    if (aadhaarDuplicate && aadhaarDuplicate.exists) {
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = originalButtonText;
-        alert(
-            "Aadhaar Number Already Registered\n\n" +
-            "Aadhaar Number : " + aadhaar + "\n" +
-            "Membership ID : " + (aadhaarDuplicate.member ? aadhaarDuplicate.member.membershipId : "") + "\n" +
-            "Member Name : " + (aadhaarDuplicate.member ? aadhaarDuplicate.member.fullName : "")
-        );
-        return;
-    }
-
-
-    /* ------------------------------
-       TRANSACTION ID DUPLICATE
-    ------------------------------ */
-
-    if (transactionId !== "") {
-        console.log("Transaction ID Before Check :", transactionId);
-        const transactionDuplicate = await checkTransactionIdDuplicate(transactionId);
-        console.log("Transaction Result :", transactionDuplicate);
-
-        if (transactionDuplicate && transactionDuplicate.exists) {
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = originalButtonText;
-            alert(
-                "Transaction ID Already Registered\n\n" +
-                "Transaction ID : " + transactionId + "\n" +
-                "Membership ID : " + (transactionDuplicate.member ? transactionDuplicate.member.membershipId : "") + "\n" +
-                "Member Name : " + (transactionDuplicate.member ? transactionDuplicate.member.fullName : "")
-            );
-            return;
-        }
-    }
-
-    /* ------------------------------
-       MEMBER DATA
-    ------------------------------ */
-
-    const admissionFee = 100;
-    const annualSubscription = 360;
-    const donation = parseFloat(document.getElementById("payNowAmount") ? document.getElementById("payNowAmount").value : (document.getElementById("manualAmount") ? document.getElementById("manualAmount").value : 0)) || 0;
-    const totalAmount = admissionFee + annualSubscription + donation;
-
-    const data = {
-        employeeId: employeeId,
-        fullName: document.getElementById("employeeName").value.trim(),
-        mobile: mobile,
-        email: document.getElementById("email").value.trim(),
-        aadhaar: aadhaar,
-
-        company: document.getElementById("company").value,
-
-        stationCircle:
-            (document.getElementById("station") ? document.getElementById("station").value : "") ||
-            (document.getElementById("circle") ? document.getElementById("circle").value : ""),
-
-        divisionRegion:
-            document.getElementById("division") ? document.getElementById("division").value : "",
-
-        subDivision:
-            document.getElementById("subDivision") ? document.getElementById("subDivision").value : "",
-
-        admissionFee: admissionFee,
-        annualSubscription: annualSubscription,
-        donation: donation,
-        totalAmount: totalAmount,
-
-        paymentMode: "UPI",
-        transactionId: transactionId,
-        paymentStatus: "Paid",
-
-        photoBase64: "",
-        photoType: "",
-
-        receiptBase64: "",
-        receiptType: ""
-    };
-
-    /* ------------------------------
-       CONVERT PHOTO TO BASE64
-    ------------------------------ */
-
-    const photoInput = document.getElementById("memberPhoto");
-
-    if (photoInput && photoInput.files && photoInput.files.length > 0) {
-        const photoFile = photoInput.files[0];
-        data.photoType = photoFile.type;
-        data.photoBase64 = await new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = function () {
-                resolve(reader.result.split(",")[1]);
-            };
-            reader.onerror = reject;
-            reader.readAsDataURL(photoFile);
-        });
-    }
-
-    /* ------------------------------
-       CONVERT RECEIPT TO BASE64
-    ------------------------------ */
-
-    const receiptInput = document.getElementById("payNowReceipt") || document.getElementById("manualReceipt");
-
-    if (receiptInput && receiptInput.files && receiptInput.files.length > 0) {
-        const receiptFile = receiptInput.files[0];
-        data.receiptType = receiptFile.type;
-        data.receiptBase64 = await new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = function () {
-                resolve(reader.result.split(",")[1]);
-            };
-            reader.onerror = reject;
-            reader.readAsDataURL(receiptFile);
-        });
-    }
-
-    console.log("Sending Data :", data);
-    console.log("Photo Type :", data.photoType);
-    console.log("Photo Base64 Length :", data.photoBase64 ? data.photoBase64.length : 0);
-    console.log("Receipt Type :", data.receiptType);
-    console.log("Receipt Base64 Length :", data.receiptBase64 ? data.receiptBase64.length : 0);
-
-    try {
-        const targetUrl = typeof BACKEND_URL !== "undefined" ? BACKEND_URL : (typeof WEB_APP_URL !== "undefined" ? WEB_APP_URL : "");
-
-        const response = await fetch(targetUrl, {
-            method: "POST",
-            headers: {
-                "Content-Type": "text/plain;charset=utf-8"
-            },
-            body: JSON.stringify({
-                action: "saveMember",
-                data: data
-            })
-        });
-
-        const raw = await response.text();
-        console.log("RAW RESPONSE :", raw);
-
-        const result = JSON.parse(raw);
-        console.log("PARSED RESPONSE :", result);
-
-        if (result.success || result.status === "success") {
-
-            const resData = result.result || result;
-            window.lastMembershipId = resData.membershipId;
-            window.lastReceiptNo = resData.receiptNo; 
-
-            // 1. Open Digital Receipt
-            openReceipt();
-
-            // 2. 📌 AUTO-RESET FORM AFTER SUCCESSFUL SUBMISSION
-            if (typeof resetMembershipForm === "function") {
-                resetMembershipForm();
-            }
-
-            if (typeof DEV_MODE !== "undefined" && !DEV_MODE) {
-                const photoPreview = document.getElementById("photoPreview");
-                if (photoPreview) {
-                    photoPreview.removeAttribute("src");
-                    photoPreview.style.display = "none";
-                }
-
-                const previewText = document.querySelector(".preview-text");
-                if (previewText) {
-                    previewText.style.display = "block";
-                }
-
-                const finalSec = document.getElementById("finalSubmitSection");
-                if (finalSec) {
-                    finalSec.style.display = "none";
-                }
-            }
-
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = originalButtonText;
-
-        } else {
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = originalButtonText;
-            alert(result.message || "Submission Failed");
-        }
-
-    } catch (error) {
-        console.error("FULL ERROR :", error);
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = originalButtonText;
-        alert("❌ " + error);
-    }
+  }
 }
-
-
-
 
 
 /* ==========================================================
@@ -4248,6 +4254,10 @@ function resetMembershipForm() {
       el.value = "";
     }
   });
+
+  // Set default state selection
+    const stateEl = document.getElementById("state") || membPage.querySelector("select[name='state']");
+    if (stateEl) stateEl.value = "Andhra Pradesh";
 
   // 2. Clear Uploaded Passport Photo Preview
   const photoPreview = document.getElementById("photoPreview");

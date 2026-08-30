@@ -1,49 +1,40 @@
 /* ==========================================================
-   ARPEU PWA SERVICE WORKER ENGINE
+   ARPEU PWA SERVICE WORKER - LIVE NETWORK-FIRST ENGINE
+   Version: 1.0 (Official Build)
    ========================================================== */
 
-const CACHE_NAME = 'arpeu-portal-v4';
-const ASSETS_TO_CACHE = [
-  './',
-  './index.html',
-  './css/style.css',
-  './js/script.js',
-  './images/arpeu-logo.png',
-  './images/bms-logo.png',
-  './manifest.json'
-];
+const CACHE_NAME = 'arpeu-portal-v1.0';
 
-/* Install Service Worker & Cache Core Assets */
+/* Install & Activate Immediately without Waiting */
 self.addEventListener('install', event => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => {
-      return cache.addAll(ASSETS_TO_CACHE);
-    })
-  );
   self.skipWaiting();
 });
 
-/* Activate Service Worker & Clean Old Caches */
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(keys => {
-      return Promise.all(
-        keys.map(key => {
-          if (key !== CACHE_NAME) {
-            return caches.delete(key);
-          }
-        })
-      );
+      return Promise.all(keys.map(key => caches.delete(key)));
     })
   );
   self.clients.claim();
 });
 
-/* Network First Strategy for Live Dynamic Data */
+/* Fetch Strategy: Cache local assets, bypass external Google Apps Script API calls */
 self.addEventListener('fetch', event => {
+  const url = event.request.url;
+
+  // Do NOT intercept Google Apps Script or external API calls
+  if (url.includes('script.google.com') || url.includes('googleusercontent.com') || url.includes('api.qrserver.com')) {
+    return; // Directly fetch from network without service worker caching
+  }
+
   event.respondWith(
-    fetch(event.request).catch(() => {
-      return caches.match(event.request);
-    })
+    fetch(event.request)
+      .then(networkResponse => {
+        return networkResponse;
+      })
+      .catch(() => {
+        return caches.match(event.request);
+      })
   );
 });
