@@ -4389,23 +4389,6 @@ function copyPermanentAddress(chk) {
   }
 }
 
-/**
- * Previews uploaded profile photo instantly in avatar box
- * @param {Event} event - File input change event
- */
-function previewProfilePhoto(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-
-  const reader = new FileReader();
-  reader.onload = function (e) {
-    const previewImg = document.getElementById("profilePhotoPreview");
-    if (previewImg) {
-      previewImg.src = e.target.result;
-    }
-  };
-  reader.readAsDataURL(file);
-}
 
 /**
  * Executes Universal Profile Search using Mobile, Aadhaar, Employee ID or Membership ID
@@ -5157,6 +5140,33 @@ document.addEventListener("DOMContentLoaded", function () {
 /* ==========================================================
    SETTINGS & USER PREFERENCES ENGINE
    ========================================================== */
+
+/* PORTAL THEME SWITCHER ENGINE (LIGHT / DARK MODE) */
+
+function togglePortalTheme() {
+  document.body.classList.toggle("dark-mode");
+  const isDark = document.body.classList.contains("dark-mode");
+  const themeBtn = document.getElementById("themeToggleBtn");
+
+  if (isDark) {
+    localStorage.setItem("arpeu_theme", "dark");
+    if (themeBtn) themeBtn.innerHTML = '<i class="fa-solid fa-sun"></i> Light Mode';
+  } else {
+    localStorage.setItem("arpeu_theme", "light");
+    if (themeBtn) themeBtn.innerHTML = '<i class="fa-solid fa-moon"></i> Dark Mode';
+  }
+}
+
+/* Auto apply saved theme preference on page load */
+document.addEventListener("DOMContentLoaded", function () {
+  const savedTheme = localStorage.getItem("arpeu_theme");
+  const themeBtn = document.getElementById("themeToggleBtn");
+  if (savedTheme === "dark") {
+    document.body.classList.add("dark-mode");
+    if (themeBtn) themeBtn.innerHTML = '<i class="fa-solid fa-sun"></i> Light Mode';
+  }
+});
+
 
 /* Adjusts dynamic font scaling across portal */
 function setPortalFontSize(size) {

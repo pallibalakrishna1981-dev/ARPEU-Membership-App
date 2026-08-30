@@ -1038,78 +1038,41 @@
 </div>
 
 
-<div class="photo-upload-container">
+<!-- =========================================================
+     PASSPORT SIZE PHOTO UPLOAD CARD (MEMBERSHIP)
+========================================================= -->
+<div class="form-card">
+    <div class="card-header">
+        <i class="fas fa-camera"></i>
+        <span class="card-title">Passport Size Photo</span>
+    </div>
 
-    <!-- Left Side -->
-    <div class="upload-row">
-            <!-- Hidden File Input for Gallery -->
-            <input
-                type="file"
-                id="memberPhoto"
-                name="memberPhoto"
-                accept="image/*"
-                hidden>
+    <div class="photo-upload-container">
+        <!-- Left Side: Action Buttons -->
+        <div class="photo-upload-section">
+            <label for="memberPhoto">Passport Size Photo <span class="required">*</span></label>
+            <div class="upload-row">
+                <input type="file" id="memberPhoto" name="memberPhoto" accept="image/*" hidden>
+                <input type="file" id="memberCameraPhoto" accept="image/*" capture="environment" hidden>
 
-            <!-- Hidden File Input for Direct Camera -->
-            <input
-                type="file"
-                id="memberCameraPhoto"
-                accept="image/*"
-                capture="environment"
-                hidden>
-
-            <!-- Upload Button (Gallery) -->
-            <button
-                type="button"
-                class="photo-btn"
-                onclick="document.getElementById('memberPhoto').click();">
-                Upload Photo
+                <button type="button" class="photo-btn" onclick="document.getElementById('memberPhoto').click();">
+                    Upload Photo
+                </button>
+                <input type="text" id="photoFileName" class="photo-file-name" value="No file selected" readonly>
+            </div>
+            <div class="photo-info">JPG • PNG • WEBP &nbsp; | &nbsp; Max Size : 4 MB</div>
+            <button type="button" id="takePhotoBtn" class="take-photo-btn" onclick="document.getElementById('memberCameraPhoto').click();">
+                📷 Take Photo
             </button>
-
-            <!-- Selected File Name -->
-            <input
-                type="text"
-                id="photoFileName"
-                class="photo-file-name"
-                value="No file selected"
-                readonly>
         </div>
 
-        <div class="photo-info">
-            JPG • PNG • WEBP &nbsp; | &nbsp; Max Size : 4 MB
+        <!-- Right Side: Preview Box -->
+        <div class="photo-preview" style="position: relative;">
+            <img id="photoPreview" src="" alt="" style="display:none; width:100%; height:100%; object-fit:cover; position:absolute; top:0; left:0; z-index:10;">
+            <span class="preview-text" style="position:relative; z-index:1;">No Photo<br>Selected</span>
         </div>
-
-        <!-- Take Photo Button (Camera) -->
-        <button
-            type="button"
-            id="takePhotoBtn"
-            class="take-photo-btn"
-            onclick="document.getElementById('memberCameraPhoto').click();">
-            📷 Take Photo
-        </button>
-
     </div>
-
-    <!-- Right Side -->
-    <div class="photo-preview">
-
-        <img
-            <img id="photoPreview" src="" alt="">
-
-        <span class="preview-text">
-
-            No Photo
-            <br>
-            Selected
-
-        </span>
-
-    </div>
-
 </div>
-
-
-
 
 
 <!-- =========================================================
@@ -1740,7 +1703,7 @@
         <div class="photo-upload-container">
           <div class="photo-upload-section">
             <label>Passport Size Photo <span class="required">*</span></label>
-            <<div class="upload-row">
+            <div class="upload-row">
               <!-- Gallery Storage Input for Profile -->
               <input type="file" id="profPhotoInput" accept="image/*" hidden />
 
@@ -4021,22 +3984,34 @@
         <p>Customize app display, alerts & system cache controls</p>
     </div>
 
-    <!-- 1. Display & Font Sizing Card -->
+    <!-- 1. Display & Theme Card (Compact Buttons Alignment) -->
     <div class="form-card" style="margin-bottom: 12px;">
         <div class="card-header">
             <i class="fa-solid fa-palette"></i>
             <span class="card-title">Display & Appearance</span>
         </div>
         <div class="card-body" style="gap: 12px;">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <div>
-                    <strong style="font-size: 12.5px; color: #1e293b; display: block;">Portal Font Scaling</strong>
-                    <span style="font-size: 10px; color: #64748b;">Adjust readability across all forms</span>
+            <!-- Dark Mode Switcher Row -->
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f1f5f9; padding-bottom: 10px; gap: 10px;">
+                <div style="flex: 1; min-width: 0;">
+                    <strong style="font-size: 12px; color: #1e293b; display: block; white-space: nowrap;">Theme Mode</strong>
+                    <span style="font-size: 9.5px; color: #64748b; display: block; white-space: nowrap;">Switch Light & Dark theme</span>
                 </div>
-                <div style="display: flex; gap: 4px;">
-                    <button type="button" class="adm-tab-btn" style="height: 30px; padding: 0 10px; font-size: 10.5px;" onclick="setPortalFontSize('small')">A-</button>
-                    <button type="button" class="adm-tab-btn active" id="fontBtnNormal" style="height: 30px; padding: 0 10px; font-size: 10.5px;" onclick="setPortalFontSize('normal')">Default</button>
-                    <button type="button" class="adm-tab-btn" style="height: 30px; padding: 0 10px; font-size: 10.5px;" onclick="setPortalFontSize('large')">A+</button>
+                <button type="button" id="themeToggleBtn" class="adm-tab-btn" style="height: 28px; padding: 0 10px; font-size: 10.5px; width: auto; flex-shrink: 0; min-width: 95px;" onclick="togglePortalTheme()">
+                    <i class="fa-solid fa-moon"></i> Dark Mode
+                </button>
+            </div>
+
+            <!-- Font Sizing Row -->
+            <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px;">
+                <div style="flex: 1; min-width: 0;">
+                    <strong style="font-size: 12px; color: #1e293b; display: block; white-space: nowrap;">Portal Font Scaling</strong>
+                    <span style="font-size: 9.5px; color: #64748b; display: block; white-space: nowrap;">Adjust text readability</span>
+                </div>
+                <div style="display: flex; gap: 4px; flex-shrink: 0;">
+                    <button type="button" class="adm-tab-btn" style="height: 28px; padding: 0 8px; font-size: 10px;" onclick="setPortalFontSize('small')">A-</button>
+                    <button type="button" class="adm-tab-btn active" id="fontBtnNormal" style="height: 28px; padding: 0 8px; font-size: 10px;" onclick="setPortalFontSize('normal')">Default</button>
+                    <button type="button" class="adm-tab-btn" style="height: 28px; padding: 0 8px; font-size: 10px;" onclick="setPortalFontSize('large')">A+</button>
                 </div>
             </div>
         </div>
@@ -4074,26 +4049,14 @@
     </div>
 
     <!-- 3. System Storage & Mobile App Card -->
-    <div class="form-card" style="margin-bottom: 12px;">
-        <div class="card-header">
-            <i class="fa-solid fa-microchip"></i>
-            <span class="card-title">System & Storage Controls</span>
-        </div>
-        <div class="card-body" style="gap: 10px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; background: #f8fafc; padding: 10px; border-radius: 8px; border: 1px dashed #cbd5e1;">
-                <div>
-                    <strong style="font-size: 12px; color: #1e293b; display: block;">Local Session Cache</strong>
-                    <span style="font-size: 10px; color: #64748b;">Temporary offline data & assets</span>
+    <div style="display: flex; justify-content: space-between; align-items: center; background: #f8fafc; padding: 8px 10px; border-radius: 8px; border: 1px dashed #cbd5e1; gap: 10px;">
+                <div style="flex: 1; min-width: 0;">
+                    <strong style="font-size: 11.5px; color: #1e293b; display: block; white-space: nowrap;">Local Session Cache</strong>
+                    <span style="font-size: 9px; color: #64748b; display: block; white-space: nowrap;">Temporary offline data</span>
                 </div>
-                <button type="button" class="dl-btn btn-preview" style="height: 30px; padding: 0 12px;" onclick="clearPortalCache()">
+                <button type="button" class="adm-tab-btn" style="height: 28px; padding: 0 10px; font-size: 10px; white-space: nowrap; flex-shrink: 0; width: auto; min-width: 95px;" onclick="clearPortalCache()">
                     <i class="fa-solid fa-rotate"></i> Clear & Reload
                 </button>
-            </div>
-
-            <button type="button" class="submit-btn" style="background: #0B4EA2; height: 44px; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 12px;" onclick="promptAppInstallation()">
-                <i class="fa-solid fa-mobile-screen"></i> Install App to Mobile Home Screen
-            </button>
-        </div>
     </div>
 
     <!-- 4. Portal Information & Credits Card -->

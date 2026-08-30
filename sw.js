@@ -2,7 +2,7 @@
    ARPEU PWA SERVICE WORKER ENGINE
    ========================================================== */
 
-const CACHE_NAME = 'arpeu-portal-v2';
+const CACHE_NAME = 'arpeu-portal-v4';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
