@@ -755,6 +755,11 @@ height:24px;
     min-width: 0 !important;
 }
 
+/* Ensure label and required asterisk stay on the same line */
+.photo-upload-section label {
+    white-space: nowrap !important;
+}
+
 .upload-row {
     display: flex !important;
     flex-direction: column !important;
