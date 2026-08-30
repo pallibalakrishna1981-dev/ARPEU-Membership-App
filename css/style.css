@@ -3350,122 +3350,114 @@ body{
     margin-bottom: 16px;
 }
 
-/* Mobile-First Bearer Card (No Text Wrapping) */
+/* Two-Column Asymmetric Bearer Card (30% Left Photo, 70% Right Info) */
 .contact-bearer-card {
     background: #ffffff;
     border: 1px solid #e2e8f0;
-    border-radius: 14px;
+    border-radius: 16px;
     padding: 12px 14px;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    display: grid !important;
+    grid-template-columns: 74px 1fr !important;
+    grid-template-rows: auto auto !important;
+    grid-template-areas:
+        "avatar info"
+        "avatar btns" !important;
+    column-gap: 14px !important;
+    row-gap: 8px !important;
+    align-items: center !important;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.04);
 }
 
-/* Avatar Box */
+/* Prominent Left Avatar Box (Spans Vertically) */
 .bearer-avatar-box {
-    width: 54px;
-    height: 54px;
-    min-width: 54px;
+    grid-area: avatar !important;
+    width: 74px !important;
+    height: 74px !important;
+    min-width: 74px !important;
     border-radius: 50%;
-    border: 2px solid #0B4EA2;
+    border: 2.5px solid #0B4EA2;
     overflow: hidden;
     background: #f8fafc;
-    flex-shrink: 0;
+    align-self: center !important;
+    box-shadow: 0 2px 8px rgba(11, 78, 162, 0.12);
 }
 
 .bearer-avatar-box img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    display: block;
 }
 
-/* Bearer Text Info (Full Space Single-Line) */
+/* Right Text Info (Tight Gap, Bold & Prominent) */
 .bearer-info {
-    flex: 1;
-    min-width: 0;
-    margin: 0 0 0 10px;
+    grid-area: info !important;
+    min-width: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    gap: 1px !important;
 }
 
 .bearer-title {
-    font-size: 13.5px;
-    font-weight: 800;
-    color: #0B4EA2;
-    margin: 0 0 3px;
-    line-height: 1.2;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    font-size: 14.5px !important;
+    font-weight: 800 !important;
+    color: #0B4EA2 !important;
+    margin: 0 !important;
+    line-height: 1.2 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
 }
 
 .bearer-name {
-    font-size: 12.5px;
-    font-weight: 600;
-    color: #334155;
-    margin: 0;
-    line-height: 1.2;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    font-size: 13.5px !important;
+    font-weight: 600 !important;
+    color: #334155 !important;
+    margin: 0 !important;
+    line-height: 1.2 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
 }
 
-/* Symmetrical Action Buttons */
+/* Right Compact Action Buttons */
 .bearer-action-btns {
-    width: 100%;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-    margin-top: 4px;
+    grid-area: btns !important;
+    width: 100% !important;
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 8px !important;
+    margin: 0 !important;
 }
 
 .btn-call, .btn-whatsapp {
-    height: 36px;
-    padding: 0 10px;
-    border-radius: 8px;
-    font-size: 12px;
-    font-weight: 700;
+    flex: 1 !important;
+    height: 32px !important;
+    padding: 0 8px !important;
+    border-radius: 7px !important;
+    font-size: 11.5px !important;
+    font-weight: 700 !important;
     color: #ffffff !important;
     text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    transition: transform 0.15s ease, opacity 0.15s ease;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 5px !important;
+    transition: transform 0.15s ease, opacity 0.15s ease !important;
 }
 
 .btn-call {
-    background-color: #0B4EA2;
+    background-color: #0B4EA2 !important;
 }
 
 .btn-whatsapp {
-    background-color: #22c55e;
+    background-color: #22c55e !important;
 }
 
 .btn-call:active, .btn-whatsapp:active {
-    transform: scale(0.96);
-    opacity: 0.9;
-}
-
-/* Desktop View (Side-by-Side Horizontal Row) */
-@media screen and (min-width: 460px) {
-    .contact-bearer-card {
-        flex-wrap: nowrap;
-        padding: 10px 14px;
-    }
-
-    .bearer-action-btns {
-        width: auto;
-        display: flex;
-        flex-direction: row;
-        margin-top: 0;
-    }
-
-    .btn-call, .btn-whatsapp {
-        height: 34px;
-        padding: 0 12px;
-    }
+    transform: scale(0.95) !important;
+    opacity: 0.9 !important;
 }
 
 /* Info Grid (Email & Website) */
@@ -3591,6 +3583,7 @@ body{
 .social-btn.yt { background-color: #FF0000; }
 .social-btn.insta { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); }
 .social-btn.twitter { background-color: #000000; }
+
 
 
 /* ==========================================================
