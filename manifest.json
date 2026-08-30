@@ -1,10 +1,10 @@
 {
-  "name": "ARPEU Digital Membership Portal",
+  "name": "Andhra Rastra Power Employees Union",
   "short_name": "ARPEU Portal",
-  "description": "Andhra Rastra Power Employees Union Digital Portal",
+  "description": "Official Digital Portal of ARPEU",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#F3F7FC",
+  "background_color": "#ffffff",
   "theme_color": "#0B4EA2",
   "orientation": "portrait",
   "icons": [
@@ -12,13 +12,13 @@
       "src": "images/arpeu-logo.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
       "src": "images/arpeu-logo.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     }
   ]
 }

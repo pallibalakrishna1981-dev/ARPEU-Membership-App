@@ -2075,7 +2075,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (typeof PaymentModuleV25 !== "undefined") {
         PaymentModuleV25.init();
-        PaymentModuleV25.restrictDates();
+       // PaymentModuleV25.restrictDates();
     }
 
     if (typeof DonationPaymentModule !== "undefined") {
@@ -5222,3 +5222,16 @@ if ('serviceWorker' in navigator) {
       });
   });
 }
+
+/* ==========================================================
+   APP SPLASH SCREEN CONTROLLER
+   Handles automatic smooth fade-out transition after launch
+   ========================================================== */
+window.addEventListener("DOMContentLoaded", function () {
+    setTimeout(function () {
+        const splash = document.getElementById("appSplashScreen");
+        if (splash) {
+            splash.classList.add("splash-hidden");
+        }
+    }, 1800); // 1.8 seconds smooth display
+});

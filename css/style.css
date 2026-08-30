@@ -5883,3 +5883,125 @@ body.dark-mode .nav-item.active {
     color: #38bdf8 !important;
     border-color: #38bdf8 !important;
 }
+
+/* ==========================================================
+   UNIVERSAL PHOTO LABEL & ASTERISK INLINE DISPLAY
+   Fixes wrapping across Membership, Profile and Search views
+   ========================================================== */
+.photo-upload-container label,
+.photo-upload-section label,
+.profile-photo-container label,
+label[for="passportPhoto"] {
+    white-space: nowrap !important;
+    display: inline-flex !important;
+    align-items: center !important;
+}
+
+.required {
+    white-space: nowrap !important;
+    display: inline !important;
+}
+
+/* ==========================================================
+   ANIMATED SPLASH SCREEN STYLES & TRANSITIONS
+   ========================================================== */
+.splash-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: #ffffff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 999999;
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
+}
+
+.splash-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 24px;
+    max-width: 90%;
+}
+
+.splash-logo-wrap {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: #ffffff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+    animation: splashZoomIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.splash-logo {
+    width: 110px;
+    height: 110px;
+    object-fit: contain;
+}
+
+.splash-title {
+    font-size: 15px;
+    font-weight: 800;
+    color: #0B4EA2;
+    margin: 0 0 8px 0;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    animation: splashFadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.2s forwards;
+    opacity: 0;
+}
+
+.splash-subtitle {
+    font-size: 13px;
+    font-weight: 600;
+    color: #475569;
+    margin: 0 0 25px 0;
+    animation: splashFadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.4s forwards;
+    opacity: 0;
+}
+
+.splash-loader-bar {
+    width: 140px;
+    height: 3.5px;
+    background: #e2e8f0;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.splash-loader-progress {
+    width: 100%;
+    height: 100%;
+    background: #0B4EA2;
+    border-radius: 4px;
+    animation: splashBarAnim 1.6s infinite ease-in-out;
+}
+
+/* Animations */
+@keyframes splashZoomIn {
+    0% { transform: scale(0.5); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes splashFadeUp {
+    0% { transform: translateY(18px); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes splashBarAnim {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+.splash-hidden {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+}
