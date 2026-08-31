@@ -6389,6 +6389,141 @@ function toggleVirtualBgMenu() {
     alert('ARPEU Official Virtual Backgrounds ready.');
 }
 
-// Immediate Execution for Auto-Join Link
-executeInstantAutoJoinCheck();
+/**
+ * Web Audio Ringtone Sound Synthesizer (No external audio file required)
+ */
+let ringtoneAudioCtx = null;
+let ringtoneInterval = null;
+let pendingIncomingRoomCode = null;
+let pendingIncomingMeetingType = null;
 
+function startIncomingRingtone() {
+    try {
+        window.AudioContext = window.AudioContext || window.webkitAudioContext;
+        ringtoneAudioCtx = new AudioContext();
+
+        const playTone = (freq1, freq2, duration) => {
+            if (!ringtoneAudioCtx || ringtoneAudioCtx.state === 'closed') return;
+            
+            const osc1 = ringtoneAudioCtx.createOscillator();
+            const osc2 = ringtoneAudioCtx.createOscillator();
+            const gain = ringtoneAudioCtx.createGain();
+
+            osc1.type = 'sine';
+            osc2.type = 'sine';
+            osc1.frequency.setValueAtTime(freq1, ringtoneAudioCtx.currentTime);
+            osc2.frequency.setValueAtTime(freq2, ringtoneAudioCtx.currentTime);
+
+            gain.gain.setValueAtTime(0.15, ringtoneAudioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, ringtoneAudioCtx.currentTime + duration);
+
+            osc1.connect(gain);
+            osc2.connect(gain);
+            gain.connect(ringtoneAudioCtx.destination);
+
+            osc1.start();
+            osc2.start();
+            osc1.stop(ringtoneAudioCtx.currentTime + duration);
+            osc2.stop(ringtoneAudioCtx.currentTime + duration);
+        };
+
+        const ringPattern = () => {
+            playTone(440, 480, 0.8);
+            setTimeout(() => playTone(440, 480, 0.8), 1000);
+        };
+
+        ringPattern();
+        ringtoneInterval = setInterval(ringPattern, 3000);
+
+    } catch (e) {
+        console.warn('Ringtone AudioContext skipped:', e);
+    }
+}
+
+function stopIncomingRingtone() {
+    if (ringtoneInterval) {
+        clearInterval(ringtoneInterval);
+        ringtoneInterval = null;
+    }
+    if (ringtoneAudioCtx && ringtoneAudioCtx.state !== 'closed') {
+        ringtoneAudioCtx.close();
+        ringtoneAudioCtx = null;
+    }
+}
+
+/**
+ * Show Full-Screen Incoming Ringing Call Screen
+ */
+function showIncomingConferenceRinging(committeeName, roomCode) {
+    const overlay = document.getElementById('arpeuIncomingCallOverlay');
+    const title = document.getElementById('incomingMeetingName');
+    
+    pendingIncomingRoomCode = roomCode;
+    pendingIncomingMeetingType = committeeName || 'Executive Committee';
+
+    if (title) title.textContent = `${pendingIncomingMeetingType} Call`;
+    if (overlay) overlay.style.display = 'flex';
+
+    startIncomingRingtone();
+    if (navigator.vibrate) {
+        navigator.vibrate([400, 200, 400, 200, 400]);
+    }
+}
+
+/**
+ * Accept Incoming Call -> Immediately enter Native Stage
+ */
+function acceptIncomingConferenceCall() {
+    stopIncomingRingtone();
+    const overlay = document.getElementById('arpeuIncomingCallOverlay');
+    if (overlay) overlay.style.display = 'none';
+
+    launchInstantConference(pendingIncomingMeetingType, 'video', pendingIncomingRoomCode);
+}
+
+/**
+ * Decline Incoming Call
+ */
+function declineIncomingConferenceCall() {
+    stopIncomingRingtone();
+    const overlay = document.getElementById('arpeuIncomingCallOverlay');
+    if (overlay) overlay.style.display = 'none';
+    pendingIncomingRoomCode = null;
+    pendingIncomingMeetingType = null;
+}
+
+/**
+ * Instant Direct Auto-Join / Ringing Detection on Link Click
+ */
+function executeInstantAutoJoinCheck() {
+    try {
+        const urlParams = new URLSearchParams(window.location.search);
+        const joinRoom = urlParams.get('joinRoom');
+        const mtgType = urlParams.get('type') || 'Core Committee';
+
+        if (joinRoom) {
+            const splash = document.getElementById('appSplashScreen');
+            if (splash) splash.style.display = 'none';
+
+            isWebrtcHost = false;
+
+            setTimeout(() => {
+                showIncomingConferenceRinging(mtgType, joinRoom);
+            }, 300);
+        }
+    } catch (e) {
+        console.warn('Auto join check error:', e);
+    }
+}
+
+// Splash Screen Auto-Dismiss Failsafe (Guarantees App Opens within 1.2s)
+setTimeout(() => {
+    const splash = document.getElementById('appSplashScreen');
+    if (splash && splash.style.display !== 'none') {
+        splash.style.opacity = '0';
+        setTimeout(() => { splash.style.display = 'none'; }, 300);
+    }
+}, 1200);
+
+// Run Link Detection
+executeInstantAutoJoinCheck();
