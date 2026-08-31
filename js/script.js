@@ -548,7 +548,8 @@ function showPage(page) {
   const contentArea = document.getElementById("contentArea") || window;
   contentArea.scrollTo({ top: 0, behavior: "smooth" });
 
-  const targetPage = String(page).toLowerCase().trim();
+// Normalize page name by removing 'section' or 'page' suffixes
+  const targetPage = String(page).toLowerCase().replace(/section|page/g, '').trim();
 
   // 5. Highlight active navbar item
   let activeLink = document.getElementById(`nav${targetPage.charAt(0).toUpperCase() + targetPage.slice(1)}`) ||
@@ -570,11 +571,12 @@ function showPage(page) {
       if (membSec) membSec.style.display = "block";
       break;
 
-    case "donations":
     case "donation":
+    case "donations":
       if (donSec) donSec.style.display = "block";
       break;
 
+    case "statistic":
     case "statistics":
     case "stats":
       if (statSec) statSec.style.display = "block";
@@ -593,8 +595,8 @@ function showPage(page) {
       if (cntSec) cntSec.style.display = "block";
       break;
 
-    case "downloads":
     case "download":
+    case "downloads":
       if (dwnSec) dwnSec.style.display = "block";
       break;
 
@@ -603,23 +605,22 @@ function showPage(page) {
       if (profSec) profSec.style.display = "block";
       break;
 
-    // 🌟 MEETINGS & CONFERENCES (PERFECT ISOLATION)
-    case "meetings":
     case "meeting":
+    case "meetings":
+    case "conference":
     case "conferences":
       if (mtgSec) mtgSec.style.display = "flex";
       if (typeof loadMeetingsList === "function") loadMeetingsList();
       break;
 
-    // 🌟 NOTIFICATIONS CENTER
-    case "notifications":
     case "notification":
+    case "notifications":
       if (notifSec) notifSec.style.display = "block";
       if (typeof loadNotificationsList === "function") loadNotificationsList();
       break;
 
-    case "settings":
     case "setting":
+    case "settings":
       if (setSec) setSec.style.display = "block";
       break;
 

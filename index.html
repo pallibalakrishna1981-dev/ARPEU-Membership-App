@@ -22,7 +22,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="#0B4EA2">
 <meta name="apple-mobile-web-app-title" content="ARPEU Portal">
 
-<link rel="stylesheet" href="css/style.css?v=2041">
+<link rel="stylesheet" href="css/style.css?v=2042">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
@@ -3894,16 +3894,13 @@
     </div>
 </div>
 
-<div id="arpeuNativeConferenceModal" class="arpeu-call-modal-overlay" style="display: none;">
-
-
 <!-- ==========================================================================
      ARPEU NATIVE WebRTC CONFERENCING ENGINE MODAL (IN-HOUSE 60-CAPACITY)
 ========================================================================== -->
 <div id="arpeuNativeConferenceModal" class="arpeu-call-modal-overlay" style="display: none;">
     <div class="arpeu-call-container">
         
-       <!-- HEADER HUD -->
+        <!-- HEADER HUD -->
         <div class="arpeu-call-header">
             <div class="call-header-left">
                 <div class="live-rec-badge" id="webrtcLiveBadge">
@@ -3934,7 +3931,7 @@
         <!-- MAIN VIEWPORT AREA -->
         <div class="arpeu-main-viewport">
             
-       <!-- 1. ACTIVE SPEAKER STAGE -->
+            <!-- 1. ACTIVE SPEAKER STAGE -->
             <div class="speaker-stage" id="speakerStageContainer">
                 <video id="mainSpeakerVideo" autoplay playsinline muted></video>
                 <canvas id="virtualBgCanvas" style="display: none;"></canvas>
@@ -3980,7 +3977,6 @@
                     <button type="button" class="agenda-hud-minimize" onclick="toggleAgendaHud()"><i class="fas fa-chevron-down"></i></button>
                 </div>
                 <div class="agenda-hud-body" id="liveAgendaListContainer">
-                    <!-- Dynamic Live Sync Agenda Items -->
                     <div class="agenda-empty-msg">No agenda configured for this session.</div>
                 </div>
                 <div class="agenda-hud-footer">
@@ -4001,7 +3997,6 @@
                         <span class="thumb-mic-status" id="selfMicIcon"><i class="fas fa-microphone"></i></span>
                     </div>
                 </div>
-                <!-- Dynamic Remote Participants Injected by WebRTC Manager -->
             </div>
         </div>
 
@@ -4032,7 +4027,6 @@
                 <span>Background</span>
             </button>
 
-            <!-- Host Special Action Menu -->
             <button type="button" class="tool-btn host-only-btn" id="btnHostAdminMenu" onclick="toggleHostAdminPanel()" title="Host Management" style="display: none;">
                 <i class="fas fa-user-shield"></i>
                 <span>Host Control</span>
@@ -4060,7 +4054,7 @@
             </div>
         </div>
 
-        <!-- 7. PRIVATE DOCUMENT SELECTOR MODAL (NO SCREEN EXPOSURE) -->
+        <!-- 7. PRIVATE DOCUMENT SELECTOR MODAL -->
         <div class="private-doc-picker-modal" id="privateDocPickerModal" style="display: none;">
             <div class="private-picker-card">
                 <div class="private-picker-header">
@@ -4918,7 +4912,7 @@
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-<script src="js/script.js?v=110"></script>
+<script src="js/script.js?v=111"></script>
 </body>
 
 </html>
