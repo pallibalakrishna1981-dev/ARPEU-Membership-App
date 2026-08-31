@@ -5297,7 +5297,7 @@ function triggerUpiPayment(appType) {
 
 /* ==========================================================
    MEETINGS, AGENDA BUILDER & NOTIFICATIONS CONTROLLER (PHASE 1)
-   Modules: SPA Routing, Dynamic Agenda Builder, WhatsApp Preview,
+   Modules: Universal SPA Routing, Dynamic Agenda Builder, WhatsApp Preview,
    Google Apps Script Sync, Live Tabs, and Notification Badge
    ========================================================== */
 
@@ -5305,25 +5305,41 @@ function triggerUpiPayment(appType) {
 let cachedMeetings = [];
 let activeMeetingTab = "upcoming";
 
-// 1. SPA Page Routing Interceptor for Meetings & Notifications
+// 1. Universal SPA Page Routing Interceptor (Prevents Under-Construction Overlap)
 if (typeof showPage === "function") {
     const prevShowPageMtg = showPage;
     
     showPage = function (page) {
+        // Universal Cleanup: Hide ALL sections inside contentArea first
+        document.querySelectorAll("#contentArea > section").forEach(function (sec) {
+            sec.style.display = "none";
+        });
+
+        // Hide specific standalone sections
         const mtgSec = document.getElementById("meetingsSection");
         const notifSec = document.getElementById("notificationsSection");
+        const devSec = document.getElementById("underDevSection") || document.getElementById("devSection");
         
         if (mtgSec) mtgSec.style.display = "none";
         if (notifSec) notifSec.style.display = "none";
+        if (devSec) devSec.style.display = "none";
 
-        // Call original router
+        // Call original router for core pages (Home, Membership, Donations, etc.)
         prevShowPageMtg(page);
 
+        // Display matching new view cleanly
         if (page === "meetings") {
+            // Re-hide any stray sections and display only Meetings
+            document.querySelectorAll("#contentArea > section").forEach(function (sec) {
+                sec.style.display = "none";
+            });
             if (mtgSec) mtgSec.style.display = "block";
             loadMeetingsList();
             closeMoreDropdownMenu();
         } else if (page === "notifications") {
+            document.querySelectorAll("#contentArea > section").forEach(function (sec) {
+                sec.style.display = "none";
+            });
             if (notifSec) notifSec.style.display = "block";
             loadNotificationsList();
             closeMoreDropdownMenu();
@@ -5345,7 +5361,6 @@ function toggleScheduleMeetingForm() {
     card.style.display = isHidden ? "block" : "none";
 
     if (isHidden) {
-        // Set default minimum date to today
         const dateInput = document.getElementById("mtgDate");
         if (dateInput && !dateInput.value) {
             dateInput.value = new Date().toISOString().split("T")[0];
@@ -5495,279 +5510,4 @@ function submitNewMeeting(event) {
     const payload = {
         action: "createMeeting",
         title: document.getElementById("mtgTitle").value.trim(),
-        meetingType: document.getElementById("mtgType").value,
-        targetGroup: document.getElementById("mtgTargetGroup").value,
-        date: document.getElementById("mtgDate").value,
-        time: document.getElementById("mtgTime").value,
-        issuedByName: document.getElementById("mtgIssuerName").value.trim(),
-        issuedByDesig: document.getElementById("mtgIssuerDesig").value.trim(),
-        additionalMessage: document.getElementById("mtgAdditionalMessage").value.trim(),
-        agenda: getEnteredAgendaPoints()
-    };
-
-    const scriptUrl = typeof GOOGLE_SCRIPT_URL !== "undefined" ? GOOGLE_SCRIPT_URL : 
-                      "https://script.google.com/macros/s/AKfycbyoBv4TQ28mb7HiST0Q42ieE7P-3Yqs-71R5tHhHqk0RqQO0ShGrLBVPVd4j2ZUV1Q/exec";
-
-    fetch(scriptUrl, {
-        method: "POST",
-        body: JSON.stringify(payload)
-    })
-    .then(res => res.json())
-    .then(data => {
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = originalBtnHtml;
-
-        if (data.success) {
-            alert("✅ Meeting Scheduled & Broadcasted Successfully!");
-            document.getElementById("createMeetingForm").reset();
-            toggleScheduleMeetingForm();
-            loadMeetingsList(); // Refresh meetings list
-        } else {
-            alert("❌ Failed to schedule meeting: " + (data.message || "Unknown error"));
-        }
-    })
-    .catch(err => {
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = originalBtnHtml;
-        alert("⚠️ Network Error: Could not broadcast meeting. Check connection.");
-    });
-}
-
-// 6. Load & Render Meetings List
-function loadMeetingsList() {
-    const grid = document.getElementById("meetingsCardsGrid");
-    if (!grid) return;
-
-    grid.innerHTML = `
-        <div class="mtg-loading-placeholder" style="text-align:center; padding:20px; color:#64748b;">
-            <i class="fa-solid fa-circle-notch fa-spin"></i> Loading meetings...
-        </div>
-    `;
-
-    const scriptUrl = typeof GOOGLE_SCRIPT_URL !== "undefined" ? GOOGLE_SCRIPT_URL : 
-                      "https://script.google.com/macros/s/AKfycbyoBv4TQ28mb7HiST0Q42ieE7P-3Yqs-71R5tHhHqk0RqQO0ShGrLBVPVd4j2ZUV1Q/exec";
-
-    fetch(`${scriptUrl}?action=getMeetings`)
-    .then(res => res.json())
-    .then(data => {
-        if (data.success && Array.isArray(data.meetings)) {
-            cachedMeetings = data.meetings;
-            renderFilteredMeetings();
-        } else {
-            grid.innerHTML = `<p style="text-align:center; color:#64748b; font-size:12px;">No meetings found.</p>`;
-        }
-    })
-    .catch(() => {
-        grid.innerHTML = `<p style="text-align:center; color:#ef4444; font-size:12px;">Failed to load meetings.</p>`;
-    });
-}
-
-function switchMeetingTab(tabName) {
-    activeMeetingTab = tabName;
-    
-    const tabs = document.querySelectorAll(".mtg-tab-btn");
-    tabs.forEach(t => t.classList.remove("active"));
-    
-    if (tabName === "upcoming" && tabs[0]) tabs[0].classList.add("active");
-    if (tabName === "live" && tabs[1]) tabs[1].classList.add("active");
-    if (tabName === "past" && tabs[2]) tabs[2].classList.add("active");
-
-    renderFilteredMeetings();
-}
-
-function renderFilteredMeetings() {
-    const grid = document.getElementById("meetingsCardsGrid");
-    if (!grid) return;
-
-    let filtered = [];
-    const todayStr = new Date().toISOString().split("T")[0];
-
-    if (activeMeetingTab === "upcoming") {
-        filtered = cachedMeetings.filter(m => m.status === "Scheduled" || m.date >= todayStr);
-    } else if (activeMeetingTab === "live") {
-        filtered = cachedMeetings.filter(m => m.status === "Live");
-    } else if (activeMeetingTab === "past") {
-        filtered = cachedMeetings.filter(m => m.status === "Completed" || m.date < todayStr);
-    }
-
-    if (filtered.length === 0) {
-        grid.innerHTML = `
-            <div style="text-align:center; padding:30px 15px; background:#ffffff; border-radius:12px; border:1px dashed #cbd5e1;">
-                <i class="fa-solid fa-calendar-xmark" style="font-size:32px; color:#94a3b8; margin-bottom:8px;"></i>
-                <p style="font-size:12.5px; font-weight:700; color:#475569; margin:0;">No ${activeMeetingTab} meetings available.</p>
-            </div>
-        `;
-        return;
-    }
-
-    let html = "";
-    filtered.forEach(mtg => {
-        let statusBadgeClass = "status-scheduled";
-        let statusText = "SCHEDULED";
-        if (mtg.status === "Live") {
-            statusBadgeClass = "status-live";
-            statusText = "🔴 LIVE NOW";
-        } else if (mtg.status === "Completed") {
-            statusBadgeClass = "status-completed";
-            statusText = "COMPLETED";
-        }
-
-        let agendaListHtml = "";
-        if (Array.isArray(mtg.agenda) && mtg.agenda.length > 0) {
-            agendaListHtml = `
-                <div class="mtg-agenda-preview-box">
-                    <div class="mtg-agenda-heading"><i class="fa-solid fa-list-check"></i> Agenda:</div>
-                    <ol class="mtg-agenda-items">
-                        ${mtg.agenda.map(a => `<li>${a}</li>`).join("")}
-                    </ol>
-                </div>
-            `;
-        }
-
-        const waNoticeText = encodeURIComponent(generateWhatsAppNoticeText(mtg));
-
-        html += `
-            <div class="mtg-card">
-                <div class="mtg-card-top-row">
-                    <span class="mtg-type-badge">${mtg.meetingType}</span>
-                    <span class="mtg-status-badge ${statusBadgeClass}">${statusText}</span>
-                </div>
-
-                <h3 class="mtg-card-title">${mtg.title}</h3>
-
-                <div class="mtg-datetime-box">
-                    <span><i class="fa-solid fa-calendar-day"></i> ${mtg.date}</span>
-                    <span><i class="fa-solid fa-clock"></i> ${mtg.time}</span>
-                    <span><i class="fa-solid fa-user-tie"></i> ${mtg.issuedByName}</span>
-                </div>
-
-                ${agendaListHtml}
-
-                <div class="mtg-card-actions">
-                    <button type="button" class="btn-mtg-action btn-mtg-join" onclick="joinMeetingRoom('${mtg.roomCode}', '${mtg.title}')">
-                        <i class="fa-solid fa-video"></i> Join Meeting
-                    </button>
-                    <a href="https://wa.me/?text=${waNoticeText}" target="_blank" class="btn-mtg-action btn-mtg-wa">
-                        <i class="fa-brands fa-whatsapp"></i> WhatsApp
-                    </a>
-                </div>
-            </div>
-        `;
-    });
-
-    grid.innerHTML = html;
-}
-
-// 7. Join Video Meeting Room Launcher
-function joinMeetingRoom(roomCode, title) {
-    // Launches meeting room (Embedded WebRTC / Jitsi RTC engine)
-    const cleanRoom = encodeURIComponent(roomCode || "ARPEU-Official-Meeting");
-    const jitsiUrl = `https://meet.jit.si/${cleanRoom}#config.startWithAudioMuted=true&config.prejoinPageEnabled=true`;
-    
-    // Open in native standalone meeting window
-    window.open(jitsiUrl, "_blank");
-}
-
-// 8. Notifications Hub Controller & Badge Manager
-function loadNotificationsList() {
-    const container = document.getElementById("notificationsContainer");
-    if (!container) return;
-
-    container.innerHTML = `
-        <div class="notif-loading-placeholder" style="text-align:center; padding:20px; color:#64748b;">
-            <i class="fa-solid fa-circle-notch fa-spin"></i> Loading notifications...
-        </div>
-    `;
-
-    const scriptUrl = typeof GOOGLE_SCRIPT_URL !== "undefined" ? GOOGLE_SCRIPT_URL : 
-                      "https://script.google.com/macros/s/AKfycbyoBv4TQ28mb7HiST0Q42ieE7P-3Yqs-71R5tHhHqk0RqQO0ShGrLBVPVd4j2ZUV1Q/exec";
-
-    fetch(`${scriptUrl}?action=getNotifications`)
-    .then(res => res.json())
-    .then(data => {
-        if (data.success && Array.isArray(data.notifications)) {
-            renderNotificationsList(data.notifications);
-            updateNotificationBadges(data.unreadCount || 0);
-        } else {
-            container.innerHTML = `<p style="text-align:center; color:#64748b; font-size:12px;">No new notifications.</p>`;
-        }
-    })
-    .catch(() => {
-        container.innerHTML = `<p style="text-align:center; color:#ef4444; font-size:12px;">Failed to load notifications.</p>`;
-    });
-}
-
-function renderNotificationsList(notifications) {
-    const container = document.getElementById("notificationsContainer");
-    if (!container) return;
-
-    if (notifications.length === 0) {
-        container.innerHTML = `
-            <div style="text-align:center; padding:30px; background:#fff; border-radius:12px;">
-                <i class="fa-solid fa-bell-slash" style="font-size:32px; color:#cbd5e1; margin-bottom:8px;"></i>
-                <p style="font-size:12px; font-weight:700; color:#64748b; margin:0;">All caught up! No notifications.</p>
-            </div>
-        `;
-        return;
-    }
-
-    let html = "";
-    notifications.forEach(n => {
-        const unreadClass = n.isRead ? "" : "unread";
-        html += `
-            <div class="notif-card ${unreadClass}">
-                <div class="notif-icon-col">
-                    <i class="fa-solid ${n.category === 'Meeting' ? 'fa-video' : 'fa-bullhorn'}"></i>
-                </div>
-                <div class="notif-content-col">
-                    <div class="notif-card-header">
-                        <span class="notif-category">${n.category}</span>
-                        <span class="notif-time">${(n.createdAt || '').slice(0, 10)}</span>
-                    </div>
-                    <div class="notif-title">${n.title}</div>
-                    <div class="notif-message">${n.message}</div>
-                    ${n.actionType === 'JOIN_MEETING' ? `
-                        <button type="button" class="btn-notif-action" onclick="showPage('meetings')">
-                            <i class="fa-solid fa-arrow-right"></i> View Meeting
-                        </button>
-                    ` : ''}
-                </div>
-            </div>
-        `;
-    });
-
-    container.innerHTML = html;
-}
-
-function updateNotificationBadges(count) {
-    const navBadge = document.getElementById("navNotificationsBadge");
-    if (navBadge) {
-        if (count > 0) {
-            navBadge.textContent = count;
-            navBadge.style.display = "inline-block";
-        } else {
-            navBadge.style.display = "none";
-        }
-    }
-
-    // Update Mobile App Icon Badge (PWA Native Badging API)
-    if ("setAppBadge" in navigator) {
-        if (count > 0) {
-            navigator.setAppBadge(count).catch(() => {});
-        } else {
-            navigator.clearAppBadge().catch(() => {});
-        }
-    }
-}
-
-function markAllNotificationsAsRead() {
-    const cards = document.querySelectorAll(".notif-card.unread");
-    cards.forEach(c => c.classList.remove("unread"));
-    updateNotificationBadges(0);
-    alert("✅ All notifications marked as read.");
-}
-
-// Auto-check notifications on load
-window.addEventListener("DOMContentLoaded", function () {
-    setTimeout(loadNotificationsList, 2500);
-});
+        meetingType: docume
