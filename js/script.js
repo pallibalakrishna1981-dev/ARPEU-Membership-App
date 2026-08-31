@@ -5498,16 +5498,236 @@ function updateLiveWhatsAppPreview() {
     previewEl.textContent = generateWhatsAppNoticeText(mtgData);
 }
 
+/* ==========================================================
+   MEETINGS, AGENDA BUILDER & NOTIFICATIONS CONTROLLER (COMPLETED)
+   ========================================================== */
+
 // 5. Submit New Meeting Form (Sync with Google Apps Script)
-function submitNewMeeting(event) {
-    event.preventDefault();
+async function submitNewMeeting(event) {
+    if (event) event.preventDefault();
 
     const submitBtn = document.getElementById("btnSubmitMeeting");
-    const originalBtnHtml = submitBtn.innerHTML;
-    submitBtn.disabled = true;
-    submitBtn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> Broadcasting Meeting...`;
+    const originalBtnHtml = submitBtn ? submitBtn.innerHTML : "Schedule & Broadcast Meeting";
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> Broadcasting Meeting...`;
+    }
 
     const payload = {
         action: "createMeeting",
-        title: document.getElementById("mtgTitle").value.trim(),
-        meetingType: docume
+        title: (document.getElementById("mtgTitle") || {}).value.trim(),
+        meetingType: (document.getElementById("mtgType") || {}).value,
+        targetGroup: (document.getElementById("mtgTargetGroup") || {}).value,
+        date: (document.getElementById("mtgDate") || {}).value,
+        time: (document.getElementById("mtgTime") || {}).value,
+        issuedByName: (document.getElementById("mtgIssuerName") || {}).value.trim(),
+        issuedByDesig: (document.getElementById("mtgIssuerDesig") || {}).value.trim(),
+        additionalMessage: (document.getElementById("mtgAdditionalMessage") || {}).value.trim(),
+        agenda: getEnteredAgendaPoints()
+    };
+
+    try {
+        const targetUrl = typeof BACKEND_URL !== "undefined" ? BACKEND_URL : "https://script.google.com/macros/s/AKfycbyoBv4TQ28mb7HIsTQ42iEe7P-3Yqs-7lR5tHhHqk0RqCQOShGrLBVPvD4j2ZUV1Q/exec";
+
+        const response = await fetch(targetUrl, {
+            method: "POST",
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: JSON.stringify({ action: "createMeeting", data: payload })
+        });
+
+        const result = await response.json();
+
+        if (result && result.success) {
+            alert("✔ Meeting Scheduled & Broadcasted Successfully!");
+            const formCard = document.getElementById("scheduleMeetingCard");
+            if (formCard) formCard.style.display = "none";
+            const formEl = document.getElementById("createMeetingForm");
+            if (formEl) formEl.reset();
+            loadMeetingsList();
+        } else {
+            alert("Error: " + (result.message || "Failed to schedule meeting."));
+        }
+    } catch (err) {
+        console.error("Meeting Submit Error:", err);
+        alert("Connection error while scheduling meeting.");
+    } finally {
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalBtnHtml;
+        }
+    }
+}
+
+// 6. Switch Meeting Filter Tabs (Upcoming / Live / Past)
+function switchMeetingTab(tabType) {
+    activeMeetingTab = tabType;
+
+    const tabs = document.querySelectorAll(".mtg-tab-btn");
+    tabs.forEach(t => t.classList.remove("active"));
+
+    // Find clicked tab
+    const activeTabBtn = Array.from(tabs).find(b => b.getAttribute("onclick") && b.getAttribute("onclick").includes(tabType));
+    if (activeTabBtn) activeTabBtn.classList.add("active");
+
+    renderMeetingsList();
+}
+
+// 7. Fetch Meetings List from Google Apps Script
+async function loadMeetingsList() {
+    const container = document.getElementById("meetingsCardsGrid");
+    if (!container) return;
+
+    container.innerHTML = `<div class="mtg-loading-placeholder"><i class="fa-solid fa-circle-notch fa-spin"></i> Loading meetings...</div>`;
+
+    try {
+        const targetUrl = typeof BACKEND_URL !== "undefined" ? BACKEND_URL : "https://script.google.com/macros/s/AKfycbyoBv4TQ28mb7HIsTQ42iEe7P-3Yqs-7lR5tHhHqk0RqCQOShGrLBVPvD4j2ZUV1Q/exec";
+        const response = await fetch(`${targetUrl}?action=getMeetings`);
+        const result = await response.json();
+
+        if (result && result.success && Array.isArray(result.meetings)) {
+            cachedMeetings = result.meetings;
+            renderMeetingsList();
+        } else {
+            container.innerHTML = `<p style="font-size:12px; color:#64748b; text-align:center; padding:20px;">No official meetings found.</p>`;
+        }
+    } catch (err) {
+        console.error("Load Meetings Error:", err);
+        container.innerHTML = `<p style="font-size:12px; color:#dc2626; text-align:center; padding:20px;">Unable to load meetings. Please check internet connection.</p>`;
+    }
+}
+
+// 8. Render Filtered Meetings
+function renderMeetingsList() {
+    const container = document.getElementById("meetingsCardsGrid");
+    if (!container) return;
+
+    if (!cachedMeetings || cachedMeetings.length === 0) {
+        container.innerHTML = `<p style="font-size:12px; color:#64748b; text-align:center; padding:20px;">No meetings available.</p>`;
+        return;
+    }
+
+    const filtered = cachedMeetings.filter(m => {
+        const status = (m.status || "Scheduled").toLowerCase();
+        if (activeMeetingTab === "live") return status === "live";
+        if (activeMeetingTab === "past") return status === "completed";
+        return status === "scheduled" || status === "upcoming";
+    });
+
+    if (filtered.length === 0) {
+        container.innerHTML = `<p style="font-size:12px; color:#64748b; text-align:center; padding:20px;">No ${activeMeetingTab} meetings at this moment.</p>`;
+        return;
+    }
+
+    let html = "";
+    filtered.forEach(mtg => {
+        const isLive = (mtg.status || "").toLowerCase() === "live";
+        const isCompleted = (mtg.status || "").toLowerCase() === "completed";
+        const statusClass = isLive ? "status-live" : (isCompleted ? "status-completed" : "status-scheduled");
+        const statusLabel = isLive ? '<span class="live-dot-pulse"></span> Live Now' : (isCompleted ? "Completed" : "Scheduled");
+
+        const agendaItems = Array.isArray(mtg.agenda) && mtg.agenda.length > 0
+            ? `<div class="mtg-agenda-preview-box">
+                 <div class="mtg-agenda-heading"><i class="fa-solid fa-list-ol"></i> Agenda:</div>
+                 <ul class="mtg-agenda-items">
+                   ${mtg.agenda.map(a => `<li>${a}</li>`).join("")}
+                 </ul>
+               </div>`
+            : "";
+
+        const waText = encodeURIComponent(generateWhatsAppNoticeText(mtg));
+
+        html += `
+          <div class="mtg-card">
+            <div class="mtg-card-top-row">
+              <span class="mtg-type-badge">${mtg.meetingType || 'State Committee'}</span>
+              <span class="mtg-status-badge ${statusClass}">${statusLabel}</span>
+            </div>
+
+            <h3 class="mtg-card-title">${mtg.title}</h3>
+
+            <div class="mtg-datetime-box">
+              <span><i class="fa-solid fa-calendar"></i> ${mtg.date}</span>
+              <span><i class="fa-solid fa-clock"></i> ${mtg.time}</span>
+            </div>
+
+            ${agendaItems}
+
+            <div style="font-size:11px; color:#64748b;">
+              <strong>Issued by:</strong> ${mtg.issuedByName || 'State President'} (${mtg.issuedByDesig || 'ARPEU'})
+            </div>
+
+            <div class="mtg-card-actions">
+              <a href="https://wa.me/?text=${waText}" target="_blank" class="btn-mtg-action btn-mtg-wa">
+                <i class="fa-brands fa-whatsapp"></i> Share Notice
+              </a>
+              <button type="button" class="btn-mtg-action btn-mtg-join" onclick="alert('Meeting Room (${mtg.roomCode}) will go live during scheduled time.')">
+                <i class="fa-solid fa-video"></i> Join Conference
+              </button>
+            </div>
+          </div>
+        `;
+    });
+
+    container.innerHTML = html;
+}
+
+// 9. Load Notifications List from Google Apps Script
+async function loadNotificationsList() {
+    const container = document.getElementById("notificationsContainer");
+    if (!container) return;
+
+    container.innerHTML = `<div class="notif-loading-placeholder"><i class="fa-solid fa-circle-notch fa-spin"></i> Loading notifications...</div>`;
+
+    try {
+        const targetUrl = typeof BACKEND_URL !== "undefined" ? BACKEND_URL : "https://script.google.com/macros/s/AKfycbyoBv4TQ28mb7HIsTQ42iEe7P-3Yqs-7lR5tHhHqk0RqCQOShGrLBVPvD4j2ZUV1Q/exec";
+        const response = await fetch(`${targetUrl}?action=getNotifications`);
+        const result = await response.json();
+
+        if (result && result.success && Array.isArray(result.notifications)) {
+            if (result.notifications.length === 0) {
+                container.innerHTML = `<p style="font-size:12px; color:#64748b; text-align:center; padding:20px;"><i class="fa-solid fa-bell-slash"></i> No notifications at this time.</p>`;
+                return;
+            }
+
+            let html = "";
+            result.notifications.forEach(notif => {
+                const unreadClass = notif.isRead ? "" : "unread";
+                html += `
+                  <div class="notif-card ${unreadClass}">
+                    <div class="notif-icon-col">
+                      <i class="fa-solid ${notif.category === 'Meeting' ? 'fa-video' : 'fa-bullhorn'}"></i>
+                    </div>
+                    <div class="notif-content-col">
+                      <div class="notif-card-header">
+                        <span class="notif-category">${notif.category || 'General'}</span>
+                        <span class="notif-time">${notif.createdAt ? new Date(notif.createdAt).toLocaleDateString('en-GB') : 'Today'}</span>
+                      </div>
+                      <h4 class="notif-title">${notif.title}</h4>
+                      <p class="notif-message">${notif.message}</p>
+                      ${notif.actionType === 'JOIN_MEETING' ? `
+                        <button type="button" class="btn-notif-action" onclick="showPage('meetings')">
+                          <i class="fa-solid fa-arrow-right"></i> View Meeting Details
+                        </button>
+                      ` : ''}
+                    </div>
+                  </div>
+                `;
+            });
+            container.innerHTML = html;
+        } else {
+            container.innerHTML = `<p style="font-size:12px; color:#64748b; text-align:center; padding:20px;">No notifications found.</p>`;
+        }
+    } catch (err) {
+        console.error("Load Notifications Error:", err);
+        container.innerHTML = `<p style="font-size:12px; color:#dc2626; text-align:center; padding:20px;">Unable to load notifications.</p>`;
+    }
+}
+
+// 10. Mark All Notifications as Read Action
+function markAllNotificationsAsRead() {
+    const cards = document.querySelectorAll(".notif-card.unread");
+    cards.forEach(c => c.classList.remove("unread"));
+    const badge = document.getElementById("navNotificationsBadge");
+    if (badge) badge.style.display = "none";
+    alert("✔ All notifications marked as read.");
+}
