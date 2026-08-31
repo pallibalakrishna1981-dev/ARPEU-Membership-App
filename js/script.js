@@ -5796,13 +5796,18 @@ async function launchInstantConference(committeeName = 'Core Committee', mode = 
 
         webrtcLocalStream = await navigator.mediaDevices.getUserMedia(constraints);
 
-        if (localVideo) localVideo.srcObject = webrtcLocalStream;
-        if (mainVideo) mainVideo.srcObject = webrtcLocalStream;
+        if (localVideo) {
+            localVideo.srcObject = webrtcLocalStream;
+            localVideo.muted = true;
+            localVideo.setAttribute('playsinline', '');
+            localVideo.play().catch(e => console.log('Local video play catch:', e));
+        }
 
-        initConferenceAgendaHUD();
-
-        if (!directRoomCode && isWebrtcHost) {
-            triggerDirectLeaderWhatsAppPods(committeeName, mode, roomCode);
+        if (mainVideo) {
+            mainVideo.srcObject = webrtcLocalStream;
+            mainVideo.muted = true; // Prevents mobile browser audio feedback & black screen
+            mainVideo.setAttribute('playsinline', '');
+            mainVideo.play().catch(e => console.log('Main video play catch:', e));
         }
 
     } catch (err) {
