@@ -5862,6 +5862,475 @@ NEW QUICK LINKS INTEGRATED CARD STYLES
     cursor: pointer;
 }
 
+
+/* ==========================================================================
+   ARPEU NATIVE WebRTC CONFERENCING ENGINE STYLES (IN-HOUSE 60-CAPACITY)
+   ========================================================================== */
+.arpeu-call-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100dvh;
+    background: #020b18;
+    z-index: 99999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+.arpeu-call-container {
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    display: flex;
+    flex-direction: column;
+    background: #07152b;
+    position: relative;
+}
+
+@media (min-width: 768px) {
+    .arpeu-call-container {
+        max-width: 480px;
+        box-shadow: 0 0 40px rgba(0,0,0,0.8);
+    }
+}
+
+/* Call Header HUD */
+.arpeu-call-header {
+    height: 60px;
+    background: rgba(11, 78, 162, 0.85);
+    backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 14px;
+    z-index: 20;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.call-header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.live-rec-badge {
+    background: #dc3545;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.live-dot {
+    width: 6px;
+    height: 6px;
+    background: #fff;
+    border-radius: 50%;
+    animation: pulseLive 1.2s infinite;
+}
+
+@keyframes pulseLive {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+}
+
+.call-title-wrap h4 {
+    margin: 0;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 170px;
+}
+
+.call-room-code {
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.75);
+    font-family: monospace;
+}
+
+.call-header-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.call-hud-btn {
+    background: rgba(255, 255, 255, 0.15);
+    border: none;
+    color: #fff;
+    font-size: 12px;
+    padding: 6px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.call-hud-close {
+    background: rgba(220, 53, 69, 0.8);
+    border: none;
+    color: #fff;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Main Viewport */
+.arpeu-main-viewport {
+    flex: 1;
+    position: relative;
+    background: #000;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.speaker-stage {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.speaker-stage video, .speaker-stage canvas {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Dynamic Voice Wave Animation */
+.voice-wave-ring {
+    position: absolute;
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    border: 3px solid #28a745;
+    box-shadow: 0 0 25px #28a745;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.voice-wave-ring.speaking {
+    opacity: 1;
+    animation: wavePulse 1s infinite alternate;
+}
+
+@keyframes wavePulse {
+    0% { transform: scale(0.95); box-shadow: 0 0 15px #28a745; }
+    100% { transform: scale(1.1); box-shadow: 0 0 35px #00e676; }
+}
+
+.speaker-info-pill {
+    position: absolute;
+    bottom: 12px;
+    left: 12px;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(8px);
+    padding: 5px 12px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #fff;
+    font-size: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.speaker-role-badge {
+    background: #f57c00;
+    padding: 2px 6px;
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: 600;
+}
+
+.stage-hand-alert {
+    position: absolute;
+    top: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.85);
+    border: 1px solid #ffc107;
+    color: #ffc107;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    animation: bounce 0.8s infinite alternate;
+    z-index: 15;
+}
+
+/* Floating Agenda HUD */
+.agenda-hud-floating {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 270px;
+    max-height: 75%;
+    background: rgba(11, 25, 44, 0.92);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(245, 124, 0, 0.5);
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+    z-index: 25;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.agenda-hud-header {
+    background: rgba(245, 124, 0, 0.2);
+    padding: 8px 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.agenda-hud-header h5 {
+    margin: 0;
+    color: #fff;
+    font-size: 12px;
+}
+
+.agenda-hud-body {
+    padding: 10px;
+    overflow-y: auto;
+    max-height: 240px;
+}
+
+.live-agenda-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 8px;
+    font-size: 11px;
+    color: #e0e0e0;
+    line-height: 1.4;
+}
+
+.live-agenda-item.completed {
+    text-decoration: line-through;
+    color: #28a745;
+}
+
+.agenda-hud-footer {
+    padding: 6px;
+    text-align: center;
+    background: rgba(0, 0, 0, 0.4);
+    font-size: 9px;
+    color: #aaa;
+}
+
+/* Document Projector */
+.doc-projector-stage {
+    position: absolute;
+    inset: 0;
+    background: #111;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+}
+
+.projector-toolbar {
+    height: 44px;
+    background: #1a2332;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 10px;
+    border-bottom: 1px solid #333;
+}
+
+.projector-info {
+    color: #fff;
+    font-size: 11px;
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+.projector-canvas-wrapper {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: auto;
+    background: #222;
+}
+
+.projector-canvas-wrapper canvas, .projector-canvas-wrapper img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+/* Horizontal 60-Cadre Carousel */
+.horizontal-cadre-carousel {
+    height: 90px;
+    background: rgba(5, 15, 30, 0.95);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 8px 10px;
+    white-space: nowrap;
+}
+
+.cadre-strip-track {
+    display: inline-flex;
+    gap: 8px;
+    height: 100%;
+}
+
+.cadre-thumb-card {
+    width: 74px;
+    height: 74px;
+    border-radius: 8px;
+    background: #142238;
+    position: relative;
+    overflow: hidden;
+    border: 2px solid transparent;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.cadre-thumb-card.active-speaker {
+    border-color: #28a745;
+}
+
+.cadre-thumb-card video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.thumb-label {
+    position: absolute;
+    bottom: 2px;
+    left: 2px;
+    right: 2px;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 2px 4px;
+    border-radius: 4px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 9px;
+    color: #fff;
+}
+
+/* Call Controls Toolbar */
+.arpeu-call-toolbar {
+    height: 70px;
+    background: #061325;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    padding: 0 8px;
+    border-top: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.tool-btn {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    width: 52px;
+    height: 52px;
+    border-radius: 12px;
+    font-size: 10px;
+    cursor: pointer;
+}
+
+.tool-btn i {
+    font-size: 16px;
+}
+
+.tool-btn.active {
+    background: #f57c00;
+    color: #fff;
+}
+
+.tool-btn.muted {
+    background: #dc3545;
+    color: #fff;
+}
+
+.tool-btn.btn-end-call {
+    background: #dc3545;
+    border-color: #dc3545;
+}
+
+/* Private Picker Popup */
+.private-doc-picker-modal {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.8);
+    z-index: 50;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.private-picker-card {
+    background: #0f2444;
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 14px;
+    width: 100%;
+    max-width: 380px;
+    padding: 16px;
+    color: #fff;
+}
+
+.private-picker-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.private-picker-header h4 {
+    margin: 0;
+    font-size: 14px;
+}
+
+.doc-upload-dropzone {
+    border: 2px dashed #0b4ea2;
+    border-radius: 10px;
+    padding: 25px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    background: rgba(11, 78, 162, 0.1);
+}
+
+
 /* ==========================================================
    PORTAL DARK MODE THEME STYLES
    ========================================================== */

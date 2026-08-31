@@ -22,7 +22,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="#0B4EA2">
 <meta name="apple-mobile-web-app-title" content="ARPEU Portal">
 
-<link rel="stylesheet" href="css/style.css?v=2033">
+<link rel="stylesheet" href="css/style.css?v=2034">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
@@ -3859,6 +3859,192 @@
     </div>
 </div>
 
+
+<!-- ==========================================================================
+     ARPEU NATIVE WebRTC CONFERENCING ENGINE MODAL (IN-HOUSE 60-CAPACITY)
+========================================================================== -->
+<div id="arpeuNativeConferenceModal" class="arpeu-call-modal-overlay" style="display: none;">
+    <div class="arpeu-call-container">
+        
+        <!-- HEADER HUD -->
+        <div class="arpeu-call-header">
+            <div class="call-header-left">
+                <div class="live-rec-badge" id="webrtcLiveBadge">
+                    <span class="live-dot"></span> LIVE
+                </div>
+                <div class="call-title-wrap">
+                    <h4 id="webrtcRoomTitle">ARPEU Executive Conference</h4>
+                    <span class="call-room-code" id="webrtcRoomCodeText">ROOM: SEC-CONF-01</span>
+                </div>
+            </div>
+
+            <div class="call-header-right">
+                <button type="button" class="call-hud-btn" id="btnToggleAgendaHud" title="Toggle Agenda Checklist" onclick="toggleAgendaHud()">
+                    <i class="fas fa-tasks"></i> <span class="hud-btn-text">Agenda</span>
+                </button>
+                <button type="button" class="call-hud-btn" id="btnToggleRec" title="Start Local HD Recording" onclick="toggleLocalRecording()">
+                    <i class="fas fa-circle text-danger"></i> <span id="recStatusText">REC</span>
+                </button>
+                <button type="button" class="call-hud-close" title="Leave Conference" onclick="leaveArpeuConference()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- MAIN VIEWPORT AREA -->
+        <div class="arpeu-main-viewport">
+            
+            <!-- 1. ACTIVE SPEAKER STAGE -->
+            <div class="speaker-stage" id="speakerStageContainer">
+                <video id="mainSpeakerVideo" autoplay playsinline></video>
+                <canvas id="virtualBgCanvas" style="display: none;"></canvas>
+
+                <!-- Voice Wave Pulse Animation -->
+                <div class="voice-wave-ring" id="speakerVoiceWave"></div>
+
+                <!-- Speaker Watermark / Info Badge -->
+                <div class="speaker-info-pill" id="speakerInfoPill">
+                    <span class="speaker-icon"><i class="fas fa-microphone"></i></span>
+                    <span class="speaker-name" id="mainSpeakerName">Connecting...</span>
+                    <span class="speaker-role-badge" id="mainSpeakerRole">State EC</span>
+                </div>
+
+                <!-- Hand Raise Alert Notification on Stage -->
+                <div class="stage-hand-alert" id="stageHandAlert" style="display: none;">
+                    <i class="fas fa-hand-paper text-warning"></i> <span id="handAlertCadreName">Leader Raised Hand</span>
+                </div>
+            </div>
+
+            <!-- 2. 100% PRIVATE DOCUMENT & CIRCULAR PROJECTOR (CANVAS VIEW) -->
+            <div class="doc-projector-stage" id="docProjectorStage" style="display: none;">
+                <div class="projector-toolbar">
+                    <div class="projector-info">
+                        <i class="fas fa-file-invoice"></i> <span id="projectorDocTitle">ARPEU Official Circular</span>
+                        <span class="page-count-badge" id="projectorPageCount">Page 1 / 1</span>
+                    </div>
+                    <div class="projector-controls">
+                        <button type="button" onclick="projectorPrevPage()" title="Previous Page"><i class="fas fa-chevron-left"></i></button>
+                        <button type="button" onclick="projectorNextPage()" title="Next Page"><i class="fas fa-chevron-right"></i></button>
+                        <button type="button" onclick="projectorZoom(0.2)" title="Zoom In"><i class="fas fa-search-plus"></i></button>
+                        <button type="button" onclick="projectorZoom(-0.2)" title="Zoom Out"><i class="fas fa-search-minus"></i></button>
+                        <button type="button" class="btn-stop-projection" onclick="stopDocumentProjection()" title="Stop Sharing"><i class="fas fa-stop-circle"></i> Close Doc</button>
+                    </div>
+                </div>
+                <div class="projector-canvas-wrapper" id="projectorCanvasWrapper">
+                    <canvas id="docProjectionCanvas"></canvas>
+                    <img id="docProjectionImg" src="" alt="Projected Document" style="display: none;">
+                </div>
+            </div>
+
+            <!-- 3. LIVE FLOATING AGENDA HUD (INTERACTIVE CHECKLIST OVERLAY) -->
+            <div class="agenda-hud-floating" id="agendaHudFloating" style="display: none;">
+                <div class="agenda-hud-header">
+                    <h5><i class="fas fa-clipboard-list text-warning"></i> Meeting Agenda HUD</h5>
+                    <button type="button" class="agenda-hud-minimize" onclick="toggleAgendaHud()"><i class="fas fa-chevron-down"></i></button>
+                </div>
+                <div class="agenda-hud-body" id="liveAgendaListContainer">
+                    <!-- Dynamic Live Sync Agenda Items -->
+                    <div class="agenda-empty-msg">No agenda configured for this session.</div>
+                </div>
+                <div class="agenda-hud-footer">
+                    <small><i class="fas fa-shield-alt"></i> Real-time sync with all 60 participants</small>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- 4. MULTI-PAGE HORIZONTAL CAROUSEL (UP TO 60 CADRES) -->
+        <div class="horizontal-cadre-carousel" id="horizontalCadreCarousel">
+            <div class="cadre-strip-track" id="cadreStripTrack">
+                <!-- Local User Card -->
+                <div class="cadre-thumb-card self-card" id="thumbUserSelf">
+                    <video id="localUserVideo" autoplay playsinline muted></video>
+                    <div class="thumb-label">
+                        <span class="thumb-name">You</span>
+                        <span class="thumb-mic-status" id="selfMicIcon"><i class="fas fa-microphone"></i></span>
+                    </div>
+                </div>
+                <!-- Dynamic Remote Participants Injected by WebRTC Manager -->
+            </div>
+        </div>
+
+        <!-- 5. CALL CONTROL TOOLBAR -->
+        <div class="arpeu-call-toolbar">
+            <button type="button" class="tool-btn" id="btnToggleMic" onclick="webrtcToggleMic()" title="Toggle Mic">
+                <i class="fas fa-microphone"></i>
+                <span>Mute</span>
+            </button>
+
+            <button type="button" class="tool-btn" id="btnToggleCam" onclick="webrtcToggleCam()" title="Toggle Camera">
+                <i class="fas fa-video"></i>
+                <span>Camera</span>
+            </button>
+
+            <button type="button" class="tool-btn" id="btnRaiseHand" onclick="webrtcRaiseHand()" title="Raise Hand">
+                <i class="fas fa-hand-paper"></i>
+                <span>Hand</span>
+            </button>
+
+            <button type="button" class="tool-btn" id="btnDocProjector" onclick="openPrivateDocPicker()" title="Project Circular/PDF">
+                <i class="fas fa-file-pdf"></i>
+                <span>Project Doc</span>
+            </button>
+
+            <button type="button" class="tool-btn" id="btnVirtualBg" onclick="toggleVirtualBgMenu()" title="Virtual Backgrounds">
+                <i class="fas fa-image"></i>
+                <span>Background</span>
+            </button>
+
+            <!-- Host Special Action Menu -->
+            <button type="button" class="tool-btn host-only-btn" id="btnHostAdminMenu" onclick="toggleHostAdminPanel()" title="Host Management" style="display: none;">
+                <i class="fas fa-user-shield"></i>
+                <span>Host Control</span>
+            </button>
+
+            <button type="button" class="tool-btn btn-end-call" onclick="leaveArpeuConference()" title="Disconnect">
+                <i class="fas fa-phone-slash"></i>
+                <span>Leave</span>
+            </button>
+        </div>
+
+        <!-- 6. HOST CONTROL DRAWER / POPUP -->
+        <div class="host-control-popup" id="hostControlPopup" style="display: none;">
+            <div class="host-control-header">
+                <h5><i class="fas fa-shield-halved"></i> Host Controls</h5>
+                <button type="button" onclick="toggleHostAdminPanel()">&times;</button>
+            </div>
+            <div class="host-actions-list">
+                <button type="button" class="btn-host-action text-danger" onclick="hostMuteAllParticipants()">
+                    <i class="fas fa-microphone-slash"></i> Global Mute (Mute All 60)
+                </button>
+                <button type="button" class="btn-host-action text-primary" onclick="hostClearAllHands()">
+                    <i class="fas fa-hand-sparkles"></i> Lower All Hands
+                </button>
+            </div>
+        </div>
+
+        <!-- 7. PRIVATE DOCUMENT SELECTOR MODAL (NO SCREEN EXPOSURE) -->
+        <div class="private-doc-picker-modal" id="privateDocPickerModal" style="display: none;">
+            <div class="private-picker-card">
+                <div class="private-picker-header">
+                    <h4><i class="fas fa-lock text-success"></i> Private Document Projector</h4>
+                    <button type="button" onclick="closePrivateDocPicker()">&times;</button>
+                </div>
+                <div class="private-picker-body">
+                    <p class="picker-note">Select official circular/letter. Your personal phone gallery and folders will <strong>never</strong> be visible to members.</p>
+                    <label class="doc-upload-dropzone">
+                        <i class="fas fa-cloud-upload-alt fa-2x"></i>
+                        <span>Select PDF or Image</span>
+                        <input type="file" id="privateProjectorFileInput" accept="application/pdf,image/png,image/jpeg" onchange="handleProjectorFileSelect(event)" style="display: none;">
+                    </label>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
 <!-- =========================================================
      DONATION MODULE & UNIVERSAL AUTO-FILL SECTION (START)
 ========================================================= -->
@@ -4695,7 +4881,7 @@
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-<script src="js/script.js?v=102"></script>
+<script src="js/script.js?v=103"></script>
 </body>
 
 </html>
