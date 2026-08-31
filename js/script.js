@@ -5800,22 +5800,25 @@ async function launchInstantConference(committeeName = 'Core Committee', mode = 
             localVideo.srcObject = webrtcLocalStream;
             localVideo.muted = true;
             localVideo.setAttribute('playsinline', '');
-            localVideo.play().catch(e => console.log('Local video play catch:', e));
+            localVideo.setAttribute('autoplay', '');
+            localVideo.play().catch(e => console.log('Local video play:', e));
         }
 
         if (mainVideo) {
             mainVideo.srcObject = webrtcLocalStream;
-            mainVideo.muted = true; // Prevents mobile browser audio feedback & black screen
+            mainVideo.muted = true;
             mainVideo.setAttribute('playsinline', '');
-            mainVideo.play().catch(e => console.log('Main video play catch:', e));
+            mainVideo.setAttribute('autoplay', '');
+            mainVideo.play().catch(e => console.log('Main video play:', e));
         }
+
+        initConferenceAgendaHUD();
 
     } catch (err) {
         console.error('Hardware Media Access Error:', err);
         alert('Could not access Camera/Microphone. Please allow permissions in browser settings.');
     }
 }
-
 /**
  * Direct WhatsApp Deep-Link Broadcaster
  */

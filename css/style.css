@@ -5875,7 +5875,7 @@ NEW QUICK LINKS INTEGRATED CARD STYLES
     height: 100dvh;
     background: radial-gradient(circle at center, #0e274c 0%, #030b17 100%);
     z-index: 999999;
-    display: flex;
+    display: none; /* Hidden by default */
     justify-content: center;
     align-items: center;
     padding: 20px;
