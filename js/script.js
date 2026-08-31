@@ -5755,4 +5755,26 @@ Would you like to start the conference room now?`;
         window.open(roomUrl, "_blank");
 
         // 2. Generate WhatsApp One-Tap Broadcast for all 4 Leaders
-        const waNotice
+        const waNotice = 
+`⚡ *ANDHRA RASTRA POWER EMPLOYEES UNION (ARPEU)* ⚡
+🏛️ *EMERGENCY ${committeeName.toUpperCase()} CONFERENCE IS LIVE*
+
+👥 *Invited Members:*
+${coreCommitteeTestCadre.map((c, i) => `▪️ ${c.name}`).join("\n")}
+
+📞 *Mode:* ${mode.toUpperCase()} Conference
+🔗 *Tap this link to Join Immediately:*
+${roomUrl}
+
+_Please join with microphone ready._
+*ARPEU State Leadership*`;
+
+        // Direct Share to WhatsApp
+        const waLink = `https://wa.me/?text=${encodeURIComponent(waNotice)}`;
+        setTimeout(() => {
+            if (confirm("Would you like to send this instant meeting link to WhatsApp Group now?")) {
+                window.open(waLink, "_blank");
+            }
+        }, 1000);
+    }
+}
