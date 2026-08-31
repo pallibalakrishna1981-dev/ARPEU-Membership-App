@@ -5735,7 +5735,7 @@ const coreCommitteeTestCadre = [
     { name: "Sri P. Balakrishna", mobile: "9393788785" }
 ];
 
-// WebRTC State Variables
+// WebRTC & Calling State Variables
 let webrtcLocalStream = null;
 let webrtcAudioContext = null;
 let webrtcAnalyser = null;
@@ -5745,6 +5745,11 @@ let isWebrtcRecording = false;
 let isWebrtcHost = true;
 let currentProjectorScale = 1.0;
 let liveOnlineParticipants = 4;
+
+let ringtoneAudioCtx = null;
+let ringtoneInterval = null;
+let pendingIncomingRoomCode = null;
+let pendingIncomingMeetingType = null;
 
 let liveAgendaItemsState = [
     { id: 0, text: "1. Review of BMS Membership Drive Progress", status: "active" },
@@ -5759,7 +5764,6 @@ async function launchInstantConference(committeeName = 'Core Committee', mode = 
     const isVideo = (mode === 'video');
     const roomCode = directRoomCode || `ARPEU-${committeeName.replace(/\s+/g, '-').toUpperCase()}-${Math.floor(100 + Math.random() * 900)}`;
 
-    // 1. Open Native Stage Modal Immediately
     const modal = document.getElementById('arpeuNativeConferenceModal');
     const roomTitle = document.getElementById('webrtcRoomTitle');
     const roomCodeText = document.getElementById('webrtcRoomCodeText');
@@ -5785,7 +5789,6 @@ async function launchInstantConference(committeeName = 'Core Committee', mode = 
     if (hostBtn) hostBtn.style.display = isWebrtcHost ? 'flex' : 'none';
 
     try {
-        // 2. Access Hardware Media
         const constraints = {
             audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
             video: isVideo ? { width: { ideal: 640 }, height: { ideal: 480 }, facingMode: 'user' } : false
@@ -5796,10 +5799,8 @@ async function launchInstantConference(committeeName = 'Core Committee', mode = 
         if (localVideo) localVideo.srcObject = webrtcLocalStream;
         if (mainVideo) mainVideo.srcObject = webrtcLocalStream;
 
-        // 3. Initialize Agenda HUD
         initConferenceAgendaHUD();
 
-        // 4. If Host started a fresh room, send 1-Tap WhatsApp notice to the 4 Leaders
         if (!directRoomCode && isWebrtcHost) {
             triggerDirectLeaderWhatsAppPods(committeeName, mode, roomCode);
         }
@@ -5811,7 +5812,7 @@ async function launchInstantConference(committeeName = 'Core Committee', mode = 
 }
 
 /**
- * 1-Tap Direct Leader WhatsApp Broadcaster (No Contact Search Required)
+ * Direct WhatsApp Deep-Link Broadcaster
  */
 function triggerDirectLeaderWhatsAppPods(committeeName, mode, roomCode) {
     const basePortalUrl = window.location.href.split('?')[0].split('#')[0];
@@ -5833,22 +5834,13 @@ ${directJoinUrl}
 _Please tap and allow Camera/Mic to join._
 *ARPEU State Leadership*`;
 
-    // Direct WhatsApp Deep-Link scheme (Opens native WhatsApp instantly with notice)
     const encoded = encodeURIComponent(waNotice);
     window.location.href = `whatsapp://send?text=${encoded}`;
 }
 
 /**
- * Instant Direct Auto-Join Engine (Runs immediately when Link is Opened)
+ * Web Audio Ringtone Sound Synthesizer
  */
-/**
- * Web Audio Ringtone Sound Synthesizer (No external audio file required)
- */
-let ringtoneAudioCtx = null;
-let ringtoneInterval = null;
-let pendingIncomingRoomCode = null;
-let pendingIncomingMeetingType = null;
-
 function startIncomingRingtone() {
     try {
         window.AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -5879,7 +5871,6 @@ function startIncomingRingtone() {
             osc2.stop(ringtoneAudioCtx.currentTime + duration);
         };
 
-        // Ringing cadence: Two dual-tone bursts every 3 seconds (Standard Telephone Ring)
         const ringPattern = () => {
             playTone(440, 480, 0.8);
             setTimeout(() => playTone(440, 480, 0.8), 1000);
@@ -5905,7 +5896,7 @@ function stopIncomingRingtone() {
 }
 
 /**
- * Show Full-Screen Incoming Ringing Call Screen
+ * Incoming Call Ringing Screen
  */
 function showIncomingConferenceRinging(committeeName, roomCode) {
     const overlay = document.getElementById('arpeuIncomingCallOverlay');
@@ -5917,134 +5908,20 @@ function showIncomingConferenceRinging(committeeName, roomCode) {
     if (title) title.textContent = `${pendingIncomingMeetingType} Call`;
     if (overlay) overlay.style.display = 'flex';
 
-    // Start Audio Ringtone & Vibration
     startIncomingRingtone();
     if (navigator.vibrate) {
         navigator.vibrate([400, 200, 400, 200, 400]);
     }
 }
 
-/**
- * Accept Incoming Call -> Immediately enter Native Stage
- */
 function acceptIncomingConferenceCall() {
     stopIncomingRingtone();
     const overlay = document.getElementById('arpeuIncomingCallOverlay');
     if (overlay) overlay.style.display = 'none';
 
-    // Launch Conference
     launchInstantConference(pendingIncomingMeetingType, 'video', pendingIncomingRoomCode);
 }
 
-/**
- * Decline Incoming Call
- */
-function declineIncomingConferenceCall() {
-    stopIncomingRingtone();
-    const overlay = document.getElementById('arpeuIncomingCallOverlay');
-    if (overlay) overlay.style.display = 'none';
-    pendingIncomingRoomCode = null;
-    pendingIncomingMeetingType = null;
-}
-
-
- * Web Audio Ringtone Sound Synthesizer (No external audio file required)
- */
-let ringtoneAudioCtx = null;
-let ringtoneInterval = null;
-let pendingIncomingRoomCode = null;
-let pendingIncomingMeetingType = null;
-
-function startIncomingRingtone() {
-    try {
-        window.AudioContext = window.AudioContext || window.webkitAudioContext;
-        ringtoneAudioCtx = new AudioContext();
-
-        const playTone = (freq1, freq2, duration) => {
-            if (!ringtoneAudioCtx || ringtoneAudioCtx.state === 'closed') return;
-            
-            const osc1 = ringtoneAudioCtx.createOscillator();
-            const osc2 = ringtoneAudioCtx.createOscillator();
-            const gain = ringtoneAudioCtx.createGain();
-
-            osc1.type = 'sine';
-            osc2.type = 'sine';
-            osc1.frequency.setValueAtTime(freq1, ringtoneAudioCtx.currentTime);
-            osc2.frequency.setValueAtTime(freq2, ringtoneAudioCtx.currentTime);
-
-            gain.gain.setValueAtTime(0.15, ringtoneAudioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.001, ringtoneAudioCtx.currentTime + duration);
-
-            osc1.connect(gain);
-            osc2.connect(gain);
-            gain.connect(ringtoneAudioCtx.destination);
-
-            osc1.start();
-            osc2.start();
-            osc1.stop(ringtoneAudioCtx.currentTime + duration);
-            osc2.stop(ringtoneAudioCtx.currentTime + duration);
-        };
-
-        // Ringing cadence: Two dual-tone bursts every 3 seconds (Standard Telephone Ring)
-        const ringPattern = () => {
-            playTone(440, 480, 0.8);
-            setTimeout(() => playTone(440, 480, 0.8), 1000);
-        };
-
-        ringPattern();
-        ringtoneInterval = setInterval(ringPattern, 3000);
-
-    } catch (e) {
-        console.warn('Ringtone AudioContext skipped:', e);
-    }
-}
-
-function stopIncomingRingtone() {
-    if (ringtoneInterval) {
-        clearInterval(ringtoneInterval);
-        ringtoneInterval = null;
-    }
-    if (ringtoneAudioCtx && ringtoneAudioCtx.state !== 'closed') {
-        ringtoneAudioCtx.close();
-        ringtoneAudioCtx = null;
-    }
-}
-
-/**
- * Show Full-Screen Incoming Ringing Call Screen
- */
-function showIncomingConferenceRinging(committeeName, roomCode) {
-    const overlay = document.getElementById('arpeuIncomingCallOverlay');
-    const title = document.getElementById('incomingMeetingName');
-    
-    pendingIncomingRoomCode = roomCode;
-    pendingIncomingMeetingType = committeeName || 'Executive Committee';
-
-    if (title) title.textContent = `${pendingIncomingMeetingType} Call`;
-    if (overlay) overlay.style.display = 'flex';
-
-    // Start Audio Ringtone & Vibration
-    startIncomingRingtone();
-    if (navigator.vibrate) {
-        navigator.vibrate([400, 200, 400, 200, 400]);
-    }
-}
-
-/**
- * Accept Incoming Call -> Immediately enter Native Stage
- */
-function acceptIncomingConferenceCall() {
-    stopIncomingRingtone();
-    const overlay = document.getElementById('arpeuIncomingCallOverlay');
-    if (overlay) overlay.style.display = 'none';
-
-    // Launch Conference
-    launchInstantConference(pendingIncomingMeetingType, 'video', pendingIncomingRoomCode);
-}
-
-/**
- * Decline Incoming Call
- */
 function declineIncomingConferenceCall() {
     stopIncomingRingtone();
     const overlay = document.getElementById('arpeuIncomingCallOverlay');
@@ -6054,7 +5931,7 @@ function declineIncomingConferenceCall() {
 }
 
 /**
- * Instant Direct Auto-Join / Ringing Detection on Link Click
+ * Instant Direct Auto-Join on Link Click
  */
 function executeInstantAutoJoinCheck() {
     try {
@@ -6063,13 +5940,11 @@ function executeInstantAutoJoinCheck() {
         const mtgType = urlParams.get('type') || 'Core Committee';
 
         if (joinRoom) {
-            // Dismiss Splash Screen immediately
             const splash = document.getElementById('appSplashScreen');
             if (splash) splash.style.display = 'none';
 
-            isWebrtcHost = false; // Joined as committee attendee
+            isWebrtcHost = false;
 
-            // Trigger Incoming Ringing Call UI on Attendee Screen!
             setTimeout(() => {
                 showIncomingConferenceRinging(mtgType, joinRoom);
             }, 300);
@@ -6078,9 +5953,6 @@ function executeInstantAutoJoinCheck() {
         console.warn('Auto join check error:', e);
     }
 }
-
-// Immediate Execution for Link Click
-executeInstantAutoJoinCheck();
 
 /**
  * Online Participants Counter Update
@@ -6092,7 +5964,7 @@ function updateOnlineParticipantsCount(count) {
 }
 
 /**
- * 50+ Senior Friendly Agenda HUD (No Strike-Through, Green Active, Red Done)
+ * 50+ Senior Friendly Agenda HUD (No Strike-Through)
  */
 function toggleAgendaHud() {
     const hud = document.getElementById('agendaHudFloating');
@@ -6131,7 +6003,7 @@ function renderConferenceAgendaHUD() {
 
         if (item.status === 'active') {
             itemClass = 'active-topic';
-            pillHtml = '<span class="agenda-status-pill pill-active"><i class="fas fa-bullhorn"></i> Active Topic</span>';
+            pillHtml = '<span class="agenda-status-pill pill-active"><i class="fas fa-bullhorn"></i> In Discussion</span>';
         } else if (item.status === 'completed') {
             itemClass = 'completed-topic';
             pillHtml = '<span class="agenda-status-pill pill-done"><i class="fas fa-check-circle"></i> Done</span>';
@@ -6168,7 +6040,7 @@ function handleHostAgendaClick(id) {
 }
 
 /**
- * Leave / Close Conference Session
+ * Leave Conference
  */
 function leaveArpeuConference() {
     const modal = document.getElementById('arpeuNativeConferenceModal');
@@ -6186,9 +6058,6 @@ function leaveArpeuConference() {
     document.body.style.overflow = '';
 }
 
-/**
- * Microphone Mute/Unmute
- */
 function webrtcToggleMic() {
     if (!webrtcLocalStream) return;
     const audioTrack = webrtcLocalStream.getAudioTracks()[0];
@@ -6208,9 +6077,6 @@ function webrtcToggleMic() {
     }
 }
 
-/**
- * Camera Toggle On/Off
- */
 function webrtcToggleCam() {
     if (!webrtcLocalStream) return;
     const videoTrack = webrtcLocalStream.getVideoTracks()[0];
@@ -6225,9 +6091,6 @@ function webrtcToggleCam() {
     }
 }
 
-/**
- * Raise Hand Priority Alert
- */
 function webrtcRaiseHand() {
     const btn = document.getElementById('btnRaiseHand');
     const stageAlert = document.getElementById('stageHandAlert');
@@ -6240,9 +6103,6 @@ function webrtcRaiseHand() {
     }
 }
 
-/**
- * 100% Private Document Projector
- */
 function openPrivateDocPicker() {
     const modal = document.getElementById('privateDocPickerModal');
     if (modal) modal.style.display = 'flex';
@@ -6303,9 +6163,6 @@ function projectorNextPage() {
     alert('Document page synchronized with all participants.');
 }
 
-/**
- * Local HD Recording
- */
 function toggleLocalRecording() {
     if (!isWebrtcRecording) {
         startLocalRecording();
@@ -6365,9 +6222,6 @@ function stopLocalRecording() {
     if (recText) recText.textContent = 'REC';
 }
 
-/**
- * Host Executive Controls
- */
 function toggleHostAdminPanel() {
     const panel = document.getElementById('hostControlPopup');
     if (panel) panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
@@ -6389,141 +6243,14 @@ function toggleVirtualBgMenu() {
     alert('ARPEU Official Virtual Backgrounds ready.');
 }
 
-/**
- * Web Audio Ringtone Sound Synthesizer (No external audio file required)
- */
-let ringtoneAudioCtx = null;
-let ringtoneInterval = null;
-let pendingIncomingRoomCode = null;
-let pendingIncomingMeetingType = null;
-
-function startIncomingRingtone() {
-    try {
-        window.AudioContext = window.AudioContext || window.webkitAudioContext;
-        ringtoneAudioCtx = new AudioContext();
-
-        const playTone = (freq1, freq2, duration) => {
-            if (!ringtoneAudioCtx || ringtoneAudioCtx.state === 'closed') return;
-            
-            const osc1 = ringtoneAudioCtx.createOscillator();
-            const osc2 = ringtoneAudioCtx.createOscillator();
-            const gain = ringtoneAudioCtx.createGain();
-
-            osc1.type = 'sine';
-            osc2.type = 'sine';
-            osc1.frequency.setValueAtTime(freq1, ringtoneAudioCtx.currentTime);
-            osc2.frequency.setValueAtTime(freq2, ringtoneAudioCtx.currentTime);
-
-            gain.gain.setValueAtTime(0.15, ringtoneAudioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.001, ringtoneAudioCtx.currentTime + duration);
-
-            osc1.connect(gain);
-            osc2.connect(gain);
-            gain.connect(ringtoneAudioCtx.destination);
-
-            osc1.start();
-            osc2.start();
-            osc1.stop(ringtoneAudioCtx.currentTime + duration);
-            osc2.stop(ringtoneAudioCtx.currentTime + duration);
-        };
-
-        const ringPattern = () => {
-            playTone(440, 480, 0.8);
-            setTimeout(() => playTone(440, 480, 0.8), 1000);
-        };
-
-        ringPattern();
-        ringtoneInterval = setInterval(ringPattern, 3000);
-
-    } catch (e) {
-        console.warn('Ringtone AudioContext skipped:', e);
-    }
-}
-
-function stopIncomingRingtone() {
-    if (ringtoneInterval) {
-        clearInterval(ringtoneInterval);
-        ringtoneInterval = null;
-    }
-    if (ringtoneAudioCtx && ringtoneAudioCtx.state !== 'closed') {
-        ringtoneAudioCtx.close();
-        ringtoneAudioCtx = null;
-    }
-}
-
-/**
- * Show Full-Screen Incoming Ringing Call Screen
- */
-function showIncomingConferenceRinging(committeeName, roomCode) {
-    const overlay = document.getElementById('arpeuIncomingCallOverlay');
-    const title = document.getElementById('incomingMeetingName');
-    
-    pendingIncomingRoomCode = roomCode;
-    pendingIncomingMeetingType = committeeName || 'Executive Committee';
-
-    if (title) title.textContent = `${pendingIncomingMeetingType} Call`;
-    if (overlay) overlay.style.display = 'flex';
-
-    startIncomingRingtone();
-    if (navigator.vibrate) {
-        navigator.vibrate([400, 200, 400, 200, 400]);
-    }
-}
-
-/**
- * Accept Incoming Call -> Immediately enter Native Stage
- */
-function acceptIncomingConferenceCall() {
-    stopIncomingRingtone();
-    const overlay = document.getElementById('arpeuIncomingCallOverlay');
-    if (overlay) overlay.style.display = 'none';
-
-    launchInstantConference(pendingIncomingMeetingType, 'video', pendingIncomingRoomCode);
-}
-
-/**
- * Decline Incoming Call
- */
-function declineIncomingConferenceCall() {
-    stopIncomingRingtone();
-    const overlay = document.getElementById('arpeuIncomingCallOverlay');
-    if (overlay) overlay.style.display = 'none';
-    pendingIncomingRoomCode = null;
-    pendingIncomingMeetingType = null;
-}
-
-/**
- * Instant Direct Auto-Join / Ringing Detection on Link Click
- */
-function executeInstantAutoJoinCheck() {
-    try {
-        const urlParams = new URLSearchParams(window.location.search);
-        const joinRoom = urlParams.get('joinRoom');
-        const mtgType = urlParams.get('type') || 'Core Committee';
-
-        if (joinRoom) {
-            const splash = document.getElementById('appSplashScreen');
-            if (splash) splash.style.display = 'none';
-
-            isWebrtcHost = false;
-
-            setTimeout(() => {
-                showIncomingConferenceRinging(mtgType, joinRoom);
-            }, 300);
-        }
-    } catch (e) {
-        console.warn('Auto join check error:', e);
-    }
-}
-
-// Splash Screen Auto-Dismiss Failsafe (Guarantees App Opens within 1.2s)
+// Splash Screen Auto-Dismiss Failsafe
 setTimeout(() => {
     const splash = document.getElementById('appSplashScreen');
     if (splash && splash.style.display !== 'none') {
         splash.style.opacity = '0';
         setTimeout(() => { splash.style.display = 'none'; }, 300);
     }
-}, 1200);
+}, 1000);
 
 // Run Link Detection
 executeInstantAutoJoinCheck();
