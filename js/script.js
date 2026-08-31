@@ -5604,7 +5604,7 @@ async function loadMeetingsList() {
     }
 }
 
-// 10. Render Filtered Meetings Cards
+// 10. Render Filtered Meetings Cards (100% IN-HOUSE NATIVE CONFERENCING)
 function renderMeetingsList() {
     const container = document.getElementById("meetingsCardsGrid");
     if (!container) return;
@@ -5645,7 +5645,7 @@ function renderMeetingsList() {
             : "";
 
         const waText = encodeURIComponent(generateWhatsAppNoticeText(mtg));
-        const confUrl = `https://meet.jit.si/${mtg.roomCode || 'ARPEU-UNION-2026'}`;
+        const cleanType = (mtg.meetingType || 'State Committee').replace(/'/g, "\\'");
 
         html += `
           <div class="mtg-card">
@@ -5671,9 +5671,9 @@ function renderMeetingsList() {
               <a href="https://wa.me/?text=${waText}" target="_blank" class="btn-mtg-action btn-mtg-wa">
                 <i class="fa-brands fa-whatsapp"></i> Broadcast Notice
               </a>
-              <a href="${confUrl}" target="_blank" class="btn-mtg-action btn-mtg-join">
-                <i class="fa-solid fa-video"></i> Join Conference
-              </a>
+              <button type="button" class="btn-mtg-action btn-mtg-join" onclick="launchInstantConference('${cleanType}', 'video')">
+                <i class="fa-solid fa-video"></i> Join Native Stage
+              </button>
             </div>
           </div>
         `;
