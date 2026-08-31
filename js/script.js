@@ -5984,19 +5984,29 @@ function initConferenceAgendaHUD() {
     const container = document.getElementById('liveAgendaListContainer');
     if (!container) return;
 
+    // Pull from scheduled form inputs or use full master agenda points
     const agendaInputs = document.querySelectorAll('.agenda-point-input');
-    if (agendaInputs.length > 0) {
-        const customPoints = [];
-        agendaInputs.forEach((inp, idx) => {
-            if (inp.value && inp.value.trim() !== '') {
-                customPoints.push({
-                    id: idx,
-                    text: `${idx + 1}. ${inp.value.trim()}`,
-                    status: idx === 0 ? 'active' : 'pending'
-                });
-            }
-        });
-        if (customPoints.length > 0) liveAgendaItemsState = customPoints;
+    const customPoints = [];
+
+    agendaInputs.forEach((inp, idx) => {
+        if (inp.value && inp.value.trim() !== '') {
+            customPoints.push({
+                id: idx,
+                text: `${idx + 1}. ${inp.value.trim()}`,
+                status: idx === 0 ? 'active' : 'pending'
+            });
+        }
+    });
+
+    if (customPoints.length > 0) {
+        liveAgendaItemsState = customPoints;
+    } else {
+        liveAgendaItemsState = [
+            { id: 0, text: "1. Review of BMS Membership Drive & Cadre Targets", status: "active" },
+            { id: 1, text: "2. Discoms Representation on Cadre Allowances & Pay Anomalies", status: "pending" },
+            { id: 2, text: "3. State EC Agitation Action Plan & District Conventions", status: "pending" },
+            { id: 3, text: "4. Any Other Matters with Permission of Chair", status: "pending" }
+        ];
     }
 
     renderConferenceAgendaHUD();
@@ -6009,21 +6019,25 @@ function renderConferenceAgendaHUD() {
     container.innerHTML = liveAgendaItemsState.map(item => {
         let itemClass = '';
         let pillHtml = '';
+        let iconHtml = '';
 
         if (item.status === 'active') {
             itemClass = 'active-topic';
+            iconHtml = '<i class="fas fa-volume-high text-success fa-lg"></i>';
             pillHtml = '<span class="agenda-status-pill pill-active"><i class="fas fa-bullhorn"></i> In Discussion</span>';
         } else if (item.status === 'completed') {
             itemClass = 'completed-topic';
-            pillHtml = '<span class="agenda-status-pill pill-done"><i class="fas fa-check-circle"></i> Done</span>';
+            iconHtml = '<i class="fas fa-check-circle text-primary fa-lg"></i>';
+            pillHtml = '<span class="agenda-status-pill pill-done"><i class="fas fa-check"></i> Completed</span>';
         } else {
-            pillHtml = '<span class="agenda-status-pill pill-pending">Pending</span>';
+            iconHtml = '<i class="far fa-circle text-secondary fa-lg"></i>';
+            pillHtml = '<span class="agenda-status-pill pill-pending">Upcoming</span>';
         }
 
         return `
             <div class="live-agenda-item ${itemClass}" onclick="handleHostAgendaClick(${item.id})">
-                <i class="fas ${item.status === 'completed' ? 'fa-check-circle text-danger' : (item.status === 'active' ? 'fa-play-circle text-success' : 'fa-circle-notch')} fa-lg"></i>
-                <span>${item.text}</span>
+                ${iconHtml}
+                <span style="flex: 1;">${item.text}</span>
                 ${pillHtml}
             </div>
         `;
@@ -6036,6 +6050,7 @@ function handleHostAgendaClick(id) {
     const currentItem = liveAgendaItemsState.find(i => i.id === id);
     if (!currentItem) return;
 
+    // Cycle: pending -> active -> completed
     if (currentItem.status === 'pending') {
         liveAgendaItemsState.forEach(i => { if (i.status === 'active') i.status = 'completed'; });
         currentItem.status = 'active';
@@ -6113,8 +6128,11 @@ function webrtcRaiseHand() {
 }
 
 function openPrivateDocPicker() {
-    const modal = document.getElementById('privateDocPickerModal');
-    if (modal) modal.style.display = 'flex';
+    const fileInput = document.getElementById('privateProjectorFileInput');
+    if (fileInput) {
+        fileInput.value = ''; // Reset previous file
+        fileInput.click();    // Directly opens Mobile Storage / Files
+    }
 }
 
 function closePrivateDocPicker() {

@@ -6052,6 +6052,7 @@ NEW QUICK LINKS INTEGRATED CARD STYLES
     flex-direction: column;
     background: #07152b;
     position: relative;
+    overflow: hidden;
 }
 
 @media (min-width: 768px) {
@@ -6063,102 +6064,91 @@ NEW QUICK LINKS INTEGRATED CARD STYLES
 
 /* Call Header HUD */
 .arpeu-call-header {
-    height: 64px;
-    background: rgba(11, 78, 162, 0.95);
-    backdrop-filter: blur(10px);
+    min-height: 58px;
+    background: rgba(7, 21, 43, 0.98);
+    backdrop-filter: blur(12px);
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 12px;
-    z-index: 20;
+    padding: 6px 10px;
+    z-index: 30;
     border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    gap: 8px;
+    flex-shrink: 0;
 }
 
 .call-header-left {
     display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.live-rec-badge {
-    background: #dc3545;
-    color: #fff;
-    font-size: 11px;
-    font-weight: 700;
-    padding: 4px 8px;
-    border-radius: 6px;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-}
-
-.live-dot {
-    width: 6px;
-    height: 6px;
-    background: #fff;
-    border-radius: 50%;
-    animation: pulseLive 1.2s infinite;
-}
-
-@keyframes pulseLive {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.3; }
-}
-
-/* Live Online Participants Count Badge */
-.live-count-badge {
-    background: rgba(0, 0, 0, 0.4);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    color: #ffc107;
-    font-size: 12px;
-    font-weight: 700;
-    padding: 4px 8px;
-    border-radius: 6px;
-    display: flex;
-    align-items: center;
-    gap: 4px;
+    flex-direction: column;
+    justify-content: center;
+    min-width: 110px;
+    text-align: left;
 }
 
 .call-title-wrap h4 {
     margin: 0;
-    color: #fff;
+    color: #ffffff;
     font-size: 13px;
-    font-weight: 600;
+    font-weight: 700;
+    line-height: 1.2;
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 140px;
 }
 
 .call-room-code {
-    font-size: 9px;
-    color: rgba(255, 255, 255, 0.75);
-    font-family: monospace;
+    font-size: 10px;
+    color: #ff9800;
+    font-weight: 600;
+    letter-spacing: 0.5px;
 }
 
 .call-header-right {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 5px;
+    flex-wrap: nowrap;
 }
 
-.call-hud-btn {
-    background: rgba(255, 255, 255, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.25);
+.live-rec-badge {
+    background: #dc3545;
     color: #fff;
-    font-size: 12px;
-    font-weight: 600;
-    padding: 6px 10px;
-    border-radius: 8px;
-    cursor: pointer;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 4px 6px;
+    border-radius: 6px;
     display: flex;
     align-items: center;
     gap: 4px;
 }
 
+.live-count-badge {
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    color: #00ff73;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 6px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+}
+
+.call-hud-btn {
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 7px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+}
+
 .call-hud-btn.recording-active {
     background: #dc3545 !important;
-    border-color: #ff4d5e !important;
     color: #fff !important;
     animation: pulseLive 1s infinite alternate;
 }
@@ -6167,18 +6157,20 @@ NEW QUICK LINKS INTEGRATED CARD STYLES
     background: rgba(220, 53, 69, 0.9);
     border: none;
     color: #fff;
-    width: 34px;
-    height: 34px;
+    width: 28px;
+    height: 28px;
     border-radius: 50%;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
+    font-size: 13px;
 }
 
-/* Main Viewport */
+/* Main Viewport Stage */
 .arpeu-main-viewport {
     flex: 1;
+    min-height: 0;
     position: relative;
     background: #000;
     overflow: hidden;
@@ -6194,36 +6186,39 @@ NEW QUICK LINKS INTEGRATED CARD STYLES
     display: flex;
     align-items: center;
     justify-content: center;
+    background: #000;
 }
 
 .speaker-stage video, .speaker-stage canvas {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    display: block;
 }
 
 .speaker-info-pill {
     position: absolute;
     bottom: 12px;
     left: 12px;
-    background: rgba(0, 0, 0, 0.8);
+    background: rgba(0, 0, 0, 0.85);
     backdrop-filter: blur(8px);
-    padding: 6px 14px;
+    padding: 6px 12px;
     border-radius: 20px;
     display: flex;
     align-items: center;
     gap: 8px;
     color: #fff;
-    font-size: 13px;
+    font-size: 12px;
+    font-weight: 600;
     border: 1px solid rgba(255, 255, 255, 0.25);
     z-index: 10;
 }
 
 .speaker-role-badge {
     background: #f57c00;
-    padding: 2px 8px;
+    padding: 2px 6px;
     border-radius: 6px;
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 700;
 }
 
@@ -6232,226 +6227,50 @@ NEW QUICK LINKS INTEGRATED CARD STYLES
     top: 15px;
     left: 50%;
     transform: translateX(-50%);
-    background: rgba(0, 0, 0, 0.9);
+    background: rgba(11, 25, 44, 0.95);
     border: 2px solid #ffc107;
+    padding: 8px 16px;
+    border-radius: 25px;
+    font-size: 14px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 0 20px rgba(255, 193, 7, 0.4);
+    z-index: 25;
+}
+
+.hand-alert-icon {
     color: #ffc107;
-    padding: 8px 18px;
-    border-radius: 24px;
-    font-size: 13px;
-    font-weight: 700;
-    animation: bounce 0.8s infinite alternate;
-    z-index: 15;
-}
-
-/* 50+ SENIOR FRIENDLY EXPANDED AGENDA HUD (FULL MOBILE WIDTH & NO STRIKE-THROUGH) */
-.agenda-hud-floating {
-    position: absolute;
-    top: 10px;
-    left: 8px !important;
-    right: 8px !important;
-    width: auto !important;
-    max-height: 85% !important;
-    background: #07152b !important;
-    border: 2px solid #f57c00 !important;
-    border-radius: 14px;
-    box-shadow: 0 12px 40px rgba(0,0,0,0.95);
-    z-index: 40;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-}
-
-.agenda-hud-header {
-    background: linear-gradient(90deg, #f57c00, #ff9800);
-    padding: 12px 16px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.agenda-hud-header h5 {
-    margin: 0;
-    color: #fff;
-    font-size: 16px !important;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.agenda-hud-minimize {
-    background: rgba(0,0,0,0.3);
-    border: none;
-    color: #fff;
-    width: 36px;
-    height: 36px;
-    border-radius: 8px;
-    cursor: pointer;
     font-size: 18px;
 }
 
-.agenda-hud-body {
-    padding: 14px 12px;
-    overflow-y: auto;
-    max-height: 340px;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
+.stage-hand-alert span {
+    color: #ffffff;
 }
 
-.live-agenda-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px 14px !important;
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 12px;
-    font-size: 16px !important;
-    font-weight: 600 !important;
-    color: #ffffff !important;
-    line-height: 1.4;
-    text-decoration: none !important; /* STRICTLY NO STRIKE THROUGH */
-}
-
-/* Active Discussion Point (Green Highlight) */
-.live-agenda-item.active-topic {
-    background: rgba(40, 167, 69, 0.3) !important;
-    border: 2px solid #28a745 !important;
-    color: #ffffff !important;
-    text-decoration: none !important;
-}
-
-/* Completed Topic (Red / Done Highlight - NO STRIKE THROUGH) */
-.live-agenda-item.completed-topic {
-    background: rgba(220, 53, 69, 0.2) !important;
-    border: 2px solid rgba(220, 53, 69, 0.6) !important;
-    color: #ff9999 !important;
-    text-decoration: none !important;
-}
-
-.agenda-status-pill {
-    font-size: 11px !important;
-    font-weight: 700;
-    padding: 4px 10px;
-    border-radius: 6px;
-    margin-left: auto;
-    text-transform: uppercase;
-    white-space: nowrap;
-}
-
-.agenda-status-pill.pill-active { background: #28a745; color: #fff; }
-.agenda-status-pill.pill-done { background: #dc3545; color: #fff; }
-.agenda-status-pill.pill-pending { background: #445; color: #ccc; }
-
-.agenda-hud-footer {
-    padding: 10px 14px;
-    text-align: center;
-    background: rgba(0, 0, 0, 0.6);
-    font-size: 12px;
-    color: #ffc107;
-    font-weight: 700;
-}
-
-/* Document Projector with Big 48px Touch Buttons */
-.doc-projector-stage {
-    position: absolute;
-    inset: 0;
-    background: #111;
-    z-index: 12;
-    display: flex;
-    flex-direction: column;
-}
-
-.projector-toolbar {
-    min-height: 52px;
-    background: #1a2332;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 6px 12px;
-    border-bottom: 2px solid #0b4ea2;
-}
-
-.projector-info {
-    color: #fff;
-    font-size: 13px;
-    font-weight: 600;
-    display: flex;
-    gap: 8px;
-    align-items: center;
-    max-width: 50%;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.projector-controls {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.projector-controls button {
-    min-width: 44px;
-    height: 44px;
-    background: rgba(255, 255, 255, 0.15);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    color: #fff;
-    border-radius: 8px;
-    font-size: 16px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.btn-stop-projection {
-    background: #dc3545 !important;
-    font-size: 13px !important;
-    font-weight: 700 !important;
-    padding: 0 12px !important;
-    gap: 6px;
-}
-
-.projector-canvas-wrapper {
-    flex: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    overflow: auto;
-    background: #1e1e1e;
-    padding: 10px;
-}
-
-.projector-canvas-wrapper img {
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: contain;
-    transition: transform 0.2s ease;
-}
-
-/* Horizontal Cadre Carousel (Comfortable 3:4 Cards) */
+/* Horizontal Cadre Carousel (Pinned Bottom) */
 .horizontal-cadre-carousel {
-    height: 105px;
-    background: rgba(5, 15, 30, 0.95);
-    border-top: 1px solid rgba(255, 255, 255, 0.15);
+    height: 95px;
+    background: #050e1c;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
     overflow-x: auto;
     overflow-y: hidden;
-    padding: 8px 10px;
+    padding: 6px 10px;
     white-space: nowrap;
+    flex-shrink: 0;
 }
 
 .cadre-strip-track {
     display: inline-flex;
-    gap: 10px;
+    gap: 8px;
     height: 100%;
 }
 
 .cadre-thumb-card {
-    width: 76px;
-    height: 88px;
-    border-radius: 10px;
+    width: 74px;
+    height: 82px;
+    border-radius: 8px;
     background: #142238;
     position: relative;
     overflow: hidden;
@@ -6477,24 +6296,26 @@ NEW QUICK LINKS INTEGRATED CARD STYLES
     left: 0;
     right: 0;
     background: rgba(0, 0, 0, 0.85);
-    padding: 3px 4px;
+    padding: 2px 4px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-size: 10px;
+    font-size: 9px;
     font-weight: 600;
     color: #fff;
 }
 
-/* Call Controls Toolbar */
+/* Call Controls Toolbar (Pinned Bottom) */
 .arpeu-call-toolbar {
-    height: 72px;
-    background: #061325;
+    height: 68px;
+    background: #030a14;
     display: flex;
     align-items: center;
     justify-content: space-around;
-    padding: 0 6px;
+    padding: 0 4px;
     border-top: 1px solid rgba(255, 255, 255, 0.15);
+    flex-shrink: 0;
+    margin-top: auto;
 }
 
 .tool-btn {
@@ -6505,17 +6326,17 @@ NEW QUICK LINKS INTEGRATED CARD STYLES
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 4px;
-    width: 52px;
-    height: 52px;
-    border-radius: 12px;
-    font-size: 10px;
+    gap: 3px;
+    width: 50px;
+    height: 50px;
+    border-radius: 10px;
+    font-size: 9px;
     font-weight: 600;
     cursor: pointer;
 }
 
 .tool-btn i {
-    font-size: 17px;
+    font-size: 16px;
 }
 
 .tool-btn.muted {
@@ -6528,6 +6349,132 @@ NEW QUICK LINKS INTEGRATED CARD STYLES
     border-color: #dc3545;
 }
 
+
+/* Premium Glassmorphism Agenda HUD Engine */
+.agenda-hud-floating {
+    position: absolute !important;
+    top: 15px !important;
+    left: 10px !important;
+    right: 10px !important;
+    width: auto !important;
+    background: #0f172a !important;
+    border: 1.5px solid #334155 !important;
+    border-radius: 16px !important;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.95) !important;
+    z-index: 100 !important;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.agenda-hud-header {
+    background: linear-gradient(135deg, #1e293b, #0f172a);
+    padding: 12px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #334155;
+}
+
+.agenda-hud-header h5 {
+    margin: 0;
+    color: #f8fafc;
+    font-size: 15px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.agenda-hud-minimize {
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: #cbd5e1;
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.agenda-hud-body {
+    padding: 14px;
+    overflow-y: auto;
+    max-height: 320px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background: #0f172a !important;
+}
+
+.live-agenda-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #e2e8f0;
+    line-height: 1.4;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+/* 1. Active Discussion Point (Vibrant Glowing Green) */
+.live-agenda-item.active-topic {
+    background: rgba(16, 185, 129, 0.15) !important;
+    border: 2px solid #10b981 !important;
+    color: #ffffff !important;
+    box-shadow: 0 0 15px rgba(16, 185, 129, 0.3) !important;
+}
+
+/* 2. Completed Topic (Clean Blue & Checked) */
+.live-agenda-item.completed-topic {
+    background: rgba(59, 130, 246, 0.12) !important;
+    border: 1.5px solid #3b82f6 !important;
+    color: #93c5fd !important;
+}
+
+/* 3. Status Badges */
+.agenda-status-pill {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 4px 8px;
+    border-radius: 6px;
+    margin-left: auto;
+    text-transform: uppercase;
+    white-space: nowrap;
+    letter-spacing: 0.5px;
+}
+
+.agenda-status-pill.pill-active {
+    background: #10b981;
+    color: #ffffff;
+    box-shadow: 0 0 8px #10b981;
+}
+
+.agenda-status-pill.pill-done {
+    background: #2563eb;
+    color: #ffffff;
+}
+
+.agenda-status-pill.pill-pending {
+    background: #475569;
+    color: #cbd5e1;
+}
+
+.agenda-hud-footer {
+    padding: 10px 14px;
+    text-align: center;
+    background: #090d16;
+    font-size: 11px;
+    color: #94a3b8;
+    font-weight: 600;
+    border-top: 1px solid #1e293b;
+}
 
 /* ==========================================================
    PORTAL DARK MODE THEME STYLES
