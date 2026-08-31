@@ -658,6 +658,29 @@ function showPage(page) {
       if (profSec) profSec.style.display = "block";
       break;
 
+    // 🌟 MEETINGS & CONFERENCES (FIXED & ROUTED DIRECTLY)
+    case "meetings":
+    case "meeting":
+    case "conferences":
+      const mtgSec = document.getElementById("meetingsSection");
+      if (mtgSec) mtgSec.style.display = "block";
+      if (typeof loadMeetingsList === "function") {
+        loadMeetingsList();
+      }
+      break;
+
+    // 🌟 NOTIFICATIONS CENTER (FIXED & ROUTED DIRECTLY)
+    case "notifications":
+    case "notification":
+      if (notifSec) notifSec.style.display = "block";
+      if (typeof loadNotificationsList === "function") {
+        loadNotificationsList();
+      }
+      if (typeof syncLiveNotificationCounts === "function") {
+        syncLiveNotificationCounts();
+      }
+      break;
+
     // UPCOMING MODULES (UNDER DEVELOPMENT PLACEHOLDERS)
     case "officebearers":
     case "office-bearers":
@@ -668,20 +691,12 @@ function showPage(page) {
       showUnderDevelopmentCard("Gallery");
       break;
 
-    case "notifications":
-    case "notification":
-      if (notifSec) notifSec.style.display = "block";
-      if (typeof syncLiveNotificationCounts === "function") {
-        syncLiveNotificationCounts();
-      }
-      break;
-
     case "settings":
     case "setting":
       if (setSec) setSec.style.display = "block";
       break;
 
-   case "adminlogin":
+    case "adminlogin":
     case "admin":
     case "admin-login":
       if (admSec) admSec.style.display = "block";
@@ -696,7 +711,6 @@ function showPage(page) {
       break;
   }
 }
-
 
 /* ==========================================================
    INITIALIZE PORTAL TOP NAVIGATION ENGINE
