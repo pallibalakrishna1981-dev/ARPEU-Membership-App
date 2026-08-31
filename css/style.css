@@ -5899,13 +5899,13 @@ NEW QUICK LINKS INTEGRATED CARD STYLES
 
 /* Call Header HUD */
 .arpeu-call-header {
-    height: 60px;
-    background: rgba(11, 78, 162, 0.85);
+    height: 64px;
+    background: rgba(11, 78, 162, 0.95);
     backdrop-filter: blur(10px);
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 14px;
+    padding: 0 12px;
     z-index: 20;
     border-bottom: 1px solid rgba(255, 255, 255, 0.15);
 }
@@ -5913,7 +5913,7 @@ NEW QUICK LINKS INTEGRATED CARD STYLES
 .call-header-left {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
 }
 
 .live-rec-badge {
@@ -5921,11 +5921,11 @@ NEW QUICK LINKS INTEGRATED CARD STYLES
     color: #fff;
     font-size: 11px;
     font-weight: 700;
-    padding: 3px 8px;
+    padding: 4px 8px;
     border-radius: 6px;
     display: flex;
     align-items: center;
-    gap: 5px;
+    gap: 4px;
 }
 
 .live-dot {
@@ -5941,19 +5941,33 @@ NEW QUICK LINKS INTEGRATED CARD STYLES
     50% { opacity: 0.3; }
 }
 
+/* Live Online Participants Count Badge */
+.live-count-badge {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #ffc107;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 4px 8px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
 .call-title-wrap h4 {
     margin: 0;
     color: #fff;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 600;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 170px;
+    max-width: 140px;
 }
 
 .call-room-code {
-    font-size: 10px;
+    font-size: 9px;
     color: rgba(255, 255, 255, 0.75);
     font-family: monospace;
 }
@@ -5961,28 +5975,36 @@ NEW QUICK LINKS INTEGRATED CARD STYLES
 .call-header-right {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
 }
 
 .call-hud-btn {
-    background: rgba(255, 255, 255, 0.15);
-    border: none;
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.25);
     color: #fff;
     font-size: 12px;
+    font-weight: 600;
     padding: 6px 10px;
     border-radius: 8px;
     cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 5px;
+    gap: 4px;
+}
+
+.call-hud-btn.recording-active {
+    background: #dc3545 !important;
+    border-color: #ff4d5e !important;
+    color: #fff !important;
+    animation: pulseLive 1s infinite alternate;
 }
 
 .call-hud-close {
-    background: rgba(220, 53, 69, 0.8);
+    background: rgba(220, 53, 69, 0.9);
     border: none;
     color: #fff;
-    width: 32px;
-    height: 32px;
+    width: 34px;
+    height: 34px;
     border-radius: 50%;
     cursor: pointer;
     display: flex;
@@ -6016,51 +6038,29 @@ NEW QUICK LINKS INTEGRATED CARD STYLES
     object-fit: cover;
 }
 
-/* Dynamic Voice Wave Animation */
-.voice-wave-ring {
-    position: absolute;
-    width: 180px;
-    height: 180px;
-    border-radius: 50%;
-    border: 3px solid #28a745;
-    box-shadow: 0 0 25px #28a745;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.2s ease, transform 0.2s ease;
-}
-
-.voice-wave-ring.speaking {
-    opacity: 1;
-    animation: wavePulse 1s infinite alternate;
-}
-
-@keyframes wavePulse {
-    0% { transform: scale(0.95); box-shadow: 0 0 15px #28a745; }
-    100% { transform: scale(1.1); box-shadow: 0 0 35px #00e676; }
-}
-
 .speaker-info-pill {
     position: absolute;
     bottom: 12px;
     left: 12px;
-    background: rgba(0, 0, 0, 0.7);
+    background: rgba(0, 0, 0, 0.8);
     backdrop-filter: blur(8px);
-    padding: 5px 12px;
+    padding: 6px 14px;
     border-radius: 20px;
     display: flex;
     align-items: center;
     gap: 8px;
     color: #fff;
-    font-size: 12px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    font-size: 13px;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    z-index: 10;
 }
 
 .speaker-role-badge {
     background: #f57c00;
-    padding: 2px 6px;
+    padding: 2px 8px;
     border-radius: 6px;
-    font-size: 10px;
-    font-weight: 600;
+    font-size: 11px;
+    font-weight: 700;
 }
 
 .stage-hand-alert {
@@ -6068,105 +6068,185 @@ NEW QUICK LINKS INTEGRATED CARD STYLES
     top: 15px;
     left: 50%;
     transform: translateX(-50%);
-    background: rgba(0, 0, 0, 0.85);
-    border: 1px solid #ffc107;
+    background: rgba(0, 0, 0, 0.9);
+    border: 2px solid #ffc107;
     color: #ffc107;
-    padding: 6px 14px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 600;
+    padding: 8px 18px;
+    border-radius: 24px;
+    font-size: 13px;
+    font-weight: 700;
     animation: bounce 0.8s infinite alternate;
     z-index: 15;
 }
 
-/* Floating Agenda HUD */
+/* 50+ SENIOR FRIENDLY EXPANDED AGENDA HUD */
 .agenda-hud-floating {
     position: absolute;
     top: 10px;
+    left: 10px;
     right: 10px;
-    width: 270px;
-    max-height: 75%;
-    background: rgba(11, 25, 44, 0.92);
-    backdrop-filter: blur(12px);
-    border: 1px solid rgba(245, 124, 0, 0.5);
-    border-radius: 12px;
-    box-shadow: 0 8px 30px rgba(0,0,0,0.6);
-    z-index: 25;
+    max-height: 82%;
+    background: #0b192c;
+    border: 2px solid #f57c00;
+    border-radius: 14px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.85);
+    z-index: 30;
     display: flex;
     flex-direction: column;
     overflow: hidden;
 }
 
 .agenda-hud-header {
-    background: rgba(245, 124, 0, 0.2);
-    padding: 8px 12px;
+    background: linear-gradient(90deg, #f57c00, #ff9800);
+    padding: 10px 14px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .agenda-hud-header h5 {
     margin: 0;
     color: #fff;
-    font-size: 12px;
+    font-size: 15px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.agenda-hud-minimize {
+    background: rgba(0,0,0,0.25);
+    border: none;
+    color: #fff;
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
 }
 
 .agenda-hud-body {
-    padding: 10px;
+    padding: 12px;
     overflow-y: auto;
-    max-height: 240px;
+    max-height: 320px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
 
 .live-agenda-item {
     display: flex;
-    align-items: flex-start;
-    gap: 8px;
-    margin-bottom: 8px;
-    font-size: 11px;
-    color: #e0e0e0;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 500;
+    color: #f1f5f9;
     line-height: 1.4;
+    transition: all 0.2s ease;
 }
 
-.live-agenda-item.completed {
-    text-decoration: line-through;
-    color: #28a745;
+/* Active Discussion Point (Green Highlight) */
+.live-agenda-item.active-topic {
+    background: rgba(40, 167, 69, 0.25) !important;
+    border: 2px solid #28a745 !important;
+    color: #ffffff !important;
+    font-weight: 700 !important;
 }
+
+/* Completed Point (Red / Done Highlight - NO STRIKE THROUGH) */
+.live-agenda-item.completed-topic {
+    background: rgba(220, 53, 69, 0.15) !important;
+    border: 1px solid rgba(220, 53, 69, 0.4) !important;
+    color: #ff8b94 !important;
+    font-weight: 600;
+}
+
+.agenda-status-pill {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 6px;
+    margin-left: auto;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.agenda-status-pill.pill-active { background: #28a745; color: #fff; }
+.agenda-status-pill.pill-done { background: #dc3545; color: #fff; }
+.agenda-status-pill.pill-pending { background: #555; color: #ccc; }
 
 .agenda-hud-footer {
-    padding: 6px;
+    padding: 8px 12px;
     text-align: center;
-    background: rgba(0, 0, 0, 0.4);
-    font-size: 9px;
-    color: #aaa;
+    background: rgba(0, 0, 0, 0.5);
+    font-size: 11px;
+    color: #ffc107;
+    font-weight: 600;
 }
 
-/* Document Projector */
+/* Document Projector with Big 48px Touch Buttons */
 .doc-projector-stage {
     position: absolute;
     inset: 0;
     background: #111;
-    z-index: 10;
+    z-index: 12;
     display: flex;
     flex-direction: column;
 }
 
 .projector-toolbar {
-    height: 44px;
+    min-height: 52px;
     background: #1a2332;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0 10px;
-    border-bottom: 1px solid #333;
+    padding: 6px 12px;
+    border-bottom: 2px solid #0b4ea2;
 }
 
 .projector-info {
     color: #fff;
-    font-size: 11px;
+    font-size: 13px;
+    font-weight: 600;
     display: flex;
-    gap: 6px;
+    gap: 8px;
     align-items: center;
+    max-width: 50%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.projector-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.projector-controls button {
+    min-width: 44px;
+    height: 44px;
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #fff;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-stop-projection {
+    background: #dc3545 !important;
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    padding: 0 12px !important;
+    gap: 6px;
 }
 
 .projector-canvas-wrapper {
@@ -6175,20 +6255,22 @@ NEW QUICK LINKS INTEGRATED CARD STYLES
     justify-content: center;
     align-items: center;
     overflow: auto;
-    background: #222;
+    background: #1e1e1e;
+    padding: 10px;
 }
 
-.projector-canvas-wrapper canvas, .projector-canvas-wrapper img {
+.projector-canvas-wrapper img {
     max-width: 100%;
     max-height: 100%;
     object-fit: contain;
+    transition: transform 0.2s ease;
 }
 
-/* Horizontal 60-Cadre Carousel */
+/* Horizontal Cadre Carousel (Comfortable 3:4 Cards) */
 .horizontal-cadre-carousel {
-    height: 90px;
+    height: 105px;
     background: rgba(5, 15, 30, 0.95);
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-top: 1px solid rgba(255, 255, 255, 0.15);
     overflow-x: auto;
     overflow-y: hidden;
     padding: 8px 10px;
@@ -6197,24 +6279,25 @@ NEW QUICK LINKS INTEGRATED CARD STYLES
 
 .cadre-strip-track {
     display: inline-flex;
-    gap: 8px;
+    gap: 10px;
     height: 100%;
 }
 
 .cadre-thumb-card {
-    width: 74px;
-    height: 74px;
-    border-radius: 8px;
+    width: 76px;
+    height: 88px;
+    border-radius: 10px;
     background: #142238;
     position: relative;
     overflow: hidden;
-    border: 2px solid transparent;
+    border: 2px solid rgba(255, 255, 255, 0.15);
     cursor: pointer;
     flex-shrink: 0;
 }
 
 .cadre-thumb-card.active-speaker {
-    border-color: #28a745;
+    border-color: #28a745 !important;
+    box-shadow: 0 0 10px #28a745;
 }
 
 .cadre-thumb-card video {
@@ -6225,26 +6308,27 @@ NEW QUICK LINKS INTEGRATED CARD STYLES
 
 .thumb-label {
     position: absolute;
-    bottom: 2px;
-    left: 2px;
-    right: 2px;
-    background: rgba(0, 0, 0, 0.7);
-    padding: 2px 4px;
-    border-radius: 4px;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.85);
+    padding: 3px 4px;
     display: flex;
     justify-content: space-between;
-    font-size: 9px;
+    align-items: center;
+    font-size: 10px;
+    font-weight: 600;
     color: #fff;
 }
 
 /* Call Controls Toolbar */
 .arpeu-call-toolbar {
-    height: 70px;
+    height: 72px;
     background: #061325;
     display: flex;
     align-items: center;
     justify-content: space-around;
-    padding: 0 8px;
+    padding: 0 6px;
     border-top: 1px solid rgba(255, 255, 255, 0.15);
 }
 
@@ -6261,73 +6345,22 @@ NEW QUICK LINKS INTEGRATED CARD STYLES
     height: 52px;
     border-radius: 12px;
     font-size: 10px;
+    font-weight: 600;
     cursor: pointer;
 }
 
 .tool-btn i {
-    font-size: 16px;
-}
-
-.tool-btn.active {
-    background: #f57c00;
-    color: #fff;
+    font-size: 17px;
 }
 
 .tool-btn.muted {
     background: #dc3545;
-    color: #fff;
+    border-color: #dc3545;
 }
 
 .tool-btn.btn-end-call {
     background: #dc3545;
     border-color: #dc3545;
-}
-
-/* Private Picker Popup */
-.private-doc-picker-modal {
-    position: absolute;
-    inset: 0;
-    background: rgba(0,0,0,0.8);
-    z-index: 50;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 20px;
-}
-
-.private-picker-card {
-    background: #0f2444;
-    border: 1px solid rgba(255,255,255,0.2);
-    border-radius: 14px;
-    width: 100%;
-    max-width: 380px;
-    padding: 16px;
-    color: #fff;
-}
-
-.private-picker-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 12px;
-}
-
-.private-picker-header h4 {
-    margin: 0;
-    font-size: 14px;
-}
-
-.doc-upload-dropzone {
-    border: 2px dashed #0b4ea2;
-    border-radius: 10px;
-    padding: 25px;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-    cursor: pointer;
-    background: rgba(11, 78, 162, 0.1);
 }
 
 

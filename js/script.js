@@ -5745,27 +5745,37 @@ let webrtcRecordedChunks = [];
 let isWebrtcRecording = false;
 let isWebrtcHost = true;
 let currentProjectorScale = 1.0;
-let liveAgendaItemsState = [];
+let liveOnlineParticipants = 4;
+let activeAgendaIndex = 0; // Current topic in discussion (Green)
+
+let liveAgendaItemsState = [
+    { id: 0, text: "1. Review of BMS Membership Drive Progress", status: "active" },
+    { id: 1, text: "2. Discoms Representation on Cadre Allowances", status: "pending" },
+    { id: 2, text: "3. State EC Action Plan Finalization", status: "pending" }
+];
 
 /**
  * Launch 100% In-House Native ARPEU WebRTC Conference
  */
-async function launchInstantConference(committeeName = 'Core Committee', mode = 'video') {
+async function launchInstantConference(committeeName = 'Core Committee', mode = 'video', directRoomCode = null) {
     const isVideo = (mode === 'video');
-    const roomCode = `ARPEU-${committeeName.replace(/\s+/g, '-').toUpperCase()}-${Math.floor(100 + Math.random() * 900)}`;
-    const cadreListText = coreCommitteeTestCadre.map((c, i) => `${i + 1}. ${c.name} (${c.mobile})`).join("\n");
+    const roomCode = directRoomCode || `ARPEU-${committeeName.replace(/\s+/g, '-').toUpperCase()}-${Math.floor(100 + Math.random() * 900)}`;
 
-    const confirmMsg = 
+    // If Host is launching for the first time, show Cadre confirmation
+    if (!directRoomCode) {
+        const cadreListText = coreCommitteeTestCadre.map((c, i) => `${i + 1}. ${c.name} (${c.mobile})`).join("\n");
+        const confirmMsg = 
 `⚡ ARPEU ${committeeName.toUpperCase()} ${mode.toUpperCase()} CONFERENCE ⚡
 
-Calling the following leaders:
+Invited Leaders:
 ${cadreListText}
 
-Would you like to launch the In-House Native Conference Stage now?`;
+Launch In-House Native Conference Stage now?`;
 
-    if (!confirm(confirmMsg)) return;
+        if (!confirm(confirmMsg)) return;
+    }
 
-    // 1. Open Native In-House Stage Modal
+    // 1. Open Native Stage Modal
     const modal = document.getElementById('arpeuNativeConferenceModal');
     const roomTitle = document.getElementById('webrtcRoomTitle');
     const roomCodeText = document.getElementById('webrtcRoomCodeText');
@@ -5778,9 +5788,11 @@ Would you like to launch the In-House Native Conference Stage now?`;
         return;
     }
 
-    if (roomTitle) roomTitle.textContent = `${committeeName} Live Conference`;
+    if (roomTitle) roomTitle.textContent = `${committeeName} Live`;
     if (roomCodeText) roomCodeText.textContent = `ROOM: ${roomCode}`;
     if (speakerName) speakerName.textContent = 'Connecting...';
+
+    updateOnlineParticipantsCount(liveOnlineParticipants);
 
     modal.style.display = 'flex';
     document.body.style.overflow = 'hidden';
@@ -5789,7 +5801,7 @@ Would you like to launch the In-House Native Conference Stage now?`;
     if (hostBtn) hostBtn.style.display = isWebrtcHost ? 'flex' : 'none';
 
     try {
-        // 2. Initialize Camera & Mic Hardware
+        // 2. Access Camera & Mic Hardware
         const constraints = {
             audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
             video: isVideo ? { width: { ideal: 640 }, height: { ideal: 480 }, facingMode: 'user' } : false
@@ -5803,38 +5815,167 @@ Would you like to launch the In-House Native Conference Stage now?`;
             if (speakerName) speakerName.textContent = 'You (Host / Active Speaker)';
         }
 
-        // 3. Initialize Voice Activity Detection (VAD)
-        initVoiceActivityDetection(webrtcLocalStream);
-
-        // 4. Initialize Live Agenda HUD
+        // 3. Initialize Clean Agenda HUD
         initConferenceAgendaHUD();
 
-        // 5. Trigger Optional WhatsApp Broadcast for Leaders
-        const waNotice = 
-`⚡ *ANDHRA RASTRA POWER EMPLOYEES UNION (ARPEU)* ⚡
-🏛️ *EMERGENCY ${committeeName.toUpperCase()} IN-HOUSE CONFERENCE IS LIVE*
-
-👥 *Invited Members:*
-${coreCommitteeTestCadre.map((c, i) => `▪️ ${c.name}`).join("\n")}
-
-📞 *Mode:* ${mode.toUpperCase()} Calling
-🔑 *Room Code:* ${roomCode}
-🔗 *Portal App:* ${window.location.href.split('#')[0]}
-
-_Please open the ARPEU App and join the conference._
-*ARPEU State Leadership*`;
-
-        const waLink = `https://wa.me/?text=${encodeURIComponent(waNotice)}`;
-        setTimeout(() => {
-            if (confirm("Send Instant Meeting Notice to ARPEU WhatsApp Group?")) {
-                window.open(waLink, "_blank");
-            }
-        }, 800);
+        // 4. If Host started a fresh room, trigger Instant WhatsApp Share
+        if (!directRoomCode) {
+            triggerSeamlessWhatsAppNotice(committeeName, mode, roomCode);
+        }
 
     } catch (err) {
         console.error('Hardware Media Access Error:', err);
         alert('Could not access Camera/Microphone. Please allow permissions in browser settings.');
     }
+}
+
+/**
+ * Seamless Direct WhatsApp Share & Deep Link
+ */
+function triggerSeamlessWhatsAppNotice(committeeName, mode, roomCode) {
+    const basePortalUrl = window.location.href.split('?')[0].split('#')[0];
+    const directJoinUrl = `${basePortalUrl}?joinRoom=${encodeURIComponent(roomCode)}&type=${encodeURIComponent(committeeName)}`;
+
+    const waNotice = 
+`⚡ *ANDHRA RASTRA POWER EMPLOYEES UNION (ARPEU)* ⚡
+🏛️ *EMERGENCY ${committeeName.toUpperCase()} CONFERENCE IS LIVE*
+
+👥 *Invited Leaders:*
+${coreCommitteeTestCadre.map((c, i) => `▪️ ${c.name}`).join("\n")}
+
+📞 *Mode:* ${mode.toUpperCase()} Call
+🔑 *Room Code:* ${roomCode}
+
+🔗 *Tap to Join Directly:*
+${directJoinUrl}
+
+_Please tap the link to enter the stage immediately._
+*ARPEU State Leadership*`;
+
+    // Attempt Native Web Share API first (Opens WhatsApp App directly)
+    if (navigator.share) {
+        navigator.share({
+            title: `ARPEU ${committeeName} Live Meeting`,
+            text: waNotice
+        }).catch(() => {
+            openNativeWhatsAppApp(waNotice);
+        });
+    } else {
+        openNativeWhatsAppApp(waNotice);
+    }
+}
+
+function openNativeWhatsAppApp(text) {
+    const encoded = encodeURIComponent(text);
+    // Directly trigger WhatsApp Native App Scheme without PlayStore redirects
+    window.location.href = `whatsapp://send?text=${encoded}`;
+}
+
+/**
+ * Auto-Join Conference on Direct URL Link Click
+ */
+function checkUrlAutoJoinMeeting() {
+    try {
+        const urlParams = new URLSearchParams(window.location.search);
+        const joinRoom = urlParams.get('joinRoom');
+        const mtgType = urlParams.get('type') || 'Core Committee';
+
+        if (joinRoom) {
+            isWebrtcHost = false; // Joined via link as participant
+            setTimeout(() => {
+                launchInstantConference(mtgType, 'video', joinRoom);
+            }, 600);
+        }
+    } catch (e) {
+        console.warn('Auto join check skipped:', e);
+    }
+}
+
+/**
+ * Online Participants Counter Update
+ */
+function updateOnlineParticipantsCount(count) {
+    liveOnlineParticipants = Math.max(1, count);
+    const badge = document.getElementById('onlineCountNumber');
+    if (badge) badge.textContent = liveOnlineParticipants;
+}
+
+/**
+ * 50+ Senior Friendly Agenda HUD (No Strike-Through, Green Active, Red Done)
+ */
+function toggleAgendaHud() {
+    const hud = document.getElementById('agendaHudFloating');
+    if (hud) hud.style.display = hud.style.display === 'none' ? 'flex' : 'none';
+}
+
+function initConferenceAgendaHUD() {
+    const container = document.getElementById('liveAgendaListContainer');
+    if (!container) return;
+
+    // Pull from dynamic agenda fields if filled in scheduler
+    const agendaInputs = document.querySelectorAll('.agenda-point-input');
+    if (agendaInputs.length > 0) {
+        const customPoints = [];
+        agendaInputs.forEach((inp, idx) => {
+            if (inp.value && inp.value.trim() !== '') {
+                customPoints.push({
+                    id: idx,
+                    text: `${idx + 1}. ${inp.value.trim()}`,
+                    status: idx === 0 ? 'active' : 'pending'
+                });
+            }
+        });
+        if (customPoints.length > 0) liveAgendaItemsState = customPoints;
+    }
+
+    renderConferenceAgendaHUD();
+}
+
+function renderConferenceAgendaHUD() {
+    const container = document.getElementById('liveAgendaListContainer');
+    if (!container) return;
+
+    container.innerHTML = liveAgendaItemsState.map(item => {
+        let itemClass = '';
+        let pillHtml = '';
+
+        if (item.status === 'active') {
+            itemClass = 'active-topic';
+            pillHtml = '<span class="agenda-status-pill pill-active"><i class="fas fa-bullhorn"></i> In Discussion</span>';
+        } else if (item.status === 'completed') {
+            itemClass = 'completed-topic';
+            pillHtml = '<span class="agenda-status-pill pill-done"><i class="fas fa-check-circle"></i> Done</span>';
+        } else {
+            pillHtml = '<span class="agenda-status-pill pill-pending">Pending</span>';
+        }
+
+        return `
+            <div class="live-agenda-item ${itemClass}" onclick="handleHostAgendaClick(${item.id})">
+                <i class="fas ${item.status === 'completed' ? 'fa-check-square text-danger' : (item.status === 'active' ? 'fa-play-circle text-success' : 'fa-square')} fa-lg"></i>
+                <span>${item.text}</span>
+                ${pillHtml}
+            </div>
+        `;
+    }).join('');
+}
+
+function handleHostAgendaClick(id) {
+    if (!isWebrtcHost) return; // Only Host can change topic statuses
+
+    const currentItem = liveAgendaItemsState.find(i => i.id === id);
+    if (!currentItem) return;
+
+    // Cycle: pending -> active -> completed
+    if (currentItem.status === 'pending') {
+        liveAgendaItemsState.forEach(i => { if (i.status === 'active') i.status = 'completed'; });
+        currentItem.status = 'active';
+    } else if (currentItem.status === 'active') {
+        currentItem.status = 'completed';
+    } else {
+        currentItem.status = 'pending';
+    }
+
+    renderConferenceAgendaHUD();
 }
 
 /**
@@ -5850,62 +5991,10 @@ function leaveArpeuConference() {
         webrtcLocalStream = null;
     }
 
-    if (webrtcVADInterval) {
-        clearInterval(webrtcVADInterval);
-        webrtcVADInterval = null;
-    }
-
-    if (webrtcAudioContext && webrtcAudioContext.state !== 'closed') {
-        webrtcAudioContext.close();
-        webrtcAudioContext = null;
-    }
-
     stopDocumentProjection();
 
     if (modal) modal.style.display = 'none';
     document.body.style.overflow = '';
-}
-
-/**
- * Voice Activity Detection (VAD) Engine for Dynamic Wave Pulse
- */
-function initVoiceActivityDetection(stream) {
-    try {
-        const audioTrack = stream.getAudioTracks()[0];
-        if (!audioTrack) return;
-
-        window.AudioContext = window.AudioContext || window.webkitAudioContext;
-        webrtcAudioContext = new AudioContext();
-        const source = webrtcAudioContext.createMediaStreamSource(stream);
-        webrtcAnalyser = webrtcAudioContext.createAnalyser();
-        webrtcAnalyser.fftSize = 256;
-        source.connect(webrtcAnalyser);
-
-        const dataArray = new Uint8Array(webrtcAnalyser.frequencyBinCount);
-        const waveRing = document.getElementById('speakerVoiceWave');
-
-        webrtcVADInterval = setInterval(() => {
-            if (!webrtcAnalyser) return;
-            webrtcAnalyser.getByteFrequencyData(dataArray);
-
-            let sum = 0;
-            for (let i = 0; i < dataArray.length; i++) {
-                sum += dataArray[i];
-            }
-            const averageVolume = sum / dataArray.length;
-
-            if (waveRing) {
-                if (averageVolume > 18) {
-                    waveRing.classList.add('speaking');
-                } else {
-                    waveRing.classList.remove('speaking');
-                }
-            }
-        }, 150);
-
-    } catch (e) {
-        console.warn('VAD Audio Analyser skipped:', e);
-    }
 }
 
 /**
@@ -5963,60 +6052,7 @@ function webrtcRaiseHand() {
 }
 
 /**
- * Floating Agenda HUD Controller
- */
-function toggleAgendaHud() {
-    const hud = document.getElementById('agendaHudFloating');
-    if (hud) hud.style.display = hud.style.display === 'none' ? 'flex' : 'none';
-}
-
-function initConferenceAgendaHUD() {
-    const container = document.getElementById('liveAgendaListContainer');
-    if (!container) return;
-
-    const agendaInputs = document.querySelectorAll('.agenda-point-input');
-    liveAgendaItemsState = [];
-
-    agendaInputs.forEach((inp, idx) => {
-        if (inp.value && inp.value.trim() !== '') {
-            liveAgendaItemsState.push({ id: idx, text: inp.value.trim(), completed: false });
-        }
-    });
-
-    if (liveAgendaItemsState.length === 0) {
-        liveAgendaItemsState = [
-            { id: 0, text: 'Review of BMS Membership Drive Progress', completed: false },
-            { id: 1, text: 'Discoms Representation on Cadre Allowances', completed: false },
-            { id: 2, text: 'State EC Action Plan Finalization', completed: false }
-        ];
-    }
-
-    renderConferenceAgendaHUD();
-}
-
-function renderConferenceAgendaHUD() {
-    const container = document.getElementById('liveAgendaListContainer');
-    if (!container) return;
-
-    container.innerHTML = liveAgendaItemsState.map(item => `
-        <div class="live-agenda-item ${item.completed ? 'completed' : ''}" onclick="toggleAgendaPointCompleted(${item.id})">
-            <i class="fas ${item.completed ? 'fa-check-square text-success' : 'fa-square'}" style="cursor: pointer;"></i>
-            <span>${item.text}</span>
-        </div>
-    `).join('');
-}
-
-function toggleAgendaPointCompleted(id) {
-    if (!isWebrtcHost) return;
-    const item = liveAgendaItemsState.find(i => i.id === id);
-    if (item) {
-        item.completed = !item.completed;
-        renderConferenceAgendaHUD();
-    }
-}
-
-/**
- * 100% Private Document Projector
+ * 100% Private Document Projector with Big Touch Targets
  */
 function openPrivateDocPicker() {
     const modal = document.getElementById('privateDocPickerModal');
@@ -6062,7 +6098,7 @@ function stopDocumentProjection() {
 }
 
 function projectorZoom(delta) {
-    currentProjectorScale = Math.max(0.5, Math.min(3.0, currentProjectorScale + delta));
+    currentProjectorScale = Math.max(0.6, Math.min(3.5, currentProjectorScale + delta));
     const docImg = document.getElementById('docProjectionImg');
     if (docImg) {
         docImg.style.transform = `scale(${currentProjectorScale})`;
@@ -6079,7 +6115,7 @@ function projectorNextPage() {
 }
 
 /**
- * Local HD Recording (Zero Cloud Cost)
+ * Zero-Cloud-Cost Local HD Recording (Active Red State Indicator)
  */
 function toggleLocalRecording() {
     if (!isWebrtcRecording) {
@@ -6116,9 +6152,12 @@ function startLocalRecording() {
 
         webrtcMediaRecorder.start(1000);
         isWebrtcRecording = true;
+
+        const recBtn = document.getElementById('btnToggleRec');
         const recText = document.getElementById('recStatusText');
-        if (recText) recText.textContent = 'STOP REC';
-        alert('Local HD Recording Started. Video will be saved directly to your device storage when stopped.');
+        if (recBtn) recBtn.classList.add('recording-active');
+        if (recText) recText.textContent = 'RECORDING';
+        
     } catch (e) {
         console.error('Recording error:', e);
         alert('Local recording is not supported on this browser version.');
@@ -6130,7 +6169,10 @@ function stopLocalRecording() {
         webrtcMediaRecorder.stop();
     }
     isWebrtcRecording = false;
+
+    const recBtn = document.getElementById('btnToggleRec');
     const recText = document.getElementById('recStatusText');
+    if (recBtn) recBtn.classList.remove('recording-active');
     if (recText) recText.textContent = 'REC';
 }
 
@@ -6143,7 +6185,7 @@ function toggleHostAdminPanel() {
 }
 
 function hostMuteAllParticipants() {
-    alert('Host Directive: Global Mute command broadcasted to all 60 participants.');
+    alert('Host Directive: Global Mute command broadcasted to all participants.');
     toggleHostAdminPanel();
 }
 
@@ -6155,5 +6197,9 @@ function hostClearAllHands() {
 }
 
 function toggleVirtualBgMenu() {
-    alert('ARPEU Official Virtual Backgrounds (Stage Crest & BMS Emblem) ready.');
+    alert('ARPEU Official Virtual Backgrounds ready.');
 }
+
+// Auto-run direct URL check when script loads
+document.addEventListener('DOMContentLoaded', checkUrlAutoJoinMeeting);
+
