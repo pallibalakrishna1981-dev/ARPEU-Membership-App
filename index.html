@@ -22,7 +22,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="#0B4EA2">
 <meta name="apple-mobile-web-app-title" content="ARPEU Portal">
 
-<link rel="stylesheet" href="css/style.css?v=2029">
+<link rel="stylesheet" href="css/style.css?v=2030">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
@@ -163,6 +163,12 @@
                 <span>Downloads</span>
             </a>
 
+            <!-- 🌟 NEW: Meetings & Video Calling Link -->
+            <a href="#" id="navMeetings" onclick="showPage('meetings'); return false;">
+                <i class="fa-solid fa-video"></i>
+                <span>Meetings & Conferences</span>
+            </a>
+
             <a href="#" id="navNotifications" onclick="showPage('notifications'); return false;">
                 <i class="fa-solid fa-bell"></i>
                 <span>Notifications</span>
@@ -184,6 +190,7 @@
     </div>
 
 </nav>
+
 
 
 <main id="contentArea" class="content-area">
@@ -3432,6 +3439,178 @@
          ========================================================= -->
 
 </section>
+
+
+<!-- =========================================================
+     MEETINGS & CONFERENCES HUB (PHASE 1)
+========================================================= -->
+<section id="meetingsSection" class="meetings-page" style="display: none;">
+
+    <!-- 1. Meetings Hero Banner -->
+    <div class="mtg-hero-banner">
+        <div class="mtg-hero-left">
+            <div class="mtg-hero-icon-box">
+                <i class="fa-solid fa-video"></i>
+            </div>
+            <div class="mtg-hero-text">
+                <h2>MEETINGS & CONFERENCES</h2>
+                <p>Official Executive Committee Meetings, Live Conferences & Dynamic Agenda Management.</p>
+            </div>
+        </div>
+        <button type="button" id="btnToggleScheduleForm" class="mtg-schedule-btn" onclick="toggleScheduleMeetingForm()">
+            <i class="fa-solid fa-plus"></i> Schedule Meeting
+        </button>
+    </div>
+
+    <!-- 2. Admin Meeting Creator & Dynamic Agenda Builder Form (Auto-Toggled) -->
+    <div id="scheduleMeetingCard" class="mtg-form-card" style="display: none;">
+        <div class="mtg-card-header">
+            <i class="fa-solid fa-calendar-plus"></i> SCHEDULE NEW OFFICIAL MEETING
+        </div>
+        
+        <form id="createMeetingForm" onsubmit="submitNewMeeting(event)">
+            <div class="mtg-form-grid">
+                <!-- Meeting Title -->
+                <div class="form-group full-width">
+                    <label>Meeting Title / Subject <span class="required">*</span></label>
+                    <input type="text" id="mtgTitle" placeholder="e.g. State Executive Committee Emergency Review" required>
+                </div>
+
+                <!-- Meeting Type -->
+                <div class="form-group">
+                    <label>Meeting Type <span class="required">*</span></label>
+                    <select id="mtgType" required>
+                        <option value="State Executive Committee">State Executive Committee</option>
+                        <option value="Core Committee">Core Committee</option>
+                        <option value="District Executive Committee">District Executive Committee</option>
+                        <option value="General Council">General Council</option>
+                        <option value="Special Emergency Meeting">Special Emergency Meeting</option>
+                    </select>
+                </div>
+
+                <!-- Target Audience / Group -->
+                <div class="form-group">
+                    <label>Target Participants <span class="required">*</span></label>
+                    <select id="mtgTargetGroup" required>
+                        <option value="All_Members">All Union Members</option>
+                        <option value="State_EC">State Executive Body Only</option>
+                        <option value="Core_Committee">Core Committee Only</option>
+                        <option value="District_Office_Bearers">District Office Bearers</option>
+                    </select>
+                </div>
+
+                <!-- Date & Time -->
+                <div class="form-group">
+                    <label>Meeting Date <span class="required">*</span></label>
+                    <input type="date" id="mtgDate" required>
+                </div>
+                <div class="form-group">
+                    <label>Meeting Time <span class="required">*</span></label>
+                    <input type="time" id="mtgTime" required>
+                </div>
+
+                <!-- Issuer Details -->
+                <div class="form-group">
+                    <label>Issued By (Leader Name)</label>
+                    <input type="text" id="mtgIssuerName" placeholder="e.g. Sri T. Sambasiva Rao" value="State President">
+                </div>
+                <div class="form-group">
+                    <label>Issuer Designation</label>
+                    <input type="text" id="mtgIssuerDesig" placeholder="e.g. State President" value="State Executive">
+                </div>
+            </div>
+
+            <!-- Dynamic Agenda Points Builder -->
+            <div class="mtg-agenda-builder-box">
+                <div class="agenda-header-row">
+                    <label class="agenda-label"><i class="fa-solid fa-list-ol"></i> Official Meeting Agenda Points</label>
+                    <button type="button" class="btn-add-agenda" onclick="addAgendaPointField()">
+                        <i class="fa-solid fa-plus-circle"></i> Add Point
+                    </button>
+                </div>
+                <div id="agendaFieldsContainer" class="agenda-fields-list">
+                    <div class="agenda-input-row">
+                        <span class="agenda-idx">1.</span>
+                        <input type="text" class="agenda-point-input" placeholder="Enter agenda point #1" required>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Additional Notes / Message -->
+            <div class="form-group full-width" style="margin-top: 12px;">
+                <label>Additional Notes / Instructions</label>
+                <textarea id="mtgAdditionalMessage" rows="2" placeholder="Instructions for attendees (e.g. Join 10 minutes prior)"></textarea>
+            </div>
+
+            <!-- Live WhatsApp Message Preview Generator -->
+            <div class="mtg-wa-preview-box">
+                <div class="wa-preview-header">
+                    <i class="fa-brands fa-whatsapp"></i> Live WhatsApp Notice Preview
+                </div>
+                <div id="mtgLiveWaNoticePreview" class="wa-preview-content">
+                    Fill the form above to generate live WhatsApp meeting notice...
+                </div>
+            </div>
+
+            <!-- Form Action Buttons -->
+            <div class="mtg-form-actions">
+                <button type="button" class="btn-cancel-mtg" onclick="toggleScheduleMeetingForm()">Cancel</button>
+                <button type="submit" id="btnSubmitMeeting" class="btn-submit-mtg">
+                    <i class="fa-solid fa-check-circle"></i> Schedule & Broadcast Meeting
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- 3. Meeting Status Filter Tabs -->
+    <div class="mtg-tabs-bar">
+        <button type="button" class="mtg-tab-btn active" onclick="switchMeetingTab('upcoming')">
+            <i class="fa-solid fa-calendar-days"></i> Upcoming
+        </button>
+        <button type="button" class="mtg-tab-btn" onclick="switchMeetingTab('live')">
+            <span class="live-dot-pulse"></span> Live Now
+        </button>
+        <button type="button" class="mtg-tab-btn" onclick="switchMeetingTab('past')">
+            <i class="fa-solid fa-clock-rotate-left"></i> Past & Recordings
+        </button>
+    </div>
+
+    <!-- 4. Dynamic Meetings List Grid -->
+    <div id="meetingsCardsGrid" class="mtg-cards-grid">
+        <div class="mtg-loading-placeholder">
+            <i class="fa-solid fa-circle-notch fa-spin"></i> Loading meetings...
+        </div>
+    </div>
+
+</section>
+
+<!-- =========================================================
+     NOTIFICATIONS & BROADCAST CENTER
+========================================================= -->
+<section id="notificationsSection" class="notifications-page" style="display: none;">
+    <div class="notif-hero-banner">
+        <div class="notif-hero-left">
+            <div class="notif-hero-icon-box">
+                <i class="fa-solid fa-bell"></i>
+            </div>
+            <div class="notif-hero-text">
+                <h2>NOTIFICATIONS CENTER</h2>
+                <p>Official announcements, meeting alerts and circulars.</p>
+            </div>
+        </div>
+        <button type="button" class="btn-mark-all-read" onclick="markAllNotificationsAsRead()">
+            <i class="fa-solid fa-check-double"></i> Mark all as read
+        </button>
+    </div>
+
+    <!-- Dynamic Notifications List Container -->
+    <div id="notificationsContainer" class="notif-list-wrap">
+        <div class="notif-loading-placeholder">
+            <i class="fa-solid fa-circle-notch fa-spin"></i> Loading notifications...
+        </div>
+    </div>
+</section>
+
 
 <!-- =========================================================
      DOWNLOADS PREVIEW MODAL
