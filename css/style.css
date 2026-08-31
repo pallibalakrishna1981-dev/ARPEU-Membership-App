@@ -1855,16 +1855,27 @@ margin-top:15px;
     z-index: 2;
 }
 
-/* INVISIBLE NATIVE PICKER (Force anchoring) */
-.native-picker-overlay {
+/* INVISIBLE NATIVE PICKER (Force anchoring isolated to dt-box-wrap only) */
+.dt-box-wrap .native-picker-overlay {
     position: absolute;
-    left: 0; top: 0; width: 100%; height: 100%;
-    opacity: 0; cursor: pointer !important; z-index: 10 !important;
+    left: 0; 
+    top: 0; 
+    width: 100%; 
+    height: 100%;
+    opacity: 0; 
+    cursor: pointer !important; 
+    z-index: 2 !important;
 }
 
-/* Picker indicator visibility fix for date */
-input[type="date"]::-webkit-calendar-picker-indicator { 
-    position: absolute; left: 0; top: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; 
+/* Native Calendar & Time Icon standard behavior */
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator { 
+    position: relative !important;
+    width: auto !important;
+    height: auto !important;
+    opacity: 1 !important;
+    cursor: pointer !important;
+    z-index: 1 !important;
 }
 
 /* Action Buttons */
@@ -1876,6 +1887,8 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 .completed-btn { background: #2e7d32; }
 .balance-trigger { background: #f57c00; }
 .inline-pay-box { border: 2px solid #ffa39e; padding: 15px; border-radius: 18px; background: #fffaf9; margin-top: 15px; }
+
+
 
 /* =========================================================
    PAYMENT MODULE V25 END
@@ -6057,24 +6070,20 @@ label[for="passportPhoto"] {
 
 /* ==========================================================
    MEETINGS & CONFERENCES ENGINE - EXECUTIVE UI STYLES
-   Modules: Hero Banner, Agenda Builder, Live WhatsApp Preview,
-   Responsive Meeting Cards, Tabs & Notification Center
    ========================================================== */
 
-.meetings-page,
-.notifications-page {
-    padding: 12px 10px 24px;
+/* Main Meetings Page Shell */
+.meetings-page {
+    padding: 12px 10px 40px;
     max-width: 500px;
     margin: 0 auto;
-    display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 14px;
     box-sizing: border-box;
 }
 
-/* 1. Meetings & Notifications Hero Banners */
-.mtg-hero-banner,
-.notif-hero-banner {
+/* 1. Hero Banner */
+.mtg-hero-banner {
     background: linear-gradient(135deg, #0B4EA2, #1565C0);
     border-radius: 14px;
     padding: 14px 16px;
@@ -6085,15 +6094,13 @@ label[for="passportPhoto"] {
     box-shadow: 0 4px 14px rgba(11, 78, 162, 0.15);
 }
 
-.mtg-hero-left,
-.notif-hero-left {
+.mtg-hero-left {
     display: flex;
     align-items: center;
     gap: 12px;
 }
 
-.mtg-hero-icon-box,
-.notif-hero-icon-box {
+.mtg-hero-icon-box {
     width: 44px;
     height: 44px;
     min-width: 44px;
@@ -6106,24 +6113,21 @@ label[for="passportPhoto"] {
     color: #ffffff;
 }
 
-.mtg-hero-text h2,
-.notif-hero-text h2 {
-    font-size: 16px;
+.mtg-hero-text h2 {
+    font-size: 15px;
     font-weight: 800;
     margin: 0 0 2px 0;
     letter-spacing: 0.5px;
 }
 
-.mtg-hero-text p,
-.notif-hero-text p {
+.mtg-hero-text p {
     font-size: 11px;
     margin: 0;
     opacity: 0.9;
     line-height: 1.3;
 }
 
-.mtg-schedule-btn,
-.btn-mark-all-read {
+.mtg-schedule-btn {
     align-self: flex-start;
     background: #f57c00;
     color: #ffffff;
@@ -6140,63 +6144,221 @@ label[for="passportPhoto"] {
     transition: transform 0.15s ease, background 0.15s ease;
 }
 
-.mtg-schedule-btn:active,
-.btn-mark-all-read:active {
+.mtg-schedule-btn:active {
     transform: scale(0.96);
     background: #e65100;
 }
 
-/* 2. Admin Schedule Meeting Form Card */
-.mtg-form-card {
+/* 2. Quick Calling Pods */
+.mtg-quick-call-card {
     background: #ffffff;
-    border: 1px solid #cbd5e1;
-    border-radius: 14px;
-    padding: 14px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
-    animation: mtgSlideDown 0.3s ease-out;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
-.mtg-card-header {
-    font-size: 13.5px;
+.quick-call-title {
+    font-size: 12px;
     font-weight: 800;
-    color: #0B4EA2;
-    margin-bottom: 14px;
+    color: #1e293b;
+    margin-bottom: 10px;
     display: flex;
     align-items: center;
     gap: 6px;
-    border-bottom: 1.5px solid #e2e8f0;
-    padding-bottom: 8px;
+}
+
+.quick-call-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.call-pod {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+}
+
+.call-pod.core-pod { background: #f0f7ff; border-color: #bfdbfe; }
+.call-pod.ec-pod   { background: #fff8f0; border-color: #ffedd5; }
+
+.pod-info strong { font-size: 13px; color: #1e293b; display: block; }
+.pod-info small  { font-size: 10px; color: #64748b; font-weight: 600; }
+
+.pod-btns { display: flex; gap: 6px; }
+
+.btn-pod-call {
+    border: none;
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: #ffffff;
+    transition: transform 0.15s;
+}
+
+.btn-pod-call:active { transform: scale(0.95); }
+.btn-pod-call.video { background: #0B4EA2; }
+.btn-pod-call.audio { background: #16a34a; }
+
+/* 3. Live Metrics Row */
+.mtg-metrics-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+    text-align: center;
+}
+
+.mtg-m-box {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 8px 4px;
+}
+
+.mtg-m-val { display: block; font-size: 15px; font-weight: 800; color: #0B4EA2; }
+.mtg-m-lbl { font-size: 9.5px; font-weight: 700; color: #64748b; }
+
+/* 4. Form Styling */
+.mtg-input-label {
+    font-size: 11.5px !important;
+    font-weight: 700 !important;
+    color: #0B4EA2 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    margin-bottom: 4px !important;
+}
+
+.mtg-input-label i {
+    font-size: 12px !important;
+    color: #f57c00 !important;
+}
+
+.mtg-custom-field {
+    width: 100% !important;
+    height: 42px !important;
+    padding: 0 10px !important;
+    border: 1.5px solid #cbd5e1 !important;
+    border-radius: 10px !important;
+    font-size: 13px !important;
+    color: #1e293b !important;
+    background: #ffffff !important;
+    box-sizing: border-box !important;
+    transition: all 0.2s ease !important;
+    outline: none !important;
+    cursor: pointer !important;
+}
+
+/* Tall Field for Issued By & Designation Multi-line */
+/* Leader Select & Multi-line Centered Designation Box */
+.mtg-leader-box {
+    height: 52px !important;
+    font-size: 13.5px !important;
+    font-weight: 700 !important;
+    color: #0B4EA2 !important;
+}
+
+.mtg-desig-display {
+    height: 52px !important;
+    background: #f8fafc !important;
+    border: 1.5px solid #cbd5e1 !important;
+    border-radius: 10px !important;
+    padding: 4px 10px !important;
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    color: #1e293b !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    text-align: left !important;
+    line-height: 1.3 !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+    word-break: break-word !important;
+}
+
+/* Date & Time Picker Click-to-Open Trigger */
+input[type="date"].mtg-custom-field,
+input[type="time"].mtg-custom-field {
+    cursor: pointer !important;
+    font-weight: 600 !important;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator {
+    cursor: pointer !important;
+    padding: 4px !important;
+    filter: invert(24%) sepia(85%) saturate(2132%) hue-rotate(203deg) brightness(92%) contrast(98%); /* Blue Theme Icon */
+}
+
+textarea.mtg-custom-field {
+    height: auto !important;
+    padding: 8px 10px !important;
+}
+
+.mtg-custom-field:focus {
+    border-color: #0B4EA2 !important;
+    box-shadow: 0 0 0 3px rgba(11, 78, 162, 0.12) !important;
+}
+
+.mtg-form-card {
+    background: #ffffff !important;
+    border: 1.5px solid #0B4EA2 !important;
+    border-radius: 16px !important;
+    padding: 14px !important;
+    box-shadow: 0 4px 18px rgba(11, 78, 162, 0.08) !important;
+}
+
+.mtg-card-header {
+    font-size: 13.5px !important;
+    font-weight: 800 !important;
+    color: #0B4EA2 !important;
+    margin-bottom: 14px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    border-bottom: 2px solid #eef4ff !important;
+    padding-bottom: 10px !important;
 }
 
 .mtg-form-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 10px !important;
 }
 
 .mtg-form-grid .full-width {
-    grid-column: 1 / -1;
+    grid-column: 1 / -1 !important;
 }
 
-/* Dynamic Agenda Builder Box */
+/* 5. Dynamic Agenda Builder Box */
 .mtg-agenda-builder-box {
     margin-top: 12px;
     background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    border-radius: 10px;
-    padding: 10px 12px;
+    border: 1.5px dashed #cbd5e1;
+    border-radius: 12px;
+    padding: 12px;
 }
 
 .agenda-header-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
 }
 
 .agenda-label {
     font-size: 12px;
-    font-weight: 700;
+    font-weight: 800;
     color: #1e293b;
 }
 
@@ -6204,8 +6366,8 @@ label[for="passportPhoto"] {
     background: #0B4EA2;
     color: #ffffff;
     border: none;
-    border-radius: 6px;
-    padding: 4px 8px;
+    border-radius: 8px;
+    padding: 5px 10px;
     font-size: 11px;
     font-weight: 700;
     cursor: pointer;
@@ -6228,7 +6390,7 @@ label[for="passportPhoto"] {
 }
 
 .agenda-idx {
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 800;
     color: #0B4EA2;
     min-width: 18px;
@@ -6236,10 +6398,10 @@ label[for="passportPhoto"] {
 
 .agenda-point-input {
     flex: 1;
-    height: 36px;
+    height: 38px;
     border: 1px solid #cbd5e1;
-    border-radius: 6px;
-    padding: 0 8px;
+    border-radius: 8px;
+    padding: 0 10px;
     font-size: 12px;
 }
 
@@ -6247,21 +6409,21 @@ label[for="passportPhoto"] {
     background: #fee2e2;
     color: #ef4444;
     border: 1px solid #fecaca;
-    border-radius: 6px;
-    width: 32px;
-    height: 36px;
+    border-radius: 8px;
+    width: 36px;
+    height: 38px;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
 }
 
-/* WhatsApp Message Live Preview Box */
+/* 6. WhatsApp Live Notice Preview */
 .mtg-wa-preview-box {
     margin-top: 12px;
     background: #efeae2;
     border: 1px solid #d1d7db;
-    border-radius: 10px;
+    border-radius: 12px;
     padding: 10px;
 }
 
@@ -6272,7 +6434,7 @@ label[for="passportPhoto"] {
     margin-bottom: 6px;
     display: flex;
     align-items: center;
-    gap: 5px;
+    gap: 6px;
 }
 
 .wa-preview-content {
@@ -6288,7 +6450,7 @@ label[for="passportPhoto"] {
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
 }
 
-/* Form Action Buttons */
+/* 7. Form Action Buttons */
 .mtg-form-actions {
     display: flex;
     gap: 10px;
@@ -6299,8 +6461,8 @@ label[for="passportPhoto"] {
     flex: 1;
     height: 42px;
     background: #f1f5f9;
-    border: 1px solid #cbd5e1;
-    border-radius: 8px;
+    border: 1.5px solid #cbd5e1;
+    border-radius: 10px;
     font-size: 12.5px;
     font-weight: 700;
     color: #475569;
@@ -6310,9 +6472,9 @@ label[for="passportPhoto"] {
 .btn-submit-mtg {
     flex: 2;
     height: 42px;
-    background: #0B4EA2;
+    background: linear-gradient(135deg, #0B4EA2, #1565C0);
     border: none;
-    border-radius: 8px;
+    border-radius: 10px;
     font-size: 12.5px;
     font-weight: 700;
     color: #ffffff;
@@ -6323,7 +6485,7 @@ label[for="passportPhoto"] {
     gap: 6px;
 }
 
-/* 3. Meeting Status Filter Tabs */
+/* 8. Tabs Bar */
 .mtg-tabs-bar {
     display: flex;
     background: #e2e8f0;
@@ -6355,22 +6517,7 @@ label[for="passportPhoto"] {
     box-shadow: 0 2px 6px rgba(11, 78, 162, 0.25);
 }
 
-.live-dot-pulse {
-    width: 8px;
-    height: 8px;
-    background: #ef4444;
-    border-radius: 50%;
-    display: inline-block;
-    animation: livePulse 1.2s infinite;
-}
-
-@keyframes livePulse {
-    0% { transform: scale(0.9); opacity: 0.8; }
-    50% { transform: scale(1.4); opacity: 1; }
-    100% { transform: scale(0.9); opacity: 0.8; }
-}
-
-/* 4. Responsive Meeting Cards */
+/* 9. Dynamic Cards */
 .mtg-cards-grid {
     display: flex;
     flex-direction: column;
@@ -6448,7 +6595,6 @@ label[for="passportPhoto"] {
     color: #0B4EA2;
 }
 
-/* Agenda Checklist Preview */
 .mtg-agenda-preview-box {
     background: #ffffff;
     border: 1px dashed #cbd5e1;
@@ -6471,7 +6617,6 @@ label[for="passportPhoto"] {
     line-height: 1.4;
 }
 
-/* Meeting Action Buttons Row */
 .mtg-card-actions {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -6493,112 +6638,217 @@ label[for="passportPhoto"] {
     text-decoration: none;
 }
 
-.btn-mtg-join {
+.btn-mtg-join { background: #0B4EA2; color: #ffffff; }
+.btn-mtg-wa { background: #25d366; color: #ffffff; }
+.btn-mtg-rec { background: #475569; color: #ffffff; }
+
+/* ==========================================================
+   NOTIFICATIONS & BROADCAST CENTER UI STYLES
+   ========================================================== */
+
+/* Main Notifications Page Shell */
+.notifications-page {
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    height: auto !important;
+    min-height: 100% !important;
+    padding: 12px 10px 60px !important;
+    max-width: 500px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    box-sizing: border-box;
+}
+
+/* 1. Notifications Hero Banner */
+.notif-hero-banner {
+    background: linear-gradient(135deg, #0B4EA2, #1565C0);
+    border-radius: 14px;
+    padding: 14px 16px;
+    color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    box-shadow: 0 4px 14px rgba(11, 78, 162, 0.15);
+}
+
+.notif-hero-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.notif-hero-icon-box {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.18);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    color: #ffffff;
+}
+
+.notif-hero-text h2 {
+    font-size: 15px;
+    font-weight: 800;
+    margin: 0 0 2px 0;
+    letter-spacing: 0.5px;
+}
+
+.notif-hero-text p {
+    font-size: 11px;
+    margin: 0;
+    opacity: 0.9;
+    line-height: 1.3;
+}
+
+.btn-mark-all-read {
+    align-self: flex-start;
+    background: #ffffff;
+    color: #0B4EA2;
+    border: none;
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-size: 11.5px;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.15s ease;
+}
+
+.btn-mark-all-read:active {
+    transform: scale(0.96);
+}
+
+/* 2. Modular Dedicated Category Containers */
+.notif-category-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.04);
+}
+
+.notif-cat-header {
+    padding: 10px 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.notif-cat-header.meeting-cat  { background: #eff6ff; color: #0B4EA2; }
+.notif-cat-header.profile-cat  { background: #fff8f0; color: #ea580c; }
+.notif-cat-header.doc-cat      { background: #f0fdf4; color: #16a34a; }
+.notif-cat-header.circular-cat { background: #f8fafc; color: #334155; }
+
+.notif-cat-title {
+    font-size: 12.5px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.notif-cat-badge {
+    font-size: 10px;
+    font-weight: 800;
+    padding: 2px 8px;
+    border-radius: 10px;
     background: #0B4EA2;
     color: #ffffff;
 }
 
-.btn-mtg-wa {
-    background: #25d366;
-    color: #ffffff;
-}
+.notif-cat-badge.orange-badge { background: #f57c00; }
+.notif-cat-badge.green-badge  { background: #16a34a; }
+.notif-cat-badge.blue-badge   { background: #0B4EA2; }
 
-.btn-mtg-rec {
-    background: #475569;
-    color: #ffffff;
-}
-
-/* 5. Notification Center Cards */
-.notif-list-wrap {
+/* Category Body & Items */
+.notif-cat-body {
+    padding: 10px 12px;
     display: flex;
     flex-direction: column;
-    gap: 8px;
-}
-
-.notif-card {
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
-    border-radius: 12px;
-    padding: 12px;
-    display: flex;
     gap: 10px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
-    position: relative;
 }
 
-.notif-card.unread {
-    border-left: 4px solid #0B4EA2;
-    background: #f0f7ff;
+.notif-item-row {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    padding-bottom: 8px;
+    border-bottom: 1px dashed #f1f5f9;
 }
 
-.notif-icon-col {
+.notif-item-row:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.notif-item-icon {
     width: 36px;
     height: 36px;
     min-width: 36px;
     border-radius: 50%;
-    background: #e0f2fe;
-    color: #0B4EA2;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 15px;
 }
 
-.notif-content-col {
+.meeting-icon    { background: #e0f2fe; color: #0B4EA2; }
+.profile-icon    { background: #ffedd5; color: #ea580c; }
+.doc-icon        { background: #dcfce7; color: #16a34a; }
+.circular-icon   { background: #fee2e2; color: #dc2626; }
+.membership-icon { background: #e0e7ff; color: #4338ca; }
+
+.notif-item-info {
     flex: 1;
     min-width: 0;
 }
 
-.notif-card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+.notif-item-info strong {
+    font-size: 12.5px;
+    font-weight: 800;
+    color: #1e293b;
+    display: block;
+    line-height: 1.3;
     margin-bottom: 2px;
 }
 
-.notif-category {
-    font-size: 10px;
-    font-weight: 800;
-    color: #0B4EA2;
-    text-transform: uppercase;
-}
-
-.notif-time {
-    font-size: 10px;
-    color: #94a3b8;
-    font-weight: 600;
-}
-
-.notif-title {
-    font-size: 13px;
-    font-weight: 800;
-    color: #1e293b;
-    margin: 0 0 4px 0;
-}
-
-.notif-message {
-    font-size: 11.5px;
-    color: #475569;
+.notif-item-info p {
+    font-size: 11px;
+    color: #64748b;
     line-height: 1.35;
-    margin: 0 0 8px 0;
+    margin: 0 0 6px 0;
 }
 
-.btn-notif-action {
+.btn-notif-mini {
     display: inline-flex;
     align-items: center;
     gap: 4px;
     padding: 4px 10px;
     background: #0B4EA2;
     color: #ffffff;
-    font-size: 11px;
+    font-size: 10.5px;
     font-weight: 700;
-    border-radius: 5px;
+    border-radius: 6px;
     border: none;
     cursor: pointer;
     text-decoration: none;
 }
 
-@keyframes mtgSlideDown {
-    0% { opacity: 0; transform: translateY(-10px); }
-    100% { opacity: 1; transform: translateY(0); }
+.notif-action-link {
+    font-size: 11px;
+    font-weight: 700;
+    color: #0B4EA2;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
 }

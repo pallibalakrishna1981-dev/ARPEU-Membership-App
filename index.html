@@ -3444,86 +3444,169 @@
 <!-- =========================================================
      MEETINGS & CONFERENCES HUB (PHASE 1)
 ========================================================= -->
+<<!-- =========================================================
+     MEETINGS & CONFERENCES EXECUTIVE HUB
+========================================================= -->
 <section id="meetingsSection" class="meetings-page" style="display: none;">
 
-    <!-- 1. Meetings Hero Banner -->
+    <!-- 1. Hero Banner -->
     <div class="mtg-hero-banner">
         <div class="mtg-hero-left">
             <div class="mtg-hero-icon-box">
                 <i class="fa-solid fa-video"></i>
             </div>
             <div class="mtg-hero-text">
-                <h2>MEETINGS & CONFERENCES</h2>
-                <p>Official Executive Committee Meetings, Live Conferences & Dynamic Agenda Management.</p>
+                <h2>EXECUTIVE CONFERENCES HUB</h2>
+                <p>Official Leadership Meetings, Direct Calling & Dynamic Broadcasts</p>
             </div>
         </div>
         <button type="button" id="btnToggleScheduleForm" class="mtg-schedule-btn" onclick="toggleScheduleMeetingForm()">
-            <i class="fa-solid fa-plus"></i> Schedule Meeting
+            <i class="fa-solid fa-plus-circle"></i> + Schedule New Meeting
         </button>
     </div>
 
-    <!-- 2. Admin Meeting Creator & Dynamic Agenda Builder Form (Auto-Toggled) -->
+    <!-- 2. QUICK DIRECT CALLING PODS (1-CLICK CORE COMMITTEE & EC CALLING) -->
+    <div class="mtg-quick-call-card">
+        <div class="quick-call-title">
+            <i class="fa-solid fa-bolt" style="color: #f57c00;"></i> Instant Committee Calling Pods
+        </div>
+        <div class="quick-call-grid">
+            <!-- Core Committee Call Pod -->
+            <div class="call-pod core-pod">
+                <div class="pod-info">
+                    <strong>Core Committee</strong>
+                    <small>Top 5 State Leaders</small>
+                </div>
+                <div class="pod-btns">
+                    <button type="button" class="btn-pod-call video" onclick="launchInstantConference('Core Committee', 'video')">
+                        <i class="fa-solid fa-video"></i> Video Call
+                    </button>
+                    <button type="button" class="btn-pod-call audio" onclick="launchInstantConference('Core Committee', 'audio')">
+                        <i class="fa-solid fa-phone"></i> Audio Call
+                    </button>
+                </div>
+            </div>
+
+            <!-- State EC Call Pod -->
+            <div class="call-pod ec-pod">
+                <div class="pod-info">
+                    <strong>State Executive Body</strong>
+                    <small>All State EC Office Bearers</small>
+                </div>
+                <div class="pod-btns">
+                    <button type="button" class="btn-pod-call video" onclick="launchInstantConference('State EC', 'video')">
+                        <i class="fa-solid fa-video"></i> Video Call
+                    </button>
+                    <button type="button" class="btn-pod-call audio" onclick="launchInstantConference('State EC', 'audio')">
+                        <i class="fa-solid fa-phone"></i> Audio Call
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. LIVE MEETINGS METRICS (STATISTICS OVERVIEW) -->
+    <div class="mtg-metrics-row">
+        <div class="mtg-m-box">
+            <span class="mtg-m-val" id="mtgTotalCount">0</span>
+            <span class="mtg-m-lbl">Total Meetings</span>
+        </div>
+        <div class="mtg-m-box">
+            <span class="mtg-m-val" id="mtgCoreCount" style="color:#0B4EA2;">0</span>
+            <span class="mtg-m-lbl">Core Committee</span>
+        </div>
+        <div class="mtg-m-box">
+            <span class="mtg-m-val" id="mtgEcCount" style="color:#f57c00;">0</span>
+            <span class="mtg-m-lbl">State EC</span>
+        </div>
+        <div class="mtg-m-box">
+            <span class="mtg-m-val" id="mtgLastDate" style="color:#2e7d32; font-size:11px;">-</span>
+            <span class="mtg-m-lbl">Last Meeting</span>
+        </div>
+    </div>
+
+    <!-- 4. SCHEDULE MEETING FORM (FIXED SCROLL & OVERFLOW) -->
     <div id="scheduleMeetingCard" class="mtg-form-card" style="display: none;">
         <div class="mtg-card-header">
-            <i class="fa-solid fa-calendar-plus"></i> SCHEDULE NEW OFFICIAL MEETING
+            <i class="fa-solid fa-calendar-plus"></i> SCHEDULE OFFICIAL UNION MEETING
         </div>
         
         <form id="createMeetingForm" onsubmit="submitNewMeeting(event)">
             <div class="mtg-form-grid">
-                <!-- Meeting Title -->
+                
+                <!-- 1. Meeting Subject / Title (Full Width) -->
                 <div class="form-group full-width">
-                    <label>Meeting Title / Subject <span class="required">*</span></label>
-                    <input type="text" id="mtgTitle" placeholder="e.g. State Executive Committee Emergency Review" required>
+                    <label class="mtg-input-label"><i class="fa-solid fa-heading"></i> Meeting Subject / Title <span class="required">*</span></label>
+                    <input type="text" id="mtgTitle" class="mtg-custom-field" placeholder="e.g. State Executive Committee Emergency Review" required>
                 </div>
 
-                <!-- Meeting Type -->
-                <div class="form-group">
-                    <label>Meeting Type <span class="required">*</span></label>
-                    <select id="mtgType" required>
-                        <option value="State Executive Committee">State Executive Committee</option>
-                        <option value="Core Committee">Core Committee</option>
-                        <option value="District Executive Committee">District Executive Committee</option>
-                        <option value="General Council">General Council</option>
-                        <option value="Special Emergency Meeting">Special Emergency Meeting</option>
+                <!-- 2. Target Committee / Participants (Full Width) -->
+                <div class="form-group full-width">
+                    <label class="mtg-input-label"><i class="fa-solid fa-users-rectangle"></i> Target Committee / Participants <span class="required">*</span></label>
+                    <select id="mtgTargetGroup" class="mtg-custom-field" required onchange="syncMeetingTypeWithTarget(this.value)">
+                        <option value="Core_Committee">Core Committee Only (Top 5 Leaders)</option>
+                        <option value="State_EC" selected>State Executive Committee (All State EC)</option>
+                        <option value="Company_Body">Company / Circle Office Bearers</option>
+                        <option value="All_Members">All Union Registered Members</option>
                     </select>
                 </div>
 
-                <!-- Target Audience / Group -->
+                <!-- 3. Meeting Type (Full Width Single Line) -->
+                <div class="form-group full-width">
+                    <label class="mtg-input-label"><i class="fa-solid fa-layer-group"></i> Meeting Type</label>
+                    <input type="text" id="mtgType" class="mtg-custom-field" value="State Executive Committee" readonly style="background:#f1f5f9; font-weight:700; color:#0B4EA2;">
+                </div>
+
+           <!-- 4. Date & Time (Flatpickr Anchored Match with AM/PM) -->
                 <div class="form-group">
-                    <label>Target Participants <span class="required">*</span></label>
-                    <select id="mtgTargetGroup" required>
-                        <option value="All_Members">All Union Members</option>
-                        <option value="State_EC">State Executive Body Only</option>
-                        <option value="Core_Committee">Core Committee Only</option>
-                        <option value="District_Office_Bearers">District Office Bearers</option>
+                    <label class="mtg-input-label"><i class="fa-solid fa-calendar-day"></i> Meeting Date <span class="required">*</span></label>
+                    <div class="dt-box-wrap">
+                        <input type="text" id="mtgDate" class="dt-field-final mtg-custom-field" placeholder="Select Date" readonly required>
+                        <i class="fas fa-calendar-alt dt-icon-right"></i>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="mtg-input-label"><i class="fa-solid fa-clock"></i> Meeting Time <span class="required">*</span></label>
+                    <div class="dt-box-wrap">
+                        <input type="text" id="mtgTime" class="dt-field-final mtg-custom-field" placeholder="Set Time (AM/PM)" readonly required>
+                        <i class="fas fa-clock dt-icon-right"></i>
+                    </div>
+                </div>
+
+                <!-- 5. Issued By & Designation (Equal Height Multi-line Centered View) -->
+                <div class="form-group">
+                    <label class="mtg-input-label"><i class="fa-solid fa-user-tie"></i> Issued By <span class="required">*</span></label>
+                    <select id="mtgIssuerSelect" class="mtg-custom-field mtg-leader-box" onchange="handleIssuerSelection(this.value)" required>
+                        <!-- ARPEU Core Leaders -->
+                        <optgroup label="ARPEU State Leadership">
+                            <option value="Sri T. Sambasiva Rao" data-desig="State President" selected>Sri T. Sambasiva Rao</option>
+                            <option value="Sri C. Ramagopal Reddy" data-desig="State General Secretary">Sri C. Ramagopal Reddy</option>
+                            <option value="Sri P. Balakrishna" data-desig="State Treasurer">Sri P. Balakrishna</option>
+                            <option value="Sri K. Jayappa" data-desig="State Working President">Sri K. Jayappa</option>
+                            <option value="Sri R. Koteswara Rao" data-desig="State Organising Secretary">Sri A. Koteswara Rao</option>
+                        </optgroup>
+                        <!-- BMS State Leadership -->
+                        <optgroup label="BMS State Leadership">
+                            <option value="Sri T. Raghuram" data-desig="Hon'ble President (ARPEU) &lt;br&gt; BMS State President">Sri T. Raghuram</option>
+                            <option value="Sri M.V.S. Naidu" data-desig="BMS State General Secretary">Sri M.V.S. Naidu</option>
+                            <option value="Sri K. Lova Reddy" data-desig="BMS State Organising Secretary">Sri K. Lova Reddy</option>
+                        </optgroup>
                     </select>
                 </div>
 
-                <!-- Date & Time -->
                 <div class="form-group">
-                    <label>Meeting Date <span class="required">*</span></label>
-                    <input type="date" id="mtgDate" required>
-                </div>
-                <div class="form-group">
-                    <label>Meeting Time <span class="required">*</span></label>
-                    <input type="time" id="mtgTime" required>
+                    <label class="mtg-input-label"><i class="fa-solid fa-id-badge"></i> Designation</label>
+                    <div id="mtgIssuerDesigBox" class="mtg-custom-field mtg-desig-display">State President</div>
+                    <!-- Hidden input to store designation value for backend -->
+                    <input type="hidden" id="mtgIssuerDesig" value="State President">
                 </div>
 
-                <!-- Issuer Details -->
-                <div class="form-group">
-                    <label>Issued By (Leader Name)</label>
-                    <input type="text" id="mtgIssuerName" placeholder="e.g. Sri T. Sambasiva Rao" value="State President">
-                </div>
-                <div class="form-group">
-                    <label>Issuer Designation</label>
-                    <input type="text" id="mtgIssuerDesig" placeholder="e.g. State President" value="State Executive">
-                </div>
             </div>
 
-            <!-- Dynamic Agenda Points Builder -->
+            <!-- 6. Dynamic Agenda Points Builder -->
             <div class="mtg-agenda-builder-box">
                 <div class="agenda-header-row">
-                    <label class="agenda-label"><i class="fa-solid fa-list-ol"></i> Official Meeting Agenda Points</label>
+                    <label class="agenda-label"><i class="fa-solid fa-list-check" style="color:#0B4EA2;"></i> Official Meeting Agenda Points</label>
                     <button type="button" class="btn-add-agenda" onclick="addAgendaPointField()">
                         <i class="fa-solid fa-plus-circle"></i> Add Point
                     </button>
@@ -3536,33 +3619,31 @@
                 </div>
             </div>
 
-            <!-- Additional Notes / Message -->
+            <!-- 7. Instructions for Attendees -->
             <div class="form-group full-width" style="margin-top: 12px;">
-                <label>Additional Notes / Instructions</label>
-                <textarea id="mtgAdditionalMessage" rows="2" placeholder="Instructions for attendees (e.g. Join 10 minutes prior)"></textarea>
+                <label class="mtg-input-label"><i class="fa-solid fa-circle-info"></i> Instructions for Attendees</label>
+                <textarea id="mtgAdditionalMessage" class="mtg-custom-field" rows="2" placeholder="e.g. All leaders are requested to join 10 minutes before schedule with notebook."></textarea>
             </div>
 
-            <!-- Live WhatsApp Message Preview Generator -->
+            <!-- 8. WhatsApp Live Notice Preview -->
             <div class="mtg-wa-preview-box">
                 <div class="wa-preview-header">
-                    <i class="fa-brands fa-whatsapp"></i> Live WhatsApp Notice Preview
+                    <i class="fa-brands fa-whatsapp"></i> WhatsApp Group Broadcast Preview
                 </div>
-                <div id="mtgLiveWaNoticePreview" class="wa-preview-content">
-                    Fill the form above to generate live WhatsApp meeting notice...
-                </div>
+                <div id="mtgLiveWaNoticePreview" class="wa-preview-content"></div>
             </div>
 
-            <!-- Form Action Buttons -->
+            <!-- 9. Actions -->
             <div class="mtg-form-actions">
                 <button type="button" class="btn-cancel-mtg" onclick="toggleScheduleMeetingForm()">Cancel</button>
                 <button type="submit" id="btnSubmitMeeting" class="btn-submit-mtg">
-                    <i class="fa-solid fa-check-circle"></i> Schedule & Broadcast Meeting
+                    <i class="fa-solid fa-paper-plane"></i> Schedule & Broadcast
                 </button>
             </div>
         </form>
     </div>
 
-    <!-- 3. Meeting Status Filter Tabs -->
+    <!-- 5. TABS BAR -->
     <div class="mtg-tabs-bar">
         <button type="button" class="mtg-tab-btn active" onclick="switchMeetingTab('upcoming')">
             <i class="fa-solid fa-calendar-days"></i> Upcoming
@@ -3571,23 +3652,30 @@
             <span class="live-dot-pulse"></span> Live Now
         </button>
         <button type="button" class="mtg-tab-btn" onclick="switchMeetingTab('past')">
-            <i class="fa-solid fa-clock-rotate-left"></i> Past & Recordings
+            <i class="fa-solid fa-clock-rotate-left"></i> Past & Records
         </button>
     </div>
 
-    <!-- 4. Dynamic Meetings List Grid -->
+    <!-- 6. DYNAMIC CARDS CONTAINER -->
     <div id="meetingsCardsGrid" class="mtg-cards-grid">
         <div class="mtg-loading-placeholder">
-            <i class="fa-solid fa-circle-notch fa-spin"></i> Loading meetings...
+            <i class="fa-solid fa-circle-notch fa-spin"></i> Loading official meetings...
         </div>
     </div>
 
 </section>
+<!-- =========================================================
+     MEETINGS & CONFERENCES EXECUTIVE HUB END
+========================================================= -->
+
+
 
 <!-- =========================================================
      NOTIFICATIONS & BROADCAST CENTER
 ========================================================= -->
 <section id="notificationsSection" class="notifications-page" style="display: none;">
+    
+    <!-- 1. Hero Banner -->
     <div class="notif-hero-banner">
         <div class="notif-hero-left">
             <div class="notif-hero-icon-box">
@@ -3595,7 +3683,7 @@
             </div>
             <div class="notif-hero-text">
                 <h2>NOTIFICATIONS CENTER</h2>
-                <p>Official announcements, meeting alerts and circulars.</p>
+                <p>Official broadcasts, meeting alerts, circulars & administrative queues.</p>
             </div>
         </div>
         <button type="button" class="btn-mark-all-read" onclick="markAllNotificationsAsRead()">
@@ -3603,12 +3691,104 @@
         </button>
     </div>
 
-    <!-- Dynamic Notifications List Container -->
-    <div id="notificationsContainer" class="notif-list-wrap">
-        <div class="notif-loading-placeholder">
-            <i class="fa-solid fa-circle-notch fa-spin"></i> Loading notifications...
+    <!-- 2. CATEGORY 1: EXECUTIVE MEETINGS & CONFERENCES ALERTS -->
+    <div class="notif-category-card">
+        <div class="notif-cat-header meeting-cat">
+            <div class="notif-cat-title">
+                <i class="fa-solid fa-video"></i>
+                <span>Official Meetings & Conferences</span>
+            </div>
+            <span class="notif-cat-badge" id="notifMtgCountBadge">Live</span>
+        </div>
+        <div id="notifMeetingsList" class="notif-cat-body">
+            <!-- Dynamic Meeting Alerts injected via JS -->
+            <div class="notif-item-row">
+                <div class="notif-item-icon meeting-icon"><i class="fa-solid fa-calendar-check"></i></div>
+                <div class="notif-item-info">
+                    <strong>State Executive Committee Review Scheduled</strong>
+                    <p>Official meeting scheduled for State EC leaders. Check agenda & join.</p>
+                    <button type="button" class="btn-notif-mini" onclick="showPage('meetings')">
+                        <i class="fa-solid fa-arrow-right"></i> Open Meeting Hub
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
+
+    <!-- 3. CATEGORY 2: MEMBER PROFILE UPDATE REQUESTS (ADMIN QUEUE) -->
+    <div class="notif-category-card">
+        <div class="notif-cat-header profile-cat">
+            <div class="notif-cat-title">
+                <i class="fa-solid fa-user-pen"></i>
+                <span>Profile Update Requests</span>
+            </div>
+            <span class="notif-cat-badge orange-badge" id="notifProfilesCount">0 Pending</span>
+        </div>
+        <div class="notif-cat-body">
+            <div class="notif-item-row" onclick="openNotificationTarget('profiles')" style="cursor:pointer;">
+                <div class="notif-item-icon profile-icon"><i class="fa-solid fa-id-card-clip"></i></div>
+                <div class="notif-item-info">
+                    <strong>Cadre Profile Modification Requests</strong>
+                    <p>Member profile edit requests are waiting for verification & approval.</p>
+                    <span class="notif-action-link"><i class="fa-solid fa-lock"></i> Review in Admin Panel &rarr;</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. CATEGORY 3: DOCUMENT VERIFICATION QUEUE -->
+    <div class="notif-category-card">
+        <div class="notif-cat-header doc-cat">
+            <div class="notif-cat-title">
+                <i class="fa-solid fa-file-circle-check"></i>
+                <span>Document Verification Queue</span>
+            </div>
+            <span class="notif-cat-badge green-badge" id="notifDocsCount">0 Pending</span>
+        </div>
+        <div class="notif-cat-body">
+            <div class="notif-item-row" onclick="openNotificationTarget('docs')" style="cursor:pointer;">
+                <div class="notif-item-icon doc-icon"><i class="fa-solid fa-file-shield"></i></div>
+                <div class="notif-item-info">
+                    <strong>Supporting Documents Pending Review</strong>
+                    <p>Aadhaar Card, Payslip & Employee ID uploads waiting for verification.</p>
+                    <span class="notif-action-link"><i class="fa-solid fa-lock"></i> Verify in Admin Panel &rarr;</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 5. CATEGORY 4: GENERAL CIRCULARS & BMS AGITATIONS -->
+    <div class="notif-category-card">
+        <div class="notif-cat-header circular-cat">
+            <div class="notif-cat-title">
+                <i class="fa-solid fa-bullhorn"></i>
+                <span>Circulars & BMS Agitations</span>
+            </div>
+            <span class="notif-cat-badge blue-badge">Active</span>
+        </div>
+        <div class="notif-cat-body">
+            <!-- News Alert 1 -->
+            <div class="notif-item-row">
+                <div class="notif-item-icon circular-icon"><i class="fa-solid fa-flag"></i></div>
+                <div class="notif-item-info">
+                    <strong>BMS Nationwide Protest Call & District Dharna</strong>
+                    <p>Central BMS call for nationwide agitation demanding electricity employee rights.</p>
+                </div>
+            </div>
+            <!-- News Alert 2 -->
+            <div class="notif-item-row">
+                <div class="notif-item-icon membership-icon"><i class="fa-solid fa-id-card"></i></div>
+                <div class="notif-item-info">
+                    <strong>Statewide Digital Membership Drive Active</strong>
+                    <p>All power sector employees are requested to complete digital registration.</p>
+                    <button type="button" class="btn-notif-mini" onclick="showPage('membership')">
+                        <i class="fa-solid fa-arrow-right"></i> Register / Renew
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </section>
 
 

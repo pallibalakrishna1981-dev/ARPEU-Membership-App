@@ -504,83 +504,55 @@ function initializeUniversalDistrictEngine() {
    COMPLETE NAVIGATION ENGINE WITH UNDER-DEVELOPMENT GUARD
    ========================================================== */
 
-/**
- * Manages view switching for all portal pages.
- * Displays completed pages and shows a professional placeholder for upcoming modules.
- * @param {string} page - Selected page target identifier
- */
 function showPage(page) {
   const rc = document.getElementById("receiptContainer");
 
-  // 2. Safely capture all page section DOM elements
-  const homeSec = document.getElementById("homeSection") || document.getElementById("homePage");
-  const membSec = document.getElementById("membershipPage") || document.getElementById("membershipSection");
-  const donSec  = document.getElementById("donationsSection") || document.getElementById("donationsPage") || document.getElementById("donationSection");
-  const statSec = document.getElementById("statisticsSection") || document.getElementById("statisticsPage");
-  const abtSec  = document.getElementById("aboutSection") || document.getElementById("aboutPage") || document.getElementById("aboutUsSection");
-  const cntSec  = document.getElementById("contactSection") || document.getElementById("contactPage") || document.getElementById("contactUsSection");
-  const dwnSec  = document.getElementById("downloadsSection") || document.getElementById("downloadsPage");
-  const profSec = document.getElementById("profileSection") || document.getElementById("profilePage") || document.getElementById("myProfileSection");
-  const admSec  = document.getElementById("adminSection");
+  // 1. Capture ALL page sections strictly
+  const homeSec  = document.getElementById("homeSection") || document.getElementById("homePage");
+  const membSec  = document.getElementById("membershipPage") || document.getElementById("membershipSection");
+  const donSec   = document.getElementById("donationsSection") || document.getElementById("donationsPage");
+  const statSec  = document.getElementById("statisticsSection") || document.getElementById("statisticsPage");
+  const abtSec   = document.getElementById("aboutSection") || document.getElementById("aboutPage");
+  const cntSec   = document.getElementById("contactSection") || document.getElementById("contactPage");
+  const dwnSec   = document.getElementById("downloadsSection") || document.getElementById("downloadsPage");
+  const profSec  = document.getElementById("profileSection") || document.getElementById("profilePage");
+  const admSec   = document.getElementById("adminSection");
   const notifSec = document.getElementById("notificationsSection");
   const setSec   = document.getElementById("settingsSection");
+  const mtgSec   = document.getElementById("meetingsSection");
+  const placeholderSec = document.getElementById("underDevPlaceholderSection");
 
-  // Placeholder section for under-development modules
-  let placeholderSec = document.getElementById("underDevPlaceholderSection");
-
-  // Create placeholder section dynamically if missing in HTML
-  if (!placeholderSec) {
-    placeholderSec = document.createElement("div");
-    placeholderSec.id = "underDevPlaceholderSection";
-    placeholderSec.className = "main-page-section";
-    placeholderSec.style.display = "none";
-    placeholderSec.innerHTML = `
-      <div class="main-page-container" style="padding: 40px 20px; text-align: center;">
-        <div style="background: #ffffff; border: 1px dashed #cbd5e1; border-radius: 12px; padding: 40px 20px; max-width: 500px; margin: 0 auto; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
-          <div style="font-size: 48px; color: #003366; margin-bottom: 12px;">🚧</div>
-          <h3 id="devPageTitle" style="color: #003366; font-size: 20px; margin-bottom: 8px; font-weight: 700;">Page Under Development</h3>
-          <p style="color: #64748b; font-size: 14px; margin-bottom: 20px; line-height: 1.5;">This module is currently being configured under the Digital Cadre Management Framework (DCMF). It will be active soon!</p>
-          <button type="button" class="profile-btn profile-btn-primary" onclick="showPage('home')" style="margin: 0 auto; padding: 8px 20px; font-size: 13px;">
-            <i class="fas fa-home"></i> Back to Home Page
-          </button>
-        </div>
-      </div>
-    `;
-    const mainContentArea = document.getElementById("contentArea") || document.body;
-    mainContentArea.appendChild(placeholderSec);
-  }
-
-  // 3. Hide ALL sections completely (Bypasses active receipts)
-  if (homeSec) homeSec.style.display = "none";
-  if (membSec) membSec.style.display = "none";
-  if (donSec) donSec.style.display = "none";
-  if (statSec) statSec.style.display = "none";
-  if (abtSec) abtSec.style.display = "none";
-  if (cntSec) cntSec.style.display = "none";
-  if (dwnSec) dwnSec.style.display = "none";
-  if (profSec) profSec.style.display = "none";
-  if (admSec) admSec.style.display = "none";
+  // 2. FORCE HIDE EVERY SECTION (Guarantees Zero Overlapping)
+  if (homeSec)  homeSec.style.display  = "none";
+  if (membSec)  membSec.style.display  = "none";
+  if (donSec)   donSec.style.display   = "none";
+  if (statSec)  statSec.style.display  = "none";
+  if (abtSec)   abtSec.style.display   = "none";
+  if (cntSec)   cntSec.style.display   = "none";
+  if (dwnSec)   dwnSec.style.display   = "none";
+  if (profSec)  profSec.style.display  = "none";
+  if (admSec)   admSec.style.display   = "none";
   if (notifSec) notifSec.style.display = "none";
-  if (setSec) setSec.style.display = "none";
+  if (setSec)   setSec.style.display   = "none";
+  if (mtgSec)   mtgSec.style.display   = "none";
   if (placeholderSec) placeholderSec.style.display = "none";
 
-  // 4. Remove 'active' highlight class from all navigation links
-  const navLinks = document.querySelectorAll(".nav-link, .nav-tab-link, .dropdown-item, .navbar-nav a, .nav-item");
-  navLinks.forEach(function (link) {
-    link.classList.remove("active");
-  });
+  // Hide standalone contentArea children if any
+  document.querySelectorAll("#contentArea > section").forEach(s => s.style.display = "none");
 
-  // 5. Scroll page view smoothly to top position
-  window.scrollTo({ top: 0, behavior: "smooth" });
+  // 3. Remove 'active' state from navigation links
+  const navLinks = document.querySelectorAll(".nav-link, .nav-tab-link, .dropdown-item, .navbar-nav a, .nav-item");
+  navLinks.forEach(link => link.classList.remove("active"));
+
+  // 4. Smooth scroll to top
+  const contentArea = document.getElementById("contentArea") || window;
+  contentArea.scrollTo({ top: 0, behavior: "smooth" });
 
   const targetPage = String(page).toLowerCase().trim();
 
-  // 6. Dynamically locate active navigation tab element
+  // 5. Highlight active navbar item
   let activeLink = document.getElementById(`nav${targetPage.charAt(0).toUpperCase() + targetPage.slice(1)}`) ||
-                   document.getElementById(`nav-${targetPage}`) ||
-                   document.querySelector(`[onclick*="'${targetPage}'"]`) || 
-                   document.querySelector(`[onclick*='"${targetPage}"']`);
-
+                   document.querySelector(`[onclick*="'${targetPage}'"]`);
   if (activeLink) {
     activeLink.classList.add("active");
     if (activeLink.parentElement && activeLink.parentElement.classList.contains("nav-item")) {
@@ -588,51 +560,27 @@ function showPage(page) {
     }
   }
 
-  // Helper function to show placeholder card for unmapped modules
-  function showUnderDevelopmentCard(titleName) {
-    const titleEl = document.getElementById("devPageTitle");
-    if (titleEl) titleEl.textContent = `${titleName} - Page Under Development`;
-    if (placeholderSec) placeholderSec.style.display = "block";
-  }
-
-  // 7. Route and display targeted section cleanly
+  // 6. SHOW ONLY TARGETED PAGE
   switch (targetPage) {
-    // COMPLETED MAJOR PAGES
     case "home":
       if (homeSec) homeSec.style.display = "block";
       break;
 
     case "membership":
-      const isMembReceiptOpen = rc && (rc.getAttribute("data-membership-active") === "true");
-      if (isMembReceiptOpen) {
-        if (membSec) membSec.style.display = "none";
-        if (rc) rc.style.display = "block"; // Retains and displays the active membership receipt
-      } else {
-        if (membSec) membSec.style.display = "block"; // Shows fresh membership form only if closed
-        if (rc) rc.style.display = "none";
-      }
+      if (membSec) membSec.style.display = "block";
       break;
 
     case "donations":
     case "donation":
-      if (rc && rc.getAttribute("data-donation-active") === "true") {
-        if (donSec) donSec.style.display = "none";
-        if (rc) rc.style.display = "block";
-      } else {
-        if (donSec) donSec.style.display = "block";
-        if (rc) rc.style.display = "none";
-      }
+      if (donSec) donSec.style.display = "block";
       break;
 
     case "statistics":
     case "stats":
       if (statSec) statSec.style.display = "block";
-      if (typeof renderStatisticsCharts === "function") {
-        renderStatisticsCharts();
-      }
+      if (typeof loadMembershipStatistics === "function") loadMembershipStatistics();
       break;
 
-    // COMPLETED 'MORE' MENU PAGES
     case "about":
     case "aboutus":
     case "about-arpeu":
@@ -652,43 +600,22 @@ function showPage(page) {
 
     case "profile":
     case "profiles":
-    case "myprofile":
-    case "my-profile":
-    case "digitalprofile":
       if (profSec) profSec.style.display = "block";
       break;
 
-    // 🌟 MEETINGS & CONFERENCES (FIXED & ROUTED DIRECTLY)
+    // 🌟 MEETINGS & CONFERENCES (PERFECT ISOLATION)
     case "meetings":
     case "meeting":
     case "conferences":
-      const mtgSec = document.getElementById("meetingsSection");
-      if (mtgSec) mtgSec.style.display = "block";
-      if (typeof loadMeetingsList === "function") {
-        loadMeetingsList();
-      }
+      if (mtgSec) mtgSec.style.display = "flex";
+      if (typeof loadMeetingsList === "function") loadMeetingsList();
       break;
 
-    // 🌟 NOTIFICATIONS CENTER (FIXED & ROUTED DIRECTLY)
+    // 🌟 NOTIFICATIONS CENTER
     case "notifications":
     case "notification":
       if (notifSec) notifSec.style.display = "block";
-      if (typeof loadNotificationsList === "function") {
-        loadNotificationsList();
-      }
-      if (typeof syncLiveNotificationCounts === "function") {
-        syncLiveNotificationCounts();
-      }
-      break;
-
-    // UPCOMING MODULES (UNDER DEVELOPMENT PLACEHOLDERS)
-    case "officebearers":
-    case "office-bearers":
-      showUnderDevelopmentCard("Office Bearers");
-      break;
-
-    case "gallery":
-      showUnderDevelopmentCard("Gallery");
+      if (typeof loadNotificationsList === "function") loadNotificationsList();
       break;
 
     case "settings":
@@ -696,18 +623,18 @@ function showPage(page) {
       if (setSec) setSec.style.display = "block";
       break;
 
-    case "adminlogin":
     case "admin":
-    case "admin-login":
+    case "adminlogin":
       if (admSec) admSec.style.display = "block";
-      if (typeof checkAdminSession === "function") {
-        checkAdminSession();
-      }
+      if (typeof checkAdminSession === "function") checkAdminSession();
       break;
 
     default:
-      // Fallback for any unmapped future link
-      showUnderDevelopmentCard("Module");
+      if (placeholderSec) {
+        const titleEl = document.getElementById("devPageTitle");
+        if (titleEl) titleEl.textContent = `${targetPage.toUpperCase()} - Page Under Development`;
+        placeholderSec.style.display = "block";
+      }
       break;
   }
 }
@@ -1929,14 +1856,27 @@ const PaymentModuleV25 = {
 };
 
 
-/* ==========================================================
-   FLATPICKR DATE & TIME PICKERS ENGINE (DIRECT CLICK FIX)
-   ========================================================== */
+// 1. Handle Automatic Issuer & Designation Selection with 2-Line HTML Support
+function handleIssuerSelection(leaderName) {
+    const selectEl = document.getElementById("mtgIssuerSelect");
+    const desigBox = document.getElementById("mtgIssuerDesigBox");
+    const hiddenDesig = document.getElementById("mtgIssuerDesig");
+    if (!selectEl || !desigBox) return;
 
-/**
- * Initializes Flatpickr on all date and time inputs across Membership, Profile and Donations
- * Direct binding ensures clicking visible date and time boxes opens popups instantly.
- */
+    const selectedOption = selectEl.options[selectEl.selectedIndex];
+    const designationHtml = selectedOption.getAttribute("data-desig") || "Leader";
+    
+    // Set visual multi-line text
+    desigBox.innerHTML = designationHtml;
+    // Set plain text for WhatsApp & Backend
+    if (hiddenDesig) {
+        hiddenDesig.value = designationHtml.replace(/<br\s*[\/]?>/gi, " - ");
+    }
+
+    updateLiveWhatsAppPreview();
+}
+
+// 2. Universal Flatpickr Initializer (Includes Meetings Date & AM/PM Time)
 function initializeDatePickers() {
   if (typeof flatpickr !== "function") return;
 
@@ -1944,26 +1884,20 @@ function initializeDatePickers() {
     disableMobile: true, 
     allowInput: false, 
     clickOpens: true, 
-    animate: true, 
+    animate: false,
     position: "auto"
   };
 
-  // 1. Universal Date Inputs (Membership, Profile & Donations)
-  const dateSelectors = ["#dob", "#joiningDate", "#profDob", "#profDoj", "#payNowDate", "#manualDate", "#donDate", "#donPayNowDate"];
+  // Date Pickers (Includes #mtgDate)
+  const dateSelectors = ["#dob", "#joiningDate", "#profDob", "#profDoj", "#payNowDate", "#manualDate", "#donDate", "#donPayNowDate", "#mtgDate"];
   dateSelectors.forEach(id => {
     const el = document.querySelector(id);
     if (el) {
       flatpickr(el, { 
         ...base, 
         dateFormat: "d-m-Y",
-        maxDate: (id.includes("payNow") || id.includes("manual") || id.includes("don")) ? "today" : null,
+        defaultDate: id === "#mtgDate" ? "today" : null,
         monthSelectorType: "dropdown",
-        onReady: function(selectedDates, dateStr, instance) {
-          const yearInput = instance.calendarContainer.querySelector(".numInput.cur-year");
-          if (yearInput) {
-            yearInput.removeAttribute("readonly");
-          }
-        },
         onChange: (selectedDates, dateStr, instance) => {
           el.value = dateStr;
           el.dispatchEvent(new Event('input', { bubbles: true }));
@@ -1974,8 +1908,8 @@ function initializeDatePickers() {
     }
   });
 
-  // 2. Universal Time Pickers (Anchored directly inside the box)
-  const timeSelectors = ["#payNowTimeDisplay", "#manualTimeDisplay", "#donTimeDisplay", "#donPayNowTimeDisplay"];
+  // Time Pickers with AM/PM (Includes #mtgTime)
+  const timeSelectors = ["#payNowTimeDisplay", "#manualTimeDisplay", "#donTimeDisplay", "#donPayNowTimeDisplay", "#mtgTime"];
   timeSelectors.forEach(id => {
     const el = document.querySelector(id);
     if (el) {
@@ -1985,8 +1919,9 @@ function initializeDatePickers() {
         noCalendar: true, 
         dateFormat: "h:i K",
         time_24hr: false,
-        minuteIncrement: 1,
-        static: true, // Anchors the popup directly to the input box container
+        minuteIncrement: 5,
+        defaultDate: id === "#mtgTime" ? "10:30" : null,
+        static: true,
         position: "above",
         onChange: (selectedDates, dateStr) => {
           el.value = dateStr;
@@ -5310,63 +5245,112 @@ function triggerUpiPayment(appType) {
 
 
 /* ==========================================================
-   MEETINGS, AGENDA BUILDER & NOTIFICATIONS CONTROLLER (PHASE 1)
-   Modules: Universal SPA Routing, Dynamic Agenda Builder, WhatsApp Preview,
-   Google Apps Script Sync, Live Tabs, and Notification Badge
+   MEETINGS, AGENDA BUILDER & NOTIFICATIONS CONTROLLER
    ========================================================== */
 
 // Global State
 let cachedMeetings = [];
 let activeMeetingTab = "upcoming";
 
-// 1. Universal SPA Page Routing Interceptor (Prevents Under-Construction Overlap)
-if (typeof showPage === "function") {
-    const prevShowPageMtg = showPage;
+// 1. Master Leaders & Designations Map (8 Key Office Bearers)
+const arpeuLeadersMap = {
+    // ARPEU Core Leaders
+    "Sri T. Sambasiva Rao": "State President",
+    "Sri C. Ramagopal Reddy": "State General Secretary",
+    "Sri P. Balakrishna": "State Treasurer",
+    "Sri K. Jayappa": "State Working President",
+    "Sri R. Koteswara Rao": "State Organising Secretary",
     
-    showPage = function (page) {
-        // Universal Cleanup: Hide ALL sections inside contentArea first
-        document.querySelectorAll("#contentArea > section").forEach(function (sec) {
-            sec.style.display = "none";
+    // BMS State Leadership (2-Line formatted)
+    "Sri T. Raghuram": "Hon'ble President (ARPEU)<br>BMS State President",
+    "Sri M.V.S. Naidu": "BMS State General Secretary",
+    "Sri K. Lova Reddy": "BMS State Organising Secretary"
+};
+
+function handleIssuerSelection(leaderName) {
+    const desigBox = document.getElementById("mtgIssuerDesigBox");
+    const hiddenDesig = document.getElementById("mtgIssuerDesig");
+    if (!desigBox) return;
+
+    const selectEl = document.getElementById("mtgIssuerSelect");
+    const selectedLeader = leaderName || (selectEl ? selectEl.value : "Sri T. Sambasiva Rao");
+
+    // Get designation from master map
+    const designationHtml = arpeuLeadersMap[selectedLeader] || "Leader";
+
+    // Instantly update visual 2-line display box
+    desigBox.innerHTML = designationHtml;
+
+    // Update hidden field for WhatsApp notice & Backend Save
+    if (hiddenDesig) {
+        hiddenDesig.value = designationHtml.replace(/<br\s*[\/]?>/gi, " - ");
+    }
+
+    // Live update WhatsApp broadcast message box
+    updateLiveWhatsAppPreview();
+}
+
+// 🌟 Date & Time Direct Click-to-Open Enhancer
+document.addEventListener("DOMContentLoaded", function () {
+    const dateInput = document.getElementById("mtgDate");
+    const timeInput = document.getElementById("mtgTime");
+
+    if (dateInput) {
+        dateInput.addEventListener("click", function () {
+            if (typeof this.showPicker === "function") this.showPicker();
         });
+    }
+    if (timeInput) {
+        timeInput.addEventListener("click", function () {
+            if (typeof this.showPicker === "function") this.showPicker();
+        });
+    }
+});
 
-        // Hide specific standalone sections
-        const mtgSec = document.getElementById("meetingsSection");
-        const notifSec = document.getElementById("notificationsSection");
-        const devSec = document.getElementById("underDevSection") || document.getElementById("devSection");
-        
-        if (mtgSec) mtgSec.style.display = "none";
-        if (notifSec) notifSec.style.display = "none";
-        if (devSec) devSec.style.display = "none";
-
-        // Call original router for core pages (Home, Membership, Donations, etc.)
-        prevShowPageMtg(page);
-
-        // Display matching new view cleanly
-        if (page === "meetings") {
-            // Re-hide any stray sections and display only Meetings
-            document.querySelectorAll("#contentArea > section").forEach(function (sec) {
-                sec.style.display = "none";
-            });
-            if (mtgSec) mtgSec.style.display = "block";
-            loadMeetingsList();
-            closeMoreDropdownMenu();
-        } else if (page === "notifications") {
-            document.querySelectorAll("#contentArea > section").forEach(function (sec) {
-                sec.style.display = "none";
-            });
-            if (notifSec) notifSec.style.display = "block";
-            loadNotificationsList();
-            closeMoreDropdownMenu();
+// 2. Setup Live Preview Listeners with New Dropdown
+function setupLiveWhatsAppPreviewListeners() {
+    const formFields = ["mtgTitle", "mtgType", "mtgDate", "mtgTime", "mtgIssuerSelect", "mtgAdditionalMessage"];
+    formFields.forEach(id => {
+        const el = document.getElementById(id);
+        if (el && !el.dataset.listenerBound) {
+            el.addEventListener("input", updateLiveWhatsAppPreview);
+            el.addEventListener("change", updateLiveWhatsAppPreview);
+            el.dataset.listenerBound = "true";
         }
+    });
+
+    const agendaInputs = document.querySelectorAll(".agenda-point-input");
+    agendaInputs.forEach(inp => {
+        if (!inp.dataset.listenerBound) {
+            inp.addEventListener("input", updateLiveWhatsAppPreview);
+            inp.dataset.listenerBound = "true";
+        }
+    });
+}
+
+function updateLiveWhatsAppPreview() {
+    const previewEl = document.getElementById("mtgLiveWaNoticePreview");
+    if (!previewEl) return;
+
+    const issuerSelect = document.getElementById("mtgIssuerSelect");
+    const issuerName = issuerSelect ? issuerSelect.value : "Sri T. Sambasiva Rao";
+    const issuerDesig = document.getElementById("mtgIssuerDesig") ? document.getElementById("mtgIssuerDesig").value : "State President";
+
+    const mtgData = {
+        title: (document.getElementById("mtgTitle") || {}).value || "State Executive Committee Emergency Review",
+        meetingType: (document.getElementById("mtgType") || {}).value || "State Executive Committee",
+        date: (document.getElementById("mtgDate") || {}).value || new Date().toISOString().split("T")[0],
+        time: (document.getElementById("mtgTime") || {}).value || "10:30 AM",
+        issuedByName: issuerName,
+        issuedByDesig: issuerDesig,
+        additionalMessage: (document.getElementById("mtgAdditionalMessage") || {}).value || "",
+        agenda: getEnteredAgendaPoints()
     };
+
+    previewEl.textContent = generateWhatsAppNoticeText(mtgData);
 }
 
-function closeMoreDropdownMenu() {
-    const dropdown = document.getElementById("moreDropdown");
-    if (dropdown) dropdown.classList.remove("show");
-}
-
-// 2. Toggle Schedule Meeting Form Card
+// 3. Toggle Schedule Meeting Form Card
 function toggleScheduleMeetingForm() {
     const card = document.getElementById("scheduleMeetingCard");
     if (!card) return;
@@ -5385,7 +5369,7 @@ function toggleScheduleMeetingForm() {
     }
 }
 
-// 3. Dynamic Agenda Points Builder Logic
+// 4. Dynamic Agenda Points Builder Logic
 function addAgendaPointField() {
     const container = document.getElementById("agendaFieldsContainer");
     if (!container) return;
@@ -5439,7 +5423,7 @@ function getEnteredAgendaPoints() {
     return points;
 }
 
-// 4. Live WhatsApp Meeting Notice Generator
+// 5. Live WhatsApp Meeting Notice Generator
 function setupLiveWhatsAppPreviewListeners() {
     const formFields = ["mtgTitle", "mtgType", "mtgDate", "mtgTime", "mtgIssuerName", "mtgIssuerDesig", "mtgAdditionalMessage"];
     formFields.forEach(id => {
@@ -5512,16 +5496,12 @@ function updateLiveWhatsAppPreview() {
     previewEl.textContent = generateWhatsAppNoticeText(mtgData);
 }
 
-/* ==========================================================
-   MEETINGS, AGENDA BUILDER & NOTIFICATIONS CONTROLLER (COMPLETED)
-   ========================================================== */
-
-// 5. Submit New Meeting Form (Sync with Google Apps Script)
+// 6. Submit New Meeting Form (Sync with Google Apps Script)
 async function submitNewMeeting(event) {
     if (event) event.preventDefault();
 
     const submitBtn = document.getElementById("btnSubmitMeeting");
-    const originalBtnHtml = submitBtn ? submitBtn.innerHTML : "Schedule & Broadcast Meeting";
+    const originalBtnHtml = submitBtn ? submitBtn.innerHTML : "Schedule & Broadcast";
     if (submitBtn) {
         submitBtn.disabled = true;
         submitBtn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> Broadcasting Meeting...`;
@@ -5572,26 +5552,39 @@ async function submitNewMeeting(event) {
     }
 }
 
-// 6. Switch Meeting Filter Tabs (Upcoming / Live / Past)
+// 7. Switch Meeting Filter Tabs (Upcoming / Live / Past)
 function switchMeetingTab(tabType) {
     activeMeetingTab = tabType;
 
     const tabs = document.querySelectorAll(".mtg-tab-btn");
     tabs.forEach(t => t.classList.remove("active"));
 
-    // Find clicked tab
     const activeTabBtn = Array.from(tabs).find(b => b.getAttribute("onclick") && b.getAttribute("onclick").includes(tabType));
     if (activeTabBtn) activeTabBtn.classList.add("active");
 
     renderMeetingsList();
 }
 
-// 7. Fetch Meetings List from Google Apps Script
+// 8. Sync Meetings Statistics Counters
+function updateMeetingsMetrics(meetings) {
+    if (!Array.isArray(meetings)) return;
+    const total = meetings.length;
+    const core = meetings.filter(m => (m.targetGroup || "").includes("Core") || (m.meetingType || "").includes("Core")).length;
+    const ec = meetings.filter(m => (m.targetGroup || "").includes("State") || (m.meetingType || "").includes("State")).length;
+    const lastMtg = meetings[0] ? meetings[0].date : "-";
+
+    if (document.getElementById("mtgTotalCount")) document.getElementById("mtgTotalCount").textContent = total;
+    if (document.getElementById("mtgCoreCount")) document.getElementById("mtgCoreCount").textContent = core;
+    if (document.getElementById("mtgEcCount")) document.getElementById("mtgEcCount").textContent = ec;
+    if (document.getElementById("mtgLastDate")) document.getElementById("mtgLastDate").textContent = lastMtg;
+}
+
+// 9. Fetch Meetings List from Google Apps Script
 async function loadMeetingsList() {
     const container = document.getElementById("meetingsCardsGrid");
     if (!container) return;
 
-    container.innerHTML = `<div class="mtg-loading-placeholder"><i class="fa-solid fa-circle-notch fa-spin"></i> Loading meetings...</div>`;
+    container.innerHTML = `<div class="mtg-loading-placeholder"><i class="fa-solid fa-circle-notch fa-spin"></i> Loading official meetings...</div>`;
 
     try {
         const targetUrl = typeof BACKEND_URL !== "undefined" ? BACKEND_URL : "https://script.google.com/macros/s/AKfycbyoBv4TQ28mb7HIsTQ42iEe7P-3Yqs-7lR5tHhHqk0RqCQOShGrLBVPvD4j2ZUV1Q/exec";
@@ -5602,21 +5595,24 @@ async function loadMeetingsList() {
             cachedMeetings = result.meetings;
             renderMeetingsList();
         } else {
-            container.innerHTML = `<p style="font-size:12px; color:#64748b; text-align:center; padding:20px;">No official meetings found.</p>`;
+            container.innerHTML = `<p style="font-size:12px; color:#64748b; text-align:center; padding:20px;">No official meetings scheduled at this time.</p>`;
+            updateMeetingsMetrics([]);
         }
     } catch (err) {
         console.error("Load Meetings Error:", err);
-        container.innerHTML = `<p style="font-size:12px; color:#dc2626; text-align:center; padding:20px;">Unable to load meetings. Please check internet connection.</p>`;
+        container.innerHTML = `<p style="font-size:12px; color:#dc2626; text-align:center; padding:20px;">Unable to load meetings. Please check connection.</p>`;
     }
 }
 
-// 8. Render Filtered Meetings
+// 10. Render Filtered Meetings Cards
 function renderMeetingsList() {
     const container = document.getElementById("meetingsCardsGrid");
     if (!container) return;
 
+    updateMeetingsMetrics(cachedMeetings);
+
     if (!cachedMeetings || cachedMeetings.length === 0) {
-        container.innerHTML = `<p style="font-size:12px; color:#64748b; text-align:center; padding:20px;">No meetings available.</p>`;
+        container.innerHTML = `<p style="font-size:12px; color:#64748b; text-align:center; padding:20px;">No meetings scheduled at this time.</p>`;
         return;
     }
 
@@ -5628,7 +5624,7 @@ function renderMeetingsList() {
     });
 
     if (filtered.length === 0) {
-        container.innerHTML = `<p style="font-size:12px; color:#64748b; text-align:center; padding:20px;">No ${activeMeetingTab} meetings at this moment.</p>`;
+        container.innerHTML = `<p style="font-size:12px; color:#64748b; text-align:center; padding:20px;">No ${activeMeetingTab} meetings found.</p>`;
         return;
     }
 
@@ -5641,7 +5637,7 @@ function renderMeetingsList() {
 
         const agendaItems = Array.isArray(mtg.agenda) && mtg.agenda.length > 0
             ? `<div class="mtg-agenda-preview-box">
-                 <div class="mtg-agenda-heading"><i class="fa-solid fa-list-ol"></i> Agenda:</div>
+                 <div class="mtg-agenda-heading"><i class="fa-solid fa-list-ol"></i> Agenda Points:</div>
                  <ul class="mtg-agenda-items">
                    ${mtg.agenda.map(a => `<li>${a}</li>`).join("")}
                  </ul>
@@ -5649,6 +5645,7 @@ function renderMeetingsList() {
             : "";
 
         const waText = encodeURIComponent(generateWhatsAppNoticeText(mtg));
+        const confUrl = `https://meet.jit.si/${mtg.roomCode || 'ARPEU-UNION-2026'}`;
 
         html += `
           <div class="mtg-card">
@@ -5672,11 +5669,11 @@ function renderMeetingsList() {
 
             <div class="mtg-card-actions">
               <a href="https://wa.me/?text=${waText}" target="_blank" class="btn-mtg-action btn-mtg-wa">
-                <i class="fa-brands fa-whatsapp"></i> Share Notice
+                <i class="fa-brands fa-whatsapp"></i> Broadcast Notice
               </a>
-              <button type="button" class="btn-mtg-action btn-mtg-join" onclick="alert('Meeting Room (${mtg.roomCode}) will go live during scheduled time.')">
+              <a href="${confUrl}" target="_blank" class="btn-mtg-action btn-mtg-join">
                 <i class="fa-solid fa-video"></i> Join Conference
-              </button>
+              </a>
             </div>
           </div>
         `;
@@ -5685,63 +5682,77 @@ function renderMeetingsList() {
     container.innerHTML = html;
 }
 
-// 9. Load Notifications List from Google Apps Script
+/// 11. Load Notifications List with Smart Container Sync
 async function loadNotificationsList() {
-    const container = document.getElementById("notificationsContainer");
-    if (!container) return;
+    // 1. Sync live pending profile and document counts
+    if (typeof syncLiveNotificationCounts === "function") {
+        syncLiveNotificationCounts();
+    }
 
-    container.innerHTML = `<div class="notif-loading-placeholder"><i class="fa-solid fa-circle-notch fa-spin"></i> Loading notifications...</div>`;
+    // 2. Fetch live meetings to show active meeting alerts inside container
+    const mtgContainer = document.getElementById("notifMeetingsList");
+    if (!mtgContainer) return;
 
     try {
         const targetUrl = typeof BACKEND_URL !== "undefined" ? BACKEND_URL : "https://script.google.com/macros/s/AKfycbyoBv4TQ28mb7HIsTQ42iEe7P-3Yqs-7lR5tHhHqk0RqCQOShGrLBVPvD4j2ZUV1Q/exec";
-        const response = await fetch(`${targetUrl}?action=getNotifications`);
+        const response = await fetch(`${targetUrl}?action=getMeetings`);
         const result = await response.json();
 
-        if (result && result.success && Array.isArray(result.notifications)) {
-            if (result.notifications.length === 0) {
-                container.innerHTML = `<p style="font-size:12px; color:#64748b; text-align:center; padding:20px;"><i class="fa-solid fa-bell-slash"></i> No notifications at this time.</p>`;
-                return;
-            }
-
+        if (result && result.success && Array.isArray(result.meetings) && result.meetings.length > 0) {
             let html = "";
-            result.notifications.forEach(notif => {
-                const unreadClass = notif.isRead ? "" : "unread";
+            result.meetings.slice(0, 2).forEach(mtg => {
                 html += `
-                  <div class="notif-card ${unreadClass}">
-                    <div class="notif-icon-col">
-                      <i class="fa-solid ${notif.category === 'Meeting' ? 'fa-video' : 'fa-bullhorn'}"></i>
-                    </div>
-                    <div class="notif-content-col">
-                      <div class="notif-card-header">
-                        <span class="notif-category">${notif.category || 'General'}</span>
-                        <span class="notif-time">${notif.createdAt ? new Date(notif.createdAt).toLocaleDateString('en-GB') : 'Today'}</span>
-                      </div>
-                      <h4 class="notif-title">${notif.title}</h4>
-                      <p class="notif-message">${notif.message}</p>
-                      ${notif.actionType === 'JOIN_MEETING' ? `
-                        <button type="button" class="btn-notif-action" onclick="showPage('meetings')">
-                          <i class="fa-solid fa-arrow-right"></i> View Meeting Details
-                        </button>
-                      ` : ''}
+                  <div class="notif-item-row">
+                    <div class="notif-item-icon meeting-icon"><i class="fa-solid fa-video"></i></div>
+                    <div class="notif-item-info">
+                      <strong>${mtg.title}</strong>
+                      <p>${mtg.meetingType} • Date: ${mtg.date} at ${mtg.time}</p>
+                      <button type="button" class="btn-notif-mini" onclick="showPage('meetings')">
+                        <i class="fa-solid fa-arrow-right"></i> View Agenda & Join
+                      </button>
                     </div>
                   </div>
                 `;
             });
-            container.innerHTML = html;
-        } else {
-            container.innerHTML = `<p style="font-size:12px; color:#64748b; text-align:center; padding:20px;">No notifications found.</p>`;
+            mtgContainer.innerHTML = html;
+            const badge = document.getElementById("notifMtgCountBadge");
+            if (badge) badge.textContent = `${result.meetings.length} Scheduled`;
         }
-    } catch (err) {
-        console.error("Load Notifications Error:", err);
-        container.innerHTML = `<p style="font-size:12px; color:#dc2626; text-align:center; padding:20px;">Unable to load notifications.</p>`;
+    } catch (e) {
+        console.warn("Meeting notification sync skipped:", e);
     }
 }
 
-// 10. Mark All Notifications as Read Action
-function markAllNotificationsAsRead() {
-    const cards = document.querySelectorAll(".notif-card.unread");
-    cards.forEach(c => c.classList.remove("unread"));
-    const badge = document.getElementById("navNotificationsBadge");
-    if (badge) badge.style.display = "none";
-    alert("✔ All notifications marked as read.");
-}
+
+/* ==========================================================
+   INSTANT DIRECT CALLING PODS (4 TEST CADRE ENGINE)
+   ========================================================== */
+
+const coreCommitteeTestCadre = [
+    { name: "Sri P. Balakrishna", mobile: "9642788786" },
+    { name: "Sri L. Prasadu", mobile: "9110771171" },
+    { name: "Sri R. Ravi", mobile: "9985333734" },
+    { name: "Sri P. Balakrishna", mobile: "9393788785" }
+];
+
+function launchInstantConference(committeeName, mode) {
+    const isVideo = (mode === 'video');
+    const roomCode = `ARPEU-CORE-COMM-${Math.floor(100 + Math.random() * 900)}`;
+    const roomUrl = `https://meet.jit.si/${roomCode}#config.startWithVideoMuted=${!isVideo}&config.prejoinPageEnabled=false`;
+
+    const cadreListText = coreCommitteeTestCadre.map((c, i) => `${i + 1}. ${c.name} (${c.mobile})`).join("\n");
+
+    const confirmMsg = 
+`⚡ ARPEU ${committeeName.toUpperCase()} ${mode.toUpperCase()} CONFERENCE ⚡
+
+Calling the following leaders:
+${cadreListText}
+
+Would you like to start the conference room now?`;
+
+    if (confirm(confirmMsg)) {
+        // 1. Launch Conference in New High-Speed Tab
+        window.open(roomUrl, "_blank");
+
+        // 2. Generate WhatsApp One-Tap Broadcast for all 4 Leaders
+        const waNotice
