@@ -63,7 +63,7 @@ a {
 /* Desktop and Tablet Responsive Centered View */
 @media screen and (min-width: 768px) {
     .app-container {
-        max-width: 480px;
+        max-width: 392px;
         height: 100vh;
         margin: auto;
         box-shadow: var(--shadow);
@@ -524,7 +524,7 @@ white-space:nowrap;
 RESPONSIVE
 =========================================*/
 
-@media (max-width:480px){
+@media (max-width:392px){
 
 .header-top{
 height:64px;
@@ -1171,7 +1171,7 @@ margin-top:15px;
     border-bottom-color:rgba(142,36,170,.18);
 }
 
-@media(max-width:480px){
+@media(max-width:382px){
 
     .statistics-page{
         padding:16px 12px;
@@ -1436,7 +1436,7 @@ margin-top:15px;
    MOBILE
 =========================================== */
 
-@media(max-width:480px){
+@media(max-width:382px){
 
     .company-title{
         font-size:16px;
@@ -1973,7 +1973,7 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 
 .receipt-container {
     width: 100%;
-    max-width: 480px;
+    max-width: 382px;
     margin: 10px auto;
     padding: 0 10px 20px 10px !important; /* Left & Right equal 10px buffer to prevent clipping */
     box-sizing: border-box;
@@ -2510,7 +2510,7 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 ========================================= */
 .profile-page {
     width: 100%;
-    max-width: 480px;
+    max-width: 392px;
     margin: 0 auto;
     padding: 12px;
     box-sizing: border-box;
@@ -4186,7 +4186,7 @@ DOWNLOADS & RESOURCES SECTION STYLES
     gap: 3px;
 }
 
-/* 3. Grid Configurations (Responsive inside 480px) */
+/* 3. Grid Configurations (Responsive inside 392px) */
 .dl-grid-2col {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -4579,7 +4579,7 @@ DOWNLOADS & RESOURCES SECTION STYLES
 .dl-modal-container {
     background: #ffffff;
     width: 100%;
-    max-width: 360px;
+    max-width: 392px;
     border-radius: 16px;
     overflow: hidden;
     display: flex;
@@ -5645,7 +5645,7 @@ NEW QUICK LINKS INTEGRATED CARD STYLES
 
 .admin-page {
     padding: 10px 12px 30px 12px;
-    max-width: 480px;
+    max-width: 392px;
     margin: 0 auto;
     box-sizing: border-box;
 }
@@ -5867,176 +5867,13 @@ NEW QUICK LINKS INTEGRATED CARD STYLES
    ARPEU NATIVE WebRTC CONFERENCING ENGINE STYLES (IN-HOUSE 60-CAPACITY)
    ========================================================================== */
 
-/* Full Screen Incoming Ringing Call Overlay */
-.incoming-call-overlay {
+.arpeu-call-modal-overlay {
     position: fixed;
     inset: 0;
     width: 100vw;
     height: 100dvh;
-    background: radial-gradient(circle at center, #0e274c 0%, #030b17 100%);
-    z-index: 999999;
-    display: none; /* Hidden by default */
-    justify-content: center;
-    align-items: center;
-    padding: 20px;
-}
-
-.incoming-call-box {
-    width: 100%;
-    max-width: 380px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-}
-
-.incoming-caller-header {
-    margin-bottom: 25px;
-}
-
-.incoming-badge-pulse {
-    background: rgba(40, 167, 69, 0.25);
-    border: 1px solid #28a745;
-    color: #00ff73;
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: 1px;
-    padding: 6px 14px;
-    border-radius: 20px;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    animation: pulseBadge 1.2s infinite;
-}
-
-@keyframes pulseBadge {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.7; transform: scale(0.96); }
-}
-
-/* Pulsating ARPEU Crest Logo */
-.incoming-logo-wrapper {
-    position: relative;
-    width: 130px;
-    height: 130px;
-    margin-bottom: 25px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.logo-ring-pulse {
-    position: absolute;
-    inset: -10px;
-    border-radius: 50%;
-    border: 2px solid #00e676;
-    animation: ringPulse 1.5s infinite;
-    pointer-events: none;
-}
-
-@keyframes ringPulse {
-    0% { transform: scale(0.85); opacity: 1; }
-    100% { transform: scale(1.35); opacity: 0; }
-}
-
-.incoming-caller-logo {
-    width: 110px;
-    height: 110px;
-    border-radius: 50%;
-    object-fit: cover;
-    background: #fff;
-    padding: 6px;
-    box-shadow: 0 0 30px rgba(0, 230, 118, 0.4);
-    border: 3px solid #0b4ea2;
-}
-
-.incoming-call-info {
-    margin-bottom: 40px;
-}
-
-.caller-union-title {
-    color: #ff9800;
-    font-size: 15px;
-    font-weight: 700;
-    letter-spacing: 1px;
-    margin: 0 0 6px 0;
-}
-
-.caller-meeting-name {
-    color: #ffffff;
-    font-size: 20px;
-    font-weight: 700;
-    margin: 0 0 8px 0;
-    line-height: 1.3;
-}
-
-.caller-status-text {
-    color: #a0aec0;
-    font-size: 14px;
-    font-weight: 500;
-    margin: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    animation: pulseBadge 1s infinite alternate;
-}
-
-/* Accept & Decline Buttons */
-.incoming-action-buttons {
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    width: 100%;
-    padding: 0 10px;
-}
-
-.btn-call-decline, .btn-call-accept {
-    width: 76px;
-    height: 76px;
-    border-radius: 50%;
-    border: none;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 4px;
-    color: #fff;
-    cursor: pointer;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.5);
-    transition: transform 0.2s;
-}
-
-.btn-call-decline {
-    background: linear-gradient(135deg, #e53935, #c62828);
-}
-
-.btn-call-accept {
-    background: linear-gradient(135deg, #00e676, #00c853);
-    animation: acceptShake 1s infinite;
-}
-
-@keyframes acceptShake {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.08); box-shadow: 0 0 30px #00e676; }
-}
-
-.btn-call-decline i, .btn-call-accept i {
-    font-size: 24px;
-}
-
-.btn-call-decline span, .btn-call-accept span {
-    font-size: 10px;
-    font-weight: 700;
-}
-
-.arpeu-call-modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100dvh;
-    background: #020b18;
+    background: rgba(2, 6, 15, 0.85);
+    backdrop-filter: blur(15px);
     z-index: 99999;
     display: flex;
     justify-content: center;
@@ -6057,122 +5894,124 @@ NEW QUICK LINKS INTEGRATED CARD STYLES
 
 @media (min-width: 768px) {
     .arpeu-call-container {
-        max-width: 480px;
-        box-shadow: 0 0 40px rgba(0,0,0,0.8);
+        max-width: 392px !important;
+        max-height: 94vh !important;
+        border-radius: 28px !important;
+        border: 2px solid rgba(255, 255, 255, 0.15) !important;
+        box-shadow: 0 0 50px rgba(0, 0, 0, 0.8) !important;
     }
 }
 
-/* Call Header HUD */
+/* 1. TOP HEADER (2-LINE METADATA + TOP ACTION BUTTONS STRIP) */
 .arpeu-call-header {
-    min-height: 58px;
     background: rgba(7, 21, 43, 0.98);
     backdrop-filter: blur(12px);
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 6px 10px;
+    flex-direction: column;
+    padding: 8px 10px 6px 10px;
     z-index: 30;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
-    gap: 8px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    gap: 6px;
     flex-shrink: 0;
 }
 
-.call-header-left {
+.call-header-meta {
     display: flex;
-    flex-direction: column;
-    justify-content: center;
-    min-width: 110px;
-    text-align: left;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
 }
 
-.call-title-wrap h4 {
+.call-meeting-title {
     margin: 0;
     color: #ffffff;
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 700;
-    line-height: 1.2;
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-.call-room-code {
-    font-size: 10px;
-    color: #ff9800;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-}
-
-.call-header-right {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    flex-wrap: nowrap;
-}
-
-.live-rec-badge {
-    background: #dc3545;
-    color: #fff;
-    font-size: 10px;
+.call-room-code-badge {
+    color: #ff9800; /* Saffron/Orange */
+    font-size: 11px;
     font-weight: 700;
-    padding: 4px 6px;
-    border-radius: 6px;
+    white-space: nowrap !important; /* STRICT SINGLE LINE */
+    letter-spacing: 0.5px;
+    font-family: monospace;
+}
+
+/* Top Action Buttons Strip */
+.call-top-actions-strip {
     display: flex;
     align-items: center;
     gap: 4px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    padding-bottom: 2px;
 }
 
-.live-count-badge {
-    background: rgba(255, 255, 255, 0.12);
-    border: 1px solid rgba(255, 255, 255, 0.25);
-    color: #00ff73;
-    font-size: 11px;
-    font-weight: 700;
-    padding: 4px 6px;
-    border-radius: 6px;
-    display: flex;
-    align-items: center;
-    gap: 3px;
+.call-top-actions-strip::-webkit-scrollbar {
+    display: none;
 }
 
-.call-hud-btn {
-    background: rgba(255, 255, 255, 0.15);
-    border: 1px solid rgba(255, 255, 255, 0.25);
-    color: #fff;
-    font-size: 11px;
+.call-hud-pill {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    color: #ffffff;
+    font-size: 10.5px;
     font-weight: 600;
-    padding: 4px 7px;
-    border-radius: 6px;
+    padding: 5px 8px;
+    border-radius: 8px;
     cursor: pointer;
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    gap: 3px;
+    gap: 4px;
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 
-.call-hud-btn.recording-active {
+.call-hud-pill.online-pill {
+    background: rgba(16, 185, 129, 0.18);
+    border-color: #10b981;
+    color: #10b981;
+    font-weight: 700;
+    cursor: default;
+}
+
+.call-hud-pill.drive-pill {
+    border-color: rgba(255, 193, 7, 0.4);
+}
+
+.call-hud-pill.rec-pill.recording-active {
     background: #dc3545 !important;
+    border-color: #ff4d5e !important;
     color: #fff !important;
     animation: pulseLive 1s infinite alternate;
 }
 
-.call-hud-close {
+.call-hud-close-btn {
     background: rgba(220, 53, 69, 0.9);
     border: none;
     color: #fff;
-    width: 28px;
-    height: 28px;
+    width: 26px;
+    height: 26px;
     border-radius: 50%;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 13px;
+    font-size: 12px;
+    flex-shrink: 0;
+    margin-left: auto;
 }
 
-/* Main Viewport Stage */
+/* 2. MAIN VIEWPORT & ACTIVE SPEAKER STAGE */
 .arpeu-main-viewport {
     flex: 1;
     min-height: 0;
     position: relative;
-    background: #000;
+    background: #020914;
     overflow: hidden;
     display: flex;
     align-items: center;
@@ -6196,30 +6035,340 @@ NEW QUICK LINKS INTEGRATED CARD STYLES
     display: block;
 }
 
-.speaker-info-pill {
+/* TARGETED PRIVATE HOST INSTRUCTION HUD (GLOWING TOP-CENTER OVERLAY) */
+.private-host-directive-banner {
+    position: absolute;
+    top: 15px;
+    left: 12px;
+    right: 12px;
+    background: rgba(15, 23, 42, 0.96);
+    border: 2px solid #ff9800;
+    border-radius: 12px;
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 0 25px rgba(255, 152, 0, 0.5);
+    z-index: 50;
+    animation: bounceIn 0.4s ease;
+}
+
+.directive-content {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.directive-icon {
+    font-size: 18px;
+    animation: pulseLive 1s infinite;
+}
+
+.directive-text-wrap {
+    display: flex;
+    flex-direction: column;
+}
+
+.directive-tag {
+    color: #ff9800;
+    font-size: 9.5px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+}
+
+.directive-msg {
+    margin: 0;
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+.btn-dismiss-directive {
+    background: rgba(255, 255, 255, 0.15);
+    border: none;
+    color: #cbd5e1;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* TOP-RIGHT HOST MAGIC BALL & SLIDING DRAWER */
+.host-magic-ball-wrap {
+    position: absolute;
+    top: 14px;
+    right: 10px;
+    z-index: 45;
+    display: flex;
+    align-items: center;
+}
+
+.host-magic-ball-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #f57c00, #ff9800);
+    border: 1.5px solid #ffffff;
+    color: #ffffff;
+    font-size: 13px;
+    cursor: pointer;
+    box-shadow: 0 0 15px rgba(245, 124, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease;
+}
+
+.host-magic-ball-btn:active {
+    transform: scale(0.9);
+}
+
+.host-magic-drawer {
+    position: absolute;
+    top: 40px;
+    right: 0;
+    background: #0d1e38;
+    border: 1.5px solid #ff9800;
+    border-radius: 12px;
+    padding: 8px;
+    width: 160px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.9);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    z-index: 50;
+}
+
+.magic-drawer-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 4px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.magic-drawer-header h6 {
+    margin: 0;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.magic-drawer-header button {
+    background: none;
+    border: none;
+    color: #aaa;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.magic-tool-item {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 6px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    text-align: left;
+}
+
+.magic-tool-item:hover {
+    background: rgba(245, 124, 0, 0.25);
+}
+
+/* LIVE NOTEPAD STAGE */
+.live-notepad-stage {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    bottom: 70px;
+    background: rgba(13, 27, 49, 0.96);
+    border: 2px solid #ff9800;
+    border-radius: 14px;
+    z-index: 40;
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.9);
+}
+
+.notepad-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.btn-close-notepad {
+    background: #dc3545;
+    border: none;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.notepad-textarea {
+    flex: 1;
+    width: 100%;
+    background: #061020;
+    border: 1px solid #1e2e4a;
+    border-radius: 8px;
+    color: #ffffff;
+    font-family: 'Poppins', sans-serif;
+    font-size: 13px;
+    padding: 10px;
+    resize: none;
+    line-height: 1.4;
+}
+
+/* DYNAMIC ACTIVE SPEAKER IDENTITY RIBBON (EXTREME LEFT AVATAR + 10px GAP + 3 LINES) */
+.speaker-identity-ribbon {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    right: 10px;
+    height: 54px !important;
+    background: rgba(7, 21, 43, 0.92) !important;
+    backdrop-filter: blur(12px);
+    border: 1.5px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    padding: 5px 10px !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: flex-start !important; /* Forces Far Left Alignment */
+    gap: 12px !important; /* 12px Clean Gap Between Photo and Text */
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.8);
+    z-index: 20;
+    max-width: calc(100% - 20px);
+    overflow: hidden;
+}
+
+/* Revenue Stamp Photo (Locked on Extreme Left) */
+.ribbon-avatar-box {
+    width: 36px !important;
+    height: 42px !important;
+    max-width: 36px !important;
+    max-height: 42px !important;
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1.5px solid #ff9800; /* Gold Saffron Border */
+    flex-shrink: 0 !important;
+    background: #0b1d3a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 !important;
+}
+
+.ribbon-avatar-img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    display: block;
+}
+
+/* 3-Line Crisp Text Column */
+.ribbon-text-col {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: flex-start !important;
+    text-align: left !important;
+    gap: 1px;
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.ribbon-name {
+    color: #ffffff !important;
+    font-size: 13px !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.4px;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-transform: uppercase;
+}
+
+.ribbon-desig {
+    color: #ff9800 !important; /* Saffron/Orange */
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.ribbon-unit {
+    color: #cbd5e1 !important;
+    font-size: 10px !important;
+    font-weight: 500 !important;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* DYNAMIC ACTIVE SPEAKER IDENTITY RIBBON (BOTTOM OF VIDEO SCREEN) */
+.speaker-identity-ribbon {
     position: absolute;
     bottom: 12px;
     left: 12px;
-    background: rgba(0, 0, 0, 0.85);
-    backdrop-filter: blur(8px);
-    padding: 6px 12px;
-    border-radius: 20px;
+    right: 12px;
+    background: linear-gradient(180deg, rgba(7, 21, 43, 0.6) 0%, rgba(3, 10, 22, 0.92) 100%);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    padding: 8px 12px;
     display: flex;
-    align-items: center;
-    gap: 8px;
-    color: #fff;
-    font-size: 12px;
-    font-weight: 600;
-    border: 1px solid rgba(255, 255, 255, 0.25);
+    flex-direction: column;
+    gap: 2px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6);
     z-index: 10;
+    max-width: calc(100% - 24px);
 }
 
-.speaker-role-badge {
-    background: #f57c00;
-    padding: 2px 6px;
-    border-radius: 6px;
-    font-size: 10px;
+.ribbon-name {
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    line-height: 1.2;
+    text-transform: uppercase;
+}
+
+.ribbon-desig {
+    color: #ff9800; /* Saffron/Orange */
+    font-size: 11.5px;
     font-weight: 700;
+    line-height: 1.2;
+}
+
+.ribbon-unit {
+    color: #cbd5e1;
+    font-size: 10.5px;
+    font-weight: 500;
+    line-height: 1.2;
 }
 
 .stage-hand-alert {
@@ -6231,32 +6380,271 @@ NEW QUICK LINKS INTEGRATED CARD STYLES
     border: 2px solid #ffc107;
     padding: 8px 16px;
     border-radius: 25px;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 700;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
     box-shadow: 0 0 20px rgba(255, 193, 7, 0.4);
     z-index: 25;
 }
 
 .hand-alert-icon {
     color: #ffc107;
-    font-size: 18px;
+    font-size: 16px;
 }
 
-.stage-hand-alert span {
-    color: #ffffff;
+/* 3. SHOW FILES / DOCUMENT PROJECTOR STAGE */
+.doc-projector-stage {
+    position: absolute;
+    inset: 0;
+    background: #090d16;
+    z-index: 15;
+    display: flex;
+    flex-direction: column;
 }
 
-/* Horizontal Cadre Carousel (Pinned Bottom) */
+.projector-toolbar {
+    min-height: 48px;
+    background: #111827;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 10px;
+    border-bottom: 1px solid #1f2937;
+}
+
+.projector-info {
+    color: #f3f4f6;
+    font-size: 12px;
+    font-weight: 700;
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    max-width: 55%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.projector-controls {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.projector-controls button {
+    min-width: 36px;
+    height: 36px;
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    color: #fff;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-stop-projection {
+    background: #dc3545 !important;
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    padding: 0 10px !important;
+    gap: 4px;
+}
+
+.projector-canvas-wrapper {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: auto;
+    background: #050810;
+    padding: 8px;
+}
+
+.projector-canvas-wrapper img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    transition: transform 0.2s ease;
+}
+
+/* 4. DUAL-TAB AGENDA & LIVE RESOLUTION HUD */
+.agenda-hud-floating {
+    position: absolute !important;
+    top: 10px !important;
+    left: 8px !important;
+    right: 8px !important;
+    width: auto !important;
+    max-height: 85% !important;
+    background: #0b1528 !important;
+    border: 1.5px solid #1e293b !important;
+    border-radius: 16px !important;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.95) !important;
+    z-index: 100 !important;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.agenda-hud-header {
+    background: linear-gradient(135deg, #1e293b, #0f172a);
+    padding: 10px 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #334155;
+}
+
+.agenda-hud-header h5 {
+    margin: 0;
+    color: #f8fafc;
+    font-size: 14px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.agenda-hud-minimize {
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: #cbd5e1;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+/* Dual Agenda Tabs */
+.agenda-tabs-bar {
+    display: flex;
+    background: #070d1a;
+    border-bottom: 1px solid #1e293b;
+}
+
+.agenda-tab-btn {
+    flex: 1;
+    padding: 8px 10px;
+    background: transparent;
+    border: none;
+    color: #94a3b8;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+}
+
+.agenda-tab-btn.active {
+    color: #ff9800;
+    border-bottom: 2px solid #ff9800;
+    background: rgba(255, 152, 0, 0.08);
+}
+
+.agenda-hud-body {
+    padding: 10px;
+    overflow-y: auto;
+    max-height: 320px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background: #0b1528 !important;
+}
+
+/* Structured Agenda & Resolution Card */
+.agenda-card {
+    background: #111d33;
+    border: 1px solid #1e2e4a;
+    border-radius: 12px;
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.agenda-card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.agenda-keyword-badge {
+    background: #1e3a8a;
+    color: #93c5fd;
+    font-size: 10px;
+    font-weight: 800;
+    padding: 2px 8px;
+    border-radius: 4px;
+    letter-spacing: 0.5px;
+}
+
+.agenda-status-pill {
+    font-size: 9.5px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 4px;
+    text-transform: uppercase;
+}
+
+.agenda-status-pill.status-completed { background: #16a34a; color: #fff; }
+.agenda-status-pill.status-process { background: #d97706; color: #fff; }
+.agenda-status-pill.status-pending { background: #dc2626; color: #fff; }
+.agenda-status-pill.status-constituted { background: #2563eb; color: #fff; }
+
+.agenda-card-title {
+    color: #f1f5f9;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+.agenda-resolution-box {
+    background: rgba(16, 185, 129, 0.1);
+    border-left: 3px solid #10b981;
+    padding: 6px 8px;
+    border-radius: 0 6px 6px 0;
+    font-size: 11.5px;
+    color: #a7f3d0;
+    line-height: 1.3;
+}
+
+.btn-add-resolution {
+    background: rgba(255, 152, 0, 0.15);
+    border: 1px dashed #ff9800;
+    color: #ff9800;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 2px;
+    width: fit-content;
+}
+
+.agenda-hud-footer {
+    padding: 8px 10px;
+    text-align: center;
+    background: #070d1a;
+    font-size: 10.5px;
+    color: #94a3b8;
+    border-top: 1px solid #1e293b;
+}
+
+/* 5. BOTTOM TOOLBAR (5 FREQUENT CONTROLS ONLY) */
 .horizontal-cadre-carousel {
-    height: 95px;
+    height: 90px;
     background: #050e1c;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
     overflow-x: auto;
     overflow-y: hidden;
-    padding: 6px 10px;
+    padding: 6px 8px;
     white-space: nowrap;
     flex-shrink: 0;
 }
@@ -6268,8 +6656,8 @@ NEW QUICK LINKS INTEGRATED CARD STYLES
 }
 
 .cadre-thumb-card {
-    width: 74px;
-    height: 82px;
+    width: 70px;
+    height: 78px;
     border-radius: 8px;
     background: #142238;
     position: relative;
@@ -6280,8 +6668,8 @@ NEW QUICK LINKS INTEGRATED CARD STYLES
 }
 
 .cadre-thumb-card.active-speaker {
-    border-color: #28a745 !important;
-    box-shadow: 0 0 10px #28a745;
+    border-color: #10b981 !important;
+    box-shadow: 0 0 10px #10b981;
 }
 
 .cadre-thumb-card video {
@@ -6305,7 +6693,6 @@ NEW QUICK LINKS INTEGRATED CARD STYLES
     color: #fff;
 }
 
-/* Call Controls Toolbar (Pinned Bottom) */
 .arpeu-call-toolbar {
     height: 68px;
     background: #030a14;
@@ -6327,10 +6714,10 @@ NEW QUICK LINKS INTEGRATED CARD STYLES
     align-items: center;
     justify-content: center;
     gap: 3px;
-    width: 50px;
-    height: 50px;
+    width: 54px;
+    height: 52px;
     border-radius: 10px;
-    font-size: 9px;
+    font-size: 9.5px;
     font-weight: 600;
     cursor: pointer;
 }
@@ -6347,133 +6734,6 @@ NEW QUICK LINKS INTEGRATED CARD STYLES
 .tool-btn.btn-end-call {
     background: #dc3545;
     border-color: #dc3545;
-}
-
-
-/* Premium Glassmorphism Agenda HUD Engine */
-.agenda-hud-floating {
-    position: absolute !important;
-    top: 15px !important;
-    left: 10px !important;
-    right: 10px !important;
-    width: auto !important;
-    background: #0f172a !important;
-    border: 1.5px solid #334155 !important;
-    border-radius: 16px !important;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.95) !important;
-    z-index: 100 !important;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-}
-
-.agenda-hud-header {
-    background: linear-gradient(135deg, #1e293b, #0f172a);
-    padding: 12px 16px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid #334155;
-}
-
-.agenda-hud-header h5 {
-    margin: 0;
-    color: #f8fafc;
-    font-size: 15px;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.agenda-hud-minimize {
-    background: rgba(255, 255, 255, 0.1);
-    border: none;
-    color: #cbd5e1;
-    width: 30px;
-    height: 30px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 15px;
-}
-
-.agenda-hud-body {
-    padding: 14px;
-    overflow-y: auto;
-    max-height: 320px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    background: #0f172a !important;
-}
-
-.live-agenda-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px 14px;
-    background: #1e293b;
-    border: 1px solid #334155;
-    border-radius: 12px;
-    font-size: 14px;
-    font-weight: 600;
-    color: #e2e8f0;
-    line-height: 1.4;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-/* 1. Active Discussion Point (Vibrant Glowing Green) */
-.live-agenda-item.active-topic {
-    background: rgba(16, 185, 129, 0.15) !important;
-    border: 2px solid #10b981 !important;
-    color: #ffffff !important;
-    box-shadow: 0 0 15px rgba(16, 185, 129, 0.3) !important;
-}
-
-/* 2. Completed Topic (Clean Blue & Checked) */
-.live-agenda-item.completed-topic {
-    background: rgba(59, 130, 246, 0.12) !important;
-    border: 1.5px solid #3b82f6 !important;
-    color: #93c5fd !important;
-}
-
-/* 3. Status Badges */
-.agenda-status-pill {
-    font-size: 10px;
-    font-weight: 700;
-    padding: 4px 8px;
-    border-radius: 6px;
-    margin-left: auto;
-    text-transform: uppercase;
-    white-space: nowrap;
-    letter-spacing: 0.5px;
-}
-
-.agenda-status-pill.pill-active {
-    background: #10b981;
-    color: #ffffff;
-    box-shadow: 0 0 8px #10b981;
-}
-
-.agenda-status-pill.pill-done {
-    background: #2563eb;
-    color: #ffffff;
-}
-
-.agenda-status-pill.pill-pending {
-    background: #475569;
-    color: #cbd5e1;
-}
-
-.agenda-hud-footer {
-    padding: 10px 14px;
-    text-align: center;
-    background: #090d16;
-    font-size: 11px;
-    color: #94a3b8;
-    font-weight: 600;
-    border-top: 1px solid #1e293b;
 }
 
 /* ==========================================================
@@ -6814,16 +7074,25 @@ label[for="passportPhoto"] {
 
 .btn-pod-call {
     border: none;
-    border-radius: 6px;
-    padding: 6px 10px;
+    padding: 6px 8px;
+    border-radius: 8px;
     font-size: 11px;
     font-weight: 700;
+    color: #ffffff;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    color: #ffffff;
-    transition: transform 0.15s;
+    white-space: nowrap !important; /* Forces 1 Single Line Always */
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.btn-pod-call.video {
+    background: #0b4ea2;
+}
+
+.btn-pod-call.audio {
+    background: #16a34a;
 }
 
 .btn-pod-call:active { transform: scale(0.95); }
