@@ -6263,3 +6263,92 @@ function dismissPrivateHostDirective() {
     const banner = document.getElementById('privateHostDirectiveBanner');
     if (banner) banner.style.display = 'none';
 }
+
+// ==========================================================================
+// 8 & 17 FIXED MASTER DATA & MANAGE COMMITTEE MEMBERS MODAL CONTROLLER
+// ==========================================================================
+
+const coreCommitteeMasterData = [
+    { id: "CC-01", name: "T. Raghuram", designation: "BMS State President | ARPEU Hon'ble President" },
+    { id: "CC-02", name: "M.V.S. Naidu", designation: "BMS State General Secretary" },
+    { id: "CC-03", name: "K. Lova Reddy", designation: "BMS State Secretary" },
+    { id: "CC-04", name: "T. Sambasiva Rao", designation: "ARPEU State President" },
+    { id: "CC-05", name: "C. Ramagopal Reddy", designation: "ARPEU State General Secretary" },
+    { id: "CC-06", name: "P. Balakrishna", designation: "ARPEU State Treasurer" },
+    { id: "CC-07", name: "K. Jayappa", designation: "ARPEU Working President" },
+    { id: "CC-08", name: "A. Koteswara Rao", designation: "ARPEU Organising Secretary" }
+];
+
+const executiveCommitteeMasterData = [
+    ...coreCommitteeMasterData,
+    { id: "EC-09", name: "A. Lakshumaiah", designation: "APSPDCL Secretary" },
+    { id: "EC-10", name: "P. Prasad", designation: "APCPDCL President" },
+    { id: "EC-11", name: "S. Gurubrahmam", designation: "APCPDCL Secretary" },
+    { id: "EC-12", name: "D. Kiran Kishore", designation: "APEPDCL President" },
+    { id: "EC-13", name: "Antarvedi V. A. Babu", designation: "APEPDCL Secretary" },
+    { id: "EC-14", name: "K. Rajesh", designation: "APTRANSCO President" },
+    { id: "EC-15", name: "N. Dinesh Kumar", designation: "APTRANSCO Secretary" },
+    { id: "EC-16", name: "Ch. Sudhakar", designation: "APGENCO President" },
+    { id: "EC-17", name: "K. Prasad Reddy", designation: "APGENCO Secretary" }
+];
+
+let currentCoreSelectedIds = coreCommitteeMasterData.map(m => m.id);
+let currentExecutiveSelectedIds = executiveCommitteeMasterData.map(m => m.id);
+let activeManagingCommitteeType = 'core';
+
+function openEditMembersModal(committeeType = 'core') {
+    activeManagingCommitteeType = committeeType;
+    const modal = document.getElementById('manageCommitteeMembersModal');
+    const titleEl = document.getElementById('manageModalTitle');
+    const container = document.getElementById('manageMembersListContainer');
+
+    if (!modal || !container) return;
+
+    const isCore = (committeeType === 'core');
+    if (titleEl) {
+        titleEl.textContent = isCore ? 'EDIT CORE COMMITTEE MEMBERS (8)' : 'EDIT EXECUTIVE COMMITTEE MEMBERS (17)';
+    }
+
+    const masterList = isCore ? coreCommitteeMasterData : executiveCommitteeMasterData;
+    const selectedIds = isCore ? currentCoreSelectedIds : currentExecutiveSelectedIds;
+
+    container.innerHTML = masterList.map((member, idx) => {
+        const isChecked = selectedIds.includes(member.id) ? 'checked' : '';
+        return `
+            <label class="manage-member-row" for="chkMember_${member.id}">
+                <input type="checkbox" class="manage-member-checkbox" id="chkMember_${member.id}" value="${member.id}" ${isChecked}>
+                <div class="manage-member-info">
+                    <span class="manage-member-name">${idx + 1}. ${member.name}</span>
+                    <span class="manage-member-desig">${member.designation}</span>
+                </div>
+            </label>
+        `;
+    }).join('');
+
+    modal.style.display = 'flex';
+}
+
+function closeEditMembersModal() {
+    const modal = document.getElementById('manageCommitteeMembersModal');
+    if (modal) modal.style.display = 'none';
+}
+
+function saveMeetingAttendeesSelection() {
+    const isCore = (activeManagingCommitteeType === 'core');
+    const checkboxes = document.querySelectorAll('.manage-member-checkbox:checked');
+    const updatedSelectedIds = Array.from(checkboxes).map(chk => chk.value);
+
+    if (updatedSelectedIds.length === 0) {
+        alert("Please select at least 1 leader to participate in the meeting.");
+        return;
+    }
+
+    if (isCore) {
+        currentCoreSelectedIds = updatedSelectedIds;
+    } else {
+        currentExecutiveSelectedIds = updatedSelectedIds;
+    }
+
+    closeEditMembersModal();
+    alert(`Calling list updated! (${updatedSelectedIds.length} leaders selected for this session).`);
+}
