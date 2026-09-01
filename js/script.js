@@ -5871,7 +5871,7 @@ function updateActiveSpeakerIdentity(name, designation, unit) {
 }
 
 /**
- * 📁 SHOW FILES (Native Mobile Storage & Document Projector)
+ * 📁 SHOW FILES (Native Mobile Storage & Document Projector Engine)
  */
 function triggerShowFilesPicker() {
     const fileInput = document.getElementById('privateProjectorFileInput');
@@ -5881,43 +5881,279 @@ function triggerShowFilesPicker() {
     }
 }
 
+// Global State for Projector Selective Broadcast & Annotations
+let isProjShowAllActive = false;
+let isProjCustomActive = false;
+let currentProjectorTool = null; // 'pen' | 'highlighter' | 'shape' | null
+let selectedProjectorViewerIds = [];
+let isDrawingOnCanvas = false;
+let lastDrawX = 0;
+let lastDrawY = 0;
+
+// 1. Show to ALL Leaders Toggle
+function toggleProjectorShowAll() {
+    isProjShowAllActive = !isProjShowAllActive;
+    if (isProjShowAllActive) isProjCustomActive = false;
+    updateProjectorBroadcastButtons();
+}
+
+function toggleProjectorMemberDropdown() {
+    const dropdown = document.getElementById('projMemberPickerDropdown');
+    const container = document.getElementById('projMembersListContainer');
+    if (!dropdown) return;
+
+    const isHidden = (dropdown.style.display === 'none' || dropdown.style.display === '');
+    if (isHidden) {
+        if (container) {
+            const list = (typeof coreCommitteeMasterData !== 'undefined') ? coreCommitteeMasterData : [];
+            container.innerHTML = list.map((m, i) => `
+                <label class="proj-member-item" for="chkProjViewer_${m.id}">
+                    <input type="checkbox" id="chkProjViewer_${m.id}" value="${m.id}" ${selectedProjectorViewerIds.includes(m.id) ? 'checked' : ''}>
+                    <span>${i + 1}. ${m.name}</span>
+                </label>
+            `).join('');
+        }
+        dropdown.style.display = 'flex';
+    } else {
+        dropdown.style.display = 'none';
+    }
+}
+
+function applyProjectorSelectiveSharing() {
+    const checkboxes = document.querySelectorAll('.proj-dropdown-list input[type="checkbox"]:checked');
+    selectedProjectorViewerIds = Array.from(checkboxes).map(c => c.value);
+
+    if (selectedProjectorViewerIds.length > 0) {
+        isProjCustomActive = true;
+        isProjShowAllActive = false;
+        alert(`Document shown only to ${selectedProjectorViewerIds.length} selected leaders.`);
+    } else {
+        isProjCustomActive = false;
+        alert('No leaders selected. Document is in Private Preview.');
+    }
+
+    const dropdown = document.getElementById('projMemberPickerDropdown');
+    if (dropdown) dropdown.style.display = 'none';
+    
+    updateProjectorBroadcastButtons();
+}
+
+function updateProjectorBroadcastButtons() {
+    const btnAll = document.getElementById('btnProjShowAll');
+    const btnCustom = document.getElementById('btnProjSelectMembers');
+
+    if (btnAll) {
+        btnAll.className = isProjShowAllActive ? 'proj-tool-btn btn-proj-active-all' : 'proj-tool-btn';
+    }
+    if (btnCustom) {
+        btnCustom.className = isProjCustomActive ? 'proj-tool-btn btn-proj-active-custom' : 'proj-tool-btn';
+    }
+}
+
+// Persistent Drawing & Shape Engine (Never Clears until Eraser is clicked)
+function setProjectorTool(toolName) {
+    const canvas = document.getElementById('projectorDrawingCanvas');
+    if (!canvas) return;
+
+    if (currentProjectorTool === toolName) {
+        currentProjectorTool = null;
+        canvas.classList.remove('drawing-active');
+    } else {
+        currentProjectorTool = toolName;
+        canvas.classList.add('drawing-active');
+        setupProjectorCanvasEngine();
+    }
+
+    // Update Button Active States
+    ['btnProjToolPen', 'btnProjToolHighlighter', 'btnProjToolShape'].forEach(id => {
+        const b = document.getElementById(id);
+        if (b) b.classList.remove('active-tool');
+    });
+
+    if (currentProjectorTool === 'pen') document.getElementById('btnProjToolPen')?.classList.add('active-tool');
+    if (currentProjectorTool === 'highlighter') document.getElementById('btnProjToolHighlighter')?.classList.add('active-tool');
+    if (currentProjectorTool === 'shape') document.getElementById('btnProjToolShape')?.classList.add('active-tool');
+}
+
+function setupProjectorCanvasEngine() {
+    const canvas = document.getElementById('projectorDrawingCanvas');
+    const wrapper = document.getElementById('projectorCanvasWrapper');
+    if (!canvas || !wrapper) return;
+
+    // Only set width/height on first initialize so drawings are preserved!
+    if (!canvas.dataset.initialized) {
+        canvas.width = wrapper.clientWidth || window.innerWidth;
+        canvas.height = wrapper.clientHeight || window.innerHeight;
+    }
+
+    const ctx = canvas.getContext('2d');
+    if (canvas.dataset.listenersAttached) return;
+
+    const startDraw = (e) => {
+        if (!currentProjectorTool) return;
+        isDrawingOnCanvas = true;
+        const rect = canvas.getBoundingClientRect();
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        lastDrawX = clientX - rect.left;
+        lastDrawY = clientY - rect.top;
+
+        if (currentProjectorTool === 'shape') {
+            canvasSnapshot = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        }
+    };
+
+    const drawMove = (e) => {
+        if (!isDrawingOnCanvas || !currentProjectorTool) return;
+        const rect = canvas.getBoundingClientRect();
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        const curX = clientX - rect.left;
+        const curY = clientY - rect.top;
+
+        if (currentProjectorTool === 'pen') {
+            ctx.beginPath();
+            ctx.strokeStyle = '#ef4444';
+            ctx.lineWidth = 3;
+            ctx.globalAlpha = 1.0;
+            ctx.lineCap = 'round';
+            ctx.moveTo(lastDrawX, lastDrawY);
+            ctx.lineTo(curX, curY);
+            ctx.stroke();
+            lastDrawX = curX;
+            lastDrawY = curY;
+        } else if (currentProjectorTool === 'highlighter') {
+            ctx.beginPath();
+            ctx.strokeStyle = 'rgba(255, 235, 59, 0.45)';
+            ctx.lineWidth = 16;
+            ctx.lineCap = 'square';
+            ctx.moveTo(lastDrawX, lastDrawY);
+            ctx.lineTo(curX, curY);
+            ctx.stroke();
+            lastDrawX = curX;
+            lastDrawY = curY;
+        } else if (currentProjectorTool === 'shape' && canvasSnapshot) {
+            ctx.putImageData(canvasSnapshot, 0, 0);
+            ctx.beginPath();
+            ctx.strokeStyle = '#f57c00';
+            ctx.lineWidth = 3;
+            ctx.globalAlpha = 1.0;
+            ctx.strokeRect(
+                Math.min(lastDrawX, curX),
+                Math.min(lastDrawY, curY),
+                Math.abs(curX - lastDrawX),
+                Math.abs(curY - lastDrawY)
+            );
+        }
+    };
+
+    const endDraw = () => {
+        isDrawingOnCanvas = false;
+        canvasSnapshot = null;
+    };
+
+    canvas.addEventListener('mousedown', startDraw);
+    canvas.addEventListener('mousemove', drawMove);
+    canvas.addEventListener('mouseup', endDraw);
+
+    canvas.addEventListener('touchstart', startDraw, { passive: true });
+    canvas.addEventListener('touchmove', drawMove, { passive: true });
+    canvas.addEventListener('touchend', endDraw);
+
+    canvas.dataset.initialized = 'true';
+    canvas.dataset.listenersAttached = 'true';
+}
+
+function clearProjectorCanvasDrawings() {
+    const canvas = document.getElementById('projectorDrawingCanvas');
+    if (canvas) {
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        canvasSnapshot = null;
+    }
+}
+
 function handleProjectorFileSelect(event) {
     const file = event.target.files[0];
     if (!file) return;
 
     const stage = document.getElementById('docProjectorStage');
     const docImg = document.getElementById('docProjectionImg');
-    const docTitle = document.getElementById('projectorDocTitle');
-
-    if (docTitle) docTitle.textContent = file.name;
+    const pdfFrame = document.getElementById('docProjectionPdfFrame');
 
     const reader = new FileReader();
-    reader.onload = function(e) {
-        if (docImg) {
-            docImg.src = e.target.result;
-            docImg.style.display = 'block';
-        }
-        if (stage) stage.style.display = 'flex';
-    };
-    reader.readAsDataURL(file);
+
+    if (file.type === "application/pdf") {
+        reader.onload = function(e) {
+            if (docImg) {
+                docImg.src = '';
+                docImg.style.display = 'none';
+            }
+            if (pdfFrame) {
+                pdfFrame.src = e.target.result;
+                pdfFrame.style.display = 'block';
+            }
+            if (stage) stage.style.display = 'flex';
+            setTimeout(setupProjectorCanvasEngine, 100);
+        };
+        reader.readAsDataURL(file);
+    } else {
+        reader.onload = function(e) {
+            if (pdfFrame) {
+                pdfFrame.src = '';
+                pdfFrame.style.display = 'none';
+            }
+            if (docImg) {
+                docImg.src = e.target.result;
+                docImg.style.display = 'block';
+            }
+            if (stage) stage.style.display = 'flex';
+            setTimeout(setupProjectorCanvasEngine, 100);
+        };
+        reader.readAsDataURL(file);
+    }
 }
 
 function stopDocumentProjection() {
     const stage = document.getElementById('docProjectorStage');
     const docImg = document.getElementById('docProjectionImg');
-    if (stage) stage.style.display = 'none';
+    const pdfFrame = document.getElementById('docProjectionPdfFrame');
+
+    isProjShowAllActive = false;
+    isProjCustomActive = false;
+    currentProjectorTool = null;
+    clearProjectorCanvasDrawings();
+    updateProjectorBroadcastButtons();
+
+    const canvas = document.getElementById('projectorDrawingCanvas');
+    if (canvas) canvas.classList.remove('drawing-active');
+
+    if (stage) stage.style.cssText = "display: none !important;";
     if (docImg) {
         docImg.src = '';
         docImg.style.display = 'none';
     }
+    if (pdfFrame) {
+        pdfFrame.src = '';
+        pdfFrame.style.display = 'none';
+    }
+
+    const fileInput = document.getElementById('privateProjectorFileInput');
+    if (fileInput) fileInput.value = '';
 }
 
 function projectorZoom(delta) {
     currentProjectorScale = Math.max(0.6, Math.min(3.5, currentProjectorScale + delta));
     const docImg = document.getElementById('docProjectionImg');
-    if (docImg) {
+    const pdfFrame = document.getElementById('docProjectionPdfFrame');
+    
+    if (docImg && docImg.style.display !== 'none') {
         docImg.style.transform = `scale(${currentProjectorScale})`;
         docImg.style.transformOrigin = 'center center';
+    }
+    if (pdfFrame && pdfFrame.style.display !== 'none') {
+        pdfFrame.style.transform = `scale(${currentProjectorScale})`;
+        pdfFrame.style.transformOrigin = 'center center';
     }
 }
 
@@ -6115,38 +6351,57 @@ function toggleVirtualBgMenu() {
 }
 
 /**
- * Bottom Frequent Controls
+ * Bottom Frequent Controls (Mic, Camera, Hand Raise)
  */
+let isHandRaised = false;
+
 function webrtcToggleMic() {
-    if (!webrtcLocalStream) return;
-    const audioTrack = webrtcLocalStream.getAudioTracks()[0];
     const btn = document.getElementById('btnToggleMic');
     const selfMicIcon = document.getElementById('selfMicIcon');
+    const btnLabel = btn ? btn.querySelector('span') : null;
+    const btnIcon = btn ? btn.querySelector('i') : null;
 
-    if (audioTrack) {
+    let isAudioEnabled = false;
+
+    if (webrtcLocalStream && webrtcLocalStream.getAudioTracks().length > 0) {
+        const audioTrack = webrtcLocalStream.getAudioTracks()[0];
         audioTrack.enabled = !audioTrack.enabled;
-        if (btn) {
-            btn.classList.toggle('muted', !audioTrack.enabled);
-            btn.querySelector('span').textContent = audioTrack.enabled ? 'Mute' : 'Unmuted';
-            btn.querySelector('i').className = audioTrack.enabled ? 'fas fa-microphone' : 'fas fa-microphone-slash';
-        }
-        if (selfMicIcon) {
-            selfMicIcon.innerHTML = audioTrack.enabled ? '<i class="fas fa-microphone"></i>' : '<i class="fas fa-microphone-slash text-danger"></i>';
-        }
+        isAudioEnabled = audioTrack.enabled;
+    } else {
+        // Fallback state toggle if local stream is simulating
+        isAudioEnabled = btn ? btn.classList.contains('muted') : true;
+    }
+
+    if (btn) {
+        btn.classList.toggle('muted', !isAudioEnabled);
+        if (btnLabel) btnLabel.textContent = isAudioEnabled ? 'Mute' : 'Unmuted';
+        if (btnIcon) btnIcon.className = isAudioEnabled ? 'fas fa-microphone' : 'fas fa-microphone-slash';
+    }
+    if (selfMicIcon) {
+        selfMicIcon.innerHTML = isAudioEnabled ? '<i class="fas fa-microphone"></i>' : '<i class="fas fa-microphone-slash text-danger"></i>';
     }
 }
 
 function webrtcToggleCam() {
-    if (!webrtcLocalStream) return;
-    const videoTrack = webrtcLocalStream.getVideoTracks()[0];
     const btn = document.getElementById('btnToggleCam');
+    const btnIcon = btn ? btn.querySelector('i') : null;
+    const btnLabel = btn ? btn.querySelector('span') : null;
 
-    if (videoTrack) {
+    let isVideoEnabled = false;
+
+    if (webrtcLocalStream && webrtcLocalStream.getVideoTracks().length > 0) {
+        const videoTrack = webrtcLocalStream.getVideoTracks()[0];
         videoTrack.enabled = !videoTrack.enabled;
-        if (btn) {
-            btn.classList.toggle('muted', !videoTrack.enabled);
-            btn.querySelector('i').className = videoTrack.enabled ? 'fas fa-video' : 'fas fa-video-slash';
-        }
+        isVideoEnabled = videoTrack.enabled;
+    } else {
+        // Fallback state toggle
+        isVideoEnabled = btn ? btn.classList.contains('muted') : true;
+    }
+
+    if (btn) {
+        btn.classList.toggle('muted', !isVideoEnabled);
+        if (btnIcon) btnIcon.className = isVideoEnabled ? 'fas fa-video' : 'fas fa-video-slash';
+        if (btnLabel) btnLabel.textContent = isVideoEnabled ? 'Camera' : 'Cam Off';
     }
 }
 
@@ -6155,16 +6410,30 @@ function webrtcRaiseHand() {
     const stageAlert = document.getElementById('stageHandAlert');
     const cadreName = document.getElementById('handAlertCadreName');
 
-    if (btn) btn.classList.toggle('active');
+    isHandRaised = !isHandRaised;
+
+    if (btn) {
+        btn.classList.toggle('active', isHandRaised);
+        btn.style.background = isHandRaised ? '#f57c00' : '';
+        btn.style.borderColor = isHandRaised ? '#ff9800' : '';
+    }
+
     if (stageAlert) {
-        stageAlert.style.display = stageAlert.style.display === 'none' ? 'flex' : 'none';
-        if (cadreName) cadreName.textContent = 'You Raised Hand';
+        if (isHandRaised) {
+            stageAlert.style.display = 'flex';
+            if (cadreName) cadreName.textContent = 'You Raised Hand';
+        } else {
+            stageAlert.style.display = 'none';
+        }
     }
 }
 
 function toggleHostAdminPanel() {
     const panel = document.getElementById('hostControlPopup');
-    if (panel) panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+    if (panel) {
+        const isHidden = (panel.style.display === 'none' || panel.style.display === '');
+        panel.style.display = isHidden ? 'flex' : 'none';
+    }
 }
 
 function hostMuteAllParticipants() {
@@ -6175,7 +6444,16 @@ function hostMuteAllParticipants() {
 function hostClearAllHands() {
     const stageAlert = document.getElementById('stageHandAlert');
     if (stageAlert) stageAlert.style.display = 'none';
-    alert('All raised hands lowered.');
+
+    const btn = document.getElementById('btnRaiseHand');
+    if (btn) {
+        btn.classList.remove('active');
+        btn.style.background = '';
+        btn.style.borderColor = '';
+    }
+    isHandRaised = false;
+
+    alert('Host Directive: All raised hands have been lowered.');
     toggleHostAdminPanel();
 }
 
@@ -6352,3 +6630,58 @@ function saveMeetingAttendeesSelection() {
     closeEditMembersModal();
     alert(`Calling list updated! (${updatedSelectedIds.length} leaders selected for this session).`);
 }
+
+// Live Preview Rectangle Highlight Marker Tool
+document.addEventListener('DOMContentLoaded', function() {
+    const canvas = document.getElementById('projectorDrawingCanvas');
+    if (!canvas) return;
+
+    let rStartX = 0, rStartY = 0, isRDrawing = false, rSnapshot = null;
+    const ctx = canvas.getContext('2d');
+
+    const getPos = (e) => {
+        const rect = canvas.getBoundingClientRect();
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        return { x: clientX - rect.left, y: clientY - rect.top };
+    };
+
+    const startRect = (e) => {
+        if (currentProjectorTool !== 'shape') return;
+        isRDrawing = true;
+        const p = getPos(e);
+        rStartX = p.x;
+        rStartY = p.y;
+        rSnapshot = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    };
+
+    const moveRect = (e) => {
+        if (!isRDrawing || currentProjectorTool !== 'shape' || !rSnapshot) return;
+        const p = getPos(e);
+        ctx.putImageData(rSnapshot, 0, 0); // Restore canvas to show smooth live frame
+        ctx.beginPath();
+        ctx.strokeStyle = '#f57c00'; // Bold Orange
+        ctx.lineWidth = 3;
+        ctx.strokeRect(rStartX, rStartY, p.x - rStartX, p.y - rStartY);
+    };
+
+    const endRect = (e) => {
+        if (!isRDrawing || currentProjectorTool !== 'shape') return;
+        isRDrawing = false;
+        const p = getPos(e);
+        if (rSnapshot) ctx.putImageData(rSnapshot, 0, 0);
+        ctx.beginPath();
+        ctx.strokeStyle = '#f57c00';
+        ctx.lineWidth = 3.5;
+        ctx.strokeRect(rStartX, rStartY, p.x - rStartX, p.y - rStartY);
+        rSnapshot = null;
+    };
+
+    canvas.addEventListener('mousedown', startRect);
+    canvas.addEventListener('mousemove', moveRect);
+    canvas.addEventListener('mouseup', endRect);
+
+    canvas.addEventListener('touchstart', startRect, { passive: true });
+    canvas.addEventListener('touchmove', moveRect, { passive: true });
+    canvas.addEventListener('touchend', endRect);
+});

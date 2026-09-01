@@ -22,7 +22,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="#0B4EA2">
 <meta name="apple-mobile-web-app-title" content="ARPEU Portal">
 
-<link rel="stylesheet" href="css/style.css?v=2045">
+<link rel="stylesheet" href="css/style.css?v=2046">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
@@ -3870,36 +3870,29 @@
 <div id="arpeuNativeConferenceModal" class="arpeu-call-modal-overlay" style="display: none;">
     <div class="arpeu-call-container">
         
-        <!-- 1. TOP HEADER (2-LINE COMPACT & TOP CONTROLS) -->
+        <!-- 1. TOP HEADER -->
         <div class="arpeu-call-header">
-            <!-- Header Text Rows -->
             <div class="call-header-meta">
                 <h4 class="call-meeting-title" id="webrtcRoomTitle">Core Committee Live</h4>
                 <div class="call-room-code-badge" id="webrtcRoomCodeText">ROOM: ARPEU-CORE-COMMITTEE-380</div>
             </div>
 
-           <!-- Top Action Buttons Strip (Ultra-Clean Common Controls) -->
             <div class="call-top-actions-strip">
                 <div class="call-hud-pill online-pill" id="webrtcLiveCountBadge" title="Online Leaders">
                     <i class="fas fa-users"></i> <span id="onlineCountNumber">4</span>
                 </div>
-                
                 <button type="button" class="call-hud-pill action-pill" id="btnToggleAgendaHud" onclick="toggleAgendaHud()" title="Agenda & Resolutions">
                     <i class="fas fa-tasks"></i> <span>Agenda</span>
                 </button>
-
                 <button type="button" class="call-hud-pill action-pill" id="btnShowFiles" onclick="triggerShowFilesPicker()" title="Show Files">
                     <i class="fas fa-folder-open"></i> <span>Show Files</span>
                 </button>
-
                 <button type="button" class="call-hud-pill action-pill rec-pill" id="btnToggleRec" onclick="toggleLocalRecording()" title="Local HD Recording">
                     <i class="fas fa-circle text-danger"></i> <span id="recStatusText">REC</span>
                 </button>
-
                 <button type="button" class="call-hud-pill action-pill" id="btnVirtualBgTop" onclick="toggleVirtualBgMenu()" title="Virtual Backgrounds">
                     <i class="fas fa-image"></i> <span>Background</span>
                 </button>
-
                 <button type="button" class="call-hud-close-btn" onclick="leaveArpeuConference()" title="Leave Conference">
                     <i class="fas fa-times"></i>
                 </button>
@@ -3909,24 +3902,12 @@
         <!-- 2. MAIN VIEWPORT AREA -->
         <div class="arpeu-main-viewport">
             
-            <!-- A. ACTIVE SPEAKER FULL SCREEN STAGE -->
+            <!-- A. ACTIVE SPEAKER STAGE -->
             <div class="speaker-stage" id="speakerStageContainer">
                 <video id="mainSpeakerVideo" autoplay playsinline muted></video>
                 <canvas id="virtualBgCanvas" style="display: none;"></canvas>
 
-                <!-- TARGETED PRIVATE HOST INSTRUCTION HUD (RECIPIENT ONLY) -->
-                <div class="private-host-directive-banner" id="privateHostDirectiveBanner" style="display: none;">
-                    <div class="directive-content">
-                        <i class="fas fa-bullhorn text-warning directive-icon"></i>
-                        <div class="directive-text-wrap">
-                            <span class="directive-tag">HOST DIRECTIVE</span>
-                            <p class="directive-msg" id="privateDirectiveMsgText">Please get ready to speak next on Cadre Issues.</p>
-                        </div>
-                    </div>
-                    <button type="button" class="btn-dismiss-directive" onclick="dismissPrivateHostDirective()"><i class="fas fa-times"></i></button>
-                </div>
-
-                <!-- TOP-RIGHT HOST MAGIC BALL & SLIDING DRAWER (HOST ONLY) -->
+                <!-- TOP-RIGHT HOST MAGIC BALL -->
                 <div class="host-magic-ball-wrap" id="hostMagicBallWrap" style="display: none;">
                     <button type="button" class="host-magic-ball-btn" id="hostMagicBallBtn" onclick="toggleHostMagicDrawer()" title="Host Quick Tools">
                         <i class="fas fa-wand-magic-sparkles"></i>
@@ -3939,31 +3920,28 @@
                         </div>
                         <div class="magic-drawer-body">
                             <button type="button" class="magic-tool-item" onclick="openPrivateDrivePicker()">
-                                <i class="fab fa-google-drive text-warning"></i>
-                                <span>Drive Projector</span>
+                                <i class="fab fa-google-drive"></i> <span>Drive Projector</span>
                             </button>
                             <button type="button" class="magic-tool-item" onclick="openLiveNotepadStage()">
-                                <i class="fas fa-edit text-success"></i>
-                                <span>Live Notepad</span>
+                                <i class="fas fa-edit"></i> <span>Live Notepad</span>
                             </button>
                             <button type="button" class="magic-tool-item" onclick="openPrivateDirectiveSenderModal()">
-                                <i class="fas fa-paper-plane text-info"></i>
-                                <span>Send Directive</span>
+                                <i class="fas fa-paper-plane"></i> <span>Send Directive</span>
                             </button>
                         </div>
                     </div>
                 </div>
 
-                <!-- LIVE NOTEPAD STAGE OVERLAY (FOR WRITING LIVE NOTES ON STAGE) -->
+                <!-- LIVE NOTEPAD -->
                 <div class="live-notepad-stage" id="liveNotepadStage" style="display: none;">
                     <div class="notepad-header">
                         <span><i class="fas fa-pen-nib text-warning"></i> Live Executive Notepad</span>
                         <button type="button" class="btn-close-notepad" onclick="closeLiveNotepadStage()"><i class="fas fa-times"></i> Close</button>
                     </div>
-                    <textarea id="liveNotepadTextarea" class="notepad-textarea" placeholder="Type meeting notes, announcements or decisions here. All participants will see this live..."></textarea>
+                    <textarea id="liveNotepadTextarea" class="notepad-textarea" placeholder="Type meeting notes here..."></textarea>
                 </div>
 
-                <!-- DYNAMIC ACTIVE SPEAKER IDENTITY RIBBON (COMPACT STAMP AVATAR + 3 LINES) -->
+                <!-- DYNAMIC ACTIVE SPEAKER RIBBON -->
                 <div class="speaker-identity-ribbon" id="speakerIdentityRibbon">
                     <div class="ribbon-avatar-box">
                         <img id="mainSpeakerAvatar" src="images/arpeu-logo.png" alt="Leader Avatar" class="ribbon-avatar-img" onerror="this.src='https://pallibalakrishna1981-dev.github.io/ARPEU-Membership-App/images/arpeu-logo.png'">
@@ -3975,47 +3953,56 @@
                     </div>
                 </div>
 
-                <!-- Hand Raise Alert Notification -->
+                <!-- Hand Raise Alert -->
                 <div class="stage-hand-alert" id="stageHandAlert" style="display: none;">
                     <i class="fas fa-hand-paper hand-alert-icon"></i> <span id="handAlertCadreName">You Raised Hand</span>
                 </div>
             </div>
 
-            <!-- B. PRIVATE DOCUMENT & CIRCULAR PROJECTOR STAGE -->
+            <!-- B. DOCUMENT PROJECTOR STAGE (CLEAN & PROPERLY CLOSED) -->
             <div class="doc-projector-stage" id="docProjectorStage" style="display: none;">
-                <div class="projector-toolbar">
-                    <div class="projector-info">
-                        <i class="fas fa-file-alt text-warning"></i> <span id="projectorDocTitle">ARPEU Official Document</span>
-                    </div>
-                    <div class="projector-controls">
-                        <button type="button" onclick="projectorZoom(0.2)" title="Zoom In"><i class="fas fa-search-plus"></i></button>
-                        <button type="button" onclick="projectorZoom(-0.2)" title="Zoom Out"><i class="fas fa-search-minus"></i></button>
-                        <button type="button" class="btn-stop-projection" onclick="stopDocumentProjection()" title="Close Document"><i class="fas fa-times-circle"></i> Close File</button>
+                <div class="projector-floating-controls" id="projectorFloatingControls">
+                    <button type="button" class="proj-tool-btn btn-proj-close" onclick="document.getElementById('docProjectorStage').style.cssText='display:none !important'; document.getElementById('privateProjectorFileInput').value='';" title="Close File"><i class="fas fa-times"></i></button>
+                    <button type="button" id="btnProjShowAll" class="proj-tool-btn" onclick="toggleProjectorShowAll()" title="Show / Hide for ALL Leaders"><i class="fas fa-users"></i></button>
+                    <button type="button" id="btnProjSelectMembers" class="proj-tool-btn" onclick="toggleProjectorMemberDropdown()" title="Show to Selected Leaders Only"><i class="fas fa-user-check"></i></button>
+                    <button type="button" id="btnProjToolPen" class="proj-tool-btn" onclick="setProjectorTool('pen')" title="Draw / Point"><i class="fas fa-pen"></i></button>
+                    <button type="button" id="btnProjToolHighlighter" class="proj-tool-btn" onclick="setProjectorTool('highlighter')" title="Highlight Lines"><i class="fas fa-highlighter text-warning"></i></button>
+                    <button type="button" id="btnProjToolShape" class="proj-tool-btn" onclick="setProjectorTool('shape')" title="Rectangle Box Marker"><i class="fas fa-vector-square text-danger"></i></button>
+                    <button type="button" class="proj-tool-btn" onclick="clearProjectorCanvasDrawings()" title="Clear All Markings"><i class="fas fa-eraser"></i></button>
+                    <button type="button" class="proj-tool-btn" onclick="projectorZoom(0.2)" title="Zoom In"><i class="fas fa-plus"></i></button>
+                    <button type="button" class="proj-tool-btn" onclick="projectorZoom(-0.2)" title="Zoom Out"><i class="fas fa-minus"></i></button>
+
+                    <!-- Dropdown Panel (Strictly Hidden) -->
+                    <div id="projMemberPickerDropdown" class="proj-member-dropdown" style="display: none;">
+                        <div class="proj-dropdown-header">
+                            <span><i class="fas fa-user-shield text-warning"></i> SELECT VIEWERS</span>
+                            <button type="button" onclick="toggleProjectorMemberDropdown()">&times;</button>
+                        </div>
+                        <div class="proj-dropdown-list" id="projMembersListContainer"></div>
+                        <div class="proj-dropdown-footer">
+                            <button type="button" class="btn-proj-apply" onclick="applyProjectorSelectiveSharing()">Apply Viewers</button>
+                        </div>
                     </div>
                 </div>
+
                 <div class="projector-canvas-wrapper" id="projectorCanvasWrapper">
                     <img id="docProjectionImg" src="" alt="Projected Document" style="display: none;">
+                    <iframe id="docProjectionPdfFrame" src="" style="display: none; width: 100%; height: 100%; border: none; background: #fff;"></iframe>
+                    <canvas id="projectorDrawingCanvas" class="projector-drawing-canvas"></canvas>
                 </div>
             </div>
 
-            <!-- C. DUAL-TAB ADVANCED AGENDA & LIVE RESOLUTIONS HUD -->
+            <!-- C. AGENDA HUD -->
             <div class="agenda-hud-floating" id="agendaHudFloating" style="display: none;">
                 <div class="agenda-hud-header">
                     <h5><i class="fas fa-clipboard-list text-warning"></i> Executive Meeting Agenda</h5>
                     <button type="button" class="agenda-hud-minimize" onclick="toggleAgendaHud()"><i class="fas fa-times"></i></button>
                 </div>
-
-                <!-- Previous vs Present Agenda Tabs -->
                 <div class="agenda-tabs-bar">
                     <button type="button" class="agenda-tab-btn active" id="tabPresentAgenda" onclick="switchAgendaTab('present')">Present Agenda</button>
                     <button type="button" class="agenda-tab-btn" id="tabPreviousAgenda" onclick="switchAgendaTab('previous')">Previous Agenda</button>
                 </div>
-
-                <!-- Dynamic Agenda Cards Container -->
-                <div class="agenda-hud-body" id="liveAgendaListContainer">
-                    <!-- Dynamic Cards injected by JS -->
-                </div>
-
+                <div class="agenda-hud-body" id="liveAgendaListContainer"></div>
                 <div class="agenda-hud-footer">
                     <small><i class="fas fa-shield-alt"></i> Real-time sync • Live resolutions update automatically</small>
                 </div>
@@ -4023,10 +4010,9 @@
 
         </div>
 
-        <!-- 3. MULTI-PAGE HORIZONTAL CAROUSEL (BOTTOM STRIP) -->
+        <!-- 3. MULTI-PAGE HORIZONTAL CAROUSEL -->
         <div class="horizontal-cadre-carousel" id="horizontalCadreCarousel">
             <div class="cadre-strip-track" id="cadreStripTrack">
-                <!-- Local User Card -->
                 <div class="cadre-thumb-card self-card" id="thumbUserSelf">
                     <video id="localUserVideo" autoplay playsinline muted></video>
                     <div class="thumb-label">
@@ -4037,46 +4023,41 @@
             </div>
         </div>
 
-        <!-- 4. BOTTOM TOOLBAR (5 FREQUENT CONTROLS ONLY) -->
+        <!-- 4. BOTTOM TOOLBAR -->
         <div class="arpeu-call-toolbar">
             <button type="button" class="tool-btn" id="btnToggleMic" onclick="webrtcToggleMic()" title="Mute/Unmute Mic">
                 <i class="fas fa-microphone"></i>
                 <span>Mute</span>
             </button>
-
             <button type="button" class="tool-btn" id="btnToggleCam" onclick="webrtcToggleCam()" title="Camera On/Off">
                 <i class="fas fa-video"></i>
                 <span>Camera</span>
             </button>
-
             <button type="button" class="tool-btn" id="btnRaiseHand" onclick="webrtcRaiseHand()" title="Raise Hand">
                 <i class="fas fa-hand-paper"></i>
                 <span>Hand</span>
             </button>
-
             <button type="button" class="tool-btn host-only-btn" id="btnHostAdminMenu" onclick="toggleHostAdminPanel()" title="Host Management" style="display: none;">
                 <i class="fas fa-user-shield"></i>
                 <span>Host Control</span>
             </button>
-
             <button type="button" class="tool-btn btn-end-call" onclick="leaveArpeuConference()" title="Leave Conference">
                 <i class="fas fa-phone-slash"></i>
                 <span>Leave</span>
             </button>
         </div>
 
-        <!-- 5. HOST CONTROL DRAWER -->
+        <!-- 5. HOST CONTROL FLOATING OVERLAY -->
         <div class="host-control-popup" id="hostControlPopup" style="display: none;">
-            <div class="host-control-header">
-                <h5><i class="fas fa-shield-halved"></i> Host Controls</h5>
-                <button type="button" onclick="toggleHostAdminPanel()">&times;</button>
-            </div>
-            <div class="host-actions-list">
-                <button type="button" class="btn-host-action text-danger" onclick="hostMuteAllParticipants()">
-                    <i class="fas fa-microphone-slash"></i> Global Mute (Mute All Leaders)
+            <div class="host-control-card">
+                <button type="button" class="btn-host-action btn-host-mute-all" onclick="hostMuteAllParticipants()" title="Mute All Leaders">
+                    <i class="fas fa-microphone-slash"></i> <span>Mute All</span>
                 </button>
-                <button type="button" class="btn-host-action text-primary" onclick="hostClearAllHands()">
-                    <i class="fas fa-hand-sparkles"></i> Lower All Raised Hands
+                <button type="button" class="btn-host-action btn-host-lower-hands" onclick="hostClearAllHands()" title="Lower All Hands">
+                    <i class="fas fa-hand-sparkles"></i> <span>Lower Hands</span>
+                </button>
+                <button type="button" class="btn-close-host-ctrl" onclick="toggleHostAdminPanel()" title="Close Controls">
+                    <i class="fas fa-times"></i>
                 </button>
             </div>
         </div>
@@ -4924,7 +4905,7 @@
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-<script src="js/script.js?v=112"></script>
+<script src="js/script.js?v=113"></script>
 </body>
 
 </html>

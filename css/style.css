@@ -6097,12 +6097,12 @@ NEW QUICK LINKS INTEGRATED CARD STYLES
     justify-content: center;
 }
 
-/* TOP-RIGHT HOST MAGIC BALL & SLIDING DRAWER */
+/* TOP-RIGHT HOST MAGIC BALL & SLIDING DRAWER (ALWAYS ON TOP) */
 .host-magic-ball-wrap {
     position: absolute;
     top: 14px;
     right: 10px;
-    z-index: 45;
+    z-index: 100 !important; /* Forces Magic Ball above everything */
     display: flex;
     align-items: center;
 }
@@ -6129,346 +6129,315 @@ NEW QUICK LINKS INTEGRATED CARD STYLES
 
 .host-magic-drawer {
     position: absolute;
-    top: 40px;
+    top: 44px;
     right: 0;
-    background: #0d1e38;
-    border: 1.5px solid #ff9800;
-    border-radius: 12px;
-    padding: 8px;
-    width: 160px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.9);
+    background: #081326 !important;
+    border: 2px solid #ff9800 !important;
+    border-radius: 16px !important;
+    padding: 12px 10px !important;
+    width: 195px !important;
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.95) !important;
     display: flex;
     flex-direction: column;
-    gap: 6px;
-    z-index: 50;
+    gap: 10px;
+    z-index: 105 !important;
 }
 
 .magic-drawer-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding-bottom: 4px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 0 4px 6px 4px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 .magic-drawer-header h6 {
     margin: 0;
-    color: #fff;
-    font-size: 11px;
-    font-weight: 700;
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    letter-spacing: 0.3px;
 }
 
 .magic-drawer-header button {
-    background: none;
+    background: rgba(255, 255, 255, 0.1);
     border: none;
-    color: #aaa;
+    color: #cbd5e1;
     cursor: pointer;
-    font-size: 12px;
-}
-
-.magic-tool-item {
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    color: #ffffff;
-    font-size: 11px;
-    font-weight: 600;
-    padding: 6px 8px;
-    border-radius: 6px;
-    cursor: pointer;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
     display: flex;
     align-items: center;
-    gap: 6px;
-    text-align: left;
+    justify-content: center;
+    font-size: 11px;
 }
 
-.magic-tool-item:hover {
-    background: rgba(245, 124, 0, 0.25);
+.magic-drawer-body {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
 }
 
-/* LIVE NOTEPAD STAGE */
-.live-notepad-stage {
+/* Base Style for All 3 Equal Buttons */
+.magic-tool-item {
+    width: 100% !important;
+    height: 44px !important;
+    border-radius: 10px !important;
+    font-size: 12.5px !important;
+    font-weight: 700 !important;
+    color: #ffffff !important;
+    cursor: pointer !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    padding: 0 12px !important;
+    gap: 10px !important;
+    border: 1.5px solid rgba(255, 255, 255, 0.2) !important;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25) !important;
+    transition: all 0.2s ease !important;
+    box-sizing: border-box !important;
+}
+
+.magic-tool-item i {
+    font-size: 15px !important;
+    min-width: 20px !important;
+    text-align: center !important;
+    color: #ffffff !important;
+}
+
+.magic-tool-item:active {
+    transform: scale(0.97) !important;
+}
+
+/* 1. Drive Projector (Royal Blue) */
+.magic-tool-item:nth-child(1) {
+    background: #0d5bb5 !important;
+    border-color: #3b82f6 !important;
+}
+.magic-tool-item:nth-child(1):hover {
+    background: #1565c0 !important;
+}
+
+/* 2. Live Notepad (Vibrant Emerald Green) */
+.magic-tool-item:nth-child(2) {
+    background: #05824e !important;
+    border-color: #10b981 !important;
+}
+.magic-tool-item:nth-child(2):hover {
+    background: #0f9d58 !important;
+}
+
+/* 3. Send Directive (Royal Purple) */
+.magic-tool-item:nth-child(3) {
+    background: #5d28a6 !important;
+    border-color: #8b5cf6 !important;
+}
+.magic-tool-item:nth-child(3):hover {
+    background: #6d28d9 !important;
+}
+
+/* Ultra-Compact Glassmorphism Floating Bar (No clash with Magic Ball) */
+.projector-floating-controls {
     position: absolute;
     top: 10px;
-    left: 10px;
-    right: 10px;
-    bottom: 70px;
-    background: rgba(13, 27, 49, 0.96);
-    border: 2px solid #ff9800;
-    border-radius: 14px;
-    z-index: 40;
-    display: flex;
-    flex-direction: column;
-    padding: 10px;
-    box-shadow: 0 15px 40px rgba(0,0,0,0.9);
-}
-
-.notepad-header {
-    display: flex;
-    justify-content: space-between;
+    left: 8px;
+    z-index: 80 !important;
+    display: inline-flex;
     align-items: center;
-    color: #fff;
-    font-size: 13px;
-    font-weight: 700;
-    margin-bottom: 8px;
-}
-
-.btn-close-notepad {
-    background: #dc3545;
-    border: none;
-    color: #fff;
-    font-size: 11px;
-    font-weight: 700;
-    padding: 3px 8px;
-    border-radius: 6px;
-    cursor: pointer;
-}
-
-.notepad-textarea {
-    flex: 1;
-    width: 100%;
-    background: #061020;
-    border: 1px solid #1e2e4a;
-    border-radius: 8px;
-    color: #ffffff;
-    font-family: 'Poppins', sans-serif;
-    font-size: 13px;
-    padding: 10px;
-    resize: none;
-    line-height: 1.4;
-}
-
-/* DYNAMIC ACTIVE SPEAKER IDENTITY RIBBON (EXTREME LEFT AVATAR + 10px GAP + 3 LINES) */
-.speaker-identity-ribbon {
-    position: absolute;
-    bottom: 10px;
-    left: 10px;
-    right: 10px;
-    height: 54px !important;
-    background: rgba(7, 21, 43, 0.92) !important;
+    gap: 3px !important; /* Tight 3px gap to fit perfectly before Magic Ball */
+    background: rgba(11, 23, 44, 0.95);
     backdrop-filter: blur(12px);
-    border: 1.5px solid rgba(255, 255, 255, 0.2);
-    border-radius: 12px;
-    padding: 5px 10px !important;
+    padding: 3px 5px !important;
+    border-radius: 8px !important;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.8);
+    pointer-events: auto !important;
+}
+
+/* Compact Square Action Buttons (28px each) */
+.proj-tool-btn {
+    width: 28px !important;
+    height: 28px !important;
+    min-width: 28px !important;
+    min-height: 28px !important;
+    border-radius: 5px !important;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    background: rgba(255, 255, 255, 0.1);
+    color: #ffffff !important;
+    cursor: pointer !important;
     display: flex !important;
-    flex-direction: row !important;
     align-items: center !important;
-    justify-content: flex-start !important; /* Forces Far Left Alignment */
-    gap: 12px !important; /* 12px Clean Gap Between Photo and Text */
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.8);
-    z-index: 20;
-    max-width: calc(100% - 20px);
-    overflow: hidden;
-}
-
-/* Revenue Stamp Photo (Locked on Extreme Left) */
-.ribbon-avatar-box {
-    width: 36px !important;
-    height: 42px !important;
-    max-width: 36px !important;
-    max-height: 42px !important;
-    border-radius: 6px;
-    overflow: hidden;
-    border: 1.5px solid #ff9800; /* Gold Saffron Border */
-    flex-shrink: 0 !important;
-    background: #0b1d3a;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    justify-content: center !important;
+    font-size: 11.5px !important;
+    padding: 0 !important;
     margin: 0 !important;
+    transition: all 0.15s ease;
+    pointer-events: auto !important;
 }
 
-.ribbon-avatar-img {
-    width: 100% !important;
-    height: 100% !important;
-    object-fit: cover !important;
-    display: block;
+.proj-tool-btn:hover {
+    background: rgba(255, 255, 255, 0.25);
 }
 
-/* 3-Line Crisp Text Column */
-.ribbon-text-col {
+.proj-tool-btn:active {
+    transform: scale(0.92);
+}
+
+.proj-tool-btn.active-tool {
+    background: #f57c00 !important;
+    border-color: #ff9800 !important;
+    box-shadow: 0 0 8px rgba(245, 124, 0, 0.9);
+}
+
+.btn-proj-close {
+    background: #dc2626 !important;
+    border-color: #ef4444 !important;
+}
+
+.btn-proj-active-all {
+    background: #16a34a !important;
+    border-color: #22c55e !important;
+    box-shadow: 0 0 8px rgba(34, 197, 94, 0.8);
+}
+
+.btn-proj-active-custom {
+    background: #0284c7 !important;
+    border-color: #38bdf8 !important;
+    box-shadow: 0 0 8px rgba(56, 189, 248, 0.8);
+}
+
+/* Specific Member Dropdown Modal (Strictly Hidden by Default) */
+.proj-member-dropdown {
+    position: absolute !important;
+    top: 38px !important;
+    left: 40px !important;
+    width: 220px !important;
+    background: #081326 !important;
+    border: 1.5px solid #0284c7 !important;
+    border-radius: 10px !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.95) !important;
+    display: none; /* Hidden by default */
+    flex-direction: column !important;
+    z-index: 90 !important;
+    overflow: hidden !important;
+}
+
+.proj-dropdown-header {
+    background: #0b1f3f !important;
+    padding: 6px 10px !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    color: #fff !important;
+    font-size: 11px !important;
+    font-weight: 800 !important;
+}
+
+.proj-dropdown-header button {
+    background: none !important;
+    border: none !important;
+    color: #cbd5e1 !important;
+    cursor: pointer !important;
+    font-size: 14px !important;
+}
+
+.proj-dropdown-list {
+    max-height: 180px !important;
+    overflow-y: auto !important;
+    padding: 6px !important;
     display: flex !important;
     flex-direction: column !important;
-    justify-content: center !important;
-    align-items: flex-start !important;
-    text-align: left !important;
-    gap: 1px;
-    flex: 1;
-    min-width: 0;
-    overflow: hidden;
+    gap: 4px !important;
+    background: #081326 !important;
 }
 
-.ribbon-name {
-    color: #ffffff !important;
-    font-size: 13px !important;
-    font-weight: 800 !important;
-    letter-spacing: 0.4px;
-    line-height: 1.2;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    text-transform: uppercase;
+.proj-member-item {
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+    padding: 4px 6px !important;
+    border-radius: 4px !important;
+    font-size: 11px !important;
+    color: #f1f5f9 !important;
+    cursor: pointer !important;
 }
 
-.ribbon-desig {
-    color: #ff9800 !important; /* Saffron/Orange */
+.proj-dropdown-footer {
+    padding: 6px !important;
+    background: #0b1f3f !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.btn-proj-apply {
+    width: 100% !important;
+    background: #0284c7 !important;
+    border: none !important;
+    color: #fff !important;
     font-size: 11px !important;
     font-weight: 700 !important;
-    line-height: 1.2;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    padding: 5px !important;
+    border-radius: 4px !important;
+    cursor: pointer !important;
 }
 
-.ribbon-unit {
-    color: #cbd5e1 !important;
-    font-size: 10px !important;
-    font-weight: 500 !important;
-    line-height: 1.2;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-/* DYNAMIC ACTIVE SPEAKER IDENTITY RIBBON (BOTTOM OF VIDEO SCREEN) */
-.speaker-identity-ribbon {
-    position: absolute;
-    bottom: 12px;
-    left: 12px;
-    right: 12px;
-    background: linear-gradient(180deg, rgba(7, 21, 43, 0.6) 0%, rgba(3, 10, 22, 0.92) 100%);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 12px;
-    padding: 8px 12px;
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6);
-    z-index: 10;
-    max-width: calc(100% - 24px);
-}
-
-.ribbon-name {
-    color: #ffffff;
-    font-size: 14px;
-    font-weight: 800;
-    letter-spacing: 0.5px;
-    line-height: 1.2;
-    text-transform: uppercase;
-}
-
-.ribbon-desig {
-    color: #ff9800; /* Saffron/Orange */
-    font-size: 11.5px;
-    font-weight: 700;
-    line-height: 1.2;
-}
-
-.ribbon-unit {
-    color: #cbd5e1;
-    font-size: 10.5px;
-    font-weight: 500;
-    line-height: 1.2;
-}
-
-.stage-hand-alert {
-    position: absolute;
-    top: 15px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(11, 25, 44, 0.95);
-    border: 2px solid #ffc107;
-    padding: 8px 16px;
-    border-radius: 25px;
-    font-size: 13px;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    box-shadow: 0 0 20px rgba(255, 193, 7, 0.4);
-    z-index: 25;
-}
-
-.hand-alert-icon {
-    color: #ffc107;
-    font-size: 16px;
-}
-
-/* 3. SHOW FILES / DOCUMENT PROJECTOR STAGE */
-.doc-projector-stage {
+/* Fullscreen Projector Canvas Wrapper */
+.projector-canvas-wrapper {
     position: absolute;
     inset: 0;
-    background: #090d16;
-    z-index: 15;
+    width: 100%;
+    height: 100%;
     display: flex;
-    flex-direction: column;
-}
-
-.projector-toolbar {
-    min-height: 48px;
-    background: #111827;
-    display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
-    padding: 6px 10px;
-    border-bottom: 1px solid #1f2937;
-}
-
-.projector-info {
-    color: #f3f4f6;
-    font-size: 12px;
-    font-weight: 700;
-    display: flex;
-    gap: 6px;
-    align-items: center;
-    max-width: 55%;
     overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.projector-controls {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.projector-controls button {
-    min-width: 36px;
-    height: 36px;
-    background: rgba(255, 255, 255, 0.12);
-    border: 1px solid rgba(255, 255, 255, 0.25);
-    color: #fff;
-    border-radius: 6px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.btn-stop-projection {
-    background: #dc3545 !important;
-    font-size: 11px !important;
-    font-weight: 700 !important;
-    padding: 0 10px !important;
-    gap: 4px;
-}
-
-.projector-canvas-wrapper {
-    flex: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    overflow: auto;
-    background: #050810;
-    padding: 8px;
+    background: #000000;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
 .projector-canvas-wrapper img {
+    width: 100%;
+    height: 100%;
     max-width: 100%;
     max-height: 100%;
     object-fit: contain;
+    display: block;
+    margin: auto;
     transition: transform 0.2s ease;
+    z-index: 1;
+}
+
+.projector-canvas-wrapper iframe {
+    width: 100%;
+    height: 100%;
+    min-width: 100%;
+    min-height: 100%;
+    border: none;
+    background: #ffffff;
+    z-index: 1;
+}
+
+/* Transparent Canvas Overlay for Realtime Highlighting */
+.projector-drawing-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 20;
+    pointer-events: none; /* Allows click-through when no pen tool is selected */
+    cursor: default;
+}
+
+.projector-drawing-canvas.drawing-active {
+    pointer-events: auto !important; /* Enables drawing only when tool is chosen */
+    cursor: crosshair;
 }
 
 /* 4. DUAL-TAB AGENDA & LIVE RESOLUTION HUD */
@@ -8144,4 +8113,244 @@ textarea.mtg-custom-field {
     display: inline-flex;
     align-items: center;
     gap: 4px;
+}
+
+/* ==========================================================
+   DYNAMIC ACTIVE SPEAKER IDENTITY RIBBON (BOTTOM FIXED OVERLAY)
+   ========================================================== */
+.speaker-identity-ribbon {
+    position: absolute !important;
+    bottom: 12px !important;
+    left: 10px !important;
+    right: 10px !important;
+    height: 52px !important;
+    background: rgba(7, 21, 43, 0.95) !important;
+    backdrop-filter: blur(12px) !important;
+    border: 1.5px solid rgba(255, 255, 255, 0.2) !important;
+    border-radius: 12px !important;
+    padding: 4px 10px !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 12px !important;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.85) !important;
+    z-index: 25 !important;
+    box-sizing: border-box !important;
+}
+
+/* Revenue Stamp Photo (Extreme Left Box) */
+.ribbon-avatar-box {
+    width: 36px !important;
+    height: 42px !important;
+    min-width: 36px !important;
+    max-height: 42px !important;
+    border-radius: 6px !important;
+    overflow: hidden !important;
+    border: 1.5px solid #ff9800 !important; /* Gold Saffron Border */
+    flex-shrink: 0 !important;
+    background: #0b1d3a !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin: 0 !important;
+}
+
+.ribbon-avatar-img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    display: block !important;
+}
+
+/* 3-Line Crisp Text Column */
+.ribbon-text-col {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: flex-start !important;
+    text-align: left !important;
+    gap: 1px !important;
+    flex: 1 !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+}
+
+.ribbon-name {
+    color: #ffffff !important;
+    font-size: 12.5px !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.4px !important;
+    line-height: 1.2 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    text-transform: uppercase !important;
+    margin: 0 !important;
+}
+
+.ribbon-desig {
+    color: #ff9800 !important; /* Saffron/Orange */
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    line-height: 1.2 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    margin: 0 !important;
+}
+
+.ribbon-unit {
+    color: #cbd5e1 !important;
+    font-size: 10px !important;
+    font-weight: 500 !important;
+    line-height: 1.2 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    margin: 0 !important;
+}
+
+/* ==========================================================
+   HAND RAISE ALERT PILL (TOP-CENTER FLOATING WITH GOLD GLOW)
+   ========================================================== */
+.stage-hand-alert {
+    position: absolute;
+    top: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(11, 25, 44, 0.95);
+    border: 2px solid #ffc107;
+    padding: 6px 14px;
+    border-radius: 25px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #ffffff;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 0 20px rgba(255, 193, 7, 0.5);
+    z-index: 60;
+    pointer-events: none;
+    white-space: nowrap;
+    animation: bounceIn 0.3s ease-out;
+}
+
+.hand-alert-icon {
+    color: #ffc107;
+    font-size: 15px;
+    animation: waveHand 1s infinite alternate ease-in-out;
+}
+
+@keyframes bounceIn {
+    0% { transform: translate(-50%, -20px); opacity: 0; }
+    100% { transform: translate(-50%, 0); opacity: 1; }
+}
+
+@keyframes waveHand {
+    0% { transform: rotate(-10deg); }
+    100% { transform: rotate(15deg); }
+}
+
+/* ==========================================================
+   SLEEK SIDE-BY-SIDE FLOATING HOST BAR (BOTTOM OVERLAY)
+   ========================================================== */
+.host-control-popup {
+    position: absolute;
+    bottom: 74px; /* Sits cleanly right above bottom toolbar */
+    left: 10px;
+    right: 10px;
+    z-index: 95;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    pointer-events: auto;
+}
+
+.host-control-card {
+    width: 100%;
+    max-width: 360px;
+    background: rgba(8, 19, 38, 0.95);
+    backdrop-filter: blur(12px);
+    border: 1.5px solid #ff9800;
+    border-radius: 12px;
+    padding: 6px 8px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.85);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+    box-sizing: border-box;
+    animation: slideUpBar 0.2s ease-out;
+}
+
+/* Side-by-Side Slim Action Buttons */
+.btn-host-action {
+    flex: 1;
+    height: 36px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-size: 11.5px;
+    font-weight: 700;
+    color: #ffffff;
+    padding: 0 8px;
+    white-space: nowrap;
+    transition: all 0.15s ease;
+}
+
+.btn-host-action:active {
+    transform: scale(0.95);
+}
+
+.btn-host-action i {
+    font-size: 13px;
+}
+
+/* Red Mute All */
+.btn-host-mute-all {
+    background: #dc2626;
+    border-color: #ef4444;
+}
+.btn-host-mute-all:hover {
+    background: #b91c1c;
+}
+
+/* Blue Lower Hands */
+.btn-host-lower-hands {
+    background: #2563eb;
+    border-color: #3b82f6;
+}
+.btn-host-lower-hands:hover {
+    background: #1d4ed8;
+}
+
+/* Compact Close Cross */
+.btn-close-host-ctrl {
+    width: 32px;
+    height: 36px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #cbd5e1;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    flex-shrink: 0;
+}
+
+.btn-close-host-ctrl:hover {
+    background: rgba(255, 255, 255, 0.2);
+    color: #fff;
+}
+
+@keyframes slideUpBar {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
