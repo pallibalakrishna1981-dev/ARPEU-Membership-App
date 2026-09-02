@@ -22,7 +22,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="#0B4EA2">
 <meta name="apple-mobile-web-app-title" content="ARPEU Portal">
 
-<link rel="stylesheet" href="css/style.css?v=2046">
+<link rel="stylesheet" href="css/style.css?v=2047">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
@@ -3578,6 +3578,19 @@
                         </button>
                     </div>
 
+                    <!-- 6. WhatsApp Live Notice Preview & Broadcast Box -->
+                    <div class="mtg-wa-preview-box" id="mtgWaPreviewContainer" style="margin-top: 14px;">
+                        <div class="wa-preview-header">
+                            <i class="fa-brands fa-whatsapp text-success"></i>
+                            <span>WhatsApp Live Notice Preview</span>
+                        </div>
+                        <pre class="wa-preview-content" id="mtgLiveWaNoticePreview">Type meeting details above to see live WhatsApp broadcast preview here...</pre>
+                        
+                        <button type="button" class="btn-mtg-action btn-mtg-wa" onclick="shareLiveWhatsAppNotice()" style="width: 100%; height: 38px; margin-top: 8px;">
+                            <i class="fa-brands fa-whatsapp"></i> Broadcast Notice to WhatsApp Groups
+                        </button>
+                    </div>
+
                     <!-- Form Actions -->
                     <div class="mtg-form-actions">
                         <button type="button" class="btn-cancel-mtg" onclick="toggleScheduleMeetingForm()">Cancel</button>
@@ -3613,7 +3626,114 @@
      MEETINGS & CONFERENCES EXECUTIVE HUB END
 ========================================================= -->
 
+<!-- ==========================================================
+     ARPEU STATE OFFICE BEARERS MASTER SECTION (1 + 28 GRID)
+========================================================== -->
+<section id="office-bearersSection" class="arpeu-office-bearers-section" style="display: none;">
 
+   <!-- 1. FEATURED HON'BLE PRESIDENT CARD -->
+<div class="arpeu-featured-card">
+    <img class="arpeu-featured-photo arpeu-zoom-photo" 
+         src="images/state-office-bearers/raghuram-state-president-bms.jpg" 
+         alt="Hon'ble President - Sri T. Raghuram" 
+         onerror="this.src='images/raghuram-state-president-bms.jpg'">
+    <div class="arpeu-featured-info">
+        <p class="arpeu-featured-role">Hon'ble President – ARPEU</p>
+        <h2 class="arpeu-featured-name">Sri T. Raghuram</h2>
+        <p class="arpeu-featured-company">BMS State President</p>
+        <div class="arpeu-contact-row">
+            <a class="arpeu-call-btn" href="tel:9440812345"><i class="fas fa-phone-alt"></i> Call</a>
+            <a class="arpeu-whatsapp-btn" href="https://wa.me/919440812345" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+        </div>
+    </div>
+</div>
+
+    <!-- 2. SECTION TITLE -->
+    <h2 class="arpeu-section-title">STATE OFFICE BEARERS</h2>
+
+    <!-- 3. 28 MEMBERS 2-COLUMN RESPONSIVE GRID -->
+    <div class="arpeu-bearers-grid" id="arpeuBearersGridContainer">
+
+        <!-- Member 1: State President -->
+        <div class="arpeu-member-card">
+            <img class="arpeu-member-photo arpeu-zoom-photo" src="images/state-office-bearers/state-president.jpg" alt="State President" onerror="this.src='images/state-president.jpg'">
+            <h3 class="arpeu-member-name">Sri T. Sambasiva Rao</h3>
+            <p class="arpeu-member-role">State President</p>
+            <p class="arpeu-member-company">APSPDCL – Corporate Office</p>
+            <div class="arpeu-contact-row">
+                <a class="arpeu-call-btn" href="tel:9490153123"><i class="fas fa-phone-alt"></i> Call</a>
+                <a class="arpeu-whatsapp-btn" href="https://wa.me/919490153123" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+            </div>
+        </div>
+
+        <!-- Member 2: State General Secretary -->
+        <div class="arpeu-member-card">
+            <img class="arpeu-member-photo arpeu-zoom-photo" src="images/state-office-bearers/general-secretary.jpg" alt="General Secretary" onerror="this.src='images/general-secretary.jpg'">
+            <h3 class="arpeu-member-name">Sri C. Ramagopal Reddy</h3>
+            <p class="arpeu-member-role">State General Secretary</p>
+            <p class="arpeu-member-company">APTRANSCO – Vidyut Soudha</p>
+            <div class="arpeu-contact-row">
+                <a class="arpeu-call-btn" href="tel:9440812345"><i class="fas fa-phone-alt"></i> Call</a>
+                <a class="arpeu-whatsapp-btn" href="https://wa.me/919440812345" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+            </div>
+        </div>
+
+        <!-- Member 3: State Treasurer -->
+        <div class="arpeu-member-card">
+            <img class="arpeu-member-photo arpeu-zoom-photo" src="images/state-office-bearers/state-treasurer.jpg" alt="State Treasurer" onerror="this.src='images/state-treasurer.jpg'">
+            <h3 class="arpeu-member-name">Sri P. Balakrishna</h3>
+            <p class="arpeu-member-role">State Treasurer</p>
+            <p class="arpeu-member-company">APGENCO – Dr. NTTPS</p>
+            <div class="arpeu-contact-row">
+                <a class="arpeu-call-btn" href="tel:9642788786"><i class="fas fa-phone-alt"></i> Call</a>
+                <a class="arpeu-whatsapp-btn" href="https://wa.me/919642788786" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+            </div>
+        </div>
+
+        <!-- Member 4: Working President -->
+        <div class="arpeu-member-card">
+            <img class="arpeu-member-photo arpeu-zoom-photo" 
+                 src="images/state-office-bearers/jayappa-working-president.jpg" 
+                 alt="Working President" 
+                 onerror="this.src='images/jayappa-working-president.jpg'">
+            <h3 class="arpeu-member-name">Sri K. Jayappa</h3>
+            <p class="arpeu-member-role">State Working President</p>
+            <p class="arpeu-member-company">APCPDCL – Vijayawada</p>
+            <div class="arpeu-contact-row">
+                <a class="arpeu-call-btn" href="tel:9490154567"><i class="fas fa-phone-alt"></i> Call</a>
+                <a class="arpeu-whatsapp-btn" href="https://wa.me/919490154567" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+            </div>
+        </div>
+
+        <!-- Member 5: Organising Secretary -->
+        <div class="arpeu-member-card">
+            <img class="arpeu-member-photo arpeu-zoom-photo" 
+                 src="images/state-office-bearers/koteswara-rao-organising-secretary.jpg" 
+                 alt="Sri R. Koteswara Rao" 
+                 onerror="this.src='images/koteswara-rao-organising-secretary.jpg'">
+            <h3 class="arpeu-member-name">Sri R. Koteswara Rao</h3>
+            <p class="arpeu-member-role">State Organising Secretary</p>
+            <p class="arpeu-member-company">APEPDCL – Visakhapatnam</p>
+            <div class="arpeu-contact-row">
+                <a class="arpeu-call-btn" href="tel:9490158888"><i class="fas fa-phone-alt"></i> Call</a>
+                <a class="arpeu-whatsapp-btn" href="https://wa.me/919490158888" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+            </div>
+        </div>
+
+        <!-- Member 6: Additional Secretary -->
+        <div class="arpeu-member-card">
+            <img class="arpeu-member-photo arpeu-zoom-photo" src="https://pallibalakrishna1981-dev.github.io/ARPEU-Membership-App/images/arpeu-logo.png" alt="Additional Secretary">
+            <h3 class="arpeu-member-name">Sri L. Prasadu</h3>
+            <p class="arpeu-member-role">State Additional Secretary</p>
+            <p class="arpeu-member-company">APSPDCL – Tirupati</p>
+            <div class="arpeu-contact-row">
+                <a class="arpeu-call-btn" href="tel:9110771171"><i class="fas fa-phone-alt"></i> Call</a>
+                <a class="arpeu-whatsapp-btn" href="https://wa.me/919110771171" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+            </div>
+        </div>
+
+    </div>
+</section>
 
 <!-- =========================================================
      NOTIFICATIONS & BROADCAST CENTER
@@ -3904,8 +4024,18 @@
             
             <!-- A. ACTIVE SPEAKER STAGE -->
             <div class="speaker-stage" id="speakerStageContainer">
+                <!-- Main Focus Speaker Stage -->
                 <video id="mainSpeakerVideo" autoplay playsinline muted></video>
                 <canvas id="virtualBgCanvas" style="display: none;"></canvas>
+
+                <!-- 🌟 SECONDARY SPEAKER PIP OVERLAY (1/4th Screen Corner Window) -->
+                <div class="secondary-speaker-pip" id="secondarySpeakerPip" style="display: none;">
+                    <video id="secondarySpeakerVideo" autoplay playsinline muted></video>
+                    <div class="pip-speaker-badge">
+                        <i class="fas fa-microphone text-success"></i>
+                        <span id="pipSpeakerName">Sri L. Prasadu</span>
+                    </div>
+                </div>
 
                 <!-- TOP-RIGHT HOST MAGIC BALL -->
                 <div class="host-magic-ball-wrap" id="hostMagicBallWrap" style="display: none;">
@@ -4041,7 +4171,7 @@
                 <i class="fas fa-user-shield"></i>
                 <span>Host Control</span>
             </button>
-            <button type="button" class="tool-btn btn-end-call" onclick="leaveArpeuConference()" title="Leave Conference">
+            <button type="button" class="tool-btn btn-end-call" onclick="document.getElementById('arpeuNativeConferenceModal').style.cssText='display:none !important;'; document.body.style.overflow=''; if(typeof leaveArpeuConference==='function') leaveArpeuConference();" title="Leave Conference">
                 <i class="fas fa-phone-slash"></i>
                 <span>Leave</span>
             </button>
@@ -4905,7 +5035,7 @@
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-<script src="js/script.js?v=113"></script>
+<script src="js/script.js?v=114"></script>
 </body>
 
 </html>

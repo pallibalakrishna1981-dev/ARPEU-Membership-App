@@ -520,6 +520,7 @@ function showPage(page) {
   const notifSec = document.getElementById("notificationsSection");
   const setSec   = document.getElementById("settingsSection");
   const mtgSec   = document.getElementById("meetingsSection");
+  const obSec    = document.getElementById("office-bearersSection"); // 👉 Added Office Bearers Section
   const placeholderSec = document.getElementById("underDevPlaceholderSection");
 
   // 2. FORCE HIDE EVERY SECTION (Guarantees Zero Overlapping)
@@ -535,6 +536,7 @@ function showPage(page) {
   if (notifSec) notifSec.style.display = "none";
   if (setSec)   setSec.style.display   = "none";
   if (mtgSec)   mtgSec.style.display   = "none";
+  if (obSec)    obSec.style.display    = "none"; // 👉 Hide Office Bearers
   if (placeholderSec) placeholderSec.style.display = "none";
 
   // Hide standalone contentArea children if any
@@ -548,7 +550,7 @@ function showPage(page) {
   const contentArea = document.getElementById("contentArea") || window;
   contentArea.scrollTo({ top: 0, behavior: "smooth" });
 
-// Normalize page name by removing 'section' or 'page' suffixes
+  // Normalize page name by removing 'section' or 'page' suffixes
   const targetPage = String(page).toLowerCase().replace(/section|page/g, '').trim();
 
   // 5. Highlight active navbar item
@@ -617,6 +619,13 @@ function showPage(page) {
     case "notifications":
       if (notifSec) notifSec.style.display = "block";
       if (typeof loadNotificationsList === "function") loadNotificationsList();
+      break;
+
+    case "office-bearers":
+    case "officebearers":
+    case "bearers":
+    case "leadership":
+      if (obSec) obSec.style.display = "block"; // 👉 Open Office Bearers Master Page
       break;
 
     case "setting":
@@ -5497,6 +5506,42 @@ function updateLiveWhatsAppPreview() {
     previewEl.textContent = generateWhatsAppNoticeText(mtgData);
 }
 
+/**
+ * 📲 SMART WHATSAPP LAUNCHER (DIRECT NATIVE MOBILE / DESKTOP APP)
+ */
+function shareLiveWhatsAppNotice() {
+    const previewEl = document.getElementById("mtgLiveWaNoticePreview");
+    let noticeText = previewEl ? (previewEl.textContent || previewEl.innerText) : "";
+
+    if (!noticeText || noticeText.includes("Type meeting details above")) {
+        const issuerSelect = document.getElementById("mtgIssuerSelect");
+        const mtgData = {
+            title: (document.getElementById("mtgTitle") || {}).value || "State Committee Review",
+            meetingType: (document.getElementById("mtgType") || {}).value || (document.getElementById("mtgTargetGroup") || {}).value || "Official Meeting",
+            date: (document.getElementById("mtgDate") || {}).value || "TBD",
+            time: (document.getElementById("mtgTime") || {}).value || "TBD",
+            issuedByName: issuerSelect ? issuerSelect.value : "State Leadership",
+            issuedByDesig: (document.getElementById("mtgIssuerDesig") || {}).value || "ARPEU",
+            additionalMessage: (document.getElementById("mtgAdditionalMessage") || {}).value || "",
+            agenda: (typeof getEnteredAgendaPoints === "function") ? getEnteredAgendaPoints() : []
+        };
+        noticeText = generateWhatsAppNoticeText(mtgData);
+    }
+
+    const encodedText = encodeURIComponent(noticeText);
+
+    // Mobile vs Desktop Detection
+    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+    if (isMobile) {
+        // Direct Native Mobile App Protocol
+        window.location.href = `whatsapp://send?text=${encodedText}`;
+    } else {
+        // Direct Universal Web/Desktop API
+        window.open(`https://api.whatsapp.com/send?text=${encodedText}`, "_blank");
+    }
+}
+
 // 6. Submit New Meeting Form (Sync with Google Apps Script)
 async function submitNewMeeting(event) {
     if (event) event.preventDefault();
@@ -6158,31 +6203,32 @@ function projectorZoom(delta) {
 }
 
 /**
- * ☁️ HOST-ONLY PRIVATE GOOGLE DRIVE SELECTOR & "SHOW ON SCREEN" ENGINE
+ * ☁️ OFFICIAL GOOGLE DRIVE POPUP WINDOW (PERFECT MOBILE FRAME CENTER LOCK)
  */
 function openPrivateDrivePicker() {
-    if (!isWebrtcHost) {
-        alert('Google Drive Document Sharing is reserved for the Host.');
-        return;
-    }
+    toggleHostMagicDrawer();
 
-    const driveUrl = prompt("Enter official ARPEU Google Drive Image/PDF URL to project on stage:", "https://pallibalakrishna1981-dev.github.io/ARPEU-Membership-App/images/arpeu-logo.png");
-    if (!driveUrl) return;
+    const officialGoogleDriveUrl = "https://drive.google.com/drive/home";
 
-    const confirmShow = confirm("File loaded in private preview.\n\nWould you like to project this file on the live screen for all leaders?");
-    if (confirmShow) {
-        const stage = document.getElementById('docProjectorStage');
-        const docImg = document.getElementById('docProjectionImg');
-        const docTitle = document.getElementById('projectorDocTitle');
+    // 1. Get Mobile Call Frame Boundaries
+    const container = document.querySelector('.arpeu-call-container') || document.body;
+    const rect = container.getBoundingClientRect();
 
-        if (docTitle) docTitle.textContent = "Google Drive Shared Document";
-        if (docImg) {
-            docImg.src = driveUrl;
-            docImg.style.display = 'block';
-        }
-        if (stage) stage.style.display = 'flex';
-    }
+    // 2. Exact Dimensions Matching Mobile Frame
+    const width = Math.min(rect.width * 0.95, 380);
+    const height = Math.min(rect.height * 0.85, 620);
+
+    // 3. Exact Center Positioning within Container
+    const left = window.screenX + rect.left + (rect.width - width) / 2;
+    const top = window.screenY + rect.top + (rect.height - height) / 2;
+
+    window.open(
+        officialGoogleDriveUrl,
+        "ARPEU_Google_Drive_Popup",
+        `width=${width},height=${height},top=${top},left=${left},resizable=yes,scrollbars=yes,status=no,toolbar=no,menubar=no,location=no`
+    );
 }
+
 
 /**
  * 📋 DUAL-TAB AGENDA & LIVE RESOLUTIONS ENGINE
@@ -6457,20 +6503,43 @@ function hostClearAllHands() {
     toggleHostAdminPanel();
 }
 
+/**
+ * 🔴 LEAVE / CLOSE CONFERENCE CALL (INSTANT FULL CLEANUP)
+ */
 function leaveArpeuConference() {
     const modal = document.getElementById('arpeuNativeConferenceModal');
     
-    if (isWebrtcRecording) stopLocalRecording();
+    // 1. Stop Recording if Active
+    if (typeof isWebrtcRecording !== 'undefined' && isWebrtcRecording) {
+        stopLocalRecording();
+    }
 
-    if (webrtcLocalStream) {
-        webrtcLocalStream.getTracks().forEach(track => track.stop());
+    // 2. Stop Camera & Microphone Tracks
+    if (typeof webrtcLocalStream !== 'undefined' && webrtcLocalStream) {
+        webrtcLocalStream.getTracks().forEach(track => {
+            track.stop();
+            track.enabled = false;
+        });
         webrtcLocalStream = null;
     }
 
-    stopDocumentProjection();
+    // 3. Stop Projected Documents & Clean Video Elements
+    if (typeof stopDocumentProjection === 'function') {
+        stopDocumentProjection();
+    }
 
-    if (modal) modal.style.display = 'none';
+    const localVideo = document.getElementById('localUserVideo');
+    const mainVideo = document.getElementById('mainSpeakerVideo');
+    if (localVideo) localVideo.srcObject = null;
+    if (mainVideo) mainVideo.srcObject = null;
+
+    // 4. Force Close Conference Modal Overlay
+    if (modal) {
+        modal.style.cssText = "display: none !important;";
+    }
+
     document.body.style.overflow = '';
+    console.log("[ARPEU Conference] Left meeting and cleaned all streams successfully.");
 }
 
 // Splash Screen Auto-Dismiss Failsafe
@@ -6510,21 +6579,21 @@ function closeLiveNotepadStage() {
 function openPrivateDirectiveSenderModal() {
     toggleHostMagicDrawer();
 
-    const cadreOptions = coreCommitteeCadreMaster.map((c, i) => `${i + 1}. ${c.name} (${c.designation})`).join('\n');
-    const targetIdx = prompt(`Select Leader Number to send Private Directive:\n\n${cadreOptions}\n\nEnter number (1-4):`, "2");
+    const cadreList = (typeof coreCommitteeMasterData !== 'undefined') ? coreCommitteeMasterData : coreCommitteeCadreMaster;
+    const cadreOptions = cadreList.map((c, i) => `${i + 1}. ${c.name} (${c.designation})`).join('\n');
     
+    const targetIdx = prompt(`Select Leader to send Private Directive:\n\n${cadreOptions}\n\nEnter number:`, "1");
     if (!targetIdx) return;
-    const selectedLeader = coreCommitteeCadreMaster[parseInt(targetIdx) - 1];
+
+    const selectedLeader = cadreList[parseInt(targetIdx) - 1];
     if (!selectedLeader) {
         alert("Invalid leader selection.");
         return;
     }
 
-    const directiveText = prompt(`Enter Private Directive for ${selectedLeader.name}:`, "Please prepare to speak next on Cadre Allowances.");
+    const directiveText = prompt(`Enter Private Directive for ${selectedLeader.name}:`, "Please get ready to speak next.");
     if (directiveText && directiveText.trim() !== '') {
-        // Simulate Real-time Peer Directive
         triggerSimulatedDirective(selectedLeader.name, directiveText.trim());
-        alert(`Private Directive sent silently to ${selectedLeader.name}.`);
     }
 }
 
@@ -6684,4 +6753,120 @@ document.addEventListener('DOMContentLoaded', function() {
     canvas.addEventListener('touchstart', startRect, { passive: true });
     canvas.addEventListener('touchmove', moveRect, { passive: true });
     canvas.addEventListener('touchend', endRect);
+});
+
+/* ==========================================================
+   ACTIVE SPEAKER + SECONDARY SPEAKER + TAP TO PIN CONTROLLER
+   ========================================================== */
+
+let currentMainSpeakerData = coreCommitteeCadreMaster[0]; // Host/Default Speaker
+let isPersonallyPinned = false;
+let secondarySpeakerTimeout = null;
+
+/**
+ * 1. Personal Focus / Local Tap-to-Pin Feature
+ * (Runs only on the local device that clicked, does not affect others)
+ */
+function handleCadreThumbClick(cadreId, cadreName, cadreRole, cadreUnit) {
+    const mainVideo = document.getElementById('mainSpeakerVideo');
+    const pinBadge = document.getElementById('personalPinIndicator');
+    const pinnedNameEl = document.getElementById('pinnedLeaderName');
+
+    isPersonallyPinned = true;
+
+    // Update Ribbon with Pinned Leader Info Locally
+    updateActiveSpeakerIdentity(cadreName, cadreRole, cadreUnit);
+
+    if (pinBadge && pinnedNameEl) {
+        pinnedNameEl.textContent = cadreName;
+        pinBadge.style.display = 'flex';
+    }
+
+    console.log(`[Local Focus View] Pinned leader: ${cadreName} on this screen.`);
+}
+
+function resetPersonalFocusView() {
+    isPersonallyPinned = false;
+    const pinBadge = document.getElementById('personalPinIndicator');
+    if (pinBadge) pinBadge.style.display = 'none';
+
+    // Reset back to original Main Speaker
+    updateActiveSpeakerIdentity(
+        currentMainSpeakerData.name,
+        currentMainSpeakerData.designation,
+        currentMainSpeakerData.unit
+    );
+}
+
+/**
+ * 2. Secondary Speaker PiP Window Activator (Interrupter / Guidance Overlay)
+ */
+function triggerSecondarySpeakerGuidance(speakerName, stream = null) {
+    const pipContainer = document.getElementById('secondarySpeakerPip');
+    const pipName = document.getElementById('pipSpeakerName');
+    const pipVideo = document.getElementById('secondarySpeakerVideo');
+
+    if (!pipContainer) return;
+
+    if (pipName) pipName.textContent = speakerName;
+    if (pipVideo && stream) {
+        pipVideo.srcObject = stream;
+        pipVideo.play().catch(e => console.log(e));
+    }
+
+    pipContainer.style.display = 'block';
+
+    // Auto-hide secondary speaker 4 seconds after they finish talking
+    if (secondarySpeakerTimeout) clearTimeout(secondarySpeakerTimeout);
+    secondarySpeakerTimeout = setTimeout(() => {
+        pipContainer.style.display = 'none';
+    }, 4500);
+}
+
+/* ==========================================================
+   ARPEU OFFICE BEARERS PROFILE ZOOM MODAL ENGINE
+   ========================================================== */
+document.addEventListener('DOMContentLoaded', function () {
+    // 1. Create Modal Container Once in DOM
+    let modal = document.querySelector('.arpeu-profile-modal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.className = 'arpeu-profile-modal';
+        modal.innerHTML = `
+            <div class="arpeu-modal-box">
+                <button class="arpeu-modal-close" type="button">&times;</button>
+                <img class="arpeu-modal-photo" src="" alt="Profile Zoom">
+                <div class="arpeu-modal-name"></div>
+                <div class="arpeu-modal-role"></div>
+                <div class="arpeu-modal-company"></div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }
+
+    const modalPhoto = modal.querySelector('.arpeu-modal-photo');
+    const modalName = modal.querySelector('.arpeu-modal-name');
+    const modalRole = modal.querySelector('.arpeu-modal-role');
+    const modalCompany = modal.querySelector('.arpeu-modal-company');
+
+    // 2. Attach Click Handler on Profile Photos & Cards
+    document.addEventListener('click', function (e) {
+        const photo = e.target.closest('.arpeu-zoom-photo');
+        if (photo) {
+            const card = photo.closest('.arpeu-member-card, .arpeu-featured-card');
+            if (card) {
+                modalPhoto.src = photo.src;
+                modalPhoto.alt = photo.alt;
+                modalName.textContent = (card.querySelector('.arpeu-member-name, .arpeu-featured-name') || {}).textContent || '';
+                modalRole.textContent = (card.querySelector('.arpeu-member-role, .arpeu-featured-role') || {}).textContent || '';
+                modalCompany.textContent = (card.querySelector('.arpeu-member-company, .arpeu-featured-company') || {}).textContent || '';
+                modal.classList.add('active');
+            }
+        }
+
+        // Close on 'X' or outside click
+        if (e.target.closest('.arpeu-modal-close') || e.target === modal) {
+            modal.classList.remove('active');
+        }
+    });
 });

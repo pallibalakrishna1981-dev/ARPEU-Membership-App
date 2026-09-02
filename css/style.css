@@ -6244,19 +6244,19 @@ NEW QUICK LINKS INTEGRATED CARD STYLES
 /* Ultra-Compact Glassmorphism Floating Bar (No clash with Magic Ball) */
 .projector-floating-controls {
     position: absolute;
-    top: 10px;
+    top: 12px;
     left: 8px;
     z-index: 80 !important;
     display: inline-flex;
+    flex-direction: column; 
     align-items: center;
-    gap: 3px !important; /* Tight 3px gap to fit perfectly before Magic Ball */
+    gap: 4px;
     background: rgba(11, 23, 44, 0.95);
     backdrop-filter: blur(12px);
-    padding: 3px 5px !important;
-    border-radius: 8px !important;
+    padding: 5px 3px;
+    border-radius: 8px;
     border: 1px solid rgba(255, 255, 255, 0.2);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.8);
-    pointer-events: auto !important;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.85);
 }
 
 /* Compact Square Action Buttons (28px each) */
@@ -8353,4 +8353,430 @@ textarea.mtg-custom-field {
 @keyframes slideUpBar {
     from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }
+}
+
+/* ==========================================================
+   LIVE NOTEPAD STAGE (PERFECT CENTER OVERLAY OVERRIDE)
+   ========================================================== */
+.live-notepad-stage {
+    position: absolute !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    width: calc(100% - 24px) !important;
+    max-width: 360px !important;
+    height: 70% !important;
+    max-height: 420px !important;
+    background: rgba(11, 23, 44, 0.96) !important;
+    backdrop-filter: blur(15px) !important;
+    border: 2px solid #ff9800 !important;
+    border-radius: 16px !important;
+    z-index: 90 !important;
+    display: none;
+    flex-direction: column !important;
+    padding: 12px !important;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.95), 0 0 25px rgba(255, 152, 0, 0.3) !important;
+    box-sizing: border-box !important;
+}
+
+.notepad-header {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    color: #ffffff !important;
+    font-size: 13px !important;
+    font-weight: 800 !important;
+    margin-bottom: 10px !important;
+    padding-bottom: 6px !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12) !important;
+}
+
+.btn-close-notepad {
+    background: #dc3545 !important;
+    border: none !important;
+    color: #ffffff !important;
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    padding: 4px 10px !important;
+    border-radius: 6px !important;
+    cursor: pointer !important;
+}
+
+.notepad-textarea {
+    flex: 1 !important;
+    width: 100% !important;
+    background: #061020 !important;
+    border: 1.5px solid #1e2e4a !important;
+    border-radius: 10px !important;
+    color: #ffffff !important;
+    font-family: 'Poppins', sans-serif !important;
+    font-size: 13px !important;
+    padding: 10px !important;
+    resize: none !important;
+    line-height: 1.5 !important;
+    box-sizing: border-box !important;
+    outline: none !important;
+}
+
+.notepad-textarea:focus {
+    border-color: #ff9800 !important;
+}
+
+/* ==========================================================
+   SECONDARY SPEAKER PIP OVERLAY & PERSONAL PIN STYLES
+   ========================================================== */
+
+/* 1. Secondary Speaker PiP (Picture-in-Picture) */
+.secondary-speaker-pip {
+    position: absolute !important;
+    bottom: 74px !important;
+    right: 12px !important;
+    width: 105px !important;
+    height: 140px !important;
+    background: #081326 !important;
+    border: 2px solid #10b981 !important; /* Emerald Green Active Mic Border */
+    border-radius: 12px !important;
+    overflow: hidden !important;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.9), 0 0 15px rgba(16, 185, 129, 0.4) !important;
+    z-index: 30 !important;
+    animation: bounceIn 0.3s ease-out !important;
+}
+
+.secondary-speaker-pip video {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    display: block !important;
+}
+
+.pip-speaker-badge {
+    position: absolute !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    background: rgba(2, 6, 15, 0.85) !important;
+    backdrop-filter: blur(4px) !important;
+    padding: 3px 4px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+    font-size: 8.5px !important;
+    font-weight: 700 !important;
+    color: #ffffff !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
+
+/* 2. Personal Pin Indicator Bar */
+.personal-pin-indicator {
+    position: absolute !important;
+    top: 14px !important;
+    left: 12px !important;
+    background: rgba(11, 23, 44, 0.95) !important;
+    backdrop-filter: blur(8px) !important;
+    border: 1.5px solid #ff9800 !important;
+    border-radius: 20px !important;
+    padding: 4px 12px !important;
+    font-size: 11px !important;
+    color: #ffffff !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    z-index: 40 !important;
+    cursor: pointer !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6) !important;
+}
+
+.personal-pin-indicator strong {
+    color: #ff9800 !important;
+}
+
+/* ==========================================================
+   ARPEU MASTER OFFICE BEARERS RESPONSIVE STYLES (PIXEL PERFECT)
+   ========================================================== */
+
+.arpeu-office-bearers-section {
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 10px 8px 40px !important;
+    box-sizing: border-box;
+}
+
+/* 1. Featured Hon'ble President Card */
+.arpeu-featured-card {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    background: #ffffff !important;
+    border-radius: 12px !important;
+    padding: 10px !important;
+    gap: 12px !important;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06) !important;
+    border: 1px solid #e2e8f0 !important;
+    margin-bottom: 14px !important;
+    box-sizing: border-box !important;
+}
+
+.arpeu-featured-photo {
+    width: 110px !important;
+    height: 125px !important;
+    min-width: 110px !important;
+    object-fit: cover !important;
+    border-radius: 10px !important;
+    display: block !important;
+    cursor: pointer !important;
+    border: 1px solid #e2e8f0 !important;
+    background: #f8fafc !important;
+}
+
+.arpeu-featured-info {
+    flex: 1 !important;
+    min-width: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    text-align: left !important;
+}
+
+.arpeu-featured-role {
+    font-size: 11.5px !important;
+    font-weight: 700 !important;
+    color: #0b4ea2 !important;
+    margin: 0 0 2px 0 !important;
+}
+
+.arpeu-featured-name {
+    font-size: 16.5px !important;
+    line-height: 1.2 !important;
+    font-weight: 800 !important;
+    color: #dc2626 !important; /* Rich Red */
+    margin: 0 0 2px 0 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
+
+.arpeu-featured-company {
+    font-size: 11.5px !important;
+    font-weight: 700 !important;
+    color: #0b4ea2 !important;
+    margin: 0 0 8px 0 !important;
+}
+
+/* 2. Professional Section Divider Title */
+.arpeu-section-title {
+    text-align: center !important;
+    color: #0b4ea2 !important;
+    font-size: 14px !important;
+    font-weight: 800 !important;
+    margin: 12px 0 10px !important;
+    letter-spacing: 0.5px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 10px !important;
+}
+
+.arpeu-section-title::before,
+.arpeu-section-title::after {
+    content: "" !important;
+    height: 1.5px !important;
+    width: 35px !important;
+    background: #0b4ea2 !important;
+}
+
+/* 3. 2-Column Responsive Grid (14 Rows on Mobile) */
+.arpeu-bearers-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+.arpeu-member-card {
+    background: #ffffff !important;
+    border-radius: 12px !important;
+    padding: 8px 6px !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
+    border: 1px solid #e2e8f0 !important;
+    box-sizing: border-box !important;
+    text-align: center !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+}
+
+.arpeu-member-photo {
+    width: 100% !important;
+    height: 150px !important;
+    object-fit: cover !important;
+    border-radius: 8px !important;
+    display: block !important;
+    cursor: pointer !important;
+    margin-bottom: 6px !important;
+    background: #f8fafc !important;
+    border: 1px solid #eef2f6 !important;
+}
+
+.arpeu-member-name {
+    font-size: 13px !important;
+    line-height: 1.2 !important;
+    font-weight: 800 !important;
+    color: #dc2626 !important; /* Vibrant Red */
+    margin: 0 0 2px 0 !important;
+    width: 100% !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
+
+.arpeu-member-role {
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    color: #16a34a !important; /* Green */
+    margin: 0 0 1px 0 !important;
+    width: 100% !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
+
+.arpeu-member-company {
+    font-size: 10.5px !important;
+    font-weight: 700 !important;
+    color: #0b4ea2 !important; /* Blue */
+    margin: 0 0 8px 0 !important;
+    width: 100% !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
+
+/* Call & WhatsApp Equal-Width Action Buttons */
+.arpeu-contact-row {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 5px !important;
+    width: 100% !important;
+    margin-top: auto !important;
+}
+
+.arpeu-call-btn,
+.arpeu-whatsapp-btn {
+    border: none !important;
+    border-radius: 6px !important;
+    padding: 6px 2px !important;
+    font-size: 10.5px !important;
+    font-weight: 700 !important;
+    color: #ffffff !important;
+    cursor: pointer !important;
+    text-align: center !important;
+    text-decoration: none !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 3px !important;
+    white-space: nowrap !important;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1) !important;
+    transition: transform 0.15s ease !important;
+}
+
+.arpeu-call-btn {
+    background: #0b4ea2 !important; /* Royal Navy Blue */
+}
+
+.arpeu-whatsapp-btn {
+    background: #16a34a !important; /* WhatsApp Green */
+}
+
+.arpeu-call-btn:active,
+.arpeu-whatsapp-btn:active {
+    transform: scale(0.95) !important;
+}
+
+/* 4. Large Profile Zoom Modal */
+.arpeu-profile-modal {
+    position: fixed !important;
+    inset: 0 !important;
+    background: rgba(2, 6, 15, 0.85) !important;
+    backdrop-filter: blur(8px) !important;
+    display: none;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 16px !important;
+    z-index: 99999 !important;
+    box-sizing: border-box !important;
+}
+
+.arpeu-profile-modal.active {
+    display: flex !important;
+}
+
+.arpeu-modal-box {
+    width: 100% !important;
+    max-width: 360px !important;
+    background: #ffffff !important;
+    border-radius: 16px !important;
+    padding: 16px !important;
+    position: relative !important;
+    text-align: center !important;
+    box-sizing: border-box !important;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5) !important;
+    animation: zoomInModal 0.2s ease-out !important;
+}
+
+.arpeu-modal-photo {
+    width: 100% !important;
+    max-height: 50vh !important;
+    object-fit: contain !important;
+    border-radius: 10px !important;
+    display: block !important;
+    margin: 0 auto !important;
+}
+
+.arpeu-modal-name {
+    font-size: 18px !important;
+    font-weight: 800 !important;
+    color: #dc2626 !important;
+    margin: 10px 0 2px !important;
+}
+
+.arpeu-modal-role {
+    font-size: 14px !important;
+    font-weight: 700 !important;
+    color: #16a34a !important;
+}
+
+.arpeu-modal-company {
+    font-size: 12.5px !important;
+    font-weight: 600 !important;
+    color: #0b4ea2 !important;
+    margin-top: 2px !important;
+}
+
+.arpeu-modal-close {
+    position: absolute !important;
+    right: 10px !important;
+    top: 10px !important;
+    width: 28px !important;
+    height: 28px !important;
+    border: none !important;
+    border-radius: 50% !important;
+    background: #dc3545 !important;
+    color: #ffffff !important;
+    font-size: 16px !important;
+    font-weight: 700 !important;
+    cursor: pointer !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+@keyframes zoomInModal {
+    from { transform: scale(0.92); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
 }
