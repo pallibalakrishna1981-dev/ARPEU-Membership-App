@@ -8493,15 +8493,16 @@ textarea.mtg-custom-field {
 }
 
 /* ==========================================================
-   ARPEU MASTER OFFICE BEARERS RESPONSIVE STYLES (PIXEL PERFECT)
+   ARPEU MASTER OFFICE BEARERS RESPONSIVE STYLES (NO CUTS / NO OVERFLOW)
    ========================================================== */
 
 .arpeu-office-bearers-section {
-    width: 100%;
-    max-width: 500px;
-    margin: 0 auto;
-    padding: 10px 8px 40px !important;
-    box-sizing: border-box;
+    width: 100% !important;
+    max-width: 480px !important;
+    margin: 0 auto !important;
+    padding: 8px 6px 40px !important;
+    box-sizing: border-box !important;
+    overflow-x: hidden !important;
 }
 
 /* 1. Featured Hon'ble President Card */
@@ -8511,23 +8512,25 @@ textarea.mtg-custom-field {
     align-items: center !important;
     background: #ffffff !important;
     border-radius: 12px !important;
-    padding: 10px !important;
-    gap: 12px !important;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06) !important;
+    padding: 8px !important;
+    gap: 10px !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06) !important;
     border: 1px solid #e2e8f0 !important;
-    margin-bottom: 14px !important;
+    margin-bottom: 12px !important;
     box-sizing: border-box !important;
+    width: 100% !important;
 }
 
 .arpeu-featured-photo {
-    width: 110px !important;
-    height: 125px !important;
-    min-width: 110px !important;
+    width: 95px !important;
+    height: 115px !important;
+    min-width: 95px !important;
     object-fit: cover !important;
-    border-radius: 10px !important;
+    object-position: top center !important;
+    border-radius: 8px !important;
     display: block !important;
     cursor: pointer !important;
-    border: 1px solid #e2e8f0 !important;
+    border: 1px solid #cbd5e1 !important;
     background: #f8fafc !important;
 }
 
@@ -8538,20 +8541,24 @@ textarea.mtg-custom-field {
     flex-direction: column !important;
     justify-content: center !important;
     text-align: left !important;
+    overflow: hidden !important;
 }
 
 .arpeu-featured-role {
-    font-size: 11.5px !important;
+    font-size: 11px !important;
     font-weight: 700 !important;
     color: #0b4ea2 !important;
     margin: 0 0 2px 0 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
 }
 
 .arpeu-featured-name {
-    font-size: 16.5px !important;
+    font-size: 15.5px !important;
     line-height: 1.2 !important;
     font-weight: 800 !important;
-    color: #dc2626 !important; /* Rich Red */
+    color: #dc2626 !important;
     margin: 0 0 2px 0 !important;
     white-space: nowrap !important;
     overflow: hidden !important;
@@ -8559,48 +8566,51 @@ textarea.mtg-custom-field {
 }
 
 .arpeu-featured-company {
-    font-size: 11.5px !important;
-    font-weight: 700 !important;
-    color: #0b4ea2 !important;
-    margin: 0 0 8px 0 !important;
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    color: #475569 !important;
+    margin: 0 0 6px 0 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
 }
 
-/* 2. Professional Section Divider Title */
+/* 2. Heading */
 .arpeu-section-title {
     text-align: center !important;
     color: #0b4ea2 !important;
-    font-size: 14px !important;
+    font-size: 13.5px !important;
     font-weight: 800 !important;
-    margin: 12px 0 10px !important;
+    margin: 10px 0 !important;
     letter-spacing: 0.5px !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    gap: 10px !important;
+    gap: 8px !important;
 }
 
 .arpeu-section-title::before,
 .arpeu-section-title::after {
     content: "" !important;
     height: 1.5px !important;
-    width: 35px !important;
+    width: 30px !important;
     background: #0b4ea2 !important;
 }
 
-/* 3. 2-Column Responsive Grid (14 Rows on Mobile) */
+/* 3. 2-Column Responsive Grid (No Overflow) */
 .arpeu-bearers-grid {
     display: grid !important;
-    grid-template-columns: repeat(2, 1fr) !important;
-    gap: 8px !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important; /* Strict 50% split */
+    gap: 6px !important;
     width: 100% !important;
     box-sizing: border-box !important;
 }
 
 .arpeu-member-card {
     background: #ffffff !important;
-    border-radius: 12px !important;
-    padding: 8px 6px !important;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
+    border-radius: 10px !important;
+    padding: 6px 4px !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05) !important;
     border: 1px solid #e2e8f0 !important;
     box-sizing: border-box !important;
     text-align: center !important;
@@ -8608,26 +8618,29 @@ textarea.mtg-custom-field {
     flex-direction: column !important;
     align-items: center !important;
     justify-content: space-between !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
 }
 
 .arpeu-member-photo {
     width: 100% !important;
-    height: 150px !important;
+    height: 135px !important;
     object-fit: cover !important;
-    border-radius: 8px !important;
+    object-position: top center !important;
+    border-radius: 6px !important;
     display: block !important;
     cursor: pointer !important;
-    margin-bottom: 6px !important;
+    margin-bottom: 4px !important;
     background: #f8fafc !important;
-    border: 1px solid #eef2f6 !important;
+    border: 1px solid #cbd5e1 !important;
 }
 
 .arpeu-member-name {
-    font-size: 13px !important;
+    font-size: 12px !important;
     line-height: 1.2 !important;
     font-weight: 800 !important;
-    color: #dc2626 !important; /* Vibrant Red */
-    margin: 0 0 2px 0 !important;
+    color: #dc2626 !important;
+    margin: 0 0 1px 0 !important;
     width: 100% !important;
     white-space: nowrap !important;
     overflow: hidden !important;
@@ -8635,9 +8648,9 @@ textarea.mtg-custom-field {
 }
 
 .arpeu-member-role {
-    font-size: 11px !important;
+    font-size: 10.5px !important;
     font-weight: 700 !important;
-    color: #16a34a !important; /* Green */
+    color: #16a34a !important;
     margin: 0 0 1px 0 !important;
     width: 100% !important;
     white-space: nowrap !important;
@@ -8646,31 +8659,33 @@ textarea.mtg-custom-field {
 }
 
 .arpeu-member-company {
-    font-size: 10.5px !important;
-    font-weight: 700 !important;
-    color: #0b4ea2 !important; /* Blue */
-    margin: 0 0 8px 0 !important;
+    font-size: 9.5px !important;
+    font-weight: 600 !important;
+    color: #0b4ea2 !important;
+    margin: 0 0 6px 0 !important;
     width: 100% !important;
     white-space: nowrap !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
 }
 
-/* Call & WhatsApp Equal-Width Action Buttons */
+/* 3 Equal-Width Action Buttons (Ultra Compact) */
 .arpeu-contact-row {
     display: grid !important;
-    grid-template-columns: 1fr 1fr !important;
-    gap: 5px !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 3px !important;
     width: 100% !important;
     margin-top: auto !important;
+    box-sizing: border-box !important;
 }
 
 .arpeu-call-btn,
-.arpeu-whatsapp-btn {
+.arpeu-whatsapp-btn,
+.arpeu-profile-btn {
     border: none !important;
-    border-radius: 6px !important;
-    padding: 6px 2px !important;
-    font-size: 10.5px !important;
+    border-radius: 4px !important;
+    padding: 5px 1px !important;
+    font-size: 8.5px !important;
     font-weight: 700 !important;
     color: #ffffff !important;
     cursor: pointer !important;
@@ -8679,23 +8694,21 @@ textarea.mtg-custom-field {
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    gap: 3px !important;
+    gap: 2px !important;
     white-space: nowrap !important;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1) !important;
-    transition: transform 0.15s ease !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
 }
 
-.arpeu-call-btn {
-    background: #0b4ea2 !important; /* Royal Navy Blue */
-}
+.arpeu-call-btn { background: #0b4ea2 !important; }
+.arpeu-whatsapp-btn { background: #16a34a !important; }
+.arpeu-profile-btn { background: #ea580c !important; }
 
-.arpeu-whatsapp-btn {
-    background: #16a34a !important; /* WhatsApp Green */
-}
-
-.arpeu-call-btn:active,
-.arpeu-whatsapp-btn:active {
-    transform: scale(0.95) !important;
+.arpeu-call-btn i,
+.arpeu-whatsapp-btn i,
+.arpeu-profile-btn i {
+    font-size: 8.5px !important;
 }
 
 /* 4. Large Profile Zoom Modal */
@@ -8718,7 +8731,7 @@ textarea.mtg-custom-field {
 
 .arpeu-modal-box {
     width: 100% !important;
-    max-width: 360px !important;
+    max-width: 340px !important;
     background: #ffffff !important;
     border-radius: 16px !important;
     padding: 16px !important;
@@ -8739,20 +8752,20 @@ textarea.mtg-custom-field {
 }
 
 .arpeu-modal-name {
-    font-size: 18px !important;
+    font-size: 17px !important;
     font-weight: 800 !important;
     color: #dc2626 !important;
     margin: 10px 0 2px !important;
 }
 
 .arpeu-modal-role {
-    font-size: 14px !important;
+    font-size: 13.5px !important;
     font-weight: 700 !important;
     color: #16a34a !important;
 }
 
 .arpeu-modal-company {
-    font-size: 12.5px !important;
+    font-size: 12px !important;
     font-weight: 600 !important;
     color: #0b4ea2 !important;
     margin-top: 2px !important;

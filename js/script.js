@@ -6824,49 +6824,39 @@ function triggerSecondarySpeakerGuidance(speakerName, stream = null) {
 }
 
 /* ==========================================================
-   ARPEU OFFICE BEARERS PROFILE ZOOM MODAL ENGINE
+   OFFICE BEARER TO PROFILE ENGINE (VIEW / EDIT / CREATE)
    ========================================================== */
-document.addEventListener('DOMContentLoaded', function () {
-    // 1. Create Modal Container Once in DOM
-    let modal = document.querySelector('.arpeu-profile-modal');
-    if (!modal) {
-        modal = document.createElement('div');
-        modal.className = 'arpeu-profile-modal';
-        modal.innerHTML = `
-            <div class="arpeu-modal-box">
-                <button class="arpeu-modal-close" type="button">&times;</button>
-                <img class="arpeu-modal-photo" src="" alt="Profile Zoom">
-                <div class="arpeu-modal-name"></div>
-                <div class="arpeu-modal-role"></div>
-                <div class="arpeu-modal-company"></div>
-            </div>
-        `;
-        document.body.appendChild(modal);
+function openBearerProfile(name, mobile, role, company) {
+    // 1. Navigate to Profile Page
+    if (typeof showPage === 'function') {
+        showPage('profile');
     }
 
-    const modalPhoto = modal.querySelector('.arpeu-modal-photo');
-    const modalName = modal.querySelector('.arpeu-modal-name');
-    const modalRole = modal.querySelector('.arpeu-modal-role');
-    const modalCompany = modal.querySelector('.arpeu-modal-company');
-
-    // 2. Attach Click Handler on Profile Photos & Cards
-    document.addEventListener('click', function (e) {
-        const photo = e.target.closest('.arpeu-zoom-photo');
-        if (photo) {
-            const card = photo.closest('.arpeu-member-card, .arpeu-featured-card');
-            if (card) {
-                modalPhoto.src = photo.src;
-                modalPhoto.alt = photo.alt;
-                modalName.textContent = (card.querySelector('.arpeu-member-name, .arpeu-featured-name') || {}).textContent || '';
-                modalRole.textContent = (card.querySelector('.arpeu-member-role, .arpeu-featured-role') || {}).textContent || '';
-                modalCompany.textContent = (card.querySelector('.arpeu-member-company, .arpeu-featured-company') || {}).textContent || '';
-                modal.classList.add('active');
-            }
+    // 2. Check if Profile Search/Load function exists (Auto-search by Mobile)
+    const searchInput = document.getElementById('searchProfileMobile') || document.getElementById('profileSearchInput') || document.getElementById('searchMobile');
+    
+    if (searchInput) {
+        searchInput.value = mobile;
+        // If there's an existing search trigger function, run it
+        if (typeof searchMemberProfile === 'function') {
+            searchMemberProfile(mobile);
+        } else if (typeof fetchProfileData === 'function') {
+            fetchProfileData(mobile);
         }
+    }
 
-        // Close on 'X' or outside click
-        if (e.target.closest('.arpeu-modal-close') || e.target === modal) {
-            modal.classList.remove('active');
-        }
-    });
-});
+    // 3. Pre-fill data into Profile Form if in Create/Edit mode
+    setTimeout(() => {
+        const nameField = document.getElementById('profFullName') || document.getElementById('memberName');
+        const mobileField = document.getElementById('profMobile') || document.getElementById('memberMobile');
+        const roleField = document.getElementById('profDesignation') || document.getElementById('memberDesignation');
+        const companyField = document.getElementById('profCompany') || document.getElementById('memberCompany');
+
+        if (nameField && !nameField.value) nameField.value = name;
+        if (mobileField && !mobileField.value) mobileField.value = mobile;
+        if (roleField && !roleField.value) roleField.value = role;
+        if (companyField && !companyField.value) companyField.value = company;
+    }, 200);
+
+    console.log(`[Office Bearer Profile] Redirected for: ${name} (${mobile})`);
+}
