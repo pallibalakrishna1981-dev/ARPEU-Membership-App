@@ -22,7 +22,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="#0B4EA2">
 <meta name="apple-mobile-web-app-title" content="ARPEU Portal">
 
-<link rel="stylesheet" href="css/style.css?v=2049">
+<link rel="stylesheet" href="css/style.css?v=2041">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
@@ -3441,9 +3441,7 @@
 </section>
 
 
-<!-- =========================================================
-     MEETINGS & CONFERENCES HUB (PHASE 1)
-========================================================= -->
+
 <!-- =========================================================
      MEETINGS & CONFERENCES EXECUTIVE HUB
 ========================================================= -->
@@ -3622,669 +3620,78 @@
     </div>
 
 </section>
+
+
 <!-- =========================================================
      MEETINGS & CONFERENCES EXECUTIVE HUB END
 ========================================================= -->
 
 <!-- ==========================================================
-         6 COMPANY LOGO SELECTION BOXES (TOP GRID)
-    ========================================================== -->
-    <div class="arpeu-hub-top-header">
+     ARPEU MASTER DYNAMIC LEADERSHIP HUB (ALL COMPANIES & CIRCLES)
+========================================================== -->
+<section id="office-bearersSection" class="arpeu-office-bearers-section page-section" style="display: none;">
+
+    <!-- 🌟 A. MAIN HUB HEADER -->
+    <div class="arpeu-hub-top-header" id="arpeuHubMainHeader">
         <h2 class="arpeu-hub-main-title"><i class="fa-solid fa-users-gear text-warning"></i> ARPEU LEADERSHIP HUB</h2>
         <p class="arpeu-hub-main-sub">Select Company / Wing to view Office Bearers</p>
     </div>
 
+    <!-- 🌟 B. 6 COMPANY SELECTION BOXES (TOP GRID) -->
     <div class="arpeu-company-boxes-grid" id="arpeuCompanySelectorGrid">
-        <!-- 1. STATE BODY -->
-        <div class="arpeu-comp-box active-comp-box" onclick="filterCompanyBearers('state', this)">
-            <img src="images/arpeu-logo.png" alt="ARPEU State" onerror="this.src='https://pallibalakrishna1981-dev.github.io/ARPEU-Membership-App/images/arpeu-logo.png'">
+        <div class="arpeu-comp-box active-comp-box" onclick="selectCompanyHub('state', this)">
+            <img src="images/arpeu-logo.png" alt="State Body" onerror="this.src='https://pallibalakrishna1981-dev.github.io/ARPEU-Membership-App/images/arpeu-logo.png'">
             <span>STATE BODY</span>
         </div>
-
-        <!-- 2. APGENCO -->
-        <div class="arpeu-comp-box" onclick="filterCompanyBearers('apgenco', this)">
+        <div class="arpeu-comp-box" onclick="selectCompanyHub('apgenco', this)">
             <img src="images/apgenco.png" alt="APGENCO" onerror="this.src='images/arpeu-logo.png'">
             <span>APGENCO</span>
         </div>
-
-        <!-- 3. APTRANSCO -->
-        <div class="arpeu-comp-box" onclick="filterCompanyBearers('aptransco', this)">
+        <div class="arpeu-comp-box" onclick="selectCompanyHub('aptransco', this)">
             <img src="images/aptransco.png" alt="APTRANSCO" onerror="this.src='images/arpeu-logo.png'">
             <span>APTRANSCO</span>
         </div>
-
-        <!-- 4. APSPDCL -->
-        <div class="arpeu-comp-box" onclick="filterCompanyBearers('apspdcl', this)">
+        <div class="arpeu-comp-box" onclick="selectCompanyHub('apspdcl', this)">
             <img src="images/apspdcl.png" alt="APSPDCL" onerror="this.src='images/arpeu-logo.png'">
             <span>APSPDCL</span>
         </div>
-
-        <!-- 5. APEPDCL -->
-        <div class="arpeu-comp-box" onclick="filterCompanyBearers('apepdcl', this)">
+        <div class="arpeu-comp-box" onclick="selectCompanyHub('apepdcl', this)">
             <img src="images/apepdcl.png" alt="APEPDCL" onerror="this.src='images/arpeu-logo.png'">
             <span>APEPDCL</span>
         </div>
-
-        <!-- 6. APCPDCL -->
-        <div class="arpeu-comp-box" onclick="filterCompanyBearers('apcpdcl', this)">
+        <div class="arpeu-comp-box" onclick="selectCompanyHub('apcpdcl', this)">
             <img src="images/apcpdcl.png" alt="APCPDCL" onerror="this.src='images/arpeu-logo.png'">
             <span>APCPDCL</span>
         </div>
     </div>
 
+    <!-- 🌟 C. SUB-TIER / CIRCLE SELECTION TABS BAR -->
+    <div class="arpeu-subtier-tabs-bar" id="arpeuSubTierTabsBar" style="display: none;">
+        <!-- Injected dynamically by JS -->
+    </div>
 
-<!-- ==========================================================
-     ARPEU STATE OFFICE BEARERS MASTER SECTION (1 + 28 GRID)
-========================================================== -->
+    <!-- 🌟 D. DYNAMIC BEARERS CONTENT CONTAINER -->
+    <div id="arpeuDynamicBearersWrapper" class="company-bearers-view-panel" style="display: none;">
+        <!-- Featured President Card (Only for State Body) -->
+        <div id="arpeuFeaturedPresidentBox" style="display: none;"></div>
 
-<!-- 👉 STATE BODY CONTAINER (HIDDEN INITIALLY) -->
-<div id="companyBearers_state" class="company-bearers-view-panel" style="display: none;">
+        <!-- Section Title -->
+        <h2 class="arpeu-section-title" id="arpeuActiveWingTitle">STATE OFFICE BEARERS</h2>
 
-<section id="office-bearersSection" class="arpeu-office-bearers-section" style="display: none;">
-
-    <!-- 1. FEATURED HON'BLE PRESIDENT CARD -->
-    <div class="arpeu-featured-card">
-        <img class="arpeu-featured-photo arpeu-zoom-photo" src="images/state-office-bearers/raghuram-state-president-bms.jpg" alt="Hon'ble President - Sri T. Raghuram" onerror="this.onerror=null; this.src='images/raghuram-state-president-bms.jpg'">
-        <div class="arpeu-featured-info">
-            <p class="arpeu-featured-role">Hon'ble President - ARPEU</p>
-            <h2 class="arpeu-featured-name">Sri T. Raghuram</h2>
-           <p class="arpeu-featured-company">State President – BMS<br>Head Cashier in BOB, VJA</p>
-            <div class="arpeu-contact-row">
-                <a class="arpeu-call-btn" href="tel:9703640710"><i class="fas fa-phone-alt"></i> Call</a>
-                <a class="arpeu-whatsapp-btn" href="https://wa.me/919703640710" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a>
-                <button type="button" class="arpeu-profile-btn" onclick="openBearerProfile('Sri T. Raghuram', '9703640710', 'Hon\'ble President', 'BMS / ARPEU')"><i class="fas fa-user-edit"></i> Profile</button>
-            </div>
+        <!-- 2-Column Responsive Grid -->
+        <div class="arpeu-bearers-grid" id="arpeuDynamicBearersGrid">
+            <!-- Dynamic Leader Cards injected by JS -->
         </div>
     </div>
 
-    <!-- 2. SECTION TITLE -->
-    <h2 class="arpeu-section-title">STATE OFFICE BEARERS</h2>
-
-    <!-- 3. 28 MEMBERS 2-COLUMN RESPONSIVE GRID -->
-    <div class="arpeu-bearers-grid" id="arpeuBearersGridContainer">
-
-        <!-- 1. State President -->
-        <div class="arpeu-member-card">
-            <img class="arpeu-member-photo arpeu-zoom-photo" src="images/state-office-bearers/state-president.jpg" alt="Sri T. Sambasiva Rao" onerror="this.onerror=null; this.src='images/state-president.jpg'">
-            <h3 class="arpeu-member-name">Sri T. Sambasiva Rao</h3>
-            <p class="arpeu-member-role">State President</p>
-            <p class="arpeu-member-company">AE / TRE / Ongole / APCPDCL / Prakasam</p>
-            <div class="arpeu-contact-row">
-                <a class="arpeu-call-btn" href="tel:9849195995"><i class="fas fa-phone-alt"></i> Call</a>
-                <a class="arpeu-whatsapp-btn" href="https://wa.me/919849195995" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a>
-                <button type="button" class="arpeu-profile-btn" onclick="openBearerProfile('Sri T. Sambasiva Rao', '9849195995', 'State President', 'APCPDCL')"><i class="fas fa-user-edit"></i> Profile</button>
-            </div>
-        </div>
-
-        <!-- 2. State General Secretary -->
-        <div class="arpeu-member-card">
-            <img class="arpeu-member-photo arpeu-zoom-photo" src="images/state-office-bearers/general-secretary.jpg" alt="Sri C. Ramagopal Reddy" onerror="this.onerror=null; this.src='images/general-secretary.jpg'">
-            <h3 class="arpeu-member-name">Sri C. Ramagopal Reddy</h3>
-            <p class="arpeu-member-role">State General Secretary</p>
-            <p class="arpeu-member-company">FM Gr.-1 / RTPP / APGENCO / Kadapa</p>
-            <div class="arpeu-contact-row">
-                <a class="arpeu-call-btn" href="tel:7989215049"><i class="fas fa-phone-alt"></i> Call</a>
-                <a class="arpeu-whatsapp-btn" href="https://wa.me/917989215049" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a>
-                <button type="button" class="arpeu-profile-btn" onclick="openBearerProfile('Sri C. Ramagopal Reddy', '7989215049', 'State General Secretary', 'APGENCO')"><i class="fas fa-user-edit"></i> Profile</button>
-            </div>
-        </div>
-
-        <!-- 3. State Treasurer -->
-        <div class="arpeu-member-card">
-            <img class="arpeu-member-photo arpeu-zoom-photo" src="images/state-office-bearers/state-treasurer.jpg" alt="Sri P. Bala Krishna" onerror="this.onerror=null; this.src='images/state-treasurer.jpg'">
-            <h3 class="arpeu-member-name">Sri P. Bala Krishna</h3>
-            <p class="arpeu-member-role">State Treasurer</p>
-            <p class="arpeu-member-company">JPA / Dr. NTTPS / NTR / APGENCO </p>
-            <div class="arpeu-contact-row">
-                <a class="arpeu-call-btn" href="tel:9642788786"><i class="fas fa-phone-alt"></i> Call</a>
-                <a class="arpeu-whatsapp-btn" href="https://wa.me/919642788786" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a>
-                <button type="button" class="arpeu-profile-btn" onclick="openBearerProfile('Sri P. Bala Krishna', '9642788786', 'State Treasurer', 'APGENCO')"><i class="fas fa-user-edit"></i> Profile</button>
-            </div>
-        </div>
-
-        <!-- 4. State Working President -->
-        <div class="arpeu-member-card">
-            <img class="arpeu-member-photo arpeu-zoom-photo" src="images/state-office-bearers/jayappa-working-president.jpg" alt="Sri K. Jayappa" onerror="this.onerror=null; this.src='images/jayappa-working-president.jpg'">
-            <h3 class="arpeu-member-name">Sri K. Jayappa</h3>
-            <p class="arpeu-member-role">State Working President</p>
-            <p class="arpeu-member-company">AAO / Kadapa / SPDCL</p>
-            <div class="arpeu-contact-row">
-                <a class="arpeu-call-btn" href="tel:9515126908"><i class="fas fa-phone-alt"></i> Call</a>
-                <a class="arpeu-whatsapp-btn" href="https://wa.me/919515126908" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a>
-                <button type="button" class="arpeu-profile-btn" onclick="openBearerProfile('Sri K. Jayappa', '9515126908', 'State Working President', 'APSPDCL')"><i class="fas fa-user-edit"></i> Profile</button>
-            </div>
-        </div>
-
-        <!-- 5. State Organising Secretary -->
-        <div class="arpeu-member-card">
-            <img class="arpeu-member-photo arpeu-zoom-photo" src="images/state-office-bearers/koteswara-rao-organising-secretary.jpg" alt="Sri A. Koteswara Rao" onerror="this.onerror=null; this.src='images/koteswara-rao-organising-secretary.jpg'">
-            <h3 class="arpeu-member-name">Sri A. Koteswara Rao</h3>
-            <p class="arpeu-member-role">State Organising Secretary</p>
-            <p class="arpeu-member-company">LM / O / Kavali / SPDCL</p>
-            <div class="arpeu-contact-row">
-                <a class="arpeu-call-btn" href="tel:9849375974"><i class="fas fa-phone-alt"></i> Call</a>
-                <a class="arpeu-whatsapp-btn" href="https://wa.me/919849375974" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a>
-                <button type="button" class="arpeu-profile-btn" onclick="openBearerProfile('Sri A. Koteswara Rao', '9849375974', 'State Organising Secretary', 'APSPDCL')"><i class="fas fa-user-edit"></i> Profile</button>
-            </div>
-        </div>
-
-        <!-- 6. Vice President -->
-        <div class="arpeu-member-card">
-            <img class="arpeu-member-photo arpeu-zoom-photo" src="images/state-office-bearers/vice-president-kiran-kishore.jpg" alt="Sri D. Kiran Kishore" onerror="this.onerror=null; this.src='images/arpeu-logo.png'">
-            <h3 class="arpeu-member-name">Sri D. Kiran Kishore</h3>
-            <p class="arpeu-member-role">Vice President</p>
-            <p class="arpeu-member-company">JE / O / Eluru / EPDCL</p>
-            <div class="arpeu-contact-row">
-                <a class="arpeu-call-btn" href="tel:8317645490"><i class="fas fa-phone-alt"></i> Call</a>
-                <a class="arpeu-whatsapp-btn" href="https://wa.me/918317645490" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a>
-                <button type="button" class="arpeu-profile-btn" onclick="openBearerProfile('Sri D. Kiran Kishore', '8317645490', 'Vice President', 'APEPDCL')"><i class="fas fa-user-edit"></i> Profile</button>
-            </div>
-        </div>
-
-        <!-- 7. Vice President -->
-        <div class="arpeu-member-card">
-            <img class="arpeu-member-photo arpeu-zoom-photo" src="images/state-office-bearers/vice-president-haritamma.jpg" alt="Smt. J. Saritha" onerror="this.onerror=null; this.src='images/arpeu-logo.png'">
-            <h3 class="arpeu-member-name">Smt. J. Saritha</h3>
-            <p class="arpeu-member-role">Vice President</p>
-            <p class="arpeu-member-company">Sr. Asst. / ERO / SPDCL</p>
-            <div class="arpeu-contact-row">
-                <a class="arpeu-call-btn" href="tel:7989797699"><i class="fas fa-phone-alt"></i> Call</a>
-                <a class="arpeu-whatsapp-btn" href="https://wa.me/917989797699" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a>
-                <button type="button" class="arpeu-profile-btn" onclick="openBearerProfile('Smt. J. Saritha', '7989797699', 'Vice President', 'APSPDCL')"><i class="fas fa-user-edit"></i> Profile</button>
-            </div>
-        </div>
-
-        <!-- 8. Vice President -->
-        <div class="arpeu-member-card">
-            <img class="arpeu-member-photo arpeu-zoom-photo" src="images/state-office-bearers/vice-president-papaiah.jpg" alt="Sri G. Papaiah" onerror="this.onerror=null; this.src='images/arpeu-logo.png'">
-            <h3 class="arpeu-member-name">Sri G. Papaiah</h3>
-            <p class="arpeu-member-role">Vice President</p>
-            <p class="arpeu-member-company">LM / O / Kavali / SPDCL</p>
-            <div class="arpeu-contact-row">
-                <a class="arpeu-call-btn" href="tel:9441685040"><i class="fas fa-phone-alt"></i> Call</a>
-                <a class="arpeu-whatsapp-btn" href="https://wa.me/919441685040" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a>
-                <button type="button" class="arpeu-profile-btn" onclick="openBearerProfile('Sri G. Papaiah', '9441685040', 'Vice President', 'APSPDCL')"><i class="fas fa-user-edit"></i> Profile</button>
-            </div>
-        </div>
-
-        <!-- 9. Vice President -->
-        <div class="arpeu-member-card">
-            <img class="arpeu-member-photo arpeu-zoom-photo" src="images/state-office-bearers/vice-president-navaratna-kumar.jpg" alt="Sri T. Navaratna Kumar" onerror="this.onerror=null; this.src='images/arpeu-logo.png'">
-            <h3 class="arpeu-member-name">Sri T. Navaratna Kumar</h3>
-            <p class="arpeu-member-role">Vice President</p>
-            <p class="arpeu-member-company">LI /                          O / Prakasam / CPDCL</p>
-            <div class="arpeu-contact-row">
-                <a class="arpeu-call-btn" href="tel:9885947549"><i class="fas fa-phone-alt"></i> Call</a>
-                <a class="arpeu-whatsapp-btn" href="https://wa.me/919885947549" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a>
-                <button type="button" class="arpeu-profile-btn" onclick="openBearerProfile('Sri T. Navaratna Kumar', '9885947549', 'Vice President', 'APCPDCL')"><i class="fas fa-user-edit"></i> Profile</button>
-            </div>
-        </div>
-
-        <!-- 10. Vice President -->
-        <div class="arpeu-member-card">
-            <img class="arpeu-member-photo arpeu-zoom-photo" src="images/state-office-bearers/vice-president-sudhakar.jpg" alt="Sri Ch. Sudhakar" onerror="this.onerror=null; this.src='images/arpeu-logo.png'">
-            <h3 class="arpeu-member-name">Sri Ch. Sudhakar</h3>
-            <p class="arpeu-member-role">Vice President</p>
-            <p class="arpeu-member-company">CL / Nellore / SDSTPS / APGENCO</p>
-            <div class="arpeu-contact-row">
-                <a class="arpeu-call-btn" href="tel:9704312927"><i class="fas fa-phone-alt"></i> Call</a>
-                <a class="arpeu-whatsapp-btn" href="https://wa.me/919704312927" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a>
-                <button type="button" class="arpeu-profile-btn" onclick="openBearerProfile('Sri Ch. Sudhakar', '9704312927', 'Vice President', 'APGENCO')"><i class="fas fa-user-edit"></i> Profile</button>
-            </div>
-        </div>
-
-        <!-- 11. Vice President -->
-        <div class="arpeu-member-card">
-            <img class="arpeu-member-photo arpeu-zoom-photo" src="images/state-office-bearers/vice-president-prasad-reddy.jpg" alt="Sri CVR. Prasad Reddy" onerror="this.onerror=null; this.src='images/arpeu-logo.png'">
-            <h3 class="arpeu-member-name">Sri CVR. Prasad Reddy</h3>
-            <p class="arpeu-member-role">Vice President</p>
-            <p class="arpeu-member-company">JPA / Kadapa / RTPP / APGENCO</p>
-            <div class="arpeu-contact-row">
-                <a class="arpeu-call-btn" href="tel:9494686398"><i class="fas fa-phone-alt"></i> Call</a>
-                <a class="arpeu-whatsapp-btn" href="https://wa.me/919494686398" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a>
-                <button type="button" class="arpeu-profile-btn" onclick="openBearerProfile('Sri CVR. Prasad Reddy', '9494686398', 'Vice President', 'APGENCO')"><i class="fas fa-user-edit"></i> Profile</button>
-            </div>
-        </div>
-
-        <!-- 12. Vice President -->
-        <div class="arpeu-member-card">
-            <img class="arpeu-member-photo arpeu-zoom-photo" src="images/state-office-bearers/vice-president-prathap.jpg" alt="Sri K. Prathap" onerror="this.onerror=null; this.src='images/arpeu-logo.png'">
-            <h3 class="arpeu-member-name">Sri K. Prathap</h3>
-            <p class="arpeu-member-role">Vice President</p>
-            <p class="arpeu-member-company">JLM / Ongole / CPDCL</p>
-            <div class="arpeu-contact-row">
-                <a class="arpeu-call-btn" href="tel:9949612824"><i class="fas fa-phone-alt"></i> Call</a>
-                <a class="arpeu-whatsapp-btn" href="https://wa.me/919949612824" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a>
-                <button type="button" class="arpeu-profile-btn" onclick="openBearerProfile('Sri K. Prathap', '9949612824', 'Vice President', 'APCPDCL')"><i class="fas fa-user-edit"></i> Profile</button>
-            </div>
-        </div>
-
-        <!-- 13. Assistant General Secretary -->
-        <div class="arpeu-member-card">
-            <img class="arpeu-member-photo arpeu-zoom-photo" src="images/state-office-bearers/asst-gen-secretary-kavitha.jpg" alt="Smt. K. Kavitha" onerror="this.onerror=null; this.src='images/arpeu-logo.png'">
-            <h3 class="arpeu-member-name">Smt. K. Kavitha</h3>
-            <p class="arpeu-member-role">Asst. General Secretary</p>
-            <p class="arpeu-member-company">JPA / Kadapa / RTPP / APGENCO</p>
-            <div class="arpeu-contact-row">
-                <a class="arpeu-call-btn" href="tel:8897541854"><i class="fas fa-phone-alt"></i> Call</a>
-                <a class="arpeu-whatsapp-btn" href="https://wa.me/918897541854" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a>
-                <button type="button" class="arpeu-profile-btn" onclick="openBearerProfile('Smt. K. Kavitha', '8897541854', 'Asst. General Secretary', 'APGENCO')"><i class="fas fa-user-edit"></i> Profile</button>
-            </div>
-        </div>
-
-        <!-- 14. Assistant General Secretary -->
-        <div class="arpeu-member-card">
-            <img class="arpeu-member-photo arpeu-zoom-photo" src="images/state-office-bearers/asst-gen-secretary-prasad.jpg" alt="Sri P. Prasad" onerror="this.onerror=null; this.src='images/arpeu-logo.png'">
-            <h3 class="arpeu-member-name">Sri P. Prasad</h3>
-            <p class="arpeu-member-role">Asst. General Secretary</p>
-            <p class="arpeu-member-company">LI / O / Ongole / CPDCL</p>
-            <div class="arpeu-contact-row">
-                <a class="arpeu-call-btn" href="tel:9492276307"><i class="fas fa-phone-alt"></i> Call</a>
-                <a class="arpeu-whatsapp-btn" href="https://wa.me/919492276307" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a>
-                <button type="button" class="arpeu-profile-btn" onclick="openBearerProfile('Sri P. Prasad', '9492276307', 'Asst. General Secretary', 'APCPDCL')"><i class="fas fa-user-edit"></i> Profile</button>
-            </div>
-        </div>
-
-        <!-- 15. Assistant General Secretary -->
-        <div class="arpeu-member-card">
-            <img class="arpeu-member-photo arpeu-zoom-photo" src="images/state-office-bearers/asst-gen-secretary-masthan-vali.jpg" alt="Sri S. Masthan Vali" onerror="this.onerror=null; this.src='images/arpeu-logo.png'">
-            <h3 class="arpeu-member-name">Sri S. Masthan Vali</h3>
-            <p class="arpeu-member-role">Asst. General Secretary</p>
-            <p class="arpeu-member-company">Sr. Asst. / Ananthapur / SPDCL</p>
-            <div class="arpeu-contact-row">
-                <a class="arpeu-call-btn" href="tel:9059128456"><i class="fas fa-phone-alt"></i> Call</a>
-                <a class="arpeu-whatsapp-btn" href="https://wa.me/919059128456" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a>
-                <button type="button" class="arpeu-profile-btn" onclick="openBearerProfile('Sri S. Masthan Vali', '9059128456', 'Asst. General Secretary', 'APSPDCL')"><i class="fas fa-user-edit"></i> Profile</button>
-            </div>
-        </div>
-
-        <!-- 16. Assistant General Secretary -->
-        <div class="arpeu-member-card">
-            <img class="arpeu-member-photo arpeu-zoom-photo" src="images/state-office-bearers/asst-gen-secretary-durga-prasad.jpg" alt="Sri A. Durga Prasad" onerror="this.onerror=null; this.src='images/arpeu-logo.png'">
-            <h3 class="arpeu-member-name">Sri A. Durga Prasad</h3>
-            <p class="arpeu-member-role">Asst. General Secretary</p>
-            <p class="arpeu-member-company">Sr. Asst. / Ongole / CPDCL</p>
-            <div class="arpeu-contact-row">
-                <a class="arpeu-call-btn" href="tel:7842090977"><i class="fas fa-phone-alt"></i> Call</a>
-                <a class="arpeu-whatsapp-btn" href="https://wa.me/917842090977" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a>
-                <button type="button" class="arpeu-profile-btn" onclick="openBearerProfile('Sri A. Durga Prasad', '7842090977', 'Asst. General Secretary', 'APCPDCL')"><i class="fas fa-user-edit"></i> Profile</button>
-            </div>
-        </div>
-
-        <!-- 17. Assistant General Secretary -->
-        <div class="arpeu-member-card">
-            <img class="arpeu-member-photo arpeu-zoom-photo" src="images/state-office-bearers/asst-gen-secretary-ramesh.jpg" alt="Sri P. Ramesh" onerror="this.onerror=null; this.src='images/arpeu-logo.png'">
-            <h3 class="arpeu-member-name">Sri P. Ramesh</h3>
-            <p class="arpeu-member-role">Asst. General Secretary</p>
-            <p class="arpeu-member-company">FM Gr.-IV / Nellore / SDSTPS / APGENCO</p>
-            <div class="arpeu-contact-row">
-                <a class="arpeu-call-btn" href="tel:9182858910"><i class="fas fa-phone-alt"></i> Call</a>
-                <a class="arpeu-whatsapp-btn" href="https://wa.me/919182858910" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a>
-                <button type="button" class="arpeu-profile-btn" onclick="openBearerProfile('Sri P. Ramesh', '9182858910', 'Asst. General Secretary', 'APGENCO')"><i class="fas fa-user-edit"></i> Profile</button>
-            </div>
-        </div>
-
-        <!-- 18. Assistant General Secretary -->
-        <div class="arpeu-member-card">
-            <img class="arpeu-member-photo arpeu-zoom-photo" src="images/state-office-bearers/asst-gen-secretary-suresh-babu.jpg" alt="Sri K. Suresh Babu" onerror="this.onerror=null; this.src='images/arpeu-logo.png'">
-            <h3 class="arpeu-member-name">Sri K. Suresh Babu</h3>
-            <p class="arpeu-member-role">Asst. General Secretary</p>
-            <p class="arpeu-member-company">LM / O / Darsi / CPDCL</p>
-            <div class="arpeu-contact-row">
-                <a class="arpeu-call-btn" href="tel:9866632669"><i class="fas fa-phone-alt"></i> Call</a>
-                <a class="arpeu-whatsapp-btn" href="https://wa.me/919866632669" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a>
-                <button type="button" class="arpeu-profile-btn" onclick="openBearerProfile('Sri K. Suresh Babu', '9866632669', 'Asst. General Secretary', 'APCPDCL')"><i class="fas fa-user-edit"></i> Profile</button>
-            </div>
-        </div>
-
-        <!-- 19. Assistant General Secretary -->
-        <div class="arpeu-member-card">
-            <img class="arpeu-member-photo arpeu-zoom-photo" src="images/state-office-bearers/asst-gen-secretary-keshava-rao.jpg" alt="Sri P. Keseva Rao" onerror="this.onerror=null; this.src='images/arpeu-logo.png'">
-            <h3 class="arpeu-member-name">Sri P. Keseva Rao</h3>
-            <p class="arpeu-member-role">Asst. General Secretary</p>
-            <p class="arpeu-member-company">LM / Nellore / SPDCL</p>
-            <div class="arpeu-contact-row">
-                <a class="arpeu-call-btn" href="tel:9494300108"><i class="fas fa-phone-alt"></i> Call</a>
-                <a class="arpeu-whatsapp-btn" href="https://wa.me/919494300108" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a>
-                <button type="button" class="arpeu-profile-btn" onclick="openBearerProfile('Sri P. Keseva Rao', '9494300108', 'Asst. General Secretary', 'APSPDCL')"><i class="fas fa-user-edit"></i> Profile</button>
-            </div>
-        </div>
-
-        <!-- 20. Assistant General Secretary -->
-        <div class="arpeu-member-card">
-            <img class="arpeu-member-photo arpeu-zoom-photo" src="images/state-office-bearers/asst-gen-secretary-chand-abdulla.jpg" alt="Sri SK. Chand Abdulla" onerror="this.onerror=null; this.src='images/arpeu-logo.png'">
-            <h3 class="arpeu-member-name">Sri SK. Chand Abdulla</h3>
-            <p class="arpeu-member-role">Asst. General Secretary</p>
-            <p class="arpeu-member-company">LM / Kavali Town / SPDCL</p>
-            <div class="arpeu-contact-row">
-                <a class="arpeu-call-btn" href="tel:9949673028"><i class="fas fa-phone-alt"></i> Call</a>
-                <a class="arpeu-whatsapp-btn" href="https://wa.me/919949673028" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a>
-                <button type="button" class="arpeu-profile-btn" onclick="openBearerProfile('Sri SK. Chand Abdulla', '9949673028', 'Asst. General Secretary', 'APSPDCL')"><i class="fas fa-user-edit"></i> Profile</button>
-            </div>
-        </div>
-
-        <!-- 21. Assistant General Secretary -->
-        <div class="arpeu-member-card">
-            <img class="arpeu-member-photo arpeu-zoom-photo" src="images/state-office-bearers/asst-gen-secretary-n-ramesh.jpg" alt="Sri N. Ramesh" onerror="this.onerror=null; this.src='images/arpeu-logo.png'">
-            <h3 class="arpeu-member-name">Sri N. Ramesh</h3>
-            <p class="arpeu-member-role">Asst. General Secretary</p>
-            <p class="arpeu-member-company">LM / O / D1 / Ongole / CPDCL</p>
-            <div class="arpeu-contact-row">
-                <a class="arpeu-call-btn" href="tel:8106018744"><i class="fas fa-phone-alt"></i> Call</a>
-                <a class="arpeu-whatsapp-btn" href="https://wa.me/918106018744" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a>
-                <button type="button" class="arpeu-profile-btn" onclick="openBearerProfile('Sri N. Ramesh', '8106018744', 'Asst. General Secretary', 'APCPDCL')"><i class="fas fa-user-edit"></i> Profile</button>
-            </div>
-        </div>
-
-        <!-- 22. Joint Secretary -->
-        <div class="arpeu-member-card">
-            <img class="arpeu-member-photo arpeu-zoom-photo" src="images/state-office-bearers/joint-secretary-praveen-kumar.jpg" alt="Sri B. Praveen Kumar" onerror="this.onerror=null; this.src='images/arpeu-logo.png'">
-            <h3 class="arpeu-member-name">Sri B. Praveen Kumar</h3>
-            <p class="arpeu-member-role">Joint Secretary</p>
-            <p class="arpeu-member-company">CL / NTR /Dr. NTTPS /APGENCO </p>
-            <div class="arpeu-contact-row">
-                <a class="arpeu-call-btn" href="tel:8978845689"><i class="fas fa-phone-alt"></i> Call</a>
-                <a class="arpeu-whatsapp-btn" href="https://wa.me/918978845689" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a>
-                <button type="button" class="arpeu-profile-btn" onclick="openBearerProfile('Sri B. Praveen Kumar', '8978845689', 'Joint Secretary', 'APGENCO')"><i class="fas fa-user-edit"></i> Profile</button>
-            </div>
-        </div>
-
-        <!-- 23. Joint Secretary -->
-        <div class="arpeu-member-card">
-            <img class="arpeu-member-photo arpeu-zoom-photo" src="images/state-office-bearers/joint-secretary-lakshmuiah.jpg" alt="Sri A. Lakshmaiah" onerror="this.onerror=null; this.src='images/arpeu-logo.png'">
-            <h3 class="arpeu-member-name">Sri A. Lakshmaiah</h3>
-            <p class="arpeu-member-role">Joint Secretary</p>
-            <p class="arpeu-member-company">JAO / Kadapa / SPDCL</p>
-            <div class="arpeu-contact-row">
-                <a class="arpeu-call-btn" href="tel:9441684787"><i class="fas fa-phone-alt"></i> Call</a>
-                <a class="arpeu-whatsapp-btn" href="https://wa.me/919441684787" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a>
-                <button type="button" class="arpeu-profile-btn" onclick="openBearerProfile('Sri A. Lakshmaiah', '9441684787', 'Joint Secretary', 'APSPDCL')"><i class="fas fa-user-edit"></i> Profile</button>
-            </div>
-        </div>
-
-        <!-- 24. Joint Secretary -->
-        <div class="arpeu-member-card">
-            <img class="arpeu-member-photo arpeu-zoom-photo" src="images/state-office-bearers/joint-secretary-dinesh-kumar.jpg" alt="Sri K. Dinesh Kumar" onerror="this.onerror=null; this.src='images/arpeu-logo.png'">
-            <h3 class="arpeu-member-name">Sri K. Dinesh Kumar</h3>
-            <p class="arpeu-member-role">Joint Secretary</p>
-            <p class="arpeu-member-company">AE / TRANSCO / Annamayya</p>
-            <div class="arpeu-contact-row">
-                <a class="arpeu-call-btn" href="tel:9490154334"><i class="fas fa-phone-alt"></i> Call</a>
-                <a class="arpeu-whatsapp-btn" href="https://wa.me/919490154334" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a>
-                <button type="button" class="arpeu-profile-btn" onclick="openBearerProfile('Sri K. Dinesh Kumar', '9490154334', 'Joint Secretary', 'APTRANSCO')"><i class="fas fa-user-edit"></i> Profile</button>
-            </div>
-        </div>
-
-        <!-- 25. Joint Secretary -->
-        <div class="arpeu-member-card">
-            <img class="arpeu-member-photo arpeu-zoom-photo" src="images/state-office-bearers/joint-secretary-baba-fakruddin.jpg" alt="Sri M. Baba Fakruddin" onerror="this.onerror=null; this.src='images/arpeu-logo.png'">
-            <h3 class="arpeu-member-name">Sri M. Baba Fakruddin</h3>
-            <p class="arpeu-member-role">Joint Secretary</p>
-            <p class="arpeu-member-company">FM Gr.-IV / RTPP / Kadapa / APGENCO</p>
-            <div class="arpeu-contact-row">
-                <a class="arpeu-call-btn" href="tel:9491938708"><i class="fas fa-phone-alt"></i> Call</a>
-                <a class="arpeu-whatsapp-btn" href="https://wa.me/919491938708" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a>
-                <button type="button" class="arpeu-profile-btn" onclick="openBearerProfile('Sri M. Baba Fakruddin', '9491938708', 'Joint Secretary', 'APGENCO')"><i class="fas fa-user-edit"></i> Profile</button>
-            </div>
-        </div>
-
-        <!-- 26. Joint Secretary -->
-        <div class="arpeu-member-card">
-            <img class="arpeu-member-photo arpeu-zoom-photo" src="images/state-office-bearers/joint-secretary-sivaiah.jpg" alt="Sri N. Sivaiah" onerror="this.onerror=null; this.src='images/arpeu-logo.png'">
-            <h3 class="arpeu-member-name">Sri N. Sivaiah</h3>
-            <p class="arpeu-member-role">Joint Secretary</p>
-            <p class="arpeu-member-company">LI / O / Nellore / SPDCL</p>
-            <div class="arpeu-contact-row">
-                <a class="arpeu-call-btn" href="tel:9652048899"><i class="fas fa-phone-alt"></i> Call</a>
-                <a class="arpeu-whatsapp-btn" href="https://wa.me/919652048899" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a>
-                <button type="button" class="arpeu-profile-btn" onclick="openBearerProfile('Sri N. Sivaiah', '9652048899', 'Joint Secretary', 'APSPDCL')"><i class="fas fa-user-edit"></i> Profile</button>
-            </div>
-        </div>
-
-        <!-- 27. Joint Secretary -->
-        <div class="arpeu-member-card">
-            <img class="arpeu-member-photo arpeu-zoom-photo" src="images/state-office-bearers/joint-secretary-praveen-kumar-reddy.jpg" alt="Sri Y. Praveen Kumar Reddy" onerror="this.onerror=null; this.src='images/arpeu-logo.png'">
-            <h3 class="arpeu-member-name">Sri Y. Praveen Kumar Reddy</h3>
-            <p class="arpeu-member-role">Joint Secretary</p>
-            <p class="arpeu-member-company">LM / Nellore / SPDCL</p>
-            <div class="arpeu-contact-row">
-                <a class="arpeu-call-btn" href="tel:9441614237"><i class="fas fa-phone-alt"></i> Call</a>
-                <a class="arpeu-whatsapp-btn" href="https://wa.me/919441614237" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a>
-                <button type="button" class="arpeu-profile-btn" onclick="openBearerProfile('Sri Y. Praveen Kumar Reddy', '9441614237', 'Joint Secretary', 'APSPDCL')"><i class="fas fa-user-edit"></i> Profile</button>
-            </div>
-        </div>
-
-        <!-- 28. Office Secretary -->
-        <div class="arpeu-member-card">
-            <img class="arpeu-member-photo arpeu-zoom-photo" src="images/state-office-bearers/office-secretary-ravi.jpg" alt="Sri R. Ravi" onerror="this.onerror=null; this.src='images/arpeu-logo.png'">
-            <h3 class="arpeu-member-name">Sri R. Ravi</h3>
-            <p class="arpeu-member-role">Office Secretary</p>
-            <p class="arpeu-member-company">CL / Dr.NTTPS /APGENCO / NTR</p>
-            <div class="arpeu-contact-row">
-                <a class="arpeu-call-btn" href="tel:9985333734"><i class="fas fa-phone-alt"></i> Call</a>
-                <a class="arpeu-whatsapp-btn" href="https://wa.me/919985333734" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a>
-                <button type="button" class="arpeu-profile-btn" onclick="openBearerProfile('Sri R. Ravi', '9985333734', 'Office Secretary', 'APGENCO')"><i class="fas fa-user-edit"></i> Profile</button>
-            </div>
-        </div>
-
-    </div>
-</div>
-
-<!-- ==========================================================
-         APGENCO COMPANY OFFICE BEARERS (15 LEADERS)
-    ========================================================== -->
-    <div id="companyBearers_apgenco" class="company-bearers-view-panel" style="display: none;">
-        
-        <!-- APGENCO SECTION TITLE -->
-        <h2 class="arpeu-section-title">APGENCO COMPANY OFFICE BEARERS</h2>
-
-        <!-- APGENCO 2-COLUMN RESPONSIVE GRID -->
-        <div class="arpeu-bearers-grid">
-
-            <!-- 1. GENCO President -->
-            <div class="arpeu-member-card">
-                <img class="arpeu-member-photo arpeu-zoom-photo" src="images/genco-office-bearers/vice-president-sudhakar.jpg" alt="Sri Ch. Sudhakar" onerror="this.onerror=null; this.src='images/vice-president-sudhakar.jpg'">
-                <h3 class="arpeu-member-name">Sri Ch. Sudhakar</h3>
-                <p class="arpeu-member-role">GENCO President</p>
-                <p class="arpeu-member-company">CLU / CHP / Stage-I SDSTPS / Nellore</p>
-                <div class="arpeu-contact-row">
-                    <a class="arpeu-call-btn" href="tel:9704312927"><i class="fas fa-phone-alt"></i> Call</a>
-                    <a class="arpeu-whatsapp-btn" href="https://wa.me/919704312927" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a>
-                    <button type="button" class="arpeu-profile-btn" onclick="openBearerProfile('Sri Ch. Sudhakar', '9704312927', 'GENCO President', 'APGENCO')"><i class="fas fa-user-edit"></i> Profile</button>
-                </div>
-            </div>
-
-            <!-- 2. GENCO Secretary -->
-            <div class="arpeu-member-card">
-                <img class="arpeu-member-photo arpeu-zoom-photo" src="images/genco-office-bearers/vice-president-prasad-reddy.jpg" alt="Sri CVR. Prasad Reddy" onerror="this.onerror=null; this.src='images/vice-president-prasad-reddy.jpg'">
-                <h3 class="arpeu-member-name">Sri CVR. Prasad Reddy</h3>
-                <p class="arpeu-member-role">GENCO Secretary</p>
-                <p class="arpeu-member-company">JPA / SE / O&M / Stage-II RTPP / Kadapa</p>
-                <div class="arpeu-contact-row">
-                    <a class="arpeu-call-btn" href="tel:9494686398"><i class="fas fa-phone-alt"></i> Call</a>
-                    <a class="arpeu-whatsapp-btn" href="https://wa.me/919494686398" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a>
-                    <button type="button" class="arpeu-profile-btn" onclick="openBearerProfile('Sri CVR. Prasad Reddy', '9494686398', 'GENCO Secretary', 'APGENCO')"><i class="fas fa-user-edit"></i> Profile</button>
-                </div>
-            </div>
-
-            <!-- 3. GENCO Treasurer -->
-            <div class="arpeu-member-card">
-                <img class="arpeu-member-photo arpeu-zoom-photo" src="images/genco-office-bearers/treasurer-srinivas.jpg" alt="Sri M. Srinivas" onerror="this.onerror=null; this.src='images/treasurer-srinivas.jpg'">
-                <h3 class="arpeu-member-name">Sri M. Srinivas</h3>
-                <p class="arpeu-member-role">GENCO Treasurer</p>
-                <p class="arpeu-member-company">FM Gr.II / Stage-IV DN.TTPS / NTR</p>
-                <div class="arpeu-contact-row">
-                    <a class="arpeu-call-btn" href="tel:9494505355"><i class="fas fa-phone-alt"></i> Call</a>
-                    <a class="arpeu-whatsapp-btn" href="https://wa.me/919494505355" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a>
-                    <button type="button" class="arpeu-profile-btn" onclick="openBearerProfile('Sri M. Srinivas', '9494505355', 'GENCO Treasurer', 'APGENCO')"><i class="fas fa-user-edit"></i> Profile</button>
-                </div>
-            </div>
-
-            <!-- 4. Working President -->
-            <div class="arpeu-member-card">
-                <img class="arpeu-member-photo arpeu-zoom-photo" src="images/genco-office-bearers/working-president-balaji.jpg" alt="Sri Bandli Balaji" onerror="this.onerror=null; this.src='images/working-president-balaji.jpg'">
-                <h3 class="arpeu-member-name">Sri Bandli Balaji</h3>
-                <p class="arpeu-member-role">Working President</p>
-                <p class="arpeu-member-company">JPA / CHP / Stage-I Dr. MVR RTPP</p>
-                <div class="arpeu-contact-row">
-                    <a class="arpeu-call-btn" href="tel:9668977029"><i class="fas fa-phone-alt"></i> Call</a>
-                    <a class="arpeu-whatsapp-btn" href="https://wa.me/919668977029" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a>
-                    <button type="button" class="arpeu-profile-btn" onclick="openBearerProfile('Sri Bandli Balaji', '9668977029', 'Working President', 'APGENCO')"><i class="fas fa-user-edit"></i> Profile</button>
-                </div>
-            </div>
-
-            <!-- 5. Vice President -->
-            <div class="arpeu-member-card">
-                <img class="arpeu-member-photo arpeu-zoom-photo" src="images/genco-office-bearers/vice-president-nirmala.jpg" alt="Smt. D. Nirmala" onerror="this.onerror=null; this.src='images/vice-president-nirmala.jpg'">
-                <h3 class="arpeu-member-name">Smt. D. Nirmala</h3>
-                <p class="arpeu-member-role">Vice President</p>
-                <p class="arpeu-member-company">PA / BWWR Bhavanapuram DN.TTPS</p>
-                <div class="arpeu-contact-row">
-                    <a class="arpeu-call-btn" href="tel:7569414130"><i class="fas fa-phone-alt"></i> Call</a>
-                    <a class="arpeu-whatsapp-btn" href="https://wa.me/917569414130" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a>
-                    <button type="button" class="arpeu-profile-btn" onclick="openBearerProfile('Smt. D. Nirmala', '7569414130', 'Vice President', 'APGENCO')"><i class="fas fa-user-edit"></i> Profile</button>
-                </div>
-            </div>
-
-            <!-- 6. Vice President -->
-            <div class="arpeu-member-card">
-                <img class="arpeu-member-photo arpeu-zoom-photo" src="images/genco-office-bearers/vice-president-suresh.jpg" alt="Sri Ch. Suresh" onerror="this.onerror=null; this.src='images/vice-president-suresh.jpg'">
-                <h3 class="arpeu-member-name">Sri Ch. Suresh</h3>
-                <p class="arpeu-member-role">Vice President</p>
-                <p class="arpeu-member-company">CLU / EE / Gen / Stage-I SDSTPS</p>
-                <div class="arpeu-contact-row">
-                    <a class="arpeu-call-btn" href="tel:8500454563"><i class="fas fa-phone-alt"></i> Call</a>
-                    <a class="arpeu-whatsapp-btn" href="https://wa.me/918500454563" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a>
-                    <button type="button" class="arpeu-profile-btn" onclick="openBearerProfile('Sri Ch. Suresh', '8500454563', 'Vice President', 'APGENCO')"><i class="fas fa-user-edit"></i> Profile</button>
-                </div>
-            </div>
-
-            <!-- 7. Vice President -->
-            <div class="arpeu-member-card">
-                <img class="arpeu-member-photo arpeu-zoom-photo" src="images/genco-office-bearers/vice-president-m-sudhakar.jpg" alt="Sri M. Sudhakar" onerror="this.onerror=null; this.src='images/vice-president-m-sudhakar.jpg'">
-                <h3 class="arpeu-member-name">Sri M. Sudhakar</h3>
-                <p class="arpeu-member-role">Vice President</p>
-                <p class="arpeu-member-company">JAO / Accounts / Dr. MVR RTPP</p>
-                <div class="arpeu-contact-row">
-                    <a class="arpeu-call-btn" href="tel:9441048533"><i class="fas fa-phone-alt"></i> Call</a>
-                    <a class="arpeu-whatsapp-btn" href="https://wa.me/919441048533" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a>
-                    <button type="button" class="arpeu-profile-btn" onclick="openBearerProfile('Sri M. Sudhakar', '9441048533', 'Vice President', 'APGENCO')"><i class="fas fa-user-edit"></i> Profile</button>
-                </div>
-            </div>
-
-            <!-- 8. Asst. Secretary -->
-            <div class="arpeu-member-card">
-                <img class="arpeu-member-photo arpeu-zoom-photo" src="images/genco-office-bearers/asst-secretary-shaik-mustafa.jpg" alt="Sri Shaik Mustafa" onerror="this.onerror=null; this.src='images/asst-secretary-shaik-mustafa.jpg'">
-                <h3 class="arpeu-member-name">Sri Shaik Mustafa</h3>
-                <p class="arpeu-member-role">Asst. Secretary</p>
-                <p class="arpeu-member-company">CLU / Fire & Safety / Dr. MVR RTPP</p>
-                <div class="arpeu-contact-row">
-                    <a class="arpeu-call-btn" href="tel:8099969825"><i class="fas fa-phone-alt"></i> Call</a>
-                    <a class="arpeu-whatsapp-btn" href="https://wa.me/918099969825" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a>
-                    <button type="button" class="arpeu-profile-btn" onclick="openBearerProfile('Sri Shaik Mustafa', '8099969825', 'Asst. Secretary', 'APGENCO')"><i class="fas fa-user-edit"></i> Profile</button>
-                </div>
-            </div>
-
-            <!-- 9. Asst. Secretary -->
-            <div class="arpeu-member-card">
-                <img class="arpeu-member-photo arpeu-zoom-photo" src="images/genco-office-bearers/asst-secretary-padmarao.jpg" alt="Sri B.V. Padma Rao" onerror="this.onerror=null; this.src='images/asst-secretary-padmarao.jpg'">
-                <h3 class="arpeu-member-name">Sri B.V. Padma Rao</h3>
-                <p class="arpeu-member-role">Asst. Secretary</p>
-                <p class="arpeu-member-company">CLU / APH / Stage-II / Dr.NTTPS</p>
-                <div class="arpeu-contact-row">
-                    <a class="arpeu-call-btn" href="tel:9909070466"><i class="fas fa-phone-alt"></i> Call</a>
-                    <a class="arpeu-whatsapp-btn" href="https://wa.me/919909070466" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a>
-                    <button type="button" class="arpeu-profile-btn" onclick="openBearerProfile('Sri B.V. Padma Rao', '9909070466', 'Asst. Secretary', 'APGENCO')"><i class="fas fa-user-edit"></i> Profile</button>
-                </div>
-            </div>
-
-            <!-- 10. Asst. Secretary -->
-            <div class="arpeu-member-card">
-                <img class="arpeu-member-photo arpeu-zoom-photo" src="images/genco-office-bearers/asst-secretary-prasad.jpg" alt="Sri K. Prasad" onerror="this.onerror=null; this.src='images/asst-secretary-prasad.jpg'">
-                <h3 class="arpeu-member-name">Sri K. Prasad</h3>
-                <p class="arpeu-member-role">Asst. Secretary</p>
-                <p class="arpeu-member-company">CLU / IC / Stage-I SDSTPS</p>
-                <div class="arpeu-contact-row">
-                    <a class="arpeu-call-btn" href="tel:9491277350"><i class="fas fa-phone-alt"></i> Call</a>
-                    <a class="arpeu-whatsapp-btn" href="https://wa.me/919491277350" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a>
-                    <button type="button" class="arpeu-profile-btn" onclick="openBearerProfile('Sri K. Prasad', '9491277350', 'Asst. Secretary', 'APGENCO')"><i class="fas fa-user-edit"></i> Profile</button>
-                </div>
-            </div>
-
-            <!-- 11. Joint Secretary -->
-            <div class="arpeu-member-card">
-                <img class="arpeu-member-photo arpeu-zoom-photo" src="images/genco-office-bearers/joint-secretary-teja.jpg" alt="Sri P. Yoho Teja" onerror="this.onerror=null; this.src='images/joint-secretary-teja.jpg'">
-                <h3 class="arpeu-member-name">Sri P. Yoho Teja</h3>
-                <p class="arpeu-member-role">Joint Secretary</p>
-                <p class="arpeu-member-company">JE / SIP / Stage-I / Dr. NTTPS</p>
-                <div class="arpeu-contact-row">
-                    <a class="arpeu-call-btn" href="tel:9676656596"><i class="fas fa-phone-alt"></i> Call</a>
-                    <a class="arpeu-whatsapp-btn" href="https://wa.me/919676656596" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a>
-                    <button type="button" class="arpeu-profile-btn" onclick="openBearerProfile('Sri P. Yoho Teja', '9676656596', 'Joint Secretary', 'APGENCO')"><i class="fas fa-user-edit"></i> Profile</button>
-                </div>
-            </div>
-
-            <!-- 12. Joint Secretary -->
-            <div class="arpeu-member-card">
-                <img class="arpeu-member-photo arpeu-zoom-photo" src="images/genco-office-bearers/joint-secretary-raja-reddy.jpg" alt="Sri V. Raj Reddy" onerror="this.onerror=null; this.src='images/joint-secretary-raja-reddy.jpg'">
-                <h3 class="arpeu-member-name">Sri V. Raj Reddy</h3>
-                <p class="arpeu-member-role">Joint Secretary</p>
-                <p class="arpeu-member-company">JPA / SE / O&M / Stage-I RTPP</p>
-                <div class="arpeu-contact-row">
-                    <a class="arpeu-call-btn" href="tel:9941466378"><i class="fas fa-phone-alt"></i> Call</a>
-                    <a class="arpeu-whatsapp-btn" href="https://wa.me/919941466378" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a>
-                    <button type="button" class="arpeu-profile-btn" onclick="openBearerProfile('Sri V. Raj Reddy', '9941466378', 'Joint Secretary', 'APGENCO')"><i class="fas fa-user-edit"></i> Profile</button>
-                </div>
-            </div>
-
-            <!-- 13. Joint Secretary -->
-            <div class="arpeu-member-card">
-                <img class="arpeu-member-photo arpeu-zoom-photo" src="images/genco-office-bearers/joint-secretary-sudheer-babu.jpg" alt="Sri B. Sidharth Babu" onerror="this.onerror=null; this.src='images/joint-secretary-sudheer-babu.jpg'">
-                <h3 class="arpeu-member-name">Sri B. Sidharth Babu</h3>
-                <p class="arpeu-member-role">Joint Secretary</p>
-                <p class="arpeu-member-company">CES / JEP / Stage-I SDSTPS</p>
-                <div class="arpeu-contact-row">
-                    <a class="arpeu-call-btn" href="tel:8985425983"><i class="fas fa-phone-alt"></i> Call</a>
-                    <a class="arpeu-whatsapp-btn" href="https://wa.me/918985425983" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a>
-                    <button type="button" class="arpeu-profile-btn" onclick="openBearerProfile('Sri B. Sidharth Babu', '8985425983', 'Joint Secretary', 'APGENCO')"><i class="fas fa-user-edit"></i> Profile</button>
-                </div>
-            </div>
-
-            <!-- 14. Organising Secretary -->
-            <div class="arpeu-member-card">
-                <img class="arpeu-member-photo arpeu-zoom-photo" src="images/genco-office-bearers/organising-secretary-shastry.jpg" alt="Sri D.S.S. Shastri" onerror="this.onerror=null; this.src='images/organising-secretary-shastry.jpg'">
-                <h3 class="arpeu-member-name">Sri D.S.S. Shastri</h3>
-                <p class="arpeu-member-role">Organising Secretary</p>
-                <p class="arpeu-member-company">JE / ESP / Stage-I / Dr. NTTPS</p>
-                <div class="arpeu-contact-row">
-                    <a class="arpeu-call-btn" href="tel:9957983377"><i class="fas fa-phone-alt"></i> Call</a>
-                    <a class="arpeu-whatsapp-btn" href="https://wa.me/919957983377" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a>
-                    <button type="button" class="arpeu-profile-btn" onclick="openBearerProfile('Sri D.S.S. Shastri', '9957983377', 'Organising Secretary', 'APGENCO')"><i class="fas fa-user-edit"></i> Profile</button>
-                </div>
-            </div>
-
-            <!-- 15. Office Secretary -->
-            <div class="arpeu-member-card">
-                <img class="arpeu-member-photo arpeu-zoom-photo" src="images/genco-office-bearers/office-secretary-rajesh-reddy.jpg" alt="Sri I. Rajesh Reddy" onerror="this.onerror=null; this.src='images/office-secretary-rajesh-reddy.jpg'">
-                <h3 class="arpeu-member-name">Sri I. Rajesh Reddy</h3>
-                <p class="arpeu-member-role">Office Secretary</p>
-                <p class="arpeu-member-company">JPH / CHP / Dozer / Dr. MVR RTPP</p>
-                <div class="arpeu-contact-row">
-                    <a class="arpeu-call-btn" href="tel:9940979303"><i class="fas fa-phone-alt"></i> Call</a>
-                    <a class="arpeu-whatsapp-btn" href="https://wa.me/919940979303" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a>
-                    <button type="button" class="arpeu-profile-btn" onclick="openBearerProfile('Sri I. Rajesh Reddy', '9940979303', 'Office Secretary', 'APGENCO')"><i class="fas fa-user-edit"></i> Profile</button>
-                </div>
-            </div>
-
-        </div>
-    </div>
-
-<!-- 🌟 FLOATING "BACK TO COMPANIES" PILL BUTTON -->
+    <!-- 🌟 E. FLOATING "BACK TO COMPANIES" PILL BUTTON -->
     <button type="button" id="btnFloatingBackToComps" class="arpeu-floating-back-btn" onclick="closeCompanyBearersPanel()" style="display: none;">
         <i class="fa-solid fa-arrow-left"></i>
         <span>Back to Companies</span>
     </button>
+
 </section>
+
 
 <!-- =========================================================
      NOTIFICATIONS & BROADCAST CENTER
@@ -5586,7 +4993,7 @@
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-<script src="js/script.js?v=116"></script>
+<script src="js/script.js?v=117"></script>
 </body>
 
 </html>

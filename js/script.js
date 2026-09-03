@@ -508,36 +508,38 @@ function showPage(page) {
   const rc = document.getElementById("receiptContainer");
 
   // 1. Capture ALL page sections strictly
-  const homeSec  = document.getElementById("homeSection") || document.getElementById("homePage");
-  const membSec  = document.getElementById("membershipPage") || document.getElementById("membershipSection");
-  const donSec   = document.getElementById("donationsSection") || document.getElementById("donationsPage");
-  const statSec  = document.getElementById("statisticsSection") || document.getElementById("statisticsPage");
-  const abtSec   = document.getElementById("aboutSection") || document.getElementById("aboutPage");
-  const cntSec   = document.getElementById("contactSection") || document.getElementById("contactPage");
-  const dwnSec   = document.getElementById("downloadsSection") || document.getElementById("downloadsPage");
-  const profSec  = document.getElementById("profileSection") || document.getElementById("profilePage");
-  const admSec   = document.getElementById("adminSection");
-  const notifSec = document.getElementById("notificationsSection");
-  const setSec   = document.getElementById("settingsSection");
-  const mtgSec   = document.getElementById("meetingsSection");
-  const obSec    = document.getElementById("office-bearersSection"); // 👉 Added Office Bearers Section
-  const placeholderSec = document.getElementById("underDevPlaceholderSection");
+  const homeSec       = document.getElementById("homeSection") || document.getElementById("homePage");
+  const membSec       = document.getElementById("membershipPage") || document.getElementById("membershipSection");
+  const donSec        = document.getElementById("donationsSection") || document.getElementById("donationsPage");
+  const statSec       = document.getElementById("statisticsSection") || document.getElementById("statisticsPage");
+  const abtSec        = document.getElementById("aboutSection") || document.getElementById("aboutPage");
+  const cntSec        = document.getElementById("contactSection") || document.getElementById("contactPage");
+  const dwnSec        = document.getElementById("downloadsSection") || document.getElementById("downloadsPage");
+  const profSec       = document.getElementById("profileSection") || document.getElementById("profilePage");
+  const admSec        = document.getElementById("adminSection");
+  const notifSec      = document.getElementById("notificationsSection");
+  const setSec        = document.getElementById("settingsSection");
+  const mtgSec        = document.getElementById("meetingsSection");
+  const obSec         = document.getElementById("office-bearersSection"); // 👉 Office Bearers Section
+  const floatingBack  = document.getElementById("btnFloatingBackToComps"); // 👉 Floating Back Button
+  const placeholderSec= document.getElementById("underDevPlaceholderSection");
 
-  // 2. FORCE HIDE EVERY SECTION (Guarantees Zero Overlapping)
-  if (homeSec)  homeSec.style.display  = "none";
-  if (membSec)  membSec.style.display  = "none";
-  if (donSec)   donSec.style.display   = "none";
-  if (statSec)  statSec.style.display  = "none";
-  if (abtSec)   abtSec.style.display   = "none";
-  if (cntSec)   cntSec.style.display   = "none";
-  if (dwnSec)   dwnSec.style.display   = "none";
-  if (profSec)  profSec.style.display  = "none";
-  if (admSec)   admSec.style.display   = "none";
-  if (notifSec) notifSec.style.display = "none";
-  if (setSec)   setSec.style.display   = "none";
-  if (mtgSec)   mtgSec.style.display   = "none";
-  if (obSec)    obSec.style.display    = "none"; // 👉 Hide Office Bearers
-  if (placeholderSec) placeholderSec.style.display = "none";
+  // 2. FORCE HIDE EVERY SECTION & FLOATING BUTTON (Guarantees Zero Overlapping)
+  if (homeSec)       homeSec.style.display       = "none";
+  if (membSec)       membSec.style.display       = "none";
+  if (donSec)        donSec.style.display        = "none";
+  if (statSec)       statSec.style.display       = "none";
+  if (abtSec)        abtSec.style.display        = "none";
+  if (cntSec)        cntSec.style.display        = "none";
+  if (dwnSec)        dwnSec.style.display        = "none";
+  if (profSec)       profSec.style.display       = "none";
+  if (admSec)        admSec.style.display        = "none";
+  if (notifSec)      notifSec.style.display      = "none";
+  if (setSec)        setSec.style.display        = "none";
+  if (mtgSec)        mtgSec.style.display        = "none";
+  if (obSec)         obSec.style.display         = "none"; // 👉 Strictly Hide Office Bearers
+  if (floatingBack)  floatingBack.style.display  = "none"; // 👉 Strictly Hide Floating Button
+  if (placeholderSec)placeholderSec.style.display= "none";
 
   // Hide standalone contentArea children if any
   document.querySelectorAll("#contentArea > section").forEach(s => s.style.display = "none");
@@ -625,7 +627,13 @@ function showPage(page) {
     case "officebearers":
     case "bearers":
     case "leadership":
-      if (obSec) obSec.style.display = "block"; // 👉 Open Office Bearers Master Page
+      if (obSec) {
+        obSec.style.display = "block"; // 👉 Open Office Bearers Hub Only
+        // Reset to Company Selector View if opened previously
+        if (typeof backToCompanySelector === "function") {
+          backToCompanySelector();
+        }
+      }
       break;
 
     case "setting":
@@ -6833,34 +6841,58 @@ function filterCompanyBearers(companyKey, element) {
     document.querySelectorAll('.arpeu-comp-box').forEach(b => b.classList.remove('active-comp-box'));
     if (element) element.classList.add('active-comp-box');
 
-    // 2. Hide all company panels first
-    document.querySelectorAll('.company-bearers-view-panel').forEach(p => p.style.display = 'none');
+    // 2. Hide all panels first
+    document.querySelectorAll('.company-bearers-view-panel').forEach(p => p.style.cssText = "display: none !important;");
 
-    // 3. Open selected company panel
-    const targetPanel = document.getElementById(`companyBearers_${companyKey}`);
-    if (targetPanel) {
-        targetPanel.style.display = 'block';
-        if (floatingBtn) floatingBtn.style.display = 'flex'; // Show floating back button
-        targetPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    // 3. Open State vs Other Companies
+    if (companyKey === 'state') {
+        const statePanel = document.getElementById('companyBearers_state');
+        if (statePanel) {
+            statePanel.style.cssText = "display: block !important;";
+        } else {
+            // Force show President + 28 Grid if outside wrapper
+            const featCard = document.querySelector('.arpeu-featured-card');
+            const gridCont = document.getElementById('arpeuBearersGridContainer');
+            const secTitle = document.querySelector('.arpeu-section-title');
+            if (featCard) featCard.style.cssText = "display: flex !important;";
+            if (gridCont) gridCont.style.cssText = "display: grid !important;";
+            if (secTitle) secTitle.style.cssText = "display: flex !important;";
+        }
+        if (floatingBtn) floatingBtn.style.display = 'flex';
+        window.scrollTo({ top: 120, behavior: 'smooth' });
     } else {
-        if (floatingBtn) floatingBtn.style.display = 'none';
-        alert(`${companyKey.toUpperCase()} Office Bearers list is being updated.`);
+        const compPanel = document.getElementById(`companyBearers_${companyKey}`);
+        if (compPanel) {
+            compPanel.style.cssText = "display: block !important;";
+            if (floatingBtn) floatingBtn.style.display = 'flex';
+            compPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } else {
+            if (floatingBtn) floatingBtn.style.display = 'none';
+            alert(`${companyKey.toUpperCase()} Office Bearers list is being updated.`);
+        }
     }
 }
 
 function closeCompanyBearersPanel() {
-    // 1. Hide open panels & floating button
-    document.querySelectorAll('.company-bearers-view-panel').forEach(p => p.style.display = 'none');
+    // 1. Hide all panels
+    document.querySelectorAll('.company-bearers-view-panel').forEach(p => p.style.cssText = "display: none !important;");
     document.querySelectorAll('.arpeu-comp-box').forEach(b => b.classList.remove('active-comp-box'));
+
+    // 2. Hide State elements if loose
+    const featCard = document.querySelector('.arpeu-featured-card');
+    const gridCont = document.getElementById('arpeuBearersGridContainer');
+    const secTitle = document.querySelector('.arpeu-section-title');
+    if (featCard) featCard.style.cssText = "display: none !important;";
+    if (gridCont) gridCont.style.cssText = "display: none !important;";
+    if (secTitle) secTitle.style.cssText = "display: none !important;";
 
     const floatingBtn = document.getElementById('btnFloatingBackToComps');
     if (floatingBtn) floatingBtn.style.display = 'none';
 
-    // 2. Smooth scroll back to Company Selector Hub
+    // 3. Scroll to Top
     const contentArea = document.getElementById("contentArea") || window;
     contentArea.scrollTo({ top: 0, behavior: 'smooth' });
 }
-
 
 /* ==========================================================
    OFFICE BEARER TO PROFILE ENGINE (VIEW / EDIT / CREATE)
@@ -6898,4 +6930,518 @@ function openBearerProfile(name, mobile, role, company) {
     }, 200);
 
     console.log(`[Office Bearer Profile] Redirected for: ${name} (${mobile})`);
+}
+
+/* ==========================================================================
+   ARPEU MASTER COMPLETE LEADERSHIP HUB DATA & DYNAMIC RENDER ENGINE
+   ========================================================================== */
+
+const arpeuMasterLeadershipData = {
+    // 1. STATE BODY
+    state: {
+        title: "STATE OFFICE BEARERS",
+        subTiers: null,
+        president: {
+            name: "Sri T. Raghuram",
+            role: "Hon'ble President - ARPEU",
+            company: "State President – BMS<br>Head Cashier in BOB, VJA",
+            phone: "9703640710",
+            photo: "images/state-office-bearers/raghuram-state-president-bms.jpg"
+        },
+        members: [
+            { name: "Sri T. Sambasiva Rao", role: "State President", company: "AE / TRE / Ongole / APCPDCL / Prakasam", phone: "9849195995", photo: "images/state-office-bearers/state-president.jpg" },
+            { name: "Sri C. Ramagopal Reddy", role: "State General Secretary", company: "FM Gr.-1 / RTPP / APGENCO / Kadapa", phone: "7989215049", photo: "images/state-office-bearers/general-secretary.jpg" },
+            { name: "Sri P. Bala Krishna", role: "State Treasurer", company: "JPA / Dr. NTTPS / NTR / APGENCO / VJA", phone: "9642788786", photo: "images/state-office-bearers/state-treasurer.jpg" },
+            { name: "Sri K. Jayappa", role: "State Working President", company: "AAO / Kadapa / SPDCL", phone: "9515126908", photo: "images/state-office-bearers/jayappa-working-president.jpg" },
+            { name: "Sri A. Koteswara Rao", role: "State Organising Secretary", company: "LM / O / Kavali / SPDCL", phone: "9849375974", photo: "images/state-office-bearers/koteswara-rao-organising-secretary.jpg" },
+            { name: "Sri D. Kiran Kishore", role: "Vice President", company: "JE / O / Eluru / EPDCL", phone: "8317645490", photo: "images/state-office-bearers/vice-president-kiran-kishore.jpg" },
+            { name: "Smt. J. Saritha", role: "Vice President", company: "Sr. Asst. / ERO / SPDCL", phone: "7989797699", photo: "images/state-office-bearers/vice-president-haritamma.jpg" },
+            { name: "Sri G. Papaiah", role: "Vice President", company: "LM / O / Kavali / SPDCL", phone: "9441685040", photo: "images/state-office-bearers/vice-president-papaiah.jpg" },
+            { name: "Sri T. Navaratna Kumar", role: "Vice President", company: "LI / O / Prakasam / CPDCL", phone: "9885947549", photo: "images/state-office-bearers/vice-president-navaratna-kumar.jpg" },
+            { name: "Sri Ch. Sudhakar", role: "Vice President", company: "CL / Nellore / SDSTPS / GENCO", phone: "9704312927", photo: "images/state-office-bearers/vice-president-sudhakar.jpg" },
+            { name: "Sri CVR. Prasad Reddy", role: "Vice President", company: "JPA / Kadapa / RTPP / GENCO", phone: "9494686398", photo: "images/state-office-bearers/vice-president-prasad-reddy.jpg" },
+            { name: "Sri K. Prathap", role: "Vice President", company: "JLM / Ongole / CPDCL", phone: "9949612824", photo: "images/state-office-bearers/vice-president-prathap.jpg" },
+            { name: "Smt. K. Kavitha", role: "Asst. General Secretary", company: "JPA / Kadapa / RTPP / GENCO", phone: "8897541854", photo: "images/state-office-bearers/asst-gen-secretary-kavitha.jpg" },
+            { name: "Sri P. Prasad", role: "Asst. General Secretary", company: "LI / O / Ongole / CPDCL", phone: "9492276307", photo: "images/state-office-bearers/asst-gen-secretary-prasad.jpg" },
+            { name: "Sri S. Masthan Vali", role: "Asst. General Secretary", company: "Sr. Asst. / Ananthapur / SPDCL", phone: "9059128456", photo: "images/state-office-bearers/asst-gen-secretary-masthan-vali.jpg" },
+            { name: "Sri A. Durga Prasad", role: "Asst. General Secretary", company: "Sr. Asst. / Ongole / CPDCL", phone: "7842090977", photo: "images/state-office-bearers/asst-gen-secretary-durga-prasad.jpg" },
+            { name: "Sri P. Ramesh", role: "Asst. General Secretary", company: "FM Gr.-IV / SDSTPS / GENCO", phone: "9182858910", photo: "images/state-office-bearers/asst-gen-secretary-ramesh.jpg" },
+            { name: "Sri K. Suresh Babu", role: "Asst. General Secretary", company: "LM / O / Darsi / CPDCL", phone: "9866632669", photo: "images/state-office-bearers/asst-gen-secretary-suresh-babu.jpg" },
+            { name: "Sri P. Keseva Rao", role: "Asst. General Secretary", company: "LM / Nellore / SPDCL", phone: "9494300108", photo: "images/state-office-bearers/asst-gen-secretary-keshava-rao.jpg" },
+            { name: "Sri SK. Chand Abdulla", role: "Asst. General Secretary", company: "LM / Kavali Town / SPDCL", phone: "9949673028", photo: "images/state-office-bearers/asst-gen-secretary-chand-abdulla.jpg" },
+            { name: "Sri N. Ramesh", role: "Asst. General Secretary", company: "LM / O / D1 / Ongole / CPDCL", phone: "8106018744", photo: "images/state-office-bearers/asst-gen-secretary-n-ramesh.jpg" },
+            { name: "Sri B. Praveen Kumar", role: "Joint Secretary", company: "CL / NTR / Dr. NTTPS / GENCO", phone: "8978845689", photo: "images/state-office-bearers/joint-secretary-praveen-kumar.jpg" },
+            { name: "Sri A. Lakshmaiah", role: "Joint Secretary", company: "JAO / Kadapa / SPDCL", phone: "9441684787", photo: "images/state-office-bearers/joint-secretary-lakshmuiah.jpg" },
+            { name: "Sri K. Dinesh Kumar", role: "Joint Secretary", company: "AE / TRANSCO / Annamayya", phone: "9490154334", photo: "images/state-office-bearers/joint-secretary-dinesh-kumar.jpg" },
+            { name: "Sri M. Baba Fakruddin", role: "Joint Secretary", company: "FM Gr.-IV / RTPP / GENCO", phone: "9491938708", photo: "images/state-office-bearers/joint-secretary-baba-fakruddin.jpg" },
+            { name: "Sri N. Sivaiah", role: "Joint Secretary", company: "LI / O / Nellore / SPDCL", phone: "9652048899", photo: "images/state-office-bearers/joint-secretary-sivaiah.jpg" },
+            { name: "Sri Y. Praveen Kumar Reddy", role: "Joint Secretary", company: "LM / Nellore / SPDCL", phone: "9441614237", photo: "images/state-office-bearers/joint-secretary-praveen-kumar-reddy.jpg" },
+            { name: "Sri R. Ravi", role: "Office Secretary", company: "CL / Dr.NTTPS / GENCO / NTR", phone: "9985333734", photo: "images/state-office-bearers/office-secretary-ravi.jpg" }
+        ]
+    },
+
+    // 2. APGENCO (Company + 3 Regional Units)
+    apgenco: {
+        title: "APGENCO LEADERSHIP",
+        subTiers: [
+            { key: "company", label: "Company Body (15)" },
+            { key: "nttps", label: "Dr. NTTPS Unit (15)" },
+            { key: "rtpp", label: "Dr. MVR RTPP Unit (15)" },
+            { key: "sdstps", label: "SDSTPS Unit (15)" }
+        ],
+        tiers: {
+            company: [
+                { name: "Sri Ch. Sudhakar", role: "GENCO President", company: "CLU / Stage-I SDSTPS / Nellore", phone: "9704312927", photo: "images/genco-office-bearers/vice-president-sudhakar.jpg" },
+                { name: "Sri CVR. Prasad Reddy", role: "GENCO Secretary", company: "JPA / Stage-II RTPP / Kadapa", phone: "9494686398", photo: "images/genco-office-bearers/vice-president-prasad-reddy.jpg" },
+                { name: "Sri M. Srinivas", role: "GENCO Treasurer", company: "FM Gr.II / Stage-IV DN.TTPS / NTR", phone: "9494505355", photo: "images/genco-office-bearers/treasurer-srinivas.jpg" },
+                { name: "Sri Bandli Balaji", role: "Working President", company: "JPA / Stage-I Dr. MVR RTPP", phone: "9668977029", photo: "images/genco-office-bearers/working-president-balaji.jpg" },
+                { name: "Smt. D. Nirmala", role: "Vice President", company: "PA / Bhavanapuram DN.TTPS", phone: "7569414130", photo: "images/genco-office-bearers/vice-president-nirmala.jpg" },
+                { name: "Sri Ch. Suresh", role: "Vice President", company: "CLU / Gen / Stage-I SDSTPS", phone: "8500454563", photo: "images/genco-office-bearers/vice-president-suresh.jpg" },
+                { name: "Sri M. Sudhakar", role: "Vice President", company: "JAO / Accounts / Dr. MVR RTPP", phone: "9441048533", photo: "images/genco-office-bearers/vice-president-m-sudhakar.jpg" },
+                { name: "Sri Shaik Mustafa", role: "Asst. Secretary", company: "CLU / Fire & Safety / RTPP", phone: "8099969825", photo: "images/genco-office-bearers/asst-secretary-shaik-mustafa.jpg" },
+                { name: "Sri B.V. Padma Rao", role: "Asst. Secretary", company: "CLU / Stage-II Dr.NTTPS", phone: "9909070466", photo: "images/genco-office-bearers/asst-secretary-padmarao.jpg" },
+                { name: "Sri K. Prasad", role: "Asst. Secretary", company: "CLU / Stage-I SDSTPS", phone: "9491277350", photo: "images/genco-office-bearers/asst-secretary-prasad.jpg" },
+                { name: "Sri P. Yoho Teja", role: "Joint Secretary", company: "JE / Stage-I Dr. NTTPS", phone: "9676656596", photo: "images/genco-office-bearers/joint-secretary-teja.jpg" },
+                { name: "Sri V. Raj Reddy", role: "Joint Secretary", company: "JPA / Stage-I RTPP", phone: "9941466378", photo: "images/genco-office-bearers/joint-secretary-raja-reddy.jpg" },
+                { name: "Sri B. Sidharth Babu", role: "Joint Secretary", company: "CES / Stage-I SDSTPS", phone: "8985425983", photo: "images/genco-office-bearers/joint-secretary-sudheer-babu.jpg" },
+                { name: "Sri D.S.S. Shastri", role: "Organising Secretary", company: "JE / Stage-I Dr. NTTPS", phone: "9957983377", photo: "images/genco-office-bearers/organising-secretary-shastry.jpg" },
+                { name: "Sri I. Rajesh Reddy", role: "Office Secretary", company: "JPH / CHP / Dr. MVR RTPP", phone: "9940979303", photo: "images/genco-office-bearers/office-secretary-rajesh-reddy.jpg" }
+            ],
+            nttps: [
+                { name: "Sri J. Aswin Kumar", role: "President", company: "CL / CHP / Stage-I", phone: "9959195237" },
+                { name: "Sri P. Balakrishna", role: "Secretary", company: "JPA / BM / III / Stage-I", phone: "9642788786" },
+                { name: "Sri K. Lakshmi Srinivas", role: "Treasurer", company: "FM Gr.I / Stage-III", phone: "9848182025" },
+                { name: "Sri N. Koteswara Rao", role: "Working President", company: "PA / 19ms Shift / Stage-I", phone: "9666987029" },
+                { name: "Sri K. Laxmi Srinivas", role: "Vice President", company: "FM Gr.I / Stage-III", phone: "9848182025" },
+                { name: "Sri MD. Imran", role: "Vice President", company: "PA / ESR / BM / Stage-I", phone: "9057986389" },
+                { name: "Smt. K. Suneetha", role: "Vice President", company: "JPA / Colony Maintenance", phone: "8519941632" },
+                { name: "Sri P. Rambabu", role: "Vice President", company: "CL / 19ms Shift / Stage-I", phone: "995865814" },
+                { name: "Sri V. Suresh", role: "Asst. Secretary", company: "CL / 19ms Shift / Stage-I", phone: "7386680621" },
+                { name: "Sri T. Srinivasa Rao", role: "Asst. Secretary", company: "CL / 19ms Shift / Stage-II", phone: "7596682755" },
+                { name: "Sri Ravi Ranastula", role: "Asst. Secretary", company: "CL / SL Gr.-I", phone: "985333734" },
+                { name: "Sri K. Sai Kiran", role: "Joint Secretary", company: "CL / 19ms Shift / Stage-I", phone: "6300884476" },
+                { name: "Sri O. Jitendra", role: "Joint Secretary", company: "CL / 19ms Shift / Stage-I", phone: "7996786194" },
+                { name: "Sri Ch. Hanumaiah", role: "Joint Secretary", company: "Colony Security Guard", phone: "7780549250" },
+                { name: "Sri B.V. Padma Rao", role: "Organising Secretary", company: "CLU / APH / Stage-II", phone: "9909070466" }
+            ],
+            rtpp: [
+                { name: "Sri R.V. Ranganath", role: "President", company: "JPA / PHMD / Civil", phone: "8500666571" },
+                { name: "Sri C. Ramagopal Reddy", role: "Secretary", company: "FM Gr.-1 / LOCO CHP", phone: "7989215049" },
+                { name: "Sri G. Chennakesava Reddy", role: "Treasurer", company: "CLI / ADE / MRT Stg-1", phone: "9908309366" },
+                { name: "Sri B. Srinivasulu", role: "Working President", company: "CLI / Civil Waterplant", phone: "988595976" },
+                { name: "Sri R. Venu Gopal", role: "Vice President", company: "JAO / Accounts", phone: "9490136024" },
+                { name: "Sri G. Chandramohan Reddy", role: "Vice President", company: "CLI / CHP", phone: "8341178785" },
+                { name: "Sri R. Rajesh Reddy", role: "Vice President", company: "JPA / CHP / Dozer", phone: "9490979309" },
+                { name: "Sri L. Jagadish Reddy", role: "Asst. Secretary", company: "MM-1 / CHP", phone: "9014513527" },
+                { name: "Sri U. Vasudevudu", role: "Asst. Secretary", company: "PA CASM SD III / Stage-II", phone: "9494668372" },
+                { name: "Sri G. C. Ungamaiah", role: "Asst. Secretary", company: "Sr. Asst. / Accounts", phone: "9493353862" },
+                { name: "Sri Shaik Shabber", role: "Joint Secretary", company: "L/F Cage off coal", phone: "9505870106" },
+                { name: "Sri P. Subbarayudu", role: "Joint Secretary", company: "CL / COOMN", phone: "9248899470" },
+                { name: "Sri G. Naresh Kumar Reddy", role: "Joint Secretary", company: "CL / CR / Civil", phone: "9491514292" },
+                { name: "Sri M. Harinath", role: "Organising Secretary", company: "Plant / Mechanical", phone: "9966485013" },
+                { name: "Sri Y. Harichandra Reddy", role: "Office Secretary", company: "CL / CHP / Dozer", phone: "8555877133" }
+            ],
+            sdstps: [
+                { name: "Sri Ch. Nagaraju", role: "President", company: "CL / CHP / Stage-I", phone: "9494300764" },
+                { name: "Sri Ch. Sudhakar", role: "Secretary", company: "CL / CHP / Stage-I", phone: "9704312927" },
+                { name: "Sri Ch. Suresh", role: "Treasurer", company: "CL / EE / Gen. / Stage-I", phone: "8500454563" },
+                { name: "Sri K. Sivakumar", role: "Working President", company: "CCR / Shift / Stage -1", phone: "7893211254" },
+                { name: "Sri V. Srinivasulu", role: "Vice President", company: "CL / Store & Fuels Stg - I", phone: "9502377025" },
+                { name: "Sri K. Prasad", role: "Vice President", company: "CL / I & C / Stage - 1", phone: "9491277350" },
+                { name: "Sri P. Ramesh", role: "Vice President", company: "FM Gr.- IV", phone: "8184974615" },
+                { name: "Sri V. Puttaiah", role: "Asst. Secretary", company: "CL / CHP / Stage-I", phone: "9618624145" },
+                { name: "Sri K. Harikrishna", role: "Asst. Secretary", company: "CIVIL / Stage - I", phone: "7337534260" },
+                { name: "Sri N. Ashok", role: "Asst. Secretary", company: "CL / I & C / Stage - 1", phone: "9701335093" },
+                { name: "Sri G. Anil", role: "Joint Secretary", company: "CL / Civil / Stg. -I", phone: "8790509445" },
+                { name: "Sri G. Ayyappa", role: "Joint Secretary", company: "CL / CCR / Shift", phone: "9640733211" },
+                { name: "Sri M. Sivasankar", role: "Joint Secretary", company: "CL / WTP / Stage I", phone: "9701694160" },
+                { name: "Sri B. Sudheer", role: "Organising Secretary", company: "CL / CCR SHIFT / Stage -1", phone: "9885425983" },
+                { name: "Sri G. Murali", role: "Office Secretary", company: "E&P / Stage -1", phone: "9490078189" }
+            ]
+        }
+    },
+
+    // 3. APTRANSCO
+    aptransco: {
+        title: "APTRANSCO COMPANY BODY",
+        subTiers: null,
+        members: [
+            { name: "Sri K. Rajesh", role: "President", company: "DEE / Chittor / Kadapa", phone: "8074602893" },
+            { name: "Sri N. Dinesh Kumar", role: "Secretary", company: "AEE / Rajampeta", phone: "9490154334" },
+            { name: "Sri R. Srinivasulu", role: "Treasurer", company: "DEE / Lines / Kadapa", phone: "8074602893" },
+            { name: "Sri K. Narayana", role: "Working President", company: "DEE / Jammalamadugu", phone: "9440817037" },
+            { name: "Sri K. Raghava", role: "Vice President", company: "Sub - Engineer / Proj.", phone: "9958541855" },
+            { name: "Sri K. Venkateswarlu", role: "Vice President", company: "Sub - Engineer / Vontimitta", phone: "9958808018" },
+            { name: "Sri L. Srinivasulu Reddy", role: "Vice President", company: "Sub - Engineer / Rajampeta", phone: "9966781880" },
+            { name: "Sri G. Vijay Kumar", role: "Assistant Secretary", company: "JLM / Vontimitta", phone: "9966899426" },
+            { name: "Sri P. Narasimha Raju", role: "Assistant Secretary", company: "JLM / Kadapa Telecom", phone: "9631632429" },
+            { name: "Sri V. Sanjeev Kumar", role: "Assistant Secretary", company: "Vontimitta", phone: "9603066659" },
+            { name: "Sri S. Thulasi Prasad", role: "Joint Secretary", company: "JLM / Rajampeta", phone: "9441022152" },
+            { name: "Sri N. Siva Kumar", role: "Joint Secretary", company: "JLM / Vontimitta", phone: "9290611040" },
+            { name: "Sri G. Supeera", role: "Joint Secretary", company: "Sub - Engineer / TG Palli SS", phone: "9052248058" },
+            { name: "Sri G. Peddaiah", role: "Organising Secretary", company: "Sub-Engineer / Vontimitta", phone: "9925145047" },
+            { name: "Sri T. Naga Seshaiah", role: "Office Secretary", company: "Watchman / Rajampeta", phone: "9666661964" }
+        ]
+    },
+
+    // 4. APSPDCL (Company Body + 4 Circles)
+    apspdcl: {
+        title: "APSPDCL LEADERSHIP",
+        subTiers: [
+            { key: "company", label: "Company Body (15)" },
+            { key: "ananthapur", label: "Ananthapur Circle (5)" },
+            { key: "kadapa", label: "Kadapa Circle (5)" },
+            { key: "annamayya", label: "Annamayya Circle (5)" },
+            { key: "nellore", label: "Nellore Circle (5)" }
+        ],
+        tiers: {
+            company: [
+                { name: "Sri A. Koteswara Rao", role: "President", company: "LM / O / Kavali / Nellore", phone: "9849375974" },
+                { name: "Sri A. Lakshumaiah", role: "Secretary", company: "JAO / Mydikur / Kadapa", phone: "9441684787" },
+                { name: "Sri A. Hanok", role: "Treasurer", company: "Jr.Asst. / ERO / Nellore Town", phone: "9394988777" },
+                { name: "Sri N. Sivaiah", role: "Working President", company: "LI / O / Atmakur / Nellore", phone: "9652484989" },
+                { name: "Sri S. Devendra Rao", role: "Vice President", company: "LM / West Section / Kadapa", phone: "9666900729" },
+                { name: "Smt. C. Karthika", role: "Vice President", company: "Sr. Asst. / SERO / Vontimitta", phone: "9652033371" },
+                { name: "Sri B. Mallikarjuna Rao", role: "Vice President", company: "ALM / Jaladanki / Nellore", phone: "996325670" },
+                { name: "Sri P. Suresh", role: "Asst. Secretary", company: "JLM / Kasayanina / Kadapa", phone: "6281605744" },
+                { name: "Sri D. Charunya", role: "Asst. Secretary", company: "JLM / Chowdavaram / Nellore", phone: "7998973606" },
+                { name: "Sri D. Ramanaiah", role: "Asst. Secretary", company: "JLM / Mydukur / Kadapa", phone: "9634249093" },
+                { name: "Sri D. Venkatesh", role: "Joint Secretary", company: "LM / MRT Protection / Annamayya", phone: "9050288800" },
+                { name: "Sri Y. Nagaseshaiah", role: "Joint Secretary", company: "Sr.Asst. / ERO / Rural Kadapa", phone: "8074969670" },
+                { name: "Sri N. Srinivulu Reddy", role: "Joint Secretary", company: "LM / Kondapuram SS / Nellore", phone: "9905407489" },
+                { name: "Sri S. Masthan Vali", role: "Organising Secretary", company: "Sr.Asst. / ERO / Tadipatri", phone: "9059128456" },
+                { name: "Sri A. Rajasekhara Rao", role: "Office Secretary", company: "Jr.Asst. / EE / Kavali / Nellore", phone: "9492337692" }
+            ],
+            ananthapur: [
+                { name: "Sri V. Vidya Sagar", role: "President", company: "Sr. Asst. / ERO / TADIPATRI", phone: "9515126908" },
+                { name: "Sri J. Pradeep", role: "Working President", company: "JE / Tadipatri", phone: "8317645490" },
+                { name: "Sri S. Masthan Vali", role: "Secretary", company: "Sr. Asst. / Ananthapur / SPDCL", phone: "9059128456" },
+                { name: "Sri M. Nagaraju", role: "Organising Secretary", company: "JAO / ERO / KALYANADURGAM", phone: "9441685040" },
+                { name: "Sri S. MD Shabeer", role: "Treasurer", company: "Jr. Asst. / ERO / TADIPATRI", phone: "9885947549" }
+            ],
+            kadapa: [
+                { name: "Sri S. Devendra Rao", role: "President", company: "LM / West Section", phone: "9666990729" },
+                { name: "Sri K. Yellam Naidu", role: "Working President", company: "Jr. Asst. / ERO / Kadapa", phone: "6281005452" },
+                { name: "Sri K. Gopi Sankar", role: "Secretary", company: "Sr. Asst. / Kadapa", phone: "9866110232" },
+                { name: "Sri P. Ayodhya Ramaiah", role: "Organising Secretary", company: "LI / Badvel", phone: "9704928851" },
+                { name: "Sri D. Uttaiah", role: "Treasurer", company: "JLM Gr.-II / VALLUR SECTION", phone: "9502019089" }
+            ],
+            annamayya: [
+                { name: "Sri S. Ramachandra", role: "President", company: "ALM / Annamayya", phone: "9154822353" },
+                { name: "Sri P. Suryanarayana", role: "Working President", company: "JLM / Annamayya", phone: "9849825723" },
+                { name: "Sri D. Venkatesh", role: "Secretary", company: "LM / MRT Protection", phone: "9059288800" },
+                { name: "Sri R. Sivaprasad", role: "Organising Secretary", company: "CT / METERS-II", phone: "9666626607" },
+                { name: "Sri B. Sukumar", role: "Treasurer", company: "JLM / Annamayya", phone: "9121654098" }
+            ],
+            nellore: [
+                { name: "Sri A. Koteswara Rao", role: "President", company: "LM / O / Kavali", phone: "9849375974" },
+                { name: "Sri T. Madhava Rao", role: "Working President", company: "LM Gr.-II / MRT", phone: "9441999789" },
+                { name: "Sri A. Hanok", role: "Secretary", company: "Jr.Asst. / ERO / Nellore Town", phone: "9394988777" },
+                { name: "Smt. P. Vijayalakshmi", role: "Organising Secretary", company: "Sr. Asst. / Nellore Town-II", phone: "94914504685" },
+                { name: "Sri N. Sivaiah", role: "Treasurer", company: "LI / O / Atmakur Division", phone: "9652048899" }
+            ]
+        }
+    },
+
+    // 5. APEPDCL (Company Body + 2 Circles)
+    apepdcl: {
+        title: "APEPDCL LEADERSHIP",
+        subTiers: [
+            { key: "company", label: "Company Body (9)" },
+            { key: "eluru", label: "Eluru Circle (9)" },
+            { key: "anakapalli", label: "Anakapalli Circle (9)" }
+        ],
+        tiers: {
+            company: [
+                { name: "Sri Antharvedi V. Babu", role: "President", company: "SO / Anakapalli", phone: "9908945833" },
+                { name: "Sri D. Kiran Kishore", role: "Secretary", company: "JE / Bayyana Gundem / Eluru", phone: "8317645490" },
+                { name: "Sri Ch. Naga Raju", role: "Treasurer", company: "AEE / DP 1 / Eluru", phone: "9440816622" },
+                { name: "Sri G. Gnana Subendra", role: "Working President", company: "JE / O / Tadikalapudi", phone: "9440631328" },
+                { name: "Sri T. Nagesh", role: "Vice President", company: "SO / Anakapalli", phone: "7013979699" },
+                { name: "Sri G. Ananta Ramu", role: "Assistant Secretary", company: "SO / Anakapalli", phone: "8501074116" },
+                { name: "Sri A. Chandramouli", role: "Joint Secretary", company: "AEDP / Eluru", phone: "6303036662" },
+                { name: "Sri Velisela Ganapathi", role: "Organising Secretary", company: "SO / Anakapalli", phone: "6305882875" },
+                { name: "Sri G. Srikanth", role: "Office Secretary", company: "JE / O / Nidamarru", phone: "8332971279" }
+            ],
+            eluru: [
+                { name: "Sri Ch. Nagaraju", role: "President", company: "AE / DPI / Eluru", phone: "9440816622" },
+                { name: "Sri M. Bhanu Prakash", role: "Working President", company: "LM / SS / Bhavanipadu", phone: "8985825986" },
+                { name: "Sri K. Gangadhara Rao", role: "Secretary", company: "LM / O / Koppa ku", phone: "8317645490" },
+                { name: "Sri G. Ravikumar", role: "Organising Secretary", company: "ALM / O / Bogapuram", phone: "7386244244" },
+                { name: "Sri G. Srikanth", role: "Treasurer", company: "JE / VO / Nidadavaru", phone: "8332971279" },
+                { name: "Sri P. Devi Pravasudu", role: "Vice President", company: "LM / O / D3 / Eluru", phone: "9141219386" },
+                { name: "Sri A. Chandra Mouli", role: "Asst. Secretary", company: "AE / OP / Eluru", phone: "6303036662" },
+                { name: "Sri G. Gnana Surendra", role: "Joint Secretary", company: "JE / O / Nidadaipadu", phone: "9440613288" },
+                { name: "Smt. D. Indra Rani", role: "Office Secretary", company: "JE / O / Tadepalli", phone: "9494285854" }
+            ],
+            anakapalli: [
+                { name: "Sri V. Ganapathi", role: "President", company: "SO / Anakapalli", phone: "6305888275" },
+                { name: "Sri M. Appa Rao", role: "Working President", company: "SO / Anakapalli", phone: "8106028560" },
+                { name: "Sri Antharvedi VA Babu", role: "Secretary", company: "SO / Anakapalli", phone: "9908945833" },
+                { name: "Sri G. Ananta Ramu", role: "Organising Secretary", company: "SO / Anakapalli", phone: "8501074116" },
+                { name: "Sri K. Ramanjaneeyulu", role: "Treasurer", company: "SO / Anakapalli", phone: "8501074116" },
+                { name: "Sri P. Venkatesh", role: "Vice President", company: "SO / Anakapalli", phone: "6300250335" },
+                { name: "Sri DVSR Apalla Naidu", role: "Asst. Secretary", company: "SO / Anakapalli", phone: "9491786889" },
+                { name: "Sri D. Janakiram", role: "Joint Secretary", company: "SO / Anakapalli", phone: "9010446339" },
+                { name: "Sri T. Nagesh", role: "Office Secretary", company: "SO / Anakapalli", phone: "7013979699" }
+            ]
+        }
+    },
+
+    // 6. APCPDCL (Company Body + 4 Circles)
+    apcpdcl: {
+        title: "APCPDCL LEADERSHIP",
+        subTiers: [
+            { key: "company", label: "Company Body (19)" },
+            { key: "crda", label: "CRDA Circle (5)" },
+            { key: "guntur", label: "Guntur Circle (5)" },
+            { key: "palnadu", label: "Palnadu Circle (5)" },
+            { key: "prakasham", label: "Prakasham Circle (5)" }
+        ],
+        tiers: {
+            company: [
+                { name: "Sri G. Seetha Ramulu", role: "Hon’ble President", company: "AEP OP / Durgi / Palnadu", phone: "8639022203" },
+                { name: "Sri P. Prasad", role: "President", company: "LI / O / Karavadi / Ongole", phone: "9492276307" },
+                { name: "Sri S. Gurubrahmam", role: "Secretary", company: "LI / Tenali Rural / Guntur", phone: "8309195958" },
+                { name: "Sri Ch. Raghu Babu", role: "Treasurer", company: "LM / Ponnuru Rural / Guntur", phone: "9490248069" },
+                { name: "Sri A. Durga Prasad", role: "Working President", company: "Sr. Asst. / Gen / Ongole", phone: "7842190977" },
+                { name: "Sri S. Naresh Nanda", role: "Vice President", company: "LM / Guntur", phone: "9299601999" },
+                { name: "Sri S. Prasanna Kumar", role: "Vice President", company: "SO / Narasaraopet / Palnadu", phone: "9490003898" },
+                { name: "Sri M. Venkateswarulu", role: "Vice President", company: "AE / D1 / Operation / Ongole", phone: "7013807999" },
+                { name: "Sri K. Prathap", role: "Vice President", company: "JLM / MRT / Ongole", phone: "9949612824" },
+                { name: "Sri K. Praveen Kumar", role: "Asst. Secretary", company: "JLM / D3 Tenali / Guntur", phone: "8523853267" },
+                { name: "Sri G. Ramesh Reddy", role: "Asst. Secretary", company: "LI / O / Pallamilli / Ongole", phone: "9948857702" },
+                { name: "Sri M. Venkata Rao", role: "Asst. Secretary", company: "JLM / Gundayapalem / Ongole", phone: "9949732069" },
+                { name: "Sri M. Anil Chowdary", role: "Asst. Secretary", company: "ALM / Pedanandipadu / Ongole", phone: "9949732069" },
+                { name: "Sri P. V. Rayudu", role: "Joint Secretary", company: "ALM / D3 / Narasaraopet", phone: "9989203720" },
+                { name: "Sri S. Venkatesh", role: "Joint Secretary", company: "SO / CRDA", phone: "8885880688" },
+                { name: "Sri S. Ramesh", role: "Joint Secretary", company: "JLM / Enduru / Ongole", phone: "9133304088" },
+                { name: "Sri S. Giribabu", role: "Joint Secretary", company: "SO / Narasaraopet / Palnadu", phone: "9493911124" },
+                { name: "Sri M. Srikanth", role: "Organising Secretary", company: "SO / Tenali / Guntur", phone: "9440576476" },
+                { name: "Sri D. V. Anjaneya Prasad", role: "Office Secretary", company: "JAO / Adm / Ongole", phone: "9848822196" }
+            ],
+            crda: [
+                { name: "Sri G. Potu Raju", role: "President", company: "ALM / Mangalagiri", phone: "9491664253" },
+                { name: "Sri R. Srinivasa Rao", role: "Working President", company: "JLM / Penumuru", phone: "9959089608" },
+                { name: "Sri V. Gopi Krishna", role: "Secretary", company: "JE / D2 / Mangalagiri", phone: "9701035342" },
+                { name: "Sri K. Narendra Babu", role: "Organising Secretary", company: "JLM / Duagirala", phone: "9160602036" },
+                { name: "Sri S. Venkatesh", role: "Treasurer", company: "Shift Operator / Pedapalam", phone: "8885880688" }
+            ],
+            guntur: [
+                { name: "Sri S. Naresh Nanda", role: "President", company: "LM / Guntur", phone: "9299601999" },
+                { name: "Sri B. Thandava Krishna", role: "Working President", company: "JLM / Tenali", phone: "9346446999" },
+                { name: "Sri Ch. Raghu Babu", role: "Secretary", company: "LM / Ponnuru Rural", phone: "9490248069" },
+                { name: "Sri K. Satya Sivaram", role: "Organising Secretary", company: "ALM / Tenali", phone: "9395552209" },
+                { name: "Sri M. Anil Chowdary", role: "Treasurer", company: "ALM / Pedanandipadu", phone: "9949732069" }
+            ],
+            palnadu: [
+                { name: "Sri S. Prasanna Kumar", role: "President", company: "SO / Narasaraopet", phone: "9490003898" },
+                { name: "Sri D. Subhani", role: "Working President", company: "ALM / Nakarikallu", phone: "9381160599" },
+                { name: "Sri P. V. Rayudu", role: "Secretary", company: "ALM / D3 / Narasaraopet", phone: "9989203720" },
+                { name: "Sri S. Giribabu", role: "Organising Secretary", company: "SO / Narasaraopet", phone: "9493911124" },
+                { name: "Sri M. Babu Naik", role: "Treasurer", company: "ALM / D3 / NRT Rural", phone: "8008231224" }
+            ],
+            prakasham: [
+                { name: "Sri K. Prathap", role: "President", company: "JLM / TRE / Ongole", phone: "9949612824" },
+                { name: "Sri G. Ramesh", role: "Working President", company: "JLM / Karavadi", phone: "9010471816" },
+                { name: "Sri A. Durga Prasad", role: "Secretary", company: "Sr. Asst. / Construction / Ongole", phone: "9059288800" },
+                { name: "Sri K. Yadukondalu", role: "Organising Secretary", company: "Computer Operator", phone: "6301677240" },
+                { name: "Sri P. Rangamannar", role: "Treasurer", company: "Jr. Asst. / ERO / Ongole", phone: "9440565280" }
+            ]
+        }
+    }
+};
+
+let activeCompanyKey = 'state';
+let activeTierKey = 'company';
+
+/**
+ * 🌟 Select Company Hub
+ */
+/**
+ * 🌟 Select Company Hub (With Strict Isolation & 2-Tier Sub-Buttons)
+ */
+function selectCompanyHub(companyKey, element) {
+    activeCompanyKey = companyKey;
+
+    // 1. Highlight Active Top Box
+    document.querySelectorAll('.arpeu-comp-box').forEach(b => b.classList.remove('active-comp-box'));
+    if (element) element.classList.add('active-comp-box');
+
+    const compData = arpeuMasterLeadershipData[companyKey];
+    if (!compData) return;
+
+    const tabsBar = document.getElementById('arpeuSubTierTabsBar');
+    const dynamicWrapper = document.getElementById('arpeuDynamicBearersWrapper');
+    const floatingBtn = document.getElementById('btnFloatingBackToComps');
+
+    // 2. Strict Sub-Tier Structure Building (Company on Top + Circles Below)
+    if (compData.subTiers && compData.subTiers.length > 0) {
+        const companyTier = compData.subTiers.find(t => t.key === 'company') || compData.subTiers[0];
+        const circleTiers = compData.subTiers.filter(t => t.key !== 'company');
+
+        let gridClass = 'subtier-grid-2x2';
+        if (circleTiers.length === 3) gridClass = 'subtier-grid-3'; // GENCO 3 units
+
+        let subTiersHtml = `
+            <!-- Top: Company Body Button -->
+            <div class="subtier-company-row">
+                <button type="button" class="subtier-company-btn active" onclick="selectSubTierTab('${companyTier.key}', this)">
+                    <i class="fa-solid fa-building-shield"></i> ${companyTier.label}
+                </button>
+            </div>
+        `;
+
+        if (circleTiers.length > 0) {
+            subTiersHtml += `
+                <!-- Bottom: Circles / Units Grid -->
+                <div class="subtier-circles-grid ${gridClass}">
+                    ${circleTiers.map(t => `
+                        <button type="button" class="subtier-circle-btn" onclick="selectSubTierTab('${t.key}', this)">
+                            ${t.label}
+                        </button>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        tabsBar.innerHTML = subTiersHtml;
+        tabsBar.style.display = 'flex';
+        activeTierKey = 'company';
+    } else {
+        // STATE BODY and APTRANSCO have no sub-circles
+        tabsBar.innerHTML = '';
+        tabsBar.style.display = 'none';
+        activeTierKey = 'company';
+    }
+
+    // 3. Render Leaders Grid
+    renderDynamicBearersGrid();
+
+    // 4. Show Content & Floating Back Button
+    if (dynamicWrapper) dynamicWrapper.style.display = 'block';
+    if (floatingBtn) floatingBtn.style.display = 'flex';
+
+    dynamicWrapper.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+/**
+ * 🌟 Select Sub-Tier / Circle Tab (Highlight Management)
+ */
+function selectSubTierTab(tierKey, element) {
+    activeTierKey = tierKey;
+
+    // Remove active state from all sub-buttons
+    document.querySelectorAll('.subtier-company-btn, .subtier-circle-btn').forEach(b => b.classList.remove('active'));
+    if (element) element.classList.add('active');
+
+    renderDynamicBearersGrid();
+}
+
+/**
+ * 🌟 Render Dynamic 2-Column Bearers Grid
+ */
+function renderDynamicBearersGrid() {
+    const compData = arpeuMasterLeadershipData[activeCompanyKey];
+    if (!compData) return;
+
+    const presBox = document.getElementById('arpeuFeaturedPresidentBox');
+    const titleEl = document.getElementById('arpeuActiveWingTitle');
+    const gridContainer = document.getElementById('arpeuDynamicBearersGrid');
+
+    let membersList = [];
+
+    if (activeCompanyKey === 'state') {
+        membersList = compData.members || [];
+        // Render Featured President Card
+        if (presBox && compData.president) {
+            const p = compData.president;
+            presBox.innerHTML = `
+                <div class="arpeu-featured-card">
+                    <img class="arpeu-featured-photo arpeu-zoom-photo" src="${p.photo}" alt="${p.name}" onerror="this.onerror=null; this.src='images/arpeu-logo.png'">
+                    <div class="arpeu-featured-info">
+                        <p class="arpeu-featured-role">${p.role}</p>
+                        <h2 class="arpeu-featured-name">${p.name}</h2>
+                        <p class="arpeu-featured-company">${p.company}</p>
+                        <div class="arpeu-contact-row">
+                            <a class="arpeu-call-btn" href="tel:${p.phone}"><i class="fas fa-phone-alt"></i> Call</a>
+                            <a class="arpeu-whatsapp-btn" href="https://wa.me/91${p.phone}" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+                            <button type="button" class="arpeu-profile-btn" onclick="openBearerProfile('${p.name}', '${p.phone}', '${p.role}', 'ARPEU State')"><i class="fas fa-user-edit"></i> Profile</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            presBox.style.display = 'block';
+        }
+        if (titleEl) titleEl.textContent = compData.title;
+    } else {
+        if (presBox) presBox.style.display = 'none';
+
+        if (compData.tiers) {
+            membersList = compData.tiers[activeTierKey] || [];
+            const subTierObj = compData.subTiers.find(t => t.key === activeTierKey);
+            if (titleEl) titleEl.textContent = `${activeCompanyKey.toUpperCase()} – ${subTierObj ? subTierObj.label.toUpperCase() : 'OFFICE BEARERS'}`;
+        } else {
+            membersList = compData.members || [];
+            if (titleEl) titleEl.textContent = compData.title;
+        }
+    }
+
+    // Render Grid Cards
+    if (gridContainer) {
+        if (membersList.length === 0) {
+            gridContainer.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding:20px; color:#64748b; font-size:12px;">Office Bearers data is being updated.</div>`;
+            return;
+        }
+
+        gridContainer.innerHTML = membersList.map(m => {
+            const photoPath = m.photo || `images/state-office-bearers/${m.name.toLowerCase().replace(/[^a-z0-9]/g, '-')}.jpg`;
+            return `
+                <div class="arpeu-member-card">
+                    <img class="arpeu-member-photo arpeu-zoom-photo" src="${photoPath}" alt="${m.name}" onerror="this.onerror=null; this.src='images/arpeu-logo.png'">
+                    <h3 class="arpeu-member-name">${m.name}</h3>
+                    <p class="arpeu-member-role">${m.role}</p>
+                    <p class="arpeu-member-company">${m.company}</p>
+                    <div class="arpeu-contact-row">
+                        <a class="arpeu-call-btn" href="tel:${m.phone}"><i class="fas fa-phone-alt"></i> Call</a>
+                        <a class="arpeu-whatsapp-btn" href="https://wa.me/91${m.phone}" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+                        <button type="button" class="arpeu-profile-btn" onclick="openBearerProfile('${m.name}', '${m.phone}', '${m.role}', '${activeCompanyKey.toUpperCase()}')"><i class="fas fa-user-edit"></i> Profile</button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+}
+
+/**
+ * 🌟 Close Panel & Scroll to Top
+ */
+/**
+ * 🌟 Close Panel & Reset to Pure 6 Company Boxes View
+ */
+function closeCompanyBearersPanel() {
+    const dynamicWrapper = document.getElementById('arpeuDynamicBearersWrapper');
+    const tabsBar = document.getElementById('arpeuSubTierTabsBar');
+    const floatingBtn = document.getElementById('btnFloatingBackToComps');
+
+    // 1. Force completely hide sub-tier circle buttons & clear their HTML
+    if (tabsBar) {
+        tabsBar.style.cssText = "display: none !important;";
+        tabsBar.innerHTML = '';
+    }
+
+    // 2. Force hide leaders cards container & floating back button
+    if (dynamicWrapper) {
+        dynamicWrapper.style.cssText = "display: none !important;";
+    }
+    if (floatingBtn) {
+        floatingBtn.style.cssText = "display: none !important;";
+    }
+
+    // 3. Remove active highlight from all 6 company boxes
+    document.querySelectorAll('.arpeu-comp-box').forEach(b => b.classList.remove('active-comp-box'));
+
+    // 4. Smooth scroll back to top of Company Hub
+    const contentArea = document.getElementById("contentArea") || window;
+    contentArea.scrollTo({ top: 0, behavior: 'smooth' });
 }

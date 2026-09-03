@@ -8944,3 +8944,343 @@ textarea.mtg-custom-field {
     margin-bottom: 20px !important;
     box-sizing: border-box !important;
 }
+
+/* ==========================================================
+   ARPEU MASTER DYNAMIC OFFICE BEARERS STYLES
+   ========================================================== */
+
+.arpeu-office-bearers-section {
+    width: 100% !important;
+    max-width: 480px !important;
+    margin: 0 auto !important;
+    padding: 8px 6px 80px !important;
+    box-sizing: border-box !important;
+    overflow-x: hidden !important;
+}
+
+.arpeu-hub-top-header {
+    text-align: center !important;
+    background: linear-gradient(135deg, #0b4ea2, #1565c0) !important;
+    padding: 8px 10px !important;
+    border-radius: 10px !important;
+    color: #ffffff !important;
+    margin-bottom: 10px !important;
+}
+
+.arpeu-hub-main-title {
+    margin: 0 !important;
+    font-size: 13.5px !important;
+    font-weight: 800 !important;
+}
+
+.arpeu-hub-main-sub {
+    margin: 2px 0 0 0 !important;
+    font-size: 10px !important;
+    opacity: 0.9 !important;
+}
+
+/* 6 Company Boxes Grid (3 Columns x 2 Rows) */
+.arpeu-company-boxes-grid {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 6px !important;
+    width: 100% !important;
+    margin-bottom: 12px !important;
+    box-sizing: border-box !important;
+}
+
+.arpeu-comp-box {
+    height: 80px !important;
+    background: #ffffff !important;
+    border: 1.5px solid #cbd5e1 !important;
+    border-radius: 10px !important;
+    padding: 6px 4px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: space-evenly !important;
+    cursor: pointer !important;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.04) !important;
+    transition: all 0.15s ease !important;
+    box-sizing: border-box !important;
+}
+
+.arpeu-comp-box:active {
+    transform: scale(0.95) !important;
+}
+
+.arpeu-comp-box img {
+    width: 38px !important;
+    height: 38px !important;
+    max-width: 38px !important;
+    max-height: 38px !important;
+    object-fit: contain !important;
+    display: block !important;
+}
+
+.arpeu-comp-box span {
+    font-size: 9.5px !important;
+    font-weight: 800 !important;
+    color: #0b4ea2 !important;
+    text-align: center !important;
+    white-space: nowrap !important;
+}
+
+.arpeu-comp-box.active-comp-box {
+    border-color: #ff9800 !important;
+    background: #fff8f0 !important;
+    box-shadow: 0 0 8px rgba(255, 152, 0, 0.4) !important;
+}
+
+.arpeu-comp-box.active-comp-box span {
+    color: #ea580c !important;
+}
+/* 🌟 2-TIER SUB-WING SELECTOR CONTAINER (COMPANY ON TOP + CIRCLES BELOW) */
+.arpeu-subtier-tabs-bar {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 6px !important;
+    width: 100% !important;
+    margin-bottom: 12px !important;
+    box-sizing: border-box !important;
+}
+
+/* Top Company Body Button Row */
+.subtier-company-row {
+    width: 100% !important;
+    display: flex !important;
+    justify-content: center !important;
+}
+
+.subtier-company-btn {
+    width: 100% !important;
+    max-width: 280px !important;
+    background: #ffffff !important;
+    border: 1.5px solid #0b4ea2 !important;
+    color: #0b4ea2 !important;
+    padding: 7px 14px !important;
+    border-radius: 20px !important;
+    font-size: 11.5px !important;
+    font-weight: 800 !important;
+    cursor: pointer !important;
+    box-shadow: 0 2px 6px rgba(11, 78, 162, 0.1) !important;
+    transition: all 0.15s ease !important;
+    text-align: center !important;
+}
+
+.subtier-company-btn.active {
+    background: linear-gradient(135deg, #0b4ea2, #1565c0) !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 12px rgba(11, 78, 162, 0.35) !important;
+}
+
+/* Bottom Circles / Units Grid Rows */
+.subtier-circles-grid {
+    display: grid !important;
+    gap: 5px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+/* 2 Circles per row for 4-circle Discoms */
+.subtier-grid-2x2 {
+    grid-template-columns: repeat(2, 1fr) !important;
+}
+
+/* 3 Units per row for GENCO (NTTPS, RTPP, SDSTPS) */
+.subtier-grid-3 {
+    grid-template-columns: repeat(3, 1fr) !important;
+}
+
+.subtier-circle-btn {
+    background: #ffffff !important;
+    border: 1.5px solid #cbd5e1 !important;
+    color: #334155 !important;
+    padding: 6px 4px !important;
+    border-radius: 14px !important;
+    font-size: 10px !important;
+    font-weight: 700 !important;
+    cursor: pointer !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    text-align: center !important;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04) !important;
+    transition: all 0.15s ease !important;
+}
+
+.subtier-circle-btn.active {
+    background: #f57c00 !important; /* Vibrant Saffron/Orange */
+    border-color: #f57c00 !important;
+    color: #ffffff !important;
+    box-shadow: 0 3px 8px rgba(245, 124, 0, 0.35) !important;
+}
+
+/* Featured President Card */
+.arpeu-featured-card {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    background: #ffffff !important;
+    border-radius: 12px !important;
+    padding: 8px !important;
+    gap: 10px !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06) !important;
+    border: 1px solid #e2e8f0 !important;
+    margin-bottom: 12px !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+}
+
+.arpeu-featured-photo {
+    width: 95px !important;
+    height: 115px !important;
+    min-width: 95px !important;
+    object-fit: cover !important;
+    object-position: top center !important;
+    border-radius: 8px !important;
+    display: block !important;
+    cursor: pointer !important;
+    border: 1px solid #cbd5e1 !important;
+}
+
+.arpeu-featured-info {
+    flex: 1 !important;
+    min-width: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    text-align: left !important;
+}
+
+.arpeu-featured-role { font-size: 11px !important; font-weight: 700 !important; color: #0b4ea2 !important; margin: 0 0 2px 0 !important; }
+.arpeu-featured-name { font-size: 15.5px !important; line-height: 1.2 !important; font-weight: 800 !important; color: #dc2626 !important; margin: 0 0 2px 0 !important; }
+.arpeu-featured-company { font-size: 10px !important; font-weight: 600 !important; color: #475569 !important; margin: 0 0 6px 0 !important; }
+
+/* Section Title */
+.arpeu-section-title {
+    text-align: center !important;
+    color: #0b4ea2 !important;
+    font-size: 13.5px !important;
+    font-weight: 800 !important;
+    margin: 10px 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+}
+
+.arpeu-section-title::before, .arpeu-section-title::after {
+    content: "" !important;
+    height: 1.5px !important;
+    width: 30px !important;
+    background: #0b4ea2 !important;
+}
+
+/* 2-Column Responsive Grid */
+.arpeu-bearers-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 6px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+.arpeu-member-card {
+    background: #ffffff !important;
+    border-radius: 10px !important;
+    padding: 6px 4px !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05) !important;
+    border: 1px solid #e2e8f0 !important;
+    box-sizing: border-box !important;
+    text-align: center !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+}
+
+.arpeu-member-photo {
+    width: 100% !important;
+    height: 135px !important;
+    object-fit: cover !important;
+    object-position: top center !important;
+    border-radius: 6px !important;
+    display: block !important;
+    cursor: pointer !important;
+    margin-bottom: 4px !important;
+    background: #f8fafc !important;
+    border: 1px solid #cbd5e1 !important;
+}
+
+.arpeu-member-name { font-size: 12px !important; font-weight: 800 !important; color: #dc2626 !important; margin: 0 0 1px 0 !important; width: 100% !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; }
+.arpeu-member-role { font-size: 10.5px !important; font-weight: 700 !important; color: #16a34a !important; margin: 0 0 1px 0 !important; width: 100% !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; }
+.arpeu-member-company { font-size: 9.0px !important; font-weight: 600 !important; color: #0b4ea2 !important; margin: 0 0 6px 0 !important; width: 100% !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; }
+
+/* Action Buttons */
+.arpeu-contact-row {
+    display: grid !important;
+    grid-template-columns: 0.9fr 1.25fr 0.9fr !important;
+    gap: 3px !important;
+    width: 100% !important;
+    margin-top: auto !important;
+    box-sizing: border-box !important;
+}
+
+.arpeu-call-btn, .arpeu-whatsapp-btn, .arpeu-profile-btn {
+    border: none !important;
+    border-radius: 5px !important;
+    padding: 6px 1px !important;
+    font-size: 8.5px !important;
+    font-weight: 700 !important;
+    color: #ffffff !important;
+    cursor: pointer !important;
+    text-align: center !important;
+    text-decoration: none !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 2px !important;
+    white-space: nowrap !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+}
+
+.arpeu-call-btn { background: #0b4ea2 !important; }
+.arpeu-whatsapp-btn { background: #16a34a !important; font-size: 9px !important; padding: 6px 2px !important; }
+.arpeu-profile-btn { background: #ea580c !important; }
+
+.arpeu-call-btn:active, .arpeu-whatsapp-btn:active, .arpeu-profile-btn:active { transform: scale(0.94) !important; }
+.arpeu-call-btn i, .arpeu-profile-btn i { font-size: 8.5px !important; }
+.arpeu-whatsapp-btn i { font-size: 10px !important; }
+
+/* Floating Back Button */
+.arpeu-floating-back-btn {
+    position: fixed !important;
+    bottom: 56px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    background: rgba(8, 19, 38, 0.94) !important;
+    backdrop-filter: blur(12px) !important;
+    color: #ffffff !important;
+    border: 1.5px solid #ff9800 !important;
+    padding: 5px 14px !important;
+    border-radius: 20px !important;
+    font-size: 10.5px !important;
+    font-weight: 800 !important;
+    cursor: pointer !important;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 152, 0, 0.3) !important;
+    z-index: 9999 !important;
+    display: flex;
+    align-items: center !important;
+    gap: 6px !important;
+    white-space: nowrap !important;
+}
+
+.company-bearers-view-panel {
+    padding-bottom: 70px !important;
+}
