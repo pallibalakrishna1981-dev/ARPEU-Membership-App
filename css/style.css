@@ -8492,6 +8492,92 @@ textarea.mtg-custom-field {
     color: #ff9800 !important;
 }
 
+
+/* ==========================================================
+   6 COMPANY LOGO SELECTION BOXES (TOP SLIM GRID)
+   ========================================================== */
+.arpeu-hub-top-header {
+    text-align: center !important;
+    background: linear-gradient(135deg, #0b4ea2, #1565c0) !important;
+    padding: 8px 10px !important;
+    border-radius: 10px !important;
+    color: #ffffff !important;
+    margin-bottom: 10px !important;
+}
+
+.arpeu-hub-main-title {
+    margin: 0 !important;
+    font-size: 13.5px !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.5px !important;
+}
+
+.arpeu-hub-main-sub {
+    margin: 2px 0 0 0 !important;
+    font-size: 10px !important;
+    opacity: 0.9 !important;
+}
+
+/* 6 Company Icons Grid (3 Columns x 2 Rows) */
+.arpeu-company-boxes-grid {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important; /* 3 Boxes per row */
+    gap: 6px !important;
+    width: 100% !important;
+    margin-bottom: 14px !important;
+    box-sizing: border-box !important;
+}
+
+.arpeu-comp-box {
+    height: 120px !important;
+    background: #ffffff !important;
+    border: 1.5px solid #cbd5e1 !important;
+    border-radius: 10px !important;
+    padding: 6px 4px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 4px !important;
+    cursor: pointer !important;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.04) !important;
+    transition: all 0.15s ease !important;
+    box-sizing: border-box !important;
+}
+
+.arpeu-comp-box:active {
+    transform: scale(0.95) !important;
+}
+
+.arpeu-comp-box img {
+    width: 52px !important;
+    height: 52px !important;
+    max-width: 52px !important;
+    max-height: 52px !important;
+    object-fit: contain !important;
+    display: block !important;
+}
+
+.arpeu-comp-box span {
+    font-size: 9.5px !important;
+    font-weight: 800 !important;
+    color: #0b4ea2 !important;
+    text-align: center !important;
+    white-space: nowrap !important;
+}
+
+/* Active Highlighted Box (Saffron/Orange) */
+.arpeu-comp-box.active-comp-box {
+    border-color: #ff9800 !important;
+    background: #fff8f0 !important;
+    box-shadow: 0 0 8px rgba(255, 152, 0, 0.4) !important;
+}
+
+.arpeu-comp-box.active-comp-box span {
+    color: #ea580c !important;
+}
+
+
 /* ==========================================================
    ARPEU MASTER OFFICE BEARERS RESPONSIVE STYLES (NO CUTS / NO OVERFLOW)
    ========================================================== */
@@ -8659,7 +8745,7 @@ textarea.mtg-custom-field {
 }
 
 .arpeu-member-company {
-    font-size: 9.5px !important;
+    font-size: 9.0px !important;
     font-weight: 600 !important;
     color: #0b4ea2 !important;
     margin: 0 0 6px 0 !important;
@@ -8669,10 +8755,10 @@ textarea.mtg-custom-field {
     text-overflow: ellipsis !important;
 }
 
-/* 3 Equal-Width Action Buttons (Ultra Compact) */
+/* 3 Action Buttons Row (Wider Center WhatsApp Button) */
 .arpeu-contact-row {
     display: grid !important;
-    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    grid-template-columns: 0.9fr 1.25fr 0.9fr !important; /* Left & Right Compact, Center WhatsApp Wide */
     gap: 3px !important;
     width: 100% !important;
     margin-top: auto !important;
@@ -8683,8 +8769,8 @@ textarea.mtg-custom-field {
 .arpeu-whatsapp-btn,
 .arpeu-profile-btn {
     border: none !important;
-    border-radius: 4px !important;
-    padding: 5px 1px !important;
+    border-radius: 5px !important;
+    padding: 6px 1px !important;
     font-size: 8.5px !important;
     font-weight: 700 !important;
     color: #ffffff !important;
@@ -8696,19 +8782,39 @@ textarea.mtg-custom-field {
     justify-content: center !important;
     gap: 2px !important;
     white-space: nowrap !important;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
     box-sizing: border-box !important;
     width: 100% !important;
+    transition: transform 0.12s ease !important;
 }
 
-.arpeu-call-btn { background: #0b4ea2 !important; }
-.arpeu-whatsapp-btn { background: #16a34a !important; }
-.arpeu-profile-btn { background: #ea580c !important; }
+.arpeu-call-btn { 
+    background: #0b4ea2 !important; /* Navy Blue */
+}
+
+.arpeu-whatsapp-btn { 
+    background: #16a34a !important; /* WhatsApp Green */
+    font-size: 9px !important; /* Slightly larger text for WhatsApp */
+    padding: 6px 2px !important;
+}
+
+.arpeu-profile-btn { 
+    background: #ea580c !important; /* Vibrant Orange */
+}
+
+.arpeu-call-btn:active,
+.arpeu-whatsapp-btn:active,
+.arpeu-profile-btn:active {
+    transform: scale(0.94) !important;
+}
 
 .arpeu-call-btn i,
-.arpeu-whatsapp-btn i,
 .arpeu-profile-btn i {
     font-size: 8.5px !important;
+}
+
+.arpeu-whatsapp-btn i {
+    font-size: 10px !important; /* Prominent WhatsApp Icon */
 }
 
 /* 4. Large Profile Zoom Modal */
@@ -8792,4 +8898,49 @@ textarea.mtg-custom-field {
 @keyframes zoomInModal {
     from { transform: scale(0.92); opacity: 0; }
     to { transform: scale(1); opacity: 1; }
+}
+
+/* ==========================================================
+   FLOATING "BACK TO COMPANIES" ULTRA-SLIM GLASS PILL
+   ========================================================== */
+.arpeu-floating-back-btn {
+    position: fixed !important;
+    bottom: 56px !important; /* 👉 Sits perfectly below cards, right above navbar */
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    background: rgba(8, 19, 38, 0.94) !important; /* Rich Dark Glass */
+    backdrop-filter: blur(12px) !important;
+    color: #ffffff !important;
+    border: 1.5px solid #ff9800 !important; /* Saffron/Orange Border */
+    padding: 5px 14px !important; /* 👉 Slim Padding */
+    border-radius: 20px !important;
+    font-size: 10.5px !important; /* 👉 Compact Font */
+    font-weight: 800 !important;
+    letter-spacing: 0.3px !important;
+    cursor: pointer !important;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 152, 0, 0.3) !important;
+    z-index: 9999 !important;
+    display: flex;
+    align-items: center !important;
+    gap: 6px !important;
+    white-space: nowrap !important;
+    animation: bounceUpPill 0.25s ease-out !important;
+}
+
+.arpeu-floating-back-btn:active {
+    transform: translateX(-50%) scale(0.92) !important;
+}
+
+.arpeu-floating-back-btn i {
+    font-size: 11px !important;
+    color: #ff9800 !important; /* Gold Arrow */
+}
+
+/* ==========================================================
+   EXTRA BOTTOM PADDING FOR ALL COMPANY PANELS (NO BUTTON CLASH)
+   ========================================================== */
+.company-bearers-view-panel {
+    padding-bottom: 70px !important;
+    margin-bottom: 20px !important;
+    box-sizing: border-box !important;
 }

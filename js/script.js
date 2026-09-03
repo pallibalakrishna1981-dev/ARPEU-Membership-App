@@ -6824,6 +6824,45 @@ function triggerSecondarySpeakerGuidance(speakerName, stream = null) {
 }
 
 /* ==========================================================
+   COMPANY TAB FILTER LOGIC (INSTANT SWITCH)
+   ========================================================== */
+function filterCompanyBearers(companyKey, element) {
+    const floatingBtn = document.getElementById('btnFloatingBackToComps');
+
+    // 1. Highlight Active Box
+    document.querySelectorAll('.arpeu-comp-box').forEach(b => b.classList.remove('active-comp-box'));
+    if (element) element.classList.add('active-comp-box');
+
+    // 2. Hide all company panels first
+    document.querySelectorAll('.company-bearers-view-panel').forEach(p => p.style.display = 'none');
+
+    // 3. Open selected company panel
+    const targetPanel = document.getElementById(`companyBearers_${companyKey}`);
+    if (targetPanel) {
+        targetPanel.style.display = 'block';
+        if (floatingBtn) floatingBtn.style.display = 'flex'; // Show floating back button
+        targetPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else {
+        if (floatingBtn) floatingBtn.style.display = 'none';
+        alert(`${companyKey.toUpperCase()} Office Bearers list is being updated.`);
+    }
+}
+
+function closeCompanyBearersPanel() {
+    // 1. Hide open panels & floating button
+    document.querySelectorAll('.company-bearers-view-panel').forEach(p => p.style.display = 'none');
+    document.querySelectorAll('.arpeu-comp-box').forEach(b => b.classList.remove('active-comp-box'));
+
+    const floatingBtn = document.getElementById('btnFloatingBackToComps');
+    if (floatingBtn) floatingBtn.style.display = 'none';
+
+    // 2. Smooth scroll back to Company Selector Hub
+    const contentArea = document.getElementById("contentArea") || window;
+    contentArea.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+
+/* ==========================================================
    OFFICE BEARER TO PROFILE ENGINE (VIEW / EDIT / CREATE)
    ========================================================== */
 function openBearerProfile(name, mobile, role, company) {
