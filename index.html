@@ -22,7 +22,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="#0B4EA2">
 <meta name="apple-mobile-web-app-title" content="ARPEU Portal">
 
-<link rel="stylesheet" href="css/style.css?v=2041">
+<link rel="stylesheet" href="css/style.css?v=2042">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
@@ -1729,6 +1729,19 @@
       <div id="profileSearchStatus" class="profile-status-msg"></div>
     </div>
     
+
+    <!-- 🌟 TOGGLE BUTTON FOR YOUR STABLE PROFILE FORM -->
+    <div class="prof-action-card" style="margin: 10px 0;">
+        <button type="button" class="btn-toggle-create-profile" id="btnToggleCreateProfile" onclick="toggleCreateProfileForm()">
+            <i class="fa-solid fa-user-plus"></i>
+            <span id="createProfileBtnText">Create / Register New Profile Form</span>
+            <i class="fa-solid fa-chevron-down toggle-arrow" id="createProfileArrow"></i>
+        </button>
+    </div>
+
+    <!-- 👉 WRAPPER TO HIDE YOUR ORIGINAL FORM SAFELY -->
+    <div id="collapsibleProfileFormWrapper" style="display: none;">
+
 <!-- PASSPORT SIZE PHOTO UPLOAD CARD (ISOLATED UNIQUE IDS) -->
       <div class="profile-section-card">
         <div class="card-section-header">
@@ -2388,7 +2401,55 @@
         </button>
       </div>
 
-    </form>
+      </div> <!-- 👈 collapsibleProfileFormWrapper ముగింపు -->
+
+  <!-- 🌟 5. EXECUTIVE COMMITTEE PROFILES (COLLAPSIBLE ACCORDION + 2-COL GRID) -->
+    <div class="prof-showcase-section">
+      <div class="prof-ec-toggle-header" onclick="toggleEcProfilesSection()">
+        <div class="d-flex align-items-center gap-2">
+          <i class="fa-solid fa-crown text-warning"></i>
+          <span>EXECUTIVE COMMITTEE PROFILES</span>
+        </div>
+        <i class="fa-solid fa-chevron-down toggle-arrow" id="ecProfilesToggleArrow"></i>
+      </div>
+
+      <!-- 2-Column Responsive Grid (Default Hidden) -->
+      <div class="prof-ec-grid-2col" id="profEcLeadersList" style="display: none;">
+        <!-- 14 EC Leaders injected dynamically by JS -->
+      </div>
+    </div>
+
+    <!-- 🌟 6. STAR VOLUNTEERS & DYNAMIC TALENTS (WITH 11 SMART CATEGORY FILTERS) -->
+    <div class="prof-showcase-section">
+      <div class="prof-showcase-title">
+        <i class="fa-solid fa-star text-warning"></i>
+        <span>STAR VOLUNTEERS & TALENT DIRECTORY</span>
+      </div>
+
+      <!-- Smart Category Dropdown Selector -->
+      <div class="talent-filter-box">
+        <label for="talentCategorySelector"><i class="fa-solid fa-filter text-primary"></i> Select Skill / Volunteer Category:</label>
+        <select id="talentCategorySelector" class="profile-select" onchange="filterTalentDirectory(this.value)">
+          <option value="blood">🩸 Willing Blood Donors (Emergency Ready)</option>
+          <option value="it">💻 Computer, IT & Typing Specialists</option>
+          <option value="social">📢 Social Media & Digital Publicity</option>
+          <option value="design">🎨 Graphic Design & Video Editing</option>
+          <option value="legal">⚖️ Legal & Labour Laws Assistance</option>
+          <option value="speech">🎙️ Public Speaking & Orators</option>
+          <option value="writing">✍️ Article & Letter Drafting</option>
+          <option value="travel">🚗 High Travel Availability (State/National)</option>
+          <option value="rss">🚩 Active Swayamsevak / Associated</option>
+          <option value="magazine">📖 Vishwakarma Sanket Subscribers</option>
+          <option value="training">🎓 Future Training Enthusiasts</option>
+        </select>
+      </div>
+
+      <!-- Dynamic Filtered Volunteer Profiles 2-Col Grid -->
+      <div class="prof-volunteers-grid" id="profStarVolunteersList">
+        <!-- Dynamic Filtered Volunteers injected by JS -->
+      </div>
+    </div>
+
   </div>
 </section>
 
@@ -4993,7 +5054,7 @@
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-<script src="js/script.js?v=117"></script>
+<script src="js/script.js?v=118"></script>
 </body>
 
 </html>

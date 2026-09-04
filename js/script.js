@@ -7445,3 +7445,144 @@ function closeCompanyBearersPanel() {
     const contentArea = document.getElementById("contentArea") || window;
     contentArea.scrollTo({ top: 0, behavior: 'smooth' });
 }
+
+
+/* ==========================================================
+   ARPEU EXECUTIVE COMMITTEE & TALENT DIRECTORY JS ENGINE
+   ========================================================== */
+
+const arpeu14ExecutiveCommitteeData = [
+    // Core State Leaders
+    { name: "Sri T. Sambasiva Rao", role: "State President", mobile: "9849195995", photo: "images/state-office-bearers/state-president.jpg" },
+    { name: "Sri C. Ramagopal Reddy", role: "State General Secretary", mobile: "7989215049", photo: "images/state-office-bearers/general-secretary.jpg" },
+    { name: "Sri P. Bala Krishna", role: "State Treasurer", mobile: "9642788786", photo: "images/state-office-bearers/state-treasurer.jpg" },
+    { name: "Sri K. Jayappa", role: "State Working President", mobile: "9515126908", photo: "images/state-office-bearers/jayappa-working-president.jpg" },
+    { name: "Sri A. Koteswara Rao", role: "State Org Sec & SPDCL Pres", mobile: "9849375974", photo: "images/state-office-bearers/koteswara-rao-organising-secretary.jpg" },
+    
+    // Company Presidents & Secretaries
+    { name: "Sri Ch. Sudhakar", role: "GENCO President", mobile: "9704312927", photo: "images/genco-office-bearers/vice-president-sudhakar.jpg" },
+    { name: "Sri CVR. Prasad Reddy", role: "GENCO Secretary", mobile: "9494686398", photo: "images/genco-office-bearers/vice-president-prasad-reddy.jpg" },
+    { name: "Sri P. Prasad", role: "CPDCL President", mobile: "9492276307", photo: "images/state-office-bearers/asst-gen-secretary-prasad.jpg" },
+    { name: "Sri S. Gurubrahmam", role: "CPDCL Secretary", mobile: "8309195958", photo: "images/arpeu-logo.png" },
+    { name: "Sri Antharvedi V. Babu", role: "EPDCL President", mobile: "9908945833", photo: "images/arpeu-logo.png" },
+    { name: "Sri D. Kiran Kishore", role: "EPDCL Secretary", mobile: "8317645490", photo: "images/state-office-bearers/vice-president-kiran-kishore.jpg" },
+    { name: "Sri A. Lakshmaiah", role: "SPDCL Secretary", mobile: "9441684787", photo: "images/state-office-bearers/joint-secretary-lakshmuiah.jpg" },
+    { name: "Sri K. Rajesh", role: "TRANSCO President", mobile: "8074602893", photo: "images/arpeu-logo.png" },
+    { name: "Sri K. Dinesh Kumar", role: "TRANSCO Secretary", mobile: "9490154334", photo: "images/state-office-bearers/joint-secretary-dinesh-kumar.jpg" }
+];
+
+const arpeuTalentDirectoryData = [
+    { name: "Sri R. Suresh", role: "Line Inspector", company: "APSPDCL - Tirupati", mobile: "9440112233", categories: ["blood", "social", "travel"] },
+    { name: "Smt. K. Anitha", role: "Senior Asst", company: "APCPDCL - Guntur", mobile: "9848223344", categories: ["blood", "it", "writing"] },
+    { name: "Sri M. Rajesh", role: "Sub-Engineer", company: "APGENCO - Dr. NTTPS", mobile: "9988334455", categories: ["social", "it", "design"] },
+    { name: "Sri D. Naresh", role: "JAO / Accounts", company: "APTRANSCO - Kadapa", mobile: "9700445566", categories: ["blood", "legal", "speech"] },
+    { name: "Sri V. Prasad", role: "Foreman", company: "APGENCO - RTPP", mobile: "9618556677", categories: ["rss", "magazine", "training"] },
+    { name: "Sri S. Venkatesh", role: "Line Mechanic", company: "APEPDCL - Visakha", mobile: "9949667788", categories: ["blood", "travel", "speech"] }
+];
+
+/**
+ * 🌟 Auto Render Elements on Page Load
+ */
+document.addEventListener('DOMContentLoaded', function () {
+    render14EcLeadersCards();
+    filterTalentDirectory('blood');
+});
+
+function render14EcLeadersCards() {
+    const ecContainer = document.getElementById('profEcLeadersList');
+    if (ecContainer) {
+        ecContainer.innerHTML = arpeu14ExecutiveCommitteeData.map(l => `
+            <div class="prof-ec-card" onclick="quickSearchLeaderProfile('${l.mobile}')">
+                <img class="prof-ec-avatar" src="${l.photo}" alt="${l.name}" onerror="this.onerror=null; this.src='images/arpeu-logo.png'">
+                <span class="prof-ec-name">${l.name}</span>
+                <span class="prof-ec-role">${l.role}</span>
+            </div>
+        `).join('');
+    }
+}
+
+/**
+ * 🌟 1. Toggle Collapsible Create Profile Form
+ */
+function toggleCreateProfileForm() {
+    const formWrapper = document.getElementById('collapsibleProfileFormWrapper');
+    if (!formWrapper) return;
+
+    const isHidden = (formWrapper.style.display === 'none' || formWrapper.style.display === '' || getComputedStyle(formWrapper).display === 'none');
+
+    if (isHidden) {
+        formWrapper.style.cssText = "display: block !important;";
+        formWrapper.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else {
+        formWrapper.style.cssText = "display: none !important;";
+    }
+}
+
+/**
+ * 🌟 2. Toggle EC Profiles Show/Hide
+ */
+function toggleEcProfilesSection() {
+    const ecGrid = document.getElementById('profEcLeadersList');
+    const arrow = document.getElementById('ecProfilesToggleArrow');
+    if (!ecGrid) return;
+
+    const isHidden = (ecGrid.style.display === 'none' || ecGrid.style.display === '' || getComputedStyle(ecGrid).display === 'none');
+
+    if (isHidden) {
+        ecGrid.style.cssText = "display: grid !important;";
+        if (arrow) arrow.classList.add('open');
+    } else {
+        ecGrid.style.cssText = "display: none !important;";
+        if (arrow) arrow.classList.remove('open');
+    }
+}
+
+/**
+ * 🌟 3. Filter Talent Directory
+ */
+function filterTalentDirectory(categoryKey) {
+    const volContainer = document.getElementById('profStarVolunteersList');
+    if (!volContainer) return;
+
+    const filtered = arpeuTalentDirectoryData.filter(m => m.categories && m.categories.includes(categoryKey));
+
+    if (filtered.length === 0) {
+        volContainer.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding:15px; color:#64748b; font-size:11px;">No registered volunteers found in this category.</div>`;
+        return;
+    }
+
+    const categoryLabels = {
+        blood: "🩸 Blood Donor (Ready)",
+        it: "💻 IT & Typing Expert",
+        social: "📢 Social Media Warrior",
+        design: "🎨 Graphic / Video Editor",
+        legal: "⚖️ Legal & Labour Laws",
+        speech: "🎙️ Public Speaker",
+        writing: "✍️ Letter / Article Drafting",
+        travel: "🚗 Travel Ready (State)",
+        rss: "🚩 Active Swayamsevak",
+        magazine: "📖 Magazine Subscriber",
+        training: "🎓 Training Enthusiast"
+    };
+
+    volContainer.innerHTML = filtered.map(v => `
+        <div class="prof-volunteer-card" onclick="quickSearchLeaderProfile('${v.mobile}')">
+            <img class="prof-vol-avatar" src="images/arpeu-logo.png" alt="${v.name}">
+            <div class="prof-vol-info">
+                <strong>${v.name}</strong>
+                <span>${v.company}</span>
+                <span class="prof-vol-tag-badge">${categoryLabels[categoryKey] || 'Volunteer'}</span>
+            </div>
+        </div>
+    `).join('');
+}
+
+function quickSearchLeaderProfile(mobile) {
+    const searchInput = document.getElementById('profileSearchQuery');
+    if (searchInput) {
+        searchInput.value = mobile;
+        if (typeof searchUniversalProfile === 'function') {
+            searchUniversalProfile();
+        }
+    }
+}

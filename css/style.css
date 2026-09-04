@@ -9284,3 +9284,267 @@ textarea.mtg-custom-field {
 .company-bearers-view-panel {
     padding-bottom: 70px !important;
 }
+
+/* ==========================================================
+   ISOLATED PROFILE SHOWCASE & TOGGLE BUTTON STYLES
+   ========================================================== */
+
+/* 1. Create Profile Toggle Button (Solid Stylish Look) */
+.prof-action-card {
+    margin: 10px 0 12px 0 !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+.btn-toggle-create-profile {
+    width: 100% !important;
+    background: #ffffff !important;
+    border: 1.5px dashed #0b4ea2 !important;
+    border-radius: 12px !important;
+    padding: 10px 14px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important; /* Left Align Content */
+    gap: 10px !important; /* 👉 Gives 10px clean gap between Icon and Text */
+    color: #0b4ea2 !important;
+    font-size: 12.5px !important;
+    font-weight: 800 !important;
+    cursor: pointer !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04) !important;
+    transition: all 0.2s ease !important;
+    box-sizing: border-box !important;
+}
+
+.btn-toggle-create-profile i:first-child {
+    font-size: 14px !important;
+    color: #0b4ea2 !important;
+    flex-shrink: 0 !important;
+}
+
+.btn-toggle-create-profile .toggle-arrow {
+    margin-left: auto !important; /* Pushes arrow to far right */
+}
+
+.btn-toggle-create-profile.active {
+    background: #eff6ff !important;
+    border-style: solid !important;
+    border-color: #0b4ea2 !important;
+}
+
+/* 2. EC Profiles Header (Single Row, Royal Blue, Right-Aligned Arrow) */
+.prof-ec-toggle-header {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    width: 100% !important;
+    color: #0b4ea2 !important;
+    font-size: 12.5px !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.3px !important;
+    cursor: pointer !important;
+    padding: 2px 0 !important;
+    box-sizing: border-box !important;
+}
+
+.prof-ec-toggle-header .d-flex {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+}
+
+.toggle-arrow {
+    font-size: 13px !important;
+    color: #0b4ea2 !important;
+    transition: transform 0.25s ease !important;
+    margin-left: auto !important;
+    flex-shrink: 0 !important;
+}
+
+.toggle-arrow.open {
+    transform: rotate(180deg) !important;
+    color: #ea580c !important; /* Turns Orange when open */
+}
+
+/* 2. Showcase Cards Container */
+.prof-showcase-section {
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 12px !important;
+    padding: 10px !important;
+    margin-bottom: 12px !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04) !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+.prof-showcase-title {
+    font-size: 12px !important;
+    font-weight: 800 !important;
+    color: #0b4ea2 !important;
+    margin-bottom: 8px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    border-bottom: 1px solid #f1f5f9 !important;
+    padding-bottom: 5px !important;
+}
+
+/* 1. EC Profiles Accordion Toggle Button */
+.btn-toggle-ec-profiles {
+    width: 100% !important;
+    background: transparent !important;
+    border: none !important;
+    padding: 4px 2px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    color: #0b4ea2 !important;
+    font-size: 12px !important;
+    font-weight: 800 !important;
+    cursor: pointer !important;
+}
+
+/* 2. 14 EC Leaders (Strict 2-Column Grid) */
+.prof-ec-grid-2col {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important; /* 👉 Strict 2 Columns */
+    gap: 8px !important;
+    width: 100% !important;
+    margin-top: 10px !important;
+    box-sizing: border-box !important;
+}
+
+.prof-ec-card {
+    background: #f8fafc !important;
+    border: 1.5px solid #cbd5e1 !important;
+    border-radius: 12px !important;
+    padding: 8px 6px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
+    cursor: pointer !important;
+    transition: all 0.15s ease !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+}
+
+.prof-ec-card:active {
+    transform: scale(0.96) !important;
+    background: #eff6ff !important;
+    border-color: #0b4ea2 !important;
+}
+
+/* Royal Navy Blue Avatar Border (No Orange) */
+.prof-ec-avatar {
+    width: 62px !important;
+    height: 62px !important;
+    border-radius: 50% !important;
+    border: 2.5px solid #0b4ea2 !important; /* 👉 Royal Blue Border */
+    object-fit: cover !important;
+    background: #ffffff !important;
+    box-shadow: 0 2px 8px rgba(11, 78, 162, 0.2) !important;
+    margin-bottom: 5px !important;
+}
+
+.prof-ec-name {
+    font-size: 11.5px !important;
+    font-weight: 800 !important;
+    color: #1e293b !important;
+    line-height: 1.2 !important;
+    text-align: center !important;
+    width: 100% !important;
+    word-break: break-word !important;
+    margin: 2px 0 1px 0 !important;
+}
+
+.prof-ec-role {
+    font-size: 9px !important;
+    font-weight: 700 !important;
+    color: #0b4ea2 !important;
+    line-height: 1.2 !important;
+    text-align: center !important;
+    width: 100% !important;
+}
+
+/* 3. Talent Filter Dropdown & Compact Volunteer Cards */
+.talent-filter-box {
+    margin-bottom: 10px !important;
+    background: #f8fafc !important;
+    padding: 8px !important;
+    border-radius: 8px !important;
+    border: 1px solid #e2e8f0 !important;
+}
+
+.talent-filter-box label {
+    display: block !important;
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    color: #0b4ea2 !important;
+    margin-bottom: 4px !important;
+}
+
+.prof-volunteers-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important; /* 2 Cards per Row */
+    gap: 6px !important;
+    width: 100% !important;
+}
+
+.prof-volunteer-card {
+    background: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 10px !important;
+    padding: 6px 8px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    cursor: pointer !important;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04) !important;
+}
+
+.prof-vol-avatar {
+    width: 40px !important;
+    height: 40px !important;
+    min-width: 40px !important;
+    max-width: 40px !important;
+    border-radius: 50% !important;
+    border: 1.5px solid #16a34a !important;
+    object-fit: cover !important;
+    display: block !important;
+}
+
+.prof-vol-info {
+    flex: 1 !important;
+    min-width: 0 !important;
+    text-align: left !important;
+}
+
+.prof-vol-info strong {
+    display: block !important;
+    font-size: 11px !important;
+    font-weight: 800 !important;
+    color: #0f172a !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
+
+.prof-vol-info span {
+    display: block !important;
+    font-size: 8.5px !important;
+    font-weight: 600 !important;
+    color: #64748b !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
+
+.prof-vol-tag-badge {
+    font-size: 8px !important;
+    font-weight: 800 !important;
+    color: #16a34a !important;
+    margin-top: 1px !important;
+    display: block !important;
+}
