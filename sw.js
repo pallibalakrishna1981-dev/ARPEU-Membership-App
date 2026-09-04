@@ -3,7 +3,7 @@
    Version: 1.0 (Official Build)
    ========================================================== */
 
-const CACHE_NAME = 'arpeu-portal-v38.0';
+const CACHE_NAME = 'arpeu-portal-v39.0';
 
 /* Install & Activate Immediately without Waiting */
 self.addEventListener('install', event => {
