@@ -522,6 +522,7 @@ function showPage(page) {
   const mtgSec        = document.getElementById("meetingsSection");
   const obSec         = document.getElementById("office-bearersSection"); // 👉 Office Bearers Section
   const floatingBack  = document.getElementById("btnFloatingBackToComps"); // 👉 Floating Back Button
+  const diarySec = document.getElementById("diarySection");
   const placeholderSec= document.getElementById("underDevPlaceholderSection");
 
   // 2. FORCE HIDE EVERY SECTION & FLOATING BUTTON (Guarantees Zero Overlapping)
@@ -539,6 +540,7 @@ function showPage(page) {
   if (mtgSec)        mtgSec.style.display        = "none";
   if (obSec)         obSec.style.display         = "none"; // 👉 Strictly Hide Office Bearers
   if (floatingBack)  floatingBack.style.display  = "none"; // 👉 Strictly Hide Floating Button
+  if (diarySec) diarySec.style.display = "none"; // 👉 Hide Diary Section
   if (placeholderSec)placeholderSec.style.display= "none";
 
   // Hide standalone contentArea children if any
@@ -633,6 +635,15 @@ function showPage(page) {
         if (typeof backToCompanySelector === "function") {
           backToCompanySelector();
         }
+      }
+      break;
+
+    case "diary":
+    case "diaries":
+    case "calendar":
+      if (diarySec) {
+        diarySec.style.display = "flex";
+        if (typeof updateDiaryPriceCalculations === "function") updateDiaryPriceCalculations();
       }
       break;
 
@@ -7585,5 +7596,155 @@ function quickSearchLeaderProfile(mobile) {
         if (typeof searchUniversalProfile === 'function') {
             searchUniversalProfile();
         }
+    }
+}
+
+/* ==========================================================
+   ARPEU ROYAL DIARY & ADVERTISEMENT ENGINE (MASTER FLOW)
+   ========================================================== */
+
+/**
+ * 🌟 1. Open Specific Form Flow & Hide Dashboard Stats
+ */
+function openDiaryFlowForm(flowType) {
+    const statsDashboard = document.getElementById('diaryStatsDashboardView');
+    const orderForm = document.getElementById('diaryOrderFormSection');
+    const advtForm = document.getElementById('diaryAdvtFormSection');
+    const btnOrder = document.getElementById('btnPillarOrder');
+    const btnAdvt = document.getElementById('btnPillarAdvt');
+
+    // Hide Dashboard Statistics
+    if (statsDashboard) statsDashboard.style.display = 'none';
+
+    if (flowType === 'order') {
+        if (orderForm) orderForm.style.display = 'block';
+        if (advtForm) advtForm.style.display = 'none';
+        if (btnOrder) btnOrder.classList.add('active');
+        if (btnAdvt) btnAdvt.classList.remove('active');
+        updateDiaryPriceCalculations();
+        orderForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else {
+        if (orderForm) orderForm.style.display = 'none';
+        if (advtForm) advtForm.style.display = 'block';
+        if (btnAdvt) btnAdvt.classList.add('active');
+        if (btnOrder) btnOrder.classList.remove('active');
+        updateAdvtPriceCalculations();
+        advtForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+}
+
+/**
+ * 🌟 2. Close Form & Return to Clean Dashboard View
+ */
+function closeDiaryFlowForm() {
+    const statsDashboard = document.getElementById('diaryStatsDashboardView');
+    const orderForm = document.getElementById('diaryOrderFormSection');
+    const advtForm = document.getElementById('diaryAdvtFormSection');
+
+    if (orderForm) orderForm.style.display = 'none';
+    if (advtForm) advtForm.style.display = 'none';
+    if (statsDashboard) statsDashboard.style.display = 'block';
+
+    document.querySelectorAll('.btn-diary-pillar').forEach(b => b.classList.remove('active'));
+
+    const contentArea = document.getElementById("contentArea") || window;
+    contentArea.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/**
+ * 🌟 3. Dynamic Company -> Station/Circle Dropdown Synchronizer
+ */
+function syncDiaryStationDropdown(company) {
+    const stationSelect = document.getElementById('diaryOrderStationSelect');
+    if (!stationSelect) return;
+
+    const stationMaps = {
+        'APGENCO': ['Dr. NTTPS (Vijayawada)', 'Dr. MVR RTPP (Kadapa)', 'SDSTPS (Krishnapatnam)', 'Srisailam Hydel Plant', 'VTPS / Hydel Stations', 'Vidyut Soudha Corporate'],
+        'APTRANSCO': ['Vidyut Soudha (Corporate)', 'Kadapa 400kV Zone', 'Visakhapatnam Zone', 'Vijayawada Zone', 'Kurnool Zone'],
+        'APSPDCL': ['Tirupati Corporate', 'Nellore Circle', 'Kadapa Circle', 'Ananthapur Circle', 'Annamayya Circle'],
+        'APCPDCL': ['Vijayawada Corporate', 'CRDA Circle', 'Guntur Circle', 'Palnadu Circle', 'Prakasam (Ongole) Circle'],
+        'APEPDCL': ['Visakhapatnam Corporate', 'Eluru Circle', 'Anakapalli Circle', 'Kakinada Circle', 'Srikakulam Circle'],
+        'Other': ['Retired Employee Association', 'BMS State Office', 'General Public / Well Wisher']
+    };
+
+    const options = stationMaps[company] || ['Select Station / Circle'];
+    stationSelect.innerHTML = options.map(opt => `<option value="${opt}">${opt}</option>`).join('');
+}
+
+/**
+ * 🌟 4. Price Calculations
+ */
+function updateDiaryPriceCalculations() {
+    const qtyInput = document.getElementById('diaryOrderQty');
+    const totalDisplay = document.getElementById('diaryOrderTotalText');
+    const qty = parseInt(qtyInput ? qtyInput.value : 1) || 1;
+    const total = qty * 300;
+
+    if (totalDisplay) totalDisplay.textContent = `₹ ${total.toLocaleString('en-IN')} /-`;
+    return total;
+}
+
+function updateAdvtPriceCalculations() {
+    const tariffSelect = document.getElementById('diaryAdvtSizeSelect');
+    const totalDisplay = document.getElementById('diaryAdvtTotalText');
+    const total = parseInt(tariffSelect ? tariffSelect.value : 10000) || 10000;
+
+    if (totalDisplay) totalDisplay.textContent = `₹ ${total.toLocaleString('en-IN')} /-`;
+    return total;
+}
+
+/**
+ * 🌟 5. Mobile Auto-Fill
+ */
+function handleDiaryMobileAutoFill(input) {
+    const mobile = input.value.trim();
+    if (mobile.length !== 10) return;
+
+    if (typeof cachedMembers !== 'undefined' && Array.isArray(cachedMembers)) {
+        const member = cachedMembers.find(m => m.mobile === mobile || String(m.phone) === mobile);
+        if (member) {
+            if (document.getElementById('diaryOrderName')) document.getElementById('diaryOrderName').value = member.name || member.fullName || '';
+            if (document.getElementById('diaryOrderCompany')) {
+                document.getElementById('diaryOrderCompany').value = member.company || '';
+                syncDiaryStationDropdown(member.company || '');
+            }
+            if (document.getElementById('diaryOrderUnionRole')) document.getElementById('diaryOrderUnionRole').value = member.designation || 'Active Cadre';
+            if (document.getElementById('diaryShipStreet')) document.getElementById('diaryShipStreet').value = member.address || '';
+            if (document.getElementById('diaryShipDistrict')) document.getElementById('diaryShipDistrict').value = member.district || '';
+            if (document.getElementById('diaryShipPincode')) document.getElementById('diaryShipPincode').value = member.pincode || '';
+        }
+    }
+}
+
+/**
+ * 🌟 6. Process Payment & Open Receipt
+ */
+function processDiaryOrderPayment(type) {
+    const isDiary = (type === 'diaries');
+    const mobile = isDiary ? (document.getElementById('diaryOrderMobile') || {}).value : (document.getElementById('diaryAdvtContactMobile') || {}).value;
+    const name = isDiary ? (document.getElementById('diaryOrderName') || {}).value : (document.getElementById('diaryAdvtFirmName') || {}).value;
+    const totalAmount = isDiary ? updateDiaryPriceCalculations() : updateAdvtPriceCalculations();
+
+    if (!mobile || mobile.length !== 10 || !name) {
+        alert("Please enter a valid Name / Firm Name and 10-digit Mobile Number.");
+        return;
+    }
+
+    const orderReceiptData = {
+        receiptNo: `ARPEU/DIARY/2027/${Math.floor(1000 + Math.random() * 9000)}`,
+        donationId: `DIR2027-${Math.floor(100 + Math.random() * 900)}`,
+        donorName: name,
+        donorMobile: mobile,
+        organization: isDiary ? ((document.getElementById('diaryOrderCompany') || {}).value || "ARPEU Member") : ((document.getElementById('diaryAdvtCategory') || {}).value || "Commercial Firm"),
+        donationType: isDiary ? `Union Diary Booking (${document.getElementById('diaryOrderQty').value} Copies)` : `Diary Advertisement (${(document.getElementById('diaryAdvtSizeSelect') || {}).options[(document.getElementById('diaryAdvtSizeSelect') || {}).selectedIndex].text.split('–')[0]})`,
+        amount: totalAmount,
+        paymentMode: "UPI / Online Payment",
+        paymentDate: new Date().toLocaleDateString('en-GB')
+    };
+
+    if (typeof openDonationReceipt === 'function') {
+        openDonationReceipt(orderReceiptData);
+    } else {
+        alert(`🎉 Order Booked Successfully!\n\nReceipt: ${orderReceiptData.receiptNo}\nTotal Amount: ₹${totalAmount}`);
     }
 }

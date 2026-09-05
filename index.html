@@ -22,7 +22,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="#0B4EA2">
 <meta name="apple-mobile-web-app-title" content="ARPEU Portal">
 
-<link rel="stylesheet" href="css/style.css?v=2043">
+<link rel="stylesheet" href="css/style.css?v=2044">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
@@ -114,6 +114,7 @@
         <span>Donations</span>
     </a>
 
+    
     <a href="#" class="nav-item" id="navStatistics">
         <i class="fa-solid fa-chart-column"></i>
         <span>Statistics</span>
@@ -161,6 +162,12 @@
             <a href="#" id="navDownloads" onclick="showPage('downloads'); return false;">
                 <i class="fa-solid fa-download"></i>
                 <span>Downloads</span>
+            </a>
+
+            <!-- 🌟 DIARY & ADVERTISEMENTS MENU ITEM -->
+            <a href="#" class="dropdown-item" onclick="showPage('diary'); return false;">
+                <i class="fa-solid fa-book-bookmark text-warning"></i>
+                <span>Diary & Advertisements</span>
             </a>
 
             <!-- 🌟 NEW: Meetings & Video Calling Link -->
@@ -4716,7 +4723,318 @@
      DONATION MODULE & UNIVERSAL AUTO-FILL SECTION (END)
 ========================================================= -->
 
+<!-- =========================================================
+     ARPEU ROYAL CROWN DIARY & ADVERTISEMENT PORTAL (#diarySection)
+========================================================= -->
+<section id="diarySection" class="diary-master-page" style="display: none;">
 
+    <!-- 🌟 BLOCK 1: ROYAL CROWN PROMOTIONAL HERO BANNER -->
+    <div class="diary-royal-banner">
+        <div class="diary-banner-badge">
+            <i class="fa-solid fa-crown text-warning"></i>
+            <span>OFFICIAL ARPEU PUBLICATION 2027</span>
+        </div>
+        <h1 class="diary-banner-heading">ROYAL CROWN EXECUTIVE DIARY & DIRECTORY</h1>
+        <p class="diary-banner-tagline">
+            Andhra Pradesh Power Sector's Most Prestigious & Comprehensive Reference Manual
+        </p>
+
+        <!-- Feature Points in Amber Gold Glass Boxes -->
+        <div class="diary-features-grid">
+            <div class="diary-feat-item">
+                <i class="fa-solid fa-book-open text-warning"></i>
+                <span>Royal Crown 1/4 Executive Hard Bound</span>
+            </div>
+            <div class="diary-feat-item">
+                <i class="fa-solid fa-network-wired text-warning"></i>
+                <span>1000+ Circulation Across 5 AP Power Utilities</span>
+            </div>
+            <div class="diary-feat-item">
+                <i class="fa-solid fa-bullhorn text-warning"></i>
+                <span>High-Impact Year-Round Commercial Exposure</span>
+            </div>
+            <div class="diary-feat-item">
+                <i class="fa-solid fa-bolt text-warning"></i>
+                <span>Complete Service Rules, Power Plants Data & Directory</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🌟 BLOCK 2: TWO MAIN 3D ACTION PILLARS -->
+    <div class="diary-actions-dual-grid">
+        <button type="button" class="btn-diary-pillar btn-pillar-order" id="btnPillarOrder" onclick="openDiaryFlowForm('order')">
+            <div class="pillar-icon-box"><i class="fa-solid fa-book-bookmark"></i></div>
+            <div class="pillar-text-col">
+                <strong>ORDER UNION DIARIES</strong>
+                <span>Personal & Bulk Copies @ ₹300/-</span>
+            </div>
+        </button>
+
+        <button type="button" class="btn-diary-pillar btn-pillar-advt" id="btnPillarAdvt" onclick="openDiaryFlowForm('advt')">
+            <div class="pillar-icon-box"><i class="fa-solid fa-rectangle-ad"></i></div>
+            <div class="pillar-text-col">
+                <strong>BOOK ADVERTISEMENT</strong>
+                <span>Full & Half Page Multi-Color Tariff</span>
+            </div>
+        </button>
+    </div>
+
+    <!-- 🌟 BLOCK 3: REAL-TIME LIVE STATISTICS DASHBOARD (DEFAULT VISIBLE) -->
+    <div class="diary-stats-dashboard-card" id="diaryStatsDashboardView">
+        <div class="diary-stats-header">
+            <i class="fa-solid fa-chart-pie text-primary"></i>
+            <span>PUBLICATION & CIRCULATION STATISTICS 2027</span>
+        </div>
+
+        <div class="diary-metrics-grid-6">
+            <div class="diary-m-card card-glow-blue">
+                <span class="diary-m-val" id="dStatCopies">1,250</span>
+                <span class="diary-m-lbl"><i class="fa-solid fa-book"></i> Diaries Booked</span>
+            </div>
+            <div class="diary-m-card card-glow-green">
+                <span class="diary-m-val" id="dStatCopiesFund">₹3,75,000</span>
+                <span class="diary-m-lbl"><i class="fa-solid fa-receipt"></i> Diary Copies Fund</span>
+            </div>
+            <div class="diary-m-card card-glow-orange">
+                <span class="diary-m-val" id="dStatFullAds">24</span>
+                <span class="diary-m-lbl"><i class="fa-solid fa-ad"></i> Full Page Ads</span>
+            </div>
+            <div class="diary-m-card card-glow-purple">
+                <span class="diary-m-val" id="dStatHalfAds">18</span>
+                <span class="diary-m-lbl"><i class="fa-solid fa-rectangle-ad"></i> Half Page Ads</span>
+            </div>
+            <div class="diary-m-card card-glow-teal">
+                <span class="diary-m-val" id="dStatAdsFund">₹3,30,000</span>
+                <span class="diary-m-lbl"><i class="fa-solid fa-bullhorn"></i> Total Ads Revenue</span>
+            </div>
+            <div class="diary-m-card card-glow-gold">
+                <span class="diary-m-val" id="dStatTotalRevenue">₹7,05,000</span>
+                <span class="diary-m-lbl"><i class="fa-solid fa-wallet"></i> Total Diary Fund</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- =========================================================
+         🌟 BLOCK 4: DIARY ORDERING FORM (DEFAULT HIDDEN)
+    ========================================================= -->
+    <div id="diaryOrderFormSection" class="diary-flow-card" style="display: none;">
+        <div class="diary-flow-header flow-header-blue">
+            <div class="d-flex align-items-center gap-2">
+                <i class="fa-solid fa-cart-shopping"></i>
+                <h3>ORDER ARPEU CROWN DIARIES</h3>
+            </div>
+            <button type="button" class="btn-close-flow-form" onclick="closeDiaryFlowForm()">&times;</button>
+        </div>
+
+        <div class="diary-flow-body">
+            <!-- 1. Mobile with Smart Auto-Fill -->
+            <div class="form-group">
+                <label class="mtg-input-label">Registered Mobile Number <span class="required">*</span></label>
+                <div class="diary-input-wrap">
+                    <i class="fa-solid fa-phone input-leading-icon"></i>
+                    <input type="tel" id="diaryOrderMobile" class="mtg-custom-field diary-field-padded" maxlength="10" placeholder="10-Digit Mobile (Auto-detects details)" oninput="handleDiaryMobileAutoFill(this)">
+                </div>
+            </div>
+
+            <!-- 2. Applicant Name & Union Role -->
+            <div class="form-group">
+                <label class="mtg-input-label">Full Name / Officer Name <span class="required">*</span></label>
+                <input type="text" id="diaryOrderName" class="mtg-custom-field" placeholder="Enter Full Name">
+            </div>
+
+            <div class="form-group">
+                <label class="mtg-input-label">Union Responsibility / Designation in ARPEU <span class="required">*</span></label>
+                <input type="text" id="diaryOrderUnionRole" class="mtg-custom-field" placeholder="e.g. State EC Member / Division President / Active Cadre">
+            </div>
+
+            <!-- 3. Company & Dynamic Station/Circle Dropdown -->
+            <div class="dob-age-grid">
+                <div class="form-group">
+                    <label class="mtg-input-label">Company / Entity <span class="required">*</span></label>
+                    <select id="diaryOrderCompany" class="mtg-custom-field" onchange="syncDiaryStationDropdown(this.value)">
+                        <option value="">Select Company</option>
+                        <option value="APGENCO">APGENCO</option>
+                        <option value="APTRANSCO">APTRANSCO</option>
+                        <option value="APSPDCL">APSPDCL</option>
+                        <option value="APCPDCL">APCPDCL</option>
+                        <option value="APEPDCL">APEPDCL</option>
+                        <option value="Other">Retired / Well Wisher</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="mtg-input-label">Station / Circle Unit <span class="required">*</span></label>
+                    <select id="diaryOrderStationSelect" class="mtg-custom-field">
+                        <option value="">Select Unit / Circle</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- 4. Tariff & Quantity Interactive Calculator -->
+            <div class="diary-price-calc-box">
+                <div class="dob-age-grid">
+                    <div class="form-group">
+                        <label class="mtg-input-label">Number of Copies <span class="required">*</span></label>
+                        <input type="number" id="diaryOrderQty" class="mtg-custom-field text-center font-weight-bold" min="1" value="2" oninput="updateDiaryPriceCalculations()" style="font-size:16px; font-weight:800; color:#0b4ea2;">
+                    </div>
+                    <div class="form-group">
+                        <label class="mtg-input-label">Price Per Copy (Fixed)</label>
+                        <input type="text" id="diaryOrderUnitRate" class="mtg-custom-field text-center" value="₹ 300 /-" readonly style="background:#f1f5f9; font-weight:700;">
+                    </div>
+                </div>
+
+                <div class="diary-calc-summary-strip">
+                    <span>Total Amount Payable:</span>
+                    <strong id="diaryOrderTotalText">₹ 600 /-</strong>
+                </div>
+            </div>
+
+            <!-- 5. Complete Postal / Shipping Address -->
+            <div class="diary-address-card-wrap">
+                <span class="address-sec-label"><i class="fa-solid fa-truck-fast text-primary"></i> Complete Dispatch / Delivery Address</span>
+                
+                <div class="form-group mt-1">
+                    <label class="mtg-input-label">Door / Office / Section No.</label>
+                    <input type="text" id="diaryShipDoorNo" class="mtg-custom-field" placeholder="Door No, Office or Section Name">
+                </div>
+
+                <div class="form-group">
+                    <label class="mtg-input-label">Street / Colony / Landmark <span class="required">*</span></label>
+                    <input type="text" id="diaryShipStreet" class="mtg-custom-field" placeholder="Street, Colony or Landmark">
+                </div>
+
+                <div class="form-group">
+                    <label class="mtg-input-label">Village / Town / City / Mandal <span class="required">*</span></label>
+                    <input type="text" id="diaryShipCity" class="mtg-custom-field" placeholder="Village, City or Mandal">
+                </div>
+
+                <div class="dob-age-grid">
+                    <div class="form-group">
+                        <label class="mtg-input-label">District <span class="required">*</span></label>
+                        <select id="diaryShipDistrict" class="mtg-custom-field">
+                            <option value="">Select District</option>
+                            <option value="NTR">NTR (Vijayawada)</option>
+                            <option value="Guntur">Guntur</option>
+                            <option value="Prakasam">Prakasam (Ongole)</option>
+                            <option value="Nellore">Nellore</option>
+                            <option value="YSR Kadapa">YSR Kadapa</option>
+                            <option value="Visakhapatnam">Visakhapatnam</option>
+                            <option value="Ananthapuramu">Ananthapuramu</option>
+                            <option value="Tirupati">Tirupati</option>
+                            <option value="Other">Other AP District</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="mtg-input-label">PIN Code <span class="required">*</span></label>
+                        <input type="text" id="diaryShipPincode" class="mtg-custom-field" maxlength="6" placeholder="6-Digit PIN">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="button" id="btnSubmitDiaryOrderFinal" class="btn-diary-submit-glow btn-submit-blue" onclick="processDiaryOrderPayment('diaries')">
+                <i class="fa-solid fa-lock"></i> PROCEED TO PAYMENT & GET RECEIPT
+            </button>
+        </div>
+    </div>
+
+    <!-- =========================================================
+         🌟 BLOCK 5: ADVERTISEMENT BOOKING FORM (DEFAULT HIDDEN)
+    ========================================================= -->
+    <div id="diaryAdvtFormSection" class="diary-flow-card" style="display: none;">
+        <div class="diary-flow-header flow-header-orange">
+            <div class="d-flex align-items-center gap-2">
+                <i class="fa-solid fa-bullhorn"></i>
+                <h3>BOOK COMMERCIAL ADVERTISEMENT</h3>
+            </div>
+            <button type="button" class="btn-close-flow-form" onclick="closeDiaryFlowForm()">&times;</button>
+        </div>
+
+        <div class="diary-flow-body">
+            <!-- 1. Advertisement Size & Specification Selection -->
+            <div class="form-group">
+                <label class="mtg-input-label">Select Advertisement Page Size & Tariff <span class="required">*</span></label>
+                <select id="diaryAdvtSizeSelect" class="mtg-custom-field" onchange="updateAdvtPriceCalculations()">
+                    <option value="15000">Back Cover Outer Page (Full Color - 14cm x 21cm) – ₹15,000</option>
+                    <option value="12000">Front / Back Inner Page (Full Color - 14cm x 21cm) – ₹12,000</option>
+                    <option value="10000" selected>Full Page Multi-Color (Standard - 14cm x 21cm) – ₹10,000</option>
+                    <option value="5000">Half Page Multi-Color (Compact - 14cm x 10cm) – ₹5,000</option>
+                    <option value="4000">Full Page Black & White (Text/Logo) – ₹4,000</option>
+                </select>
+            </div>
+
+            <!-- 2. Business / Firm Name (Full-Width Single Row) -->
+            <div class="form-group">
+                <label class="mtg-input-label">Business / Firm / Advertiser Name <span class="required">*</span></label>
+                <input type="text" id="diaryAdvtFirmName" class="mtg-custom-field" placeholder="e.g. Sri Lakshmi Electricals & Contractors">
+            </div>
+
+            <!-- 3. Business Nature / Category (Full-Width Single Row) -->
+            <div class="form-group">
+                <label class="mtg-input-label">Business Nature / Category <span class="required">*</span></label>
+                <select id="diaryAdvtCategory" class="mtg-custom-field">
+                    <option value="Electrical & Power Contractors">Electrical & Power Contractors</option>
+                    <option value="Textiles & Clothing Showroom">Textiles & Garments</option>
+                    <option value="Jewellers & Gold Merchants">Jewellery & Gold Merchants</option>
+                    <option value="Hardware & Machinery Spares">Industrial Machinery & Spares</option>
+                    <option value="Hospital & Diagnostics">Hospitals & Healthcare</option>
+                    <option value="Educational Institutions">Colleges & Institutions</option>
+                    <option value="Automobile / Showroom">Automobile & Transports</option>
+                    <option value="Other Business">Other Commercial Business</option>
+                </select>
+            </div>
+
+            <!-- 4. Contact Person Mobile (Full-Width Single Row) -->
+            <div class="form-group">
+                <label class="mtg-input-label">Contact Person Mobile Number <span class="required">*</span></label>
+                <input type="tel" id="diaryAdvtContactMobile" class="mtg-custom-field" maxlength="10" placeholder="10-Digit Mobile Number">
+            </div>
+
+            <!-- 5. Ad Content & Artwork Upload -->
+            <div class="form-group">
+                <label class="mtg-input-label">Matter / Text to be Printed in Advertisement</label>
+                <textarea id="diaryAdvtMatterText" class="mtg-custom-field" style="height:60px;" placeholder="Enter Tagline, Services, Office Address, Key Phone Numbers for the ad..."></textarea>
+            </div>
+
+            <div class="form-group">
+                <label class="mtg-input-label">Upload Ad Design Artwork / Visiting Card / Logo</label>
+                <input type="file" id="diaryAdvtDesignFile" accept="image/*,.pdf" class="mtg-custom-field" style="padding-top:6px;">
+            </div>
+
+            <!-- 6. Complementary Diary Postal Address -->
+            <div class="diary-address-card-wrap">
+                <span class="address-sec-label"><i class="fa-solid fa-gift text-warning"></i> Complementary Diary Dispatch Address</span>
+                
+                <div class="form-group mt-1">
+                    <label class="mtg-input-label">Door No / Street / Landmark <span class="required">*</span></label>
+                    <input type="text" id="diaryAdvtShipStreet" class="mtg-custom-field" placeholder="Door No, Street or Landmark">
+                </div>
+
+                <div class="dob-age-grid">
+                    <div class="form-group">
+                        <label class="mtg-input-label">City / Town / Mandal <span class="required">*</span></label>
+                        <input type="text" id="diaryAdvtShipCity" class="mtg-custom-field" placeholder="City or Mandal">
+                    </div>
+                    <div class="form-group">
+                        <label class="mtg-input-label">PIN Code <span class="required">*</span></label>
+                        <input type="text" id="diaryAdvtShipPincode" class="mtg-custom-field" maxlength="6" placeholder="PIN Code">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Amount Display -->
+            <div class="diary-calc-summary-strip bg-orange-strip">
+                <span>Advertisement Tariff:</span>
+                <strong id="diaryAdvtTotalText">₹ 10,000 /-</strong>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="button" id="btnSubmitAdvtOrderFinal" class="btn-diary-submit-glow btn-submit-orange" onclick="processDiaryOrderPayment('advt')">
+                <i class="fa-solid fa-shield-check"></i> PROCEED TO PAYMENT & GET AD RECEIPT
+            </button>
+        </div>
+    </div>
+
+</section>
 
 <!-- =========================================================
      SETTINGS & SYSTEM PREFERENCES MODULE (START)
@@ -5054,7 +5372,7 @@
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-<script src="js/script.js?v=119"></script>
+<script src="js/script.js?v=120"></script>
 </body>
 
 </html>
