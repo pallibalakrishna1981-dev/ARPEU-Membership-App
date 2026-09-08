@@ -517,6 +517,7 @@ function showPage(page) {
   const dwnSec        = document.getElementById("downloadsSection") || document.getElementById("downloadsPage");
   const profSec       = document.getElementById("profileSection") || document.getElementById("profilePage");
   const admSec        = document.getElementById("adminSection");
+  const diarySec      = document.getElementById("diarySection");
   const notifSec      = document.getElementById("notificationsSection");
   const setSec        = document.getElementById("settingsSection");
   const mtgSec        = document.getElementById("meetingsSection");
@@ -540,6 +541,7 @@ function showPage(page) {
   if (obSec)         obSec.style.display         = "none"; // 👉 Strictly Hide Office Bearers
   if (floatingBack)  floatingBack.style.display  = "none"; // 👉 Strictly Hide Floating Button
   if (placeholderSec)placeholderSec.style.display= "none";
+  if (diarySec)      diarySec.style.display      = "none";
 
   // Hide standalone contentArea children if any
   document.querySelectorAll("#contentArea > section").forEach(s => s.style.display = "none");
@@ -634,6 +636,14 @@ function showPage(page) {
           backToCompanySelector();
         }
       }
+      break;
+
+    case "diary":
+    case "diaries":
+      if (diarySec) {
+        diarySec.style.display = "block";
+        if (typeof updateDiaryPriceCalculations === "function") updateDiaryPriceCalculations();
+        }
       break;
 
     case "setting":
@@ -3960,8 +3970,6 @@ async function submitDonationForm() {
     address:        document.getElementById("donorAddress") ? document.getElementById("donorAddress").value.trim() : "",
     pan:            document.getElementById("donorPan") ? document.getElementById("donorPan").value.trim().toUpperCase() : "",
     donationType:   donationType,
-    advtSize:       document.getElementById("advtSize") ? document.getElementById("advtSize").value : "",
-    diaryCount:     document.getElementById("diaryCount") ? document.getElementById("diaryCount").value : "",
     amount:         donationAmount,
     purpose:        document.getElementById("donationPurpose") ? document.getElementById("donationPurpose").value.trim() : "",
     paymentMode:    paymentMode,
@@ -7584,6 +7592,225 @@ function quickSearchLeaderProfile(mobile) {
         searchInput.value = mobile;
         if (typeof searchUniversalProfile === 'function') {
             searchUniversalProfile();
+        }
+    }
+}
+
+/* ==========================================================
+   ARPEU ROYAL DIARY ENGINE
+   ========================================================== */
+function openDiaryFlowForm(flowType) {
+    const statsDashboard = document.getElementById('diaryStatsDashboardView');
+    const orderForm = document.getElementById('diaryOrderFormSection');
+    const advtForm = document.getElementById('diaryAdvtFormSection');
+    const btnOrder = document.getElementById('btnPillarOrder');
+    const btnAdvt = document.getElementById('btnPillarAdvt');
+
+    if (statsDashboard) statsDashboard.style.display = 'none';
+
+    if (flowType === 'order') {
+        if (orderForm) orderForm.style.display = 'block';
+        if (advtForm) advtForm.style.display = 'none';
+        if (btnOrder) btnOrder.classList.add('active');
+        if (btnAdvt) btnAdvt.classList.remove('active');
+        updateDiaryPriceCalculations();
+        orderForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else {
+        if (orderForm) orderForm.style.display = 'none';
+        if (advtForm) advtForm.style.display = 'block';
+        if (btnAdvt) btnAdvt.classList.add('active');
+        if (btnOrder) btnOrder.classList.remove('active');
+        updateAdvtPriceCalculations();
+        advtForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+}
+
+function closeDiaryFlowForm() {
+    const statsDashboard = document.getElementById('diaryStatsDashboardView');
+    const orderForm = document.getElementById('diaryOrderFormSection');
+    const advtForm = document.getElementById('diaryAdvtFormSection');
+
+    if (orderForm) {
+        orderForm.style.display = 'none';
+        orderForm.querySelectorAll('input:not([readonly]), textarea').forEach(el => el.value = '');
+    }
+    if (advtForm) {
+        advtForm.style.display = 'none';
+        advtForm.querySelectorAll('input, textarea').forEach(el => el.value = '');
+    }
+
+    if (statsDashboard) statsDashboard.style.display = 'block';
+    document.querySelectorAll('.btn-diary-pillar').forEach(b => b.classList.remove('active'));
+
+    const contentArea = document.getElementById("contentArea") || window;
+    contentArea.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function updateDiaryPriceCalculations() {
+    const qtyInput = document.getElementById('diaryOrderQty');
+    const totalDisplay = document.getElementById('diaryOrderTotalText');
+    const qty = parseInt(qtyInput ? qtyInput.value : 2) || 1;
+    const total = qty * 300;
+
+    if (totalDisplay) totalDisplay.textContent = `₹ ${total.toLocaleString('en-IN')} /-`;
+
+    const qrImg = document.getElementById('dynamicDiaryQR');
+    if (qrImg) {
+        const upiUrl = `upi://pay?pa=andhrarastrapowerempunion@sbi&pn=ARPEU&am=${total}&cu=INR&tn=DiaryCopies${qty}`;
+        qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(upiUrl)}`;
+    }
+    return total;
+}
+
+function updateAdvtPriceCalculations() {
+    const tariffSelect = document.getElementById('diaryAdvtSizeSelect');
+    const totalDisplay = document.getElementById('diaryAdvtTotalText');
+    const total = parseInt(tariffSelect ? tariffSelect.value : 10000) || 10000;
+
+    if (totalDisplay) totalDisplay.textContent = `₹ ${total.toLocaleString('en-IN')} /-`;
+    return total;
+}
+
+function toggleDiaryPaymentMethod(method) {
+    const payNowSec = document.getElementById('diaryPayNowSection');
+    const alreadyPaidSec = document.getElementById('diaryAlreadyPaidSection');
+    const submitWrap = document.getElementById('diarySubmitWrapper');
+
+    if (method === 'payNow') {
+        if (payNowSec) payNowSec.style.display = 'block';
+        if (alreadyPaidSec) alreadyPaidSec.style.display = 'none';
+        updateDiaryPriceCalculations();
+        const dateInput = document.getElementById('diaryPayNowDate');
+        if (dateInput && !dateInput.value) dateInput.value = new Date().toLocaleDateString('en-GB');
+    } else {
+        if (payNowSec) payNowSec.style.display = 'none';
+        if (alreadyPaidSec) alreadyPaidSec.style.display = 'block';
+        const dateInput = document.getElementById('diaryManualDate');
+        if (dateInput && !dateInput.value) dateInput.value = new Date().toLocaleDateString('en-GB');
+    }
+
+    if (submitWrap) submitWrap.style.display = 'block';
+}
+
+function triggerDiaryUpiApp(app) {
+    const qty = parseInt(document.getElementById('diaryOrderQty')?.value || 2) || 1;
+    const total = qty * 300;
+    const upiId = "andhrarastrapowerempunion@sbi";
+    const note = `ARPEU Diary Order - ${qty} Copies`;
+
+    let url = `upi://pay?pa=${upiId}&pn=ARPEU&am=${total}&cu=INR&tn=${encodeURIComponent(note)}`;
+    if (app === 'gpay') url = `tez://upi/pay?pa=${upiId}&pn=ARPEU&am=${total}&cu=INR&tn=${encodeURIComponent(note)}`;
+    else if (app === 'phonepe') url = `phonepe://pay?pa=${upiId}&pn=ARPEU&am=${total}&cu=INR&tn=${encodeURIComponent(note)}`;
+    else if (app === 'paytm') url = `paytmmp://pay?pa=${upiId}&pn=ARPEU&am=${total}&cu=INR&tn=${encodeURIComponent(note)}`;
+
+    window.location.href = url;
+}
+
+async function submitDiaryOrderForm() {
+    const declCheck = document.getElementById('diaryDeclarationCheck');
+    if (!declCheck || !declCheck.checked) {
+        alert("Please accept the declaration before submitting.");
+        return;
+    }
+
+    const name = document.getElementById('diaryOrderName')?.value.trim();
+    const mobile = document.getElementById('diaryOrderMobile')?.value.trim();
+    const address = document.getElementById('diaryOrderAddress')?.value.trim();
+    const busStand = document.getElementById('diaryOrderBusStand')?.value.trim();
+    const qty = document.getElementById('diaryOrderQty')?.value || 2;
+    const totalAmount = updateDiaryPriceCalculations();
+
+    if (!name || !mobile || mobile.length !== 10 || !address || !busStand) {
+        alert("Please fill all mandatory fields: Full Name, 10-Digit Mobile, Complete Address, and Nearest APSRTC Depot.");
+        return;
+    }
+
+    const isPayNow = document.getElementById('diaryPayNowOption')?.checked;
+    const txnId = isPayNow ? document.getElementById('diaryPayNowTxnId')?.value.trim() : document.getElementById('diaryManualTxnId')?.value.trim();
+    const payDate = isPayNow ? document.getElementById('diaryPayNowDate')?.value : document.getElementById('diaryManualDate')?.value;
+
+    if (!txnId) {
+        alert("Please enter a valid Transaction ID / UTR Number.");
+        return;
+    }
+
+    const submitBtn = document.getElementById('btnSubmitDiaryOrderFinal');
+    const origText = submitBtn ? submitBtn.innerHTML : "SUBMIT ORDER";
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> GENERATING RECEIPT...';
+    }
+
+    const currentYear = new Date().getFullYear();
+    const orderPayload = {
+        receiptNo: `ARPEU/DIR/${currentYear}/${Math.floor(1000 + Math.random() * 9000)}`,
+        donationId: `DIR${currentYear}${Math.floor(100 + Math.random() * 900)}`,
+        donorName: name,
+        donorMobile: mobile,
+        donorType: "APSRTC Cargo Delivery",
+        organization: `APSRTC Depot: ${busStand}`,
+        address: address,
+        donationType: `Diary Booking (${qty} Copies)`,
+        amount: totalAmount,
+        purpose: "ARPEU Royal Crown Publication 2027",
+        paymentMode: isPayNow ? "UPI / Online" : "Direct Transfer",
+        transactionId: txnId,
+        paymentDate: payDate || new Date().toLocaleDateString('en-GB')
+    };
+
+    setTimeout(() => {
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = origText;
+        }
+
+        if (typeof openDonationReceipt === 'function') {
+            openDonationReceipt(orderPayload);
+
+            const titlePill = document.getElementById("receiptTitle");
+            if (titlePill) {
+                titlePill.textContent = "DIARY ORDER RECEIPT";
+                titlePill.style.backgroundColor = "#0B4EA2";
+            }
+        }
+    }, 600);
+}
+
+function processDiaryOrderPayment(type) {
+    const mobile = (document.getElementById('diaryAdvtContactMobile') || {}).value?.trim();
+    const name = (document.getElementById('diaryAdvtFirmName') || {}).value?.trim();
+    const address = (document.getElementById('diaryAdvtAddress') || {}).value?.trim();
+    const totalAmount = updateAdvtPriceCalculations();
+
+    if (!mobile || mobile.length !== 10 || !name || !address) {
+        alert("Please enter Firm Name, 10-Digit Mobile Number, and Delivery Address.");
+        return;
+    }
+
+    const currentYear = new Date().getFullYear();
+    const advtPayload = {
+        receiptNo: `ARPEU/ADV/${currentYear}/${Math.floor(1000 + Math.random() * 9000)}`,
+        donationId: `ADV${currentYear}${Math.floor(100 + Math.random() * 900)}`,
+        donorName: name,
+        donorMobile: mobile,
+        donorType: "Commercial Advertiser",
+        organization: (document.getElementById('diaryAdvtCategory') || {}).value || "Commercial Firm",
+        address: address,
+        donationType: `Diary Advt (${(document.getElementById('diaryAdvtSizeSelect') || {}).options[(document.getElementById('diaryAdvtSizeSelect') || {}).selectedIndex].text.split('–')[0].trim()})`,
+        amount: totalAmount,
+        purpose: "Commercial Diary Advertisement 2027",
+        paymentMode: "UPI / Online Payment",
+        transactionId: `TXN-${Math.floor(100000 + Math.random() * 900000)}`,
+        paymentDate: new Date().toLocaleDateString('en-GB')
+    };
+
+    if (typeof openDonationReceipt === 'function') {
+        openDonationReceipt(advtPayload);
+
+        const titlePill = document.getElementById("receiptTitle");
+        if (titlePill) {
+            titlePill.textContent = "ADVERTISEMENT RECEIPT";
+            titlePill.style.backgroundColor = "#EA580C";
         }
     }
 }

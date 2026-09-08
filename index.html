@@ -22,7 +22,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="#0B4EA2">
 <meta name="apple-mobile-web-app-title" content="ARPEU Portal">
 
-<link rel="stylesheet" href="css/style.css?v=2043">
+<link rel="stylesheet" href="css/style.css?v=2044">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
@@ -99,26 +99,31 @@
 
 <nav class="navbar">
 
-    <a href="#" class="nav-item active" id="navHome">
+    <!-- 1. Home -->
+    <a href="#" class="nav-item active" id="navHome" onclick="showPage('home'); return false;">
         <i class="fa-solid fa-house"></i>
         <span>Home</span>
     </a>
 
-    <a href="#" class="nav-item" id="navMembership">
-        <i class="fa-solid fa-id-card"></i>
-        <span>Membership</span>
+    <!-- 2. Office Bearers (Top Bar) -->
+    <a href="#" class="nav-item" id="navOfficeBearers" onclick="showPage('office-bearers'); return false;">
+        <i class="fa-solid fa-users"></i>
+        <span>Office Bearers</span>
+    </a>
+    
+    <!-- 3. Profiles (Top Bar) -->
+    <a href="#" class="nav-item" id="navProfiles" onclick="showPage('profiles'); return false;">
+        <i class="fas fa-id-card"></i>
+        <span>Profiles</span>
     </a>
 
-    <a href="#" class="nav-item" id="navDonations" onclick="showPage('donations'); return false;">
-        <i class="fas fa-hand-holding-heart"></i>
-        <span>Donations</span>
-    </a>
-
-    <a href="#" class="nav-item" id="navStatistics">
+    <!-- 4. Statistics -->
+    <a href="#" class="nav-item" id="navStatistics" onclick="showPage('statistics'); return false;">
         <i class="fa-solid fa-chart-column"></i>
         <span>Statistics</span>
     </a>
 
+    <!-- 5. More Menu Dropdown -->
     <div class="nav-item more-menu">
 
         <button type="button" id="moreBtn" class="more-btn">
@@ -128,58 +133,72 @@
 
         <div class="more-dropdown" id="moreDropdown">
 
+            <!-- About ARPEU -->
             <a href="#" id="navAbout" onclick="
-    document.querySelectorAll('#contentArea > section').forEach(s => s.style.display='none');
-    document.getElementById('aboutSection').style.display='flex';
-    return false;
-">
-    <i class="fa-solid fa-circle-info"></i>
-    <span>About ARPEU</span>
-</a>
-
-            <a href="#" id="navOfficeBearers" onclick="showPage('office-bearers'); return false;">
-                <i class="fa-solid fa-users"></i>
-                <span>Office Bearers</span>
+                document.querySelectorAll('#contentArea > section').forEach(s => s.style.display='none');
+                document.getElementById('aboutSection').style.display='flex';
+                return false;
+            ">
+                <i class="fa-solid fa-circle-info"></i>
+                <span>About ARPEU</span>
             </a>
 
+            <!-- 🌟 Membership (Moved to More) -->
+            <a href="#" class="dropdown-item" id="navMembership" onclick="showPage('membership'); return false;">
+                <i class="fa-solid fa-id-card text-primary"></i>
+                <span>Membership</span>
+            </a>
+
+            <!-- 🌟 Donations (Moved to More) -->
+            <a href="#" class="dropdown-item" id="navDonations" onclick="showPage('donations'); return false;">
+                <i class="fas fa-hand-holding-heart text-warning"></i>
+                <span>Donations</span>
+            </a>
+
+            <!-- Contact Us -->
             <a href="#" id="navContact" onclick="showPage('contact'); return false;">
                 <i class="fa-solid fa-address-book"></i>
                 <span>Contact Us</span>
             </a>
 
-
-            <a href="#" id="navProfiles" onclick="showPage('profiles'); return false;">
-                <i class="fas fa-id-card"></i>
-                <span>Profiles</span>
-            </a>
-
+            <!-- Gallery -->
             <a href="#" id="navGallery" onclick="showPage('gallery'); return false;">
                 <i class="fa-solid fa-images"></i>
                 <span>Gallery</span>
             </a>
 
+            <!-- Downloads -->
             <a href="#" id="navDownloads" onclick="showPage('downloads'); return false;">
                 <i class="fa-solid fa-download"></i>
                 <span>Downloads</span>
             </a>
 
-            <!-- 🌟 NEW: Meetings & Video Calling Link -->
+            <!-- 🌟 Diary & Advertisements -->
+            <a href="#" class="dropdown-item" onclick="showPage('diary'); return false;">
+                <i class="fa-solid fa-book-bookmark text-warning"></i>
+                <span>Diary & Advertisements</span>
+            </a>
+
+            <!-- Meetings & Conferences -->
             <a href="#" id="navMeetings" onclick="showPage('meetings'); return false;">
                 <i class="fa-solid fa-video"></i>
                 <span>Meetings & Conferences</span>
             </a>
 
+            <!-- Notifications -->
             <a href="#" id="navNotifications" onclick="showPage('notifications'); return false;">
                 <i class="fa-solid fa-bell"></i>
                 <span>Notifications</span>
                 <span id="navNotificationsBadge" class="adm-badge-count" style="display:none;">0</span>
             </a>
 
+            <!-- Settings -->
             <a href="#" id="navSettings" onclick="showPage('settings'); return false;">
                 <i class="fa-solid fa-gear"></i>
                 <span>Settings</span>
             </a>
 
+            <!-- Admin Login -->
             <a href="#" id="navAdmin" onclick="showPage('admin'); return false;">
                 <i class="fa-solid fa-user-shield"></i>
                 <span>Admin Login</span>
@@ -4348,8 +4367,6 @@
                     <option value="">Select Donation Type</option>
                     <option value="General Donation">General Donation</option>
                     <option value="Union Development Fund">Union Development Fund</option>
-                    <option value="Diary Advertisement">Diary Advertisement</option>
-                    <option value="Diary Donation">Diary Donation</option>
                     <option value="Welfare Fund">Welfare Fund</option>
                     <option value="Relief Fund">Relief Fund</option>
                     <option value="Building Fund">Building Fund</option>
@@ -4357,32 +4374,6 @@
                     <option value="Event Sponsorship">Event Sponsorship</option>
                     <option value="Other">Other</option>
                 </select>
-            </div>
-
-            <!-- CONDITIONAL BOX 1: Diary Advertisement -->
-            <div id="diaryAdvtBox" class="conditional-don-box" style="display:none;">
-                <div class="form-group">
-                    <label for="advtSize">Advertisement Size <span class="required">*</span></label>
-                    <select id="advtSize">
-                        <option value="">Select Size</option>
-                        <option value="Full Page Colour">Full Page Colour (₹10,000)</option>
-                        <option value="Half Page Colour">Half Page Colour (₹5,000)</option>
-                    </select>
-                </div>
-            </div>
-
-            <!-- CONDITIONAL BOX 2: Diary Donation -->
-            <div id="diaryDonationBox" class="conditional-don-box" style="display:none;">
-                <div class="dob-age-grid">
-                    <div class="form-group">
-                        <label for="diaryCount">Number of Diaries <span class="required">*</span></label>
-                        <input type="number" id="diaryCount" min="1" placeholder="Qty (e.g. 10)">
-                    </div>
-                    <div class="form-group">
-                        <label for="diaryRate">Rate Per Diary (₹) <span class="required">*</span></label>
-                        <input type="number" id="diaryRate" value="200" placeholder="e.g. 200">
-                    </div>
-                </div>
             </div>
 
             <!-- Donation Amount -->
@@ -4896,7 +4887,304 @@
      NOTIFICATIONS & LIVE ALERTS MODULE (END)
 ========================================================= -->
 
+<!-- =========================================================
+     ARPEU ROYAL CROWN DIARY & ADVERTISEMENT PORTAL (#diarySection)
+========================================================= -->
+<section id="diarySection" class="diary-master-page" style="display: none;">
 
+    <!-- 🌟 BLOCK 1: HERO BANNER -->
+    <div class="diary-royal-banner">
+        <div class="diary-banner-badge">
+            <i class="fa-solid fa-crown"></i>
+            <span>OFFICIAL ARPEU PUBLICATION 2027</span>
+        </div>
+        <h1 class="diary-banner-heading">ROYAL CROWN EXECUTIVE DIARY & DIRECTORY</h1>
+        <p class="diary-banner-tagline">
+            Andhra Pradesh Power Sector's Most Prestigious & Comprehensive Reference Manual
+        </p>
+
+        <div class="diary-features-grid">
+            <div class="diary-feat-item">
+                <i class="fa-solid fa-book-open text-warning"></i>
+                <span>Royal Crown 1/4 Executive Hard Bound</span>
+            </div>
+            <div class="diary-feat-item">
+                <i class="fa-solid fa-network-wired text-warning"></i>
+                <span>1000+ Circulation Across 5 AP Power Utilities</span>
+            </div>
+            <div class="diary-feat-item">
+                <i class="fa-solid fa-bullhorn text-warning"></i>
+                <span>High-Impact Year-Round Commercial Exposure</span>
+            </div>
+            <div class="diary-feat-item">
+                <i class="fa-solid fa-bolt text-warning"></i>
+                <span>Complete Service Rules, Power Plants Data & Directory</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🌟 BLOCK 2: TWO MAIN 3D ACTION PILLARS -->
+    <div class="diary-actions-dual-grid">
+        <button type="button" class="btn-diary-pillar btn-pillar-order" id="btnPillarOrder" onclick="openDiaryFlowForm('order')">
+            <div class="pillar-icon-box"><i class="fa-solid fa-book-bookmark"></i></div>
+            <div class="pillar-text-col">
+                <strong>ORDER UNION DIARIES</strong>
+                <span>Personal & Bulk Copies @ ₹300/-</span>
+            </div>
+        </button>
+
+        <button type="button" class="btn-diary-pillar btn-pillar-advt" id="btnPillarAdvt" onclick="openDiaryFlowForm('advt')">
+            <div class="pillar-icon-box"><i class="fa-solid fa-rectangle-ad"></i></div>
+            <div class="pillar-text-col">
+                <strong>BOOK ADVERTISEMENT</strong>
+                <span>Full & Half Page Multi-Color Tariff</span>
+            </div>
+        </button>
+    </div>
+
+    <!-- 🌟 BLOCK 3: STATISTICS DASHBOARD -->
+    <div class="diary-stats-dashboard-card" id="diaryStatsDashboardView">
+        <div class="diary-stats-header">
+            <i class="fa-solid fa-chart-pie text-primary"></i>
+            <span>PUBLICATION & CIRCULATION STATISTICS 2027</span>
+        </div>
+
+        <div class="diary-metrics-grid-6">
+            <div class="diary-m-card card-glow-blue">
+                <span class="diary-m-val" id="dStatCopies">1,250</span>
+                <span class="diary-m-lbl"><i class="fa-solid fa-book"></i> Diaries Booked</span>
+            </div>
+            <div class="diary-m-card card-glow-green">
+                <span class="diary-m-val" id="dStatCopiesFund">₹3,75,000</span>
+                <span class="diary-m-lbl"><i class="fa-solid fa-receipt"></i> Diary Copies Fund</span>
+            </div>
+            <div class="diary-m-card card-glow-orange">
+                <span class="diary-m-val" id="dStatFullAds">24</span>
+                <span class="diary-m-lbl"><i class="fa-solid fa-ad"></i> Full Page Ads</span>
+            </div>
+            <div class="diary-m-card card-glow-purple">
+                <span class="diary-m-val" id="dStatHalfAds">18</span>
+                <span class="diary-m-lbl"><i class="fa-solid fa-rectangle-ad"></i> Half Page Ads</span>
+            </div>
+            <div class="diary-m-card card-glow-teal">
+                <span class="diary-m-val" id="dStatAdsFund">₹3,30,000</span>
+                <span class="diary-m-lbl"><i class="fa-solid fa-bullhorn"></i> Total Ads Revenue</span>
+            </div>
+            <div class="diary-m-card card-glow-gold">
+                <span class="diary-m-val" id="dStatTotalRevenue">₹7,05,000</span>
+                <span class="diary-m-lbl"><i class="fa-solid fa-wallet"></i> Total Diary Fund</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🌟 BLOCK 4: SIMPLIFIED DIARY ORDERING FORM (APSRTC CARGO) -->
+    <div id="diaryOrderFormSection" class="diary-flow-card" style="display: none;">
+        <div class="diary-flow-header flow-header-blue">
+            <div class="flow-header-inline-title">
+                <i class="fa-solid fa-cart-shopping"></i>
+                <span>ORDER ARPEU CROWN DIARIES 2027</span>
+            </div>
+            <button type="button" class="btn-close-flow-form" onclick="closeDiaryFlowForm()">&times;</button>
+        </div>
+
+        <div class="diary-flow-body">
+            <div class="form-group">
+                <label class="mtg-input-label">Full Name / Officer Name <span class="required">*</span></label>
+                <input type="text" id="diaryOrderName" class="mtg-custom-field" placeholder="Enter Full Name">
+            </div>
+
+            <div class="form-group">
+                <label class="mtg-input-label">Contact Mobile Number <span class="required">*</span></label>
+                <input type="tel" id="diaryOrderMobile" class="mtg-custom-field" maxlength="10" placeholder="10-Digit Mobile Number">
+            </div>
+
+            <div class="form-group">
+                <label class="mtg-input-label">Complete Postal / Delivery Address <span class="required">*</span></label>
+                <textarea id="diaryOrderAddress" class="mtg-custom-field" style="height:70px;" placeholder="Enter Complete Address (Door No, Street, Town/City, District & PIN Code)..."></textarea>
+            </div>
+
+            <div class="form-group">
+                <label class="mtg-input-label"><i class="fa-solid fa-bus text-primary"></i> Nearest APSRTC Bus Stand / Cargo Depot <span class="required">*</span></label>
+                <input type="text" id="diaryOrderBusStand" class="mtg-custom-field" placeholder="e.g. PNBS Vijayawada / Guntur Depot / Tirupati Central / Kadapa Depot">
+            </div>
+
+            <div class="diary-price-calc-box">
+                <div class="dob-age-grid">
+                    <div class="form-group">
+                        <label class="mtg-input-label">Number of Copies <span class="required">*</span></label>
+                        <input type="number" id="diaryOrderQty" class="mtg-custom-field text-center font-weight-bold" min="1" value="2" oninput="updateDiaryPriceCalculations()" style="font-size:16px; font-weight:800; color:#0b4ea2;">
+                    </div>
+                    <div class="form-group">
+                        <label class="mtg-input-label">Price Per Copy (Fixed)</label>
+                        <input type="text" value="₹ 300 /-" readonly class="mtg-custom-field text-center" style="background:#f1f5f9; font-weight:700;">
+                    </div>
+                </div>
+
+                <div class="diary-calc-summary-strip">
+                    <span>Total Amount Payable:</span>
+                    <strong id="diaryOrderTotalText">₹ 600 /-</strong>
+                </div>
+            </div>
+
+            <div class="form-card" style="margin-top: 6px; padding: 10px;">
+                <label class="mtg-input-label" style="font-weight: 800; margin-bottom: 8px;"><i class="fa-solid fa-credit-card"></i> SELECT PAYMENT METHOD <span class="required">*</span></label>
+                
+                <div class="main-payment-toggle-row">
+                    <label class="main-method-btn" for="diaryPayNowOption">
+                        <input type="radio" name="diaryPaymentMethod" id="diaryPayNowOption" value="payNow" onchange="toggleDiaryPaymentMethod('payNow')">
+                        <span>Pay Now (Online)</span>
+                    </label>
+                    <label class="main-method-btn" for="diaryAlreadyPaidOption">
+                        <input type="radio" name="diaryPaymentMethod" id="diaryAlreadyPaidOption" value="alreadyPaid" onchange="toggleDiaryPaymentMethod('alreadyPaid')">
+                        <span>Already Paid</span>
+                    </label>
+                </div>
+
+                <div id="diaryPayNowSection" style="display: none; margin-top: 12px;">
+                    <div class="upi-box-large">
+                        <div class="qr-container">
+                            <img id="dynamicDiaryQR" src="" alt="Scan QR">
+                            <p style="font-size: 10px; font-weight: 700; margin-top: 4px;">SCAN QR TO PAY</p>
+                        </div>
+                        <div class="apps-container">
+                            <p class="upi-id-single-line">UPI ID: <span>andhrarastrapowerempunion@sbi</span></p>
+                            <div class="large-icon-grid">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/f/f2/Google_Pay_Logo.svg" alt="Google Pay" class="app-icon-gpay" onclick="triggerDiaryUpiApp('gpay')" style="cursor: pointer;">
+                                
+                                <svg class="app-icon-phonepe" viewBox="0 0 160 40" fill="none" xmlns="http://www.w3.org/2000/svg" onclick="triggerDiaryUpiApp('phonepe')" style="cursor: pointer;">
+                                    <rect width="36" height="36" rx="8" fill="#5F259F" y="2"/>
+                                    <path d="M25.5 16C25.5 12.1 22.6 9 18.7 9H13.3C12.7 9 12.2 9.5 12.2 10.1V27.9C12.2 28.5 12.7 29 13.3 29H16C16.6 29 17.1 28.5 17.1 27.9V22.9H18.7C22.6 22.9 25.5 19.9 25.5 16ZM20.5 18.1H17.1V13.9H20.5C21.7 13.9 22.6 14.8 22.6 16C22.6 17.2 21.7 18.1 20.5 18.1Z" fill="white"/>
+                                    <text x="44" y="26" font-family="'Poppins', sans-serif" font-size="18" font-weight="800" fill="#5F259F" letter-spacing="-0.5">PhonePe</text>
+                                </svg>
+
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/2/24/Paytm_Logo_%28standalone%29.svg" alt="Paytm" class="app-icon-paytm" onclick="triggerDiaryUpiApp('paytm')" style="cursor: pointer;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="dob-age-grid" style="margin-top: 10px;">
+                        <div class="form-group">
+                            <label class="mtg-input-label">Payment Date <span class="required">*</span></label>
+                            <input type="text" id="diaryPayNowDate" class="mtg-custom-field" placeholder="DD-MM-YYYY">
+                        </div>
+                        <div class="form-group">
+                            <label class="mtg-input-label">UTR / Ref No <span class="required">*</span></label>
+                            <input type="text" id="diaryPayNowTxnId" class="mtg-custom-field" placeholder="12-Digit UTR Number">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="mtg-input-label">Upload Payment Screenshot <span class="required">*</span></label>
+                        <input type="file" id="diaryPayNowReceipt" accept="image/*,.pdf" class="mtg-custom-field" style="padding-top:6px;">
+                    </div>
+                </div>
+
+                <div id="diaryAlreadyPaidSection" style="display: none; margin-top: 12px;">
+                    <div class="form-group">
+                        <label class="mtg-input-label">Amount Already Paid <span class="required">*</span></label>
+                        <input type="number" id="diaryManualAmount" class="mtg-custom-field" placeholder="Enter Amount Paid">
+                    </div>
+                    <div class="dob-age-grid">
+                        <div class="form-group">
+                            <label class="mtg-input-label">Payment Date <span class="required">*</span></label>
+                            <input type="text" id="diaryManualDate" class="mtg-custom-field" placeholder="DD-MM-YYYY">
+                        </div>
+                        <div class="form-group">
+                            <label class="mtg-input-label">UTR / Transaction No <span class="required">*</span></label>
+                            <input type="text" id="diaryManualTxnId" class="mtg-custom-field" placeholder="12-Digit UTR Number">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="mtg-input-label">Upload Receipt Screenshot <span class="required">*</span></label>
+                        <input type="file" id="diaryManualReceipt" accept="image/*,.pdf" class="mtg-custom-field" style="padding-top:6px;">
+                    </div>
+                </div>
+
+                <div id="diarySubmitWrapper" style="display: none; margin-top: 15px;">
+                    <div class="declaration-box">
+                        <label class="declaration-label">
+                            <input type="checkbox" id="diaryDeclarationCheck">
+                            <span>I confirm that the APSRTC cargo delivery address and payment details provided are correct.</span>
+                        </label>
+                    </div>
+
+                    <button type="button" id="btnSubmitDiaryOrderFinal" class="btn-diary-submit-glow btn-submit-blue" onclick="submitDiaryOrderForm()">
+                        <i class="fa-solid fa-lock"></i> SUBMIT ORDER & GET OFFICIAL RECEIPT
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🌟 BLOCK 5: SIMPLIFIED ADVERTISEMENT BOOKING FORM -->
+    <div id="diaryAdvtFormSection" class="diary-flow-card" style="display: none;">
+        <div class="diary-flow-header flow-header-orange">
+            <div class="flow-header-inline-title">
+                <i class="fa-solid fa-bullhorn"></i>
+                <span>BOOK COMMERCIAL ADVERTISEMENT</span>
+            </div>
+            <button type="button" class="btn-close-flow-form" onclick="closeDiaryFlowForm()">&times;</button>
+        </div>
+
+        <div class="diary-flow-body">
+            <div class="form-group">
+                <label class="mtg-input-label">Select Page Size & Tariff <span class="required">*</span></label>
+                <select id="diaryAdvtSizeSelect" class="mtg-custom-field" onchange="updateAdvtPriceCalculations()">
+                    <option value="10000" selected>Full Page Multi-Color – ₹10,000</option>
+                    <option value="5000">Half Page Multi-Color – ₹5,000</option>
+                    <option value="3000">Full Page Black & White – ₹3,000</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="mtg-input-label">Business / Firm / Advertiser Name <span class="required">*</span></label>
+                <input type="text" id="diaryAdvtFirmName" class="mtg-custom-field" placeholder="e.g. Sri Lakshmi Electricals & Contractors">
+            </div>
+
+            <div class="form-group">
+                <label class="mtg-input-label">Business Category <span class="required">*</span></label>
+                <select id="diaryAdvtCategory" class="mtg-custom-field">
+                    <option value="Electrical & Power Contractors">Electrical & Power Contractors</option>
+                    <option value="Industrial Machinery & Spares">Industrial Machinery & Spares</option>
+                    <option value="Textiles & Showroom">Textiles & Showroom</option>
+                    <option value="Jewellers & Gold Merchants">Jewellery & Gold Merchants</option>
+                    <option value="Hospitals & Healthcare">Hospitals & Healthcare</option>
+                    <option value="Educational Institutions">Educational Institutions</option>
+                    <option value="Other Business">Other Commercial Firm</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="mtg-input-label">Contact Mobile Number <span class="required">*</span></label>
+                <input type="tel" id="diaryAdvtContactMobile" class="mtg-custom-field" maxlength="10" placeholder="10-Digit Mobile Number">
+            </div>
+
+            <div class="form-group">
+                <label class="mtg-input-label">Ad Matter / Taglines / Phone Numbers</label>
+                <textarea id="diaryAdvtMatterText" class="mtg-custom-field" style="height:60px;" placeholder="Enter details to be printed in the advertisement..."></textarea>
+            </div>
+
+            <div class="form-group">
+                <label class="mtg-input-label">Upload Ad Design / Visiting Card / Logo</label>
+                <input type="file" id="diaryAdvtDesignFile" accept="image/*,.pdf" multiple class="mtg-custom-field" style="padding-top:6px;">
+            </div>
+
+            <div class="form-group">
+                <label class="mtg-input-label">Complementary Diary Delivery Address <span class="required">*</span></label>
+                <textarea id="diaryAdvtAddress" class="mtg-custom-field" style="height:65px;" placeholder="Complete Firm / Shop Address with Town, District & PIN Code..."></textarea>
+            </div>
+
+            <div class="diary-calc-summary-strip bg-orange-strip">
+                <span>Advertisement Tariff:</span>
+                <strong id="diaryAdvtTotalText">₹ 10,000 /-</strong>
+            </div>
+
+            <button type="button" id="btnSubmitAdvtOrderFinal" class="btn-diary-submit-glow btn-submit-orange" onclick="processDiaryOrderPayment('advt')">
+                <i class="fa-solid fa-shield-check"></i> PROCEED TO PAYMENT & GET AD RECEIPT
+            </button>
+        </div>
+    </div>
+
+</section>
 
 <!-- =========================================================
      ARPEU ADMIN PANEL & MANAGEMENT MODULE (START)
@@ -5054,7 +5342,7 @@
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-<script src="js/script.js?v=119"></script>
+<script src="js/script.js?v=120"></script>
 </body>
 
 </html>
