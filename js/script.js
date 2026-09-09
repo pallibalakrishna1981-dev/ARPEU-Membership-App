@@ -795,15 +795,6 @@ function setMembershipMode(mode) {
 
     membershipMode = mode;
 
-    /* BUG-FIX: the payment engine object is named PaymentModuleV4,
-       not PaymentModule. The old reference to "PaymentModule" was
-       always undefined, so switching New Member <-> Renewal never
-       reset the payment module state. Fixed to call the real
-       object and its real reset method. */
-   if(!DEV_MODE){
-    PaymentModuleV4.reset();
-}
-
     if (!membershipTitle || !submitMembershipBtn) {
         return;
     }
@@ -1884,26 +1875,6 @@ const PaymentModuleV25 = {
 };
 
 
-// 1. Handle Automatic Issuer & Designation Selection with 2-Line HTML Support
-function handleIssuerSelection(leaderName) {
-    const selectEl = document.getElementById("mtgIssuerSelect");
-    const desigBox = document.getElementById("mtgIssuerDesigBox");
-    const hiddenDesig = document.getElementById("mtgIssuerDesig");
-    if (!selectEl || !desigBox) return;
-
-    const selectedOption = selectEl.options[selectEl.selectedIndex];
-    const designationHtml = selectedOption.getAttribute("data-desig") || "Leader";
-    
-    // Set visual multi-line text
-    desigBox.innerHTML = designationHtml;
-    // Set plain text for WhatsApp & Backend
-    if (hiddenDesig) {
-        hiddenDesig.value = designationHtml.replace(/<br\s*[\/]?>/gi, " - ");
-    }
-
-    updateLiveWhatsAppPreview();
-}
-
 // 2. Universal Flatpickr Initializer (Includes Meetings Date & AM/PM Time)
 function initializeDatePickers() {
   if (typeof flatpickr !== "function") return;
@@ -2251,68 +2222,6 @@ function initializeValidations() {
 
 /* ==========================================================
    UNIVERSAL UTR / TRANSACTION ID DUPLICATE CHECK ENGINE
-   Seamless real-time check for Membership & Donation UTR inputs.
-   ========================================================== */
-
-function initializeUniversalUtrCheckEngine() {
-  const utrInputs = document.querySelectorAll(
-    '#payNowTransactionId, #manualTransactionId, #donUpiTxnId, #donPayNowTxnId, #donBankRefNo, .utr-field'
-  );
-
-  utrInputs.forEach(function (utrInput) {
-    if (!utrInput) return;
-
-    utrInput.addEventListener("input", function () {
-      this.value = this.value.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
-      const val = this.value.trim();
-
-      /* Auto-detect corresponding status container */
-      let statusEl = document.getElementById(this.id + "Status") || 
-                     document.getElementById("donUpiTxnStatus") || 
-                     document.getElementById("donPayNowTxnStatus") || 
-                     document.getElementById("manualTransactionIdStatus") || 
-                     document.getElementById("transactionIdStatus");
-
-      clearTimeout(debounceTimers.transactionid);
-
-      if (val.length < 5) {
-        if (statusEl) {
-          statusEl.className = "field-status";
-          statusEl.innerHTML = "";
-        }
-        return;
-      }
-
-      if (statusEl) {
-        statusEl.className = "field-status checking";
-        statusEl.style.color = "#0B4EA2";
-        statusEl.innerHTML = "Checking availability...";
-      }
-
-      debounceTimers.transactionid = setTimeout(function () {
-        executeDuplicateCheck("transactionid", val, statusEl ? statusEl.id : "transactionIdStatus");
-      }, 800);
-    });
-
-    utrInput.addEventListener("blur", function () {
-    
-      if (val.length >= 5) {
-        let statusEl = document.getElementById(this.id + "Status") || 
-                       document.getElementById("donUpiTxnStatus") || 
-                       document.getElementById("donPayNowTxnStatus") || 
-                       document.getElementById("manualTransactionIdStatus") || 
-                       document.getElementById("transactionIdStatus");
-
-        clearTimeout(debounceTimers.transactionid);
-        executeDuplicateCheck("transactionid", val, statusEl ? statusEl.id : "transactionIdStatus");
-      }
-    });
-  });
-}
-
-
-/* ==========================================================
-   UNIVERSAL UTR / TRANSACTION ID DUPLICATE CHECK ENGINE
    ========================================================== */
 
 function initializeUniversalUtrCheckEngine() {
@@ -2362,37 +2271,6 @@ function initializeUniversalUtrCheckEngine() {
 ============================================ */
 
 const BACKEND_URL = "https://script.google.com/macros/s/AKfycbyoBv4TQ28mb7HIsTQ42iEe7P-3Yqs-7lR5tHhHqk0RqCQOShGrLBVPvD4j2ZUV1Q/exec";
-
-async function testBackendConnection() {
-
-    try {
-
-        const response = await fetch(BACKEND_URL);
-
-        const text = await response.text();
-
-        console.log("STATUS:", response.status);
-        console.log("RAW:", text);
-
-        return;
-
-        console.log(result);
-
-        if (result.success) {
-            alert("✅ Backend Connected Successfully");
-        } else {
-            alert("❌ Backend Connection Failed");
-        }
-
-    } catch (error) {
-
-        console.error(error);
-
-        alert("❌ Unable to connect to Backend");
-
-    }
-
-}
 
 
 /* ==========================================================
@@ -2946,13 +2824,6 @@ function generateUniversalReceipt(data) {
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
-function openReceipt() {
-  // Simple wrapper calling Universal Engine
-  const data = typeof collectReceiptData === "function" ? collectReceiptData() : {};
-  data.type = "membership";
-  generateUniversalReceipt(data);
-}
-
 
 /* ==========================================================
    MEMBER DIGITAL PROFILE LOADER ENGINE
@@ -3061,7 +2932,6 @@ async function loadMemberProfile(memberId) {
         closeProfile();
     }
 }
-
 
 
 // 📌 URL Check on Page Load
@@ -3224,10 +3094,23 @@ function openReceipt() {
    HOME PAGE ENHANCEMENTS ENGINE
 ========================================================== */
 
+function dismissHomeBanner() {
+    const banner = document.getElementById("homeBannerContainer");
+    if (banner) {
+        banner.style.opacity = "0";
+        banner.style.transform = "translateY(-20px)";
+        banner.style.maxHeight = "0px";
+        banner.style.marginBottom = "0px";
+        banner.style.padding = "0px";
+        banner.style.overflow = "hidden";
+    }
+}
+
 // 📌 6 సెకన్ల తర్వాత ఆటోమేటిక్‌గా వెల్‌కమ్ బ్యానర్ దాగిపోతుంది (Auto Disappear)
 setTimeout(function () {
     dismissHomeBanner();
 }, 6000);
+
 
 // 📌 హోమ్ పేజీ కౌంటర్లను లైవ్ డేటాతో అప్‌డేట్ చేస్తుంది
 function syncHomeLiveCounters(stats) {
@@ -4142,36 +4025,6 @@ function openDonationReceipt(data) {
   }
 
   window.scrollTo({ top: 0, behavior: "smooth" });
-}
-
-// ==========================================
-// MEMBERSHIP FORM RESET FUNCTION
-// ==========================================
-function resetMembershipForm() {
-
-    // 1. ఫారమ్ లోని ఇన్పుట్ ఫీల్డ్స్ అన్నింటినీ రీసెట్ చేయడం
-    document.querySelectorAll("#membershipPage input, #membershipPage select").forEach(el => el.value = "");
-
-    // 2. అప్‌లోడ్ చేసిన ఫోటో ప్రివ్యూ ని క్లియర్ చేయడం
-    const photoPreview = document.getElementById("photoPreview");
-    if (photoPreview) {
-        photoPreview.src = ""; // లేదా డెఫాల్ట్ ఇమేజ్ పాత్
-    }
-
-    const photoFileName = document.getElementById("photoFileName");
-    if (photoFileName) {
-        photoFileName.textContent = "";
-    }
-
-    // 3. డూప్లికేట్ చెకింగ్ స్టేటస్ మెసేజ్ లను క్లియర్ చేయడం
-    const statusIds = ["mobileStatus", "employeeIdStatus", "aadhaarStatus", "transactionIdStatus"];
-    statusIds.forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.textContent = "";
-    });
-
-    // 4. పేజీ పైభాగంలోకి స్మూత్‌గా స్క్రోల్ చేయడం
-    window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 /* ==========================================================
