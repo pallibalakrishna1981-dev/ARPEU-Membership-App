@@ -22,7 +22,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="#0B4EA2">
 <meta name="apple-mobile-web-app-title" content="ARPEU Portal">
 
-<link rel="stylesheet" href="css/style.css?v=2046">
+<link rel="stylesheet" href="css/style.css?v=2050">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
@@ -2945,6 +2945,121 @@
 
 </section>
 
+<!-- ==========================================================
+     GALLERY PAGE MODULE (CLEAN & ERROR-FREE)
+     ========================================================== -->
+<section id="gallery" class="page gallery-page-container" style="display: none;">
+    
+    <!-- Gallery Home View -->
+    <div id="galleryHomeView" class="gallery-subview">
+        <div class="gallery-banner">
+            <div class="gallery-banner-content">
+                <h1 class="gallery-heading">Gallery</h1>
+                <p class="gallery-subheading">Moments that Strengthen Our Union</p>
+            </div>
+        </div>
+
+        <!-- Event Cards Container -->
+        <div class="gallery-events-wrap">
+            <div id="galleryEventsContainer" class="gallery-events-grid">
+                <!-- Cards load dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Album Detail View -->
+    <div id="galleryAlbumView" class="gallery-subview" style="display: none;">
+        <div class="album-header-bar">
+            <button type="button" class="album-back-btn" id="galleryBackBtn">
+                <i class="fa-solid fa-arrow-left"></i>
+                <span>Back to Gallery</span>
+            </button>
+        </div>
+
+        <div class="album-meta-box">
+            <h2 id="albumDetailTitle" class="album-title">Event Title</h2>
+            <div class="album-meta-tags">
+                <span id="albumDetailDate" class="album-meta-tag">
+                    <i class="fa-regular fa-calendar"></i>
+                    <span>2025</span>
+                </span>
+                <span id="albumDetailCount" class="album-meta-tag">
+                    <i class="fa-regular fa-images"></i>
+                    <span>0 Photos</span>
+                </span>
+            </div>
+        </div>
+
+        <!-- Loader -->
+        <div id="albumPhotosLoader" class="gallery-loader-wrapper" style="display: none;">
+            <div class="gallery-spinner"></div>
+            <p>Loading photographs...</p>
+        </div>
+
+        <!-- Thumbnails Grid -->
+        <div id="albumPhotosGrid" class="album-thumbnails-grid"></div>
+        
+        <div id="albumEmptyState" class="gallery-empty-state" style="display: none;">
+            <p>No photos found in this folder.</p>
+        </div>
+    </div>
+
+    <!-- Lightbox Fullscreen Modal -->
+    <div id="galleryLightboxModal" class="gallery-lightbox" style="display: none;">
+        <!-- Black Overlay -->
+        <div class="lightbox-overlay" id="lightboxOverlay" onclick="window.closeArpeuGallery();"></div>
+        
+        <!-- Top Bar: Close (Left), Counter (Center), Options (Right) -->
+        <div class="lightbox-top-bar">
+            <button type="button" class="lightbox-action-btn lightbox-close-btn" id="lightboxCloseBtn" onclick="window.closeArpeuGallery(); return false;" title="Close Viewer">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="lightbox-counter" id="lightboxCounter">1 / 1</div>
+            <button type="button" class="lightbox-action-btn" id="lightboxMenuBtn" title="Options">
+                <i class="fa-solid fa-ellipsis-vertical"></i>
+            </button>
+        </div>
+
+        <!-- Main Photo Stage with Prev / Next Arrows -->
+        <div class="lightbox-stage" id="lightboxStage">
+            <button type="button" class="lightbox-nav-btn lightbox-prev-btn" id="lightboxPrevBtn" title="Previous">
+                <i class="fa-solid fa-chevron-left"></i>
+            </button>
+
+            <div class="lightbox-image-container">
+                <img id="lightboxActiveImage" src="" alt="Photo" class="lightbox-img" />
+                <div id="lightboxImageLoader" class="lightbox-img-loader" style="display: none;">
+                    <div class="gallery-spinner"></div>
+                </div>
+            </div>
+
+            <button type="button" class="lightbox-nav-btn lightbox-next-btn" id="lightboxNextBtn" title="Next">
+                <i class="fa-solid fa-chevron-right"></i>
+            </button>
+        </div>
+
+        <!-- Bottom Horizontal Thumbnail Strip (Filmstrip) -->
+        <div class="lightbox-thumbnails-strip" id="lightboxThumbnailsStrip"></div>
+
+        <!-- Options Bottom Sheet (Download / Share) -->
+        <div class="lightbox-sheet" id="lightboxActionSheet" style="display: none;">
+            <div class="sheet-content">
+                <a href="#" id="lightboxDownloadLink" target="_blank" class="sheet-option">
+                    <i class="fa-solid fa-download"></i>
+                    <span>Download Photo</span>
+                </a>
+                <button type="button" id="lightboxShareBtn" class="sheet-option">
+                    <i class="fa-solid fa-share-nodes"></i>
+                    <span>Share Photo</span>
+                </button>
+                <button type="button" id="lightboxCloseSheetBtn" class="sheet-cancel">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+</section>
+
+
 <!-- =========================================
      ABOUT ARPEU SECTION (EXACT MOCKUP MATCH)
 ========================================= -->
@@ -5408,7 +5523,7 @@
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-<script src="js/script.js?v=122"></script>
+<script src="js/script.js?v=126"></script>
 </body>
 
 </html>

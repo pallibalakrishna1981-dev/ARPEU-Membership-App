@@ -514,6 +514,7 @@ function showPage(page) {
   const statSec       = document.getElementById("statisticsSection") || document.getElementById("statisticsPage");
   const abtSec        = document.getElementById("aboutSection") || document.getElementById("aboutPage");
   const cntSec        = document.getElementById("contactSection") || document.getElementById("contactPage");
+  const gallerySec    = document.getElementById("gallerySection") || document.getElementById("galleryPage") || document.getElementById("gallery");
   const dwnSec        = document.getElementById("downloadsSection") || document.getElementById("downloadsPage");
   const profSec       = document.getElementById("profileSection") || document.getElementById("profilePage");
   const admSec        = document.getElementById("adminSection");
@@ -532,6 +533,7 @@ function showPage(page) {
   if (statSec)       statSec.style.display       = "none";
   if (abtSec)        abtSec.style.display        = "none";
   if (cntSec)        cntSec.style.display        = "none";
+  if (gallerySec)    gallerySec.style.display    = "none";
   if (dwnSec)        dwnSec.style.display        = "none";
   if (profSec)       profSec.style.display       = "none";
   if (admSec)        admSec.style.display        = "none";
@@ -601,6 +603,13 @@ function showPage(page) {
       if (cntSec) cntSec.style.display = "block";
       break;
 
+    case "gallery":
+    case "galleries":
+      if (gallerySec) gallerySec.style.display = "block";
+      if (window.arpeuGalleryEngine) {
+        window.arpeuGalleryEngine.init();
+      }
+      break;
     case "download":
     case "downloads":
       if (dwnSec) dwnSec.style.display = "block";
@@ -7822,3 +7831,492 @@ function togglePastEvents() {
         arrow.className = "fa-solid fa-chevron-down";
     }
 }
+
+// ==========================================================
+// ARPEU GALLERY ENGINE (MASTER CLEAN VERSION)
+// ==========================================================
+
+const arpeuGalleryEngine = (function() {
+
+    const GALLERY_EVENTS = [
+        {
+            eventId: "EVT-2025-DIARY",
+            title: "Diary Opening Event 2025",
+            date: "01-01-2025",
+            folderId: "1D_h8x_aTwrXcgmwodmUR96R3-1fFClNJ",
+            expectedCount: 22
+        },
+        {
+            eventId: "EVT-2026-NELLORE",
+            title: "ARPEU State Executive Committee Meeting - Nellore - 2026",
+            date: "10-09-2026",
+            folderId: "1UpJuxaizUMJi0SAqiIgRubd_6okrp_kY",
+            expectedCount: null
+        }
+    ];
+
+    let currentEvent = null;
+    let currentPhotos = [];
+    let currentPhotoIndex = 0;
+    const albumCache = {};
+    const slideshowTimers = {};
+
+    let touchStartX = 0;
+    let touchEndX = 0;
+
+    // Cache Helpers (Instant 0.01s load)
+    function getStoredPhotos(folderId) {
+        try {
+            const raw = localStorage.getItem("arpeu_gal_" + folderId);
+            if (!raw) return null;
+            const parsed = JSON.parse(raw);
+            if (Date.now() - parsed.timestamp < 12 * 60 * 60 * 1000) {
+                return parsed.photos;
+            }
+        } catch (e) {}
+        return null;
+    }
+
+    function setStoredPhotos(folderId, photos) {
+        try {
+            localStorage.setItem("arpeu_gal_" + folderId, JSON.stringify({
+                timestamp: Date.now(),
+                photos: photos
+            }));
+        } catch (e) {}
+    }
+
+    function initGallery() {
+        renderEventCards();
+        setupEventListeners();
+        loadEventPreviews();
+    }
+
+    function renderEventCards() {
+        const container = document.getElementById("galleryEventsContainer");
+        if (!container) return;
+
+        container.innerHTML = "";
+
+        GALLERY_EVENTS.forEach(function(event) {
+            const cachedPhotos = getStoredPhotos(event.folderId);
+            if (cachedPhotos && cachedPhotos.length > 0) {
+                albumCache[event.folderId] = cachedPhotos;
+            }
+
+            const initialPhoto = (cachedPhotos && cachedPhotos.length > 0) ? cachedPhotos[0].thumbnail : "";
+            const initialCount = cachedPhotos ? cachedPhotos.length : (event.expectedCount || "Photos");
+
+            const card = document.createElement("div");
+            card.className = "gallery-event-card";
+
+            card.innerHTML = `
+                <div class="event-card-cover-wrap">
+                    <div id="placeholder-${event.eventId}" class="event-cover-placeholder" style="${initialPhoto ? 'display:none;' : ''}">
+                        <div class="gallery-spinner" style="width: 22px; height: 22px; border-width: 2px; border-top-color: #fff; margin: 0 auto 4px auto;"></div>
+                        <span style="font-size: 0.7rem; color: #94a3b8;">Loading...</span>
+                    </div>
+                    <img class="event-card-cover-img" 
+                         id="cover-${event.eventId}"
+                         src="${initialPhoto}" 
+                         alt="${event.title}" 
+                         referrerpolicy="no-referrer"
+                         loading="lazy" 
+                         style="${initialPhoto ? 'display:block;' : 'display:none;'} width: 100%; height: 100%; object-fit: cover;" />
+                </div>
+                <div class="event-card-body">
+                    <h3 class="event-card-title">${event.title}</h3>
+                    <div class="event-card-single-row">
+                        <div class="event-card-meta-inline">
+                            <span class="event-card-meta-item">
+                                <i class="fa-regular fa-calendar"></i>
+                                <span>${event.date}</span>
+                            </span>
+                            <span class="event-card-meta-item">
+                                <i class="fa-regular fa-images"></i>
+                                <span id="count-${event.eventId}">${initialCount} ${typeof initialCount === 'number' ? 'Photos' : ''}</span>
+                            </span>
+                        </div>
+                        <button type="button" class="event-view-btn" aria-label="View Album">
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            card.addEventListener("click", function() {
+                openAlbum(event);
+            });
+
+            container.appendChild(card);
+
+            if (cachedPhotos && cachedPhotos.length > 0) {
+                startCardSlideshow(event, cachedPhotos);
+            }
+        });
+    }
+
+    function loadEventPreviews() {
+        const targetUrl = typeof BACKEND_URL !== "undefined" ? BACKEND_URL : "https://script.google.com/macros/s/AKfycbyoBv4TQ28mb7HIsTQ42iEe7P-3Yqs-7lR5tHhHqk0RqCQOShGrLBVPvD4j2ZUV1Q/exec";
+
+        GALLERY_EVENTS.forEach(function(event) {
+            if (albumCache[event.folderId]) {
+                startCardSlideshow(event, albumCache[event.folderId]);
+                return;
+            }
+
+            fetch(targetUrl, {
+                method: "POST",
+                headers: { "Content-Type": "text/plain;charset=utf-8" },
+                body: JSON.stringify({
+                    action: "getGalleryPhotos",
+                    folderId: event.folderId,
+                    data: { folderId: event.folderId }
+                })
+            })
+            .then(function(res) { return res.json(); })
+            .then(function(data) {
+                if (data && data.success && data.photos && data.photos.length > 0) {
+                    albumCache[event.folderId] = data.photos;
+                    setStoredPhotos(event.folderId, data.photos);
+
+                    const countEl = document.getElementById("count-" + event.eventId);
+                    if (countEl) countEl.innerText = data.photos.length + " Photos";
+
+                    startCardSlideshow(event, data.photos);
+                }
+            })
+            .catch(function() {});
+        });
+    }
+
+    function startCardSlideshow(event, photos) {
+        if (!photos || photos.length === 0) return;
+        const imgEl = document.getElementById("cover-" + event.eventId);
+        const placeholderEl = document.getElementById("placeholder-" + event.eventId);
+        if (!imgEl) return;
+
+        imgEl.onload = function() {
+            imgEl.style.display = "block";
+            if (placeholderEl) placeholderEl.style.display = "none";
+        };
+        imgEl.src = photos[0].thumbnail;
+
+        if (photos.length > 1) {
+            let slideIdx = 0;
+            const previewLimit = Math.min(photos.length, 3);
+
+            if (slideshowTimers[event.eventId]) {
+                clearInterval(slideshowTimers[event.eventId]);
+            }
+
+            slideshowTimers[event.eventId] = setInterval(function() {
+                slideIdx = (slideIdx + 1) % previewLimit;
+                imgEl.style.opacity = "0.7";
+                setTimeout(function() {
+                    imgEl.src = photos[slideIdx].thumbnail;
+                    imgEl.style.opacity = "1";
+                }, 250);
+            }, 3000);
+        }
+    }
+
+    function openAlbum(event) {
+        currentEvent = event;
+        
+        document.getElementById("galleryHomeView").style.display = "none";
+        document.getElementById("galleryAlbumView").style.display = "block";
+
+        document.getElementById("albumDetailTitle").innerText = event.title;
+        document.getElementById("albumDetailDate").querySelector("span").innerText = event.date;
+
+        const grid = document.getElementById("albumPhotosGrid");
+        const loader = document.getElementById("albumPhotosLoader");
+        const emptyState = document.getElementById("albumEmptyState");
+
+        const cached = albumCache[event.folderId] || getStoredPhotos(event.folderId);
+        if (cached && cached.length > 0) {
+            albumCache[event.folderId] = cached;
+            renderPhotosGrid(cached);
+            return;
+        }
+
+        grid.innerHTML = "";
+        loader.style.display = "block";
+        emptyState.style.display = "none";
+        document.getElementById("albumDetailCount").querySelector("span").innerText = "Loading...";
+
+        const targetUrl = typeof BACKEND_URL !== "undefined" ? BACKEND_URL : "https://script.google.com/macros/s/AKfycbyoBv4TQ28mb7HIsTQ42iEe7P-3Yqs-7lR5tHhHqk0RqCQOShGrLBVPvD4j2ZUV1Q/exec";
+
+        fetch(targetUrl, {
+            method: "POST",
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: JSON.stringify({
+                action: "getGalleryPhotos",
+                folderId: event.folderId,
+                data: { folderId: event.folderId }
+            })
+        })
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+            if (data && data.success && data.photos && data.photos.length > 0) {
+                albumCache[event.folderId] = data.photos;
+                setStoredPhotos(event.folderId, data.photos);
+                renderPhotosGrid(data.photos);
+            } else {
+                loader.style.display = "none";
+                emptyState.style.display = "block";
+            }
+        })
+        .catch(function(err) {
+            loader.style.display = "none";
+            emptyState.style.display = "block";
+        });
+    }
+
+    function renderPhotosGrid(photos) {
+        const loader = document.getElementById("albumPhotosLoader");
+        const emptyState = document.getElementById("albumEmptyState");
+        const grid = document.getElementById("albumPhotosGrid");
+        
+        loader.style.display = "none";
+        currentPhotos = photos || [];
+
+        document.getElementById("albumDetailCount").querySelector("span").innerText = currentPhotos.length + " Photos";
+        
+        if (currentEvent) {
+            const countTag = document.getElementById("count-" + currentEvent.eventId);
+            if (countTag) countTag.innerText = currentPhotos.length + " Photos";
+        }
+
+        if (currentPhotos.length === 0) {
+            emptyState.style.display = "block";
+            return;
+        }
+
+        grid.innerHTML = "";
+        currentPhotos.forEach(function(photo, index) {
+            const thumb = document.createElement("div");
+            thumb.className = "thumbnail-item";
+            thumb.innerHTML = `
+                <img class="thumbnail-img" 
+                     src="${photo.thumbnail}" 
+                     alt="${photo.title || 'Photo'}" 
+                     referrerpolicy="no-referrer"
+                     loading="lazy" 
+                     onerror="this.src='https://drive.google.com/thumbnail?id=${photo.id}&sz=w400';" />
+            `;
+            thumb.addEventListener("click", function() {
+                openLightbox(index);
+            });
+            grid.appendChild(thumb);
+        });
+    }
+
+    function openLightbox(index) {
+        if (!currentPhotos || currentPhotos.length === 0) return;
+        currentPhotoIndex = index;
+
+        const modal = document.getElementById("galleryLightboxModal");
+        if (modal) {
+            modal.classList.add("active");
+            modal.style.setProperty("display", "flex", "important");
+        }
+        document.body.style.overflow = "hidden";
+
+        buildLightboxFilmstrip();
+        updateLightboxContent();
+    }
+
+    function closeLightbox(e) {
+        if (e && e.stopPropagation) e.stopPropagation();
+        
+        const modal = document.getElementById("galleryLightboxModal");
+        if (modal) {
+            modal.classList.remove("active");
+            modal.style.setProperty("display", "none", "important");
+        }
+        document.body.style.overflow = "";
+        const sheet = document.getElementById("lightboxActionSheet");
+        if (sheet) sheet.style.display = "none";
+    }
+
+    window.closeArpeuGallery = closeLightbox;
+
+    function buildLightboxFilmstrip() {
+        const strip = document.getElementById("lightboxThumbnailsStrip");
+        if (!strip) return;
+
+        strip.innerHTML = "";
+        currentPhotos.forEach(function(photo, idx) {
+            const item = document.createElement("div");
+            item.className = "strip-thumb-item" + (idx === currentPhotoIndex ? " active" : "");
+            item.id = "strip-thumb-" + idx;
+            item.innerHTML = `
+                <img class="strip-thumb-img" 
+                     src="${photo.thumbnail}" 
+                     alt="thumb" 
+                     referrerpolicy="no-referrer" 
+                     loading="lazy" 
+                     onerror="this.src='https://drive.google.com/thumbnail?id=${photo.id}&sz=w200';" />
+            `;
+            item.addEventListener("click", function(e) {
+                e.stopPropagation();
+                currentPhotoIndex = idx;
+                updateLightboxContent();
+            });
+            strip.appendChild(item);
+        });
+    }
+
+    function updateLightboxContent() {
+        const photo = currentPhotos[currentPhotoIndex];
+        if (!photo) return;
+
+        const img = document.getElementById("lightboxActiveImage");
+        const counter = document.getElementById("lightboxCounter");
+        const loader = document.getElementById("lightboxImageLoader");
+
+        counter.innerText = (currentPhotoIndex + 1) + " / " + currentPhotos.length;
+        loader.style.display = "block";
+
+        img.onload = () => { loader.style.display = "none"; };
+        img.onerror = () => { 
+            img.src = "https://drive.google.com/thumbnail?id=" + photo.id + "&sz=w1600";
+            loader.style.display = "none"; 
+        };
+        img.setAttribute("referrerpolicy", "no-referrer");
+        img.src = photo.fullUrl;
+
+        const strip = document.getElementById("lightboxThumbnailsStrip");
+        if (strip) {
+            const prevActive = strip.querySelector(".strip-thumb-item.active");
+            if (prevActive) prevActive.classList.remove("active");
+
+            const currentThumb = document.getElementById("strip-thumb-" + currentPhotoIndex);
+            if (currentThumb) {
+                currentThumb.classList.add("active");
+                currentThumb.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+            }
+        }
+    }
+
+    function nextPhoto() {
+        currentPhotoIndex = (currentPhotoIndex < currentPhotos.length - 1) ? currentPhotoIndex + 1 : 0;
+        updateLightboxContent();
+    }
+
+    function prevPhoto() {
+        currentPhotoIndex = (currentPhotoIndex > 0) ? currentPhotoIndex - 1 : currentPhotos.length - 1;
+        updateLightboxContent();
+    }
+
+    async function directDownloadActivePhoto() {
+        const photo = currentPhotos[currentPhotoIndex];
+        if (!photo) return;
+
+        const sheet = document.getElementById("lightboxActionSheet");
+        if (sheet) sheet.style.display = "none";
+
+        try {
+            const response = await fetch(photo.fullUrl);
+            const blob = await response.blob();
+            const blobUrl = window.URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.style.display = "none";
+            a.href = blobUrl;
+            a.download = (photo.title || "ARPEU_Photo_" + (currentPhotoIndex + 1)) + ".jpg";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(blobUrl);
+        } catch (err) {
+            window.open(photo.fullUrl, "_blank");
+        }
+    }
+
+    function backToGalleryHome() {
+        document.getElementById("galleryAlbumView").style.display = "none";
+        document.getElementById("galleryHomeView").style.display = "block";
+        currentEvent = null;
+    }
+
+    function setupEventListeners() {
+        const backBtn = document.getElementById("galleryBackBtn");
+        if (backBtn) backBtn.onclick = backToGalleryHome;
+
+        const nextBtn = document.getElementById("lightboxNextBtn");
+        const prevBtn = document.getElementById("lightboxPrevBtn");
+        const closeBtn = document.getElementById("lightboxCloseBtn");
+        const overlay = document.getElementById("lightboxOverlay");
+
+        if (nextBtn) nextBtn.onclick = nextPhoto;
+        if (prevBtn) prevBtn.onclick = prevPhoto;
+        if (closeBtn) closeBtn.onclick = closeLightbox;
+        if (overlay) overlay.onclick = closeLightbox;
+
+        const menuBtn = document.getElementById("lightboxMenuBtn");
+        const sheet = document.getElementById("lightboxActionSheet");
+        const closeSheetBtn = document.getElementById("lightboxCloseSheetBtn");
+        const shareBtn = document.getElementById("lightboxShareBtn");
+        const downloadBtn = document.getElementById("lightboxDownloadLink");
+
+        if (menuBtn) {
+            menuBtn.onclick = function() {
+                sheet.style.display = sheet.style.display === "none" ? "block" : "none";
+            };
+        }
+        if (closeSheetBtn) {
+            closeSheetBtn.onclick = function() { sheet.style.display = "none"; };
+        }
+        if (downloadBtn) {
+            downloadBtn.onclick = function(e) {
+                e.preventDefault();
+                directDownloadActivePhoto();
+            };
+        }
+        if (shareBtn) {
+            shareBtn.onclick = function() {
+                const photo = currentPhotos[currentPhotoIndex];
+                if (navigator.share && photo) {
+                    navigator.share({
+                        title: currentEvent ? currentEvent.title : "ARPEU Gallery",
+                        url: photo.fullUrl
+                    }).catch(() => {});
+                } else {
+                    alert("Sharing option not supported in this browser.");
+                }
+            };
+        }
+
+        window.addEventListener("keydown", function(e) {
+            const modal = document.getElementById("galleryLightboxModal");
+            if (modal && modal.style.display === "flex") {
+                if (e.key === "ArrowRight") nextPhoto();
+                if (e.key === "ArrowLeft") prevPhoto();
+                if (e.key === "Escape") closeLightbox();
+            }
+        });
+
+        const stage = document.getElementById("lightboxStage");
+        if (stage) {
+            stage.addEventListener("touchstart", function(e) {
+                touchStartX = e.changedTouches[0].screenX;
+            }, { passive: true });
+
+            stage.addEventListener("touchend", function(e) {
+                touchEndX = e.changedTouches[0].screenX;
+                if (touchEndX < touchStartX - 45) nextPhoto();
+                if (touchEndX > touchStartX + 45) prevPhoto();
+            }, { passive: true });
+        }
+    }
+
+    return {
+        init: initGallery,
+        closeLightbox: closeLightbox
+    };
+
+})();
+
+window.arpeuGalleryEngine = arpeuGalleryEngine;
