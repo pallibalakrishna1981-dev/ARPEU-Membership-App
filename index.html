@@ -22,7 +22,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="#0B4EA2">
 <meta name="apple-mobile-web-app-title" content="ARPEU Portal">
 
-<link rel="stylesheet" href="css/style.css?v=2044">
+<link rel="stylesheet" href="css/style.css?v=2045">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
@@ -219,51 +219,112 @@
 ========================================= -->
 <section id="homeSection">
 
-    <!-- 3. MEMBERSHIP SERVICES (LOCKED - UNTOUCHED) -->
-    <section class="service-section">
-        <h3 class="section-title">Membership Services</h3>
-        <div class="service-grid">
-            <a href="#" id="newMemberBtn" class="service-card new-card">
-                <span>New Member</span>
-            </a>
-            <a href="#" id="renewalBtn" class="service-card renewal-card">
-                <span>Renewal</span>
-            </a>
+   <!-- 1. HERO BANNER -->
+    <div class="home-hero-banner">
+        <div class="hero-content">
+            <h2 class="hero-heading">UNITED FOR POWER EMPLOYEES</h2>
+            <div class="hero-flag-accent"></div>
+            <p class="hero-subheading">Unity &nbsp;|&nbsp; Service &nbsp;|&nbsp; Welfare &nbsp;|&nbsp; Progress</p>
         </div>
-    </section>
+    </div>
 
-    <!-- 4. COMPACT LIVE COUNTERS (LINK MOVED TO TOP RIGHT) -->
-    <section class="home-counters-section">
-        <div class="counters-card-compact">
-            <div class="counters-header-split">
-                <div class="counters-title-box">
-                    <span class="live-dot-pulse"></span>
-                    <span class="counters-title"><i class="fas fa-chart-line"></i> Live Membership Overview</span>
-                </div>
-                <a href="#" class="view-stats-link-top" onclick="showPage('statistics'); return false;">
-                    Detailed Statistics <i class="fas fa-arrow-right"></i>
-                </a>
+    <!-- 2. QUICK ACCESS CONTAINER (3 x 3 GRID) -->
+    <div class="quick-access-card">
+        <div class="quick-access-header">
+            <div class="qa-title-wrap">
+                <i class="fa-solid fa-table-cells-large qa-header-icon"></i>
+                <h3 class="qa-header-title">Quick Access</h3>
             </div>
-            <div class="counters-grid-compact">
-                <div class="counter-box total">
-                    <span class="c-val" id="hTotalMembers">0</span>
-                    <span class="c-lbl">Total Members</span>
-                </div>
-                <div class="counter-box last-year">
-                    <span class="c-val" id="hLastYearMembers">0</span>
-                    <span class="c-lbl">Last Year</span>
-                </div>
-                <div class="counter-box current-year">
-                    <span class="c-val" id="hCurrentYearMembers">0</span>
-                    <span class="c-lbl">Current Year</span>
-                </div>
-                <div class="counter-box growth">
-                    <span class="c-val" id="hGrowthMembers">+0</span>
-                    <span class="c-lbl">Growth</span>
-                </div>
-            </div>
+            <span class="qa-header-sub">Explore our services <i class="fa-solid fa-arrow-right"></i></span>
         </div>
-    </section>
+
+        <div class="quick-access-grid">
+            <!-- ROW 1 -->
+            <!-- 1. Membership -->
+            <a href="#" class="qa-tile tile-membership" onclick="showPage('membership'); return false;">
+                <div class="qa-icon-bubble">
+                    <i class="fa-solid fa-id-card"></i>
+                </div>
+                <span class="qa-tile-title">Membership</span>
+                <i class="fa-solid fa-chevron-right qa-tile-chevron"></i>
+            </a>
+
+            <!-- 2. Donations -->
+            <a href="#" class="qa-tile tile-donations" onclick="showPage('donations'); return false;">
+                <div class="qa-icon-bubble">
+                    <i class="fa-solid fa-hand-holding-heart"></i>
+                </div>
+                <span class="qa-tile-title">Donations</span>
+                <i class="fa-solid fa-chevron-right qa-tile-chevron"></i>
+            </a>
+
+            <!-- 3. Diary & Advertisements -->
+            <a href="#" class="qa-tile tile-diary" onclick="showPage('diary'); return false;">
+                <div class="qa-icon-bubble">
+                    <i class="fa-solid fa-book-bookmark"></i>
+                </div>
+                <span class="qa-tile-title">Diary &amp;<br>Advertisements</span>
+                <i class="fa-solid fa-chevron-right qa-tile-chevron"></i>
+            </a>
+
+            <!-- ROW 2 -->
+            <!-- 4. About ARPEU -->
+            <a href="#" class="qa-tile tile-about" onclick="showPage('about'); return false;">
+                <div class="qa-icon-bubble">
+                    <i class="fa-solid fa-circle-info"></i>
+                </div>
+                <span class="qa-tile-title">About ARPEU</span>
+                <i class="fa-solid fa-chevron-right qa-tile-chevron"></i>
+            </a>
+
+            <!-- 5. Gallery -->
+            <a href="#" class="qa-tile tile-gallery" onclick="showPage('gallery'); return false;">
+                <div class="qa-icon-bubble">
+                    <i class="fa-solid fa-images"></i>
+                </div>
+                <span class="qa-tile-title">Gallery</span>
+                <i class="fa-solid fa-chevron-right qa-tile-chevron"></i>
+            </a>
+
+            <!-- 6. Downloads -->
+            <a href="#" class="qa-tile tile-downloads" onclick="showPage('downloads'); return false;">
+                <div class="qa-icon-bubble">
+                    <i class="fa-solid fa-download"></i>
+                </div>
+                <span class="qa-tile-title">Downloads</span>
+                <i class="fa-solid fa-chevron-right qa-tile-chevron"></i>
+            </a>
+
+            <!-- ROW 3 -->
+            <!-- 7. Contact Us -->
+            <a href="#" class="qa-tile tile-contact" onclick="showPage('contact'); return false;">
+                <div class="qa-icon-bubble">
+                    <i class="fa-solid fa-address-book"></i>
+                </div>
+                <span class="qa-tile-title">Contact Us</span>
+                <i class="fa-solid fa-chevron-right qa-tile-chevron"></i>
+            </a>
+
+            <!-- 8. Meetings & Conferences -->
+            <a href="#" class="qa-tile tile-meetings" onclick="showPage('meetings'); return false;">
+                <div class="qa-icon-bubble">
+                    <i class="fa-solid fa-users-rectangle"></i>
+                </div>
+                <span class="qa-tile-title">Meetings &amp;<br>Conferences</span>
+                <i class="fa-solid fa-chevron-right qa-tile-chevron"></i>
+            </a>
+
+            <!-- 9. Notifications -->
+            <a href="#" class="qa-tile tile-notifications" onclick="showPage('notifications'); return false;">
+                <div class="qa-icon-bubble">
+                    <i class="fa-solid fa-bell"></i>
+                    <span id="homeNotifBadge" class="qa-notif-bubble-badge" style="display:none;">0</span>
+                </div>
+                <span class="qa-tile-title">Notifications</span>
+                <i class="fa-solid fa-chevron-right qa-tile-chevron"></i>
+            </a>
+        </div>
+    </div>
 
     <!-- 8. NOTICE BOARD (SCROLLING TICKER) -->
     <section class="notice-board-section">
@@ -5266,7 +5327,7 @@
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-<script src="js/script.js?v=120"></script>
+<script src="js/script.js?v=121"></script>
 </body>
 
 </html>

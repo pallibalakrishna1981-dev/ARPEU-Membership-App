@@ -4935,7 +4935,7 @@ function closeReceipt() {
    NOTIFICATIONS ENGINE & SMART ADMIN REDIRECTION
    ========================================================== */
 
-/* Syncs live pending counts onto Notification cards & Top Menu Badge */
+/* Syncs live pending counts onto Notification cards & Top Menu Badge & Home Tile */
 async function syncLiveNotificationCounts() {
   try {
     const resProf = await fetch(`${BACKEND_URL}?action=getProfileRequests`);
@@ -4953,10 +4953,19 @@ async function syncLiveNotificationCounts() {
     if (notifDocsEl) notifDocsEl.textContent = dCount;
 
     const totalAlerts = pCount + dCount;
+
+    // 1. Top Navbar Bell Icon Badge Update
     const topBadge = document.getElementById("navNotificationsBadge");
     if (topBadge) {
       topBadge.textContent = totalAlerts;
       topBadge.style.display = totalAlerts > 0 ? "inline-block" : "none";
+    }
+
+    // 2. Home Page Quick Access Notifications Tile Badge Update
+    const homeBadge = document.getElementById("homeNotifBadge");
+    if (homeBadge) {
+      homeBadge.textContent = totalAlerts;
+      homeBadge.style.display = totalAlerts > 0 ? "flex" : "none";
     }
   } catch (e) {
     console.warn("Notifications count sync skipped:", e);
@@ -4974,6 +4983,17 @@ function openNotificationTarget(targetTab) {
     // If not logged in, prompt user and then redirect to requested tab upon successful login
     sessionStorage.setItem("arpeu_redirect_tab", targetTab);
   }
+}
+
+/* Dismisses both Top Badge and Home Tile Badge when "Mark all as read" is clicked */
+function markAllNotificationsAsRead() {
+  const navBadge = document.getElementById("navNotificationsBadge");
+  const homeBadge = document.getElementById("homeNotifBadge");
+
+  if (navBadge) navBadge.style.display = "none";
+  if (homeBadge) homeBadge.style.display = "none";
+
+  alert("All notifications marked as read.");
 }
 
 /* Auto sync notification alerts on initial load */
@@ -5599,42 +5619,32 @@ function renderMeetingsList() {
 
 /// 11. Load Notifications List with Smart Container Sync
 async function loadNotificationsList() {
-    // 1. Sync live pending profile and document counts
-    if (typeof syncLiveNotificationCounts === "function") {
-        syncLiveNotificationCounts();
-    }
-
-    // 2. Fetch live meetings to show active meeting alerts inside container
-    const mtgContainer = document.getElementById("notifMeetingsList");
-    if (!mtgContainer) return;
-
     try {
-        const targetUrl = typeof BACKEND_URL !== "undefined" ? BACKEND_URL : "https://script.google.com/macros/s/AKfycbyoBv4TQ28mb7HIsTQ42iEe7P-3Yqs-7lR5tHhHqk0RqCQOShGrLBVPvD4j2ZUV1Q/exec";
-        const response = await fetch(`${targetUrl}?action=getMeetings`);
-        const result = await response.json();
+        const resP = await fetch(`${BACKEND_URL}?action=getProfileRequests`);
+        const dataP = await resP.json();
+        const pCount = dataP?.requests?.length || 0;
+        document.getElementById("notifProfilesCount") && (document.getElementById("notifProfilesCount").textContent = `${pCount} Pending`);
 
-        if (result && result.success && Array.isArray(result.meetings) && result.meetings.length > 0) {
-            let html = "";
-            result.meetings.slice(0, 2).forEach(mtg => {
-                html += `
-                  <div class="notif-item-row">
-                    <div class="notif-item-icon meeting-icon"><i class="fa-solid fa-video"></i></div>
-                    <div class="notif-item-info">
-                      <strong>${mtg.title}</strong>
-                      <p>${mtg.meetingType} • Date: ${mtg.date} at ${mtg.time}</p>
-                      <button type="button" class="btn-notif-mini" onclick="showPage('meetings')">
-                        <i class="fa-solid fa-arrow-right"></i> View Agenda & Join
-                      </button>
-                    </div>
-                  </div>
-                `;
-            });
-            mtgContainer.innerHTML = html;
-            const badge = document.getElementById("notifMtgCountBadge");
-            if (badge) badge.textContent = `${result.meetings.length} Scheduled`;
+        const resD = await fetch(`${BACKEND_URL}?action=getPendingDocuments`);
+        const dataD = await resD.json();
+        const dCount = dataD?.documents?.length || 0;
+        document.getElementById("notifDocsCount") && (document.getElementById("notifDocsCount").textContent = `${dCount} Pending`);
+
+        const total = pCount + dCount;
+        const badge = document.getElementById("navNotificationsBadge");
+        if (badge) {
+            badge.textContent = total;
+            badge.style.display = total > 0 ? "inline-block" : "none";
+        }
+
+        /* Sync Quick Access Notifications Tile Badge */
+        const homeBadge = document.getElementById("homeNotifBadge");
+        if (homeBadge) {
+            homeBadge.textContent = total;
+            homeBadge.style.display = total > 0 ? "flex" : "none";
         }
     } catch (e) {
-        console.warn("Meeting notification sync skipped:", e);
+        console.warn("Notification counts sync skipped:", e);
     }
 }
 

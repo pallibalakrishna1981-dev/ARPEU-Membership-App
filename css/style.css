@@ -321,54 +321,334 @@ color:#0B4EA2;
 font-size:16px;
 }
 
+/* ==========================================================
+   HOME PAGE — HERO BANNER
+   ========================================================== */
 
-/*=========================================
-MEMBERSHIP SERVICES
-=========================================*/
-.service-section{
-flex:1;
-display:flex;
-flex-direction:column;
-}
-.section-title{
-text-align:center;
-font-size:18px;
-font-weight:700;
-color:var(--primary);
-margin-bottom:14px;
-}
-.service-grid{
-display:flex;
-gap:10px;
-}
-.service-card{
-flex:1;
-display:flex;
-justify-content:center;
-align-items:center;
-height:46px;
-border-radius:30px;
-text-decoration:none;
-color:#FFFFFF;
-font-size:15px;
-font-weight:700;
-box-shadow:0 4px 10px rgba(0,0,0,.12);
-transition:var(--transition);
+.home-hero-banner {
+    position: relative;
+    background: linear-gradient(180deg, #EBF3FC 0%, #D8E9FB 100%);
+    border: 1px solid #C8DEF7;
+    border-radius: 14px;
+    padding: 18px 14px;
+    margin: 4px 0 12px 0;
+    text-align: center;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85), 0 2px 8px rgba(11, 78, 162, 0.05);
 }
 
-.new-card{
-background:linear-gradient(135deg,#1565C0,#0D47A1);
-}
-.renewal-card{
-background:linear-gradient(135deg,#FB8C00,#EF6C00);
-}
-.service-card:hover{
-transform:translateY(-2px);
-}
-.service-card:active{
-transform:scale(.98);
+.hero-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 
+.hero-heading {
+    font-family: 'Cinzel', 'Poppins', Georgia, serif;
+    font-size: 16px;
+    font-weight: 800;
+    color: #0B4EA2;
+    letter-spacing: 0.8px;
+    margin: 0;
+    line-height: 1.25;
+}
+
+.hero-flag-accent {
+    width: 64px;
+    height: 3px;
+    margin: 6px auto 5px;
+    background: linear-gradient(90deg, #FF6F00 0%, #FFFFFF 50%, #2E7D32 100%);
+    border-radius: 2px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.hero-subheading {
+    font-size: 11px;
+    font-weight: 600;
+    color: #1E293B;
+    margin: 0;
+    letter-spacing: 0.4px;
+    opacity: 0.95;
+}
+
+body.dark-mode .home-hero-banner {
+    background: linear-gradient(180deg, #0F172A 0%, #1E293B 100%);
+    border-color: #334155;
+}
+
+body.dark-mode .hero-heading {
+    color: #38BDF8;
+}
+
+body.dark-mode .hero-subheading {
+    color: #CBD5E1;
+}
+
+/* ==========================================================
+   HOME PAGE — QUICK ACCESS CONTAINER (3 x 3 GRID)
+   ========================================================== */
+
+.quick-access-card {
+    background: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    border-radius: 16px;
+    padding: 12px 10px 14px;
+    box-shadow: 0 4px 16px rgba(11, 78, 162, 0.06);
+    margin-bottom: 12px;
+}
+
+.quick-access-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    padding: 0 4px;
+}
+
+.qa-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.qa-header-icon {
+    font-size: 15px;
+    color: #0B4EA2;
+}
+
+.qa-header-title {
+    font-size: 14px;
+    font-weight: 800;
+    color: #0B4EA2;
+    margin: 0;
+    letter-spacing: 0.2px;
+}
+
+.qa-header-sub {
+    font-size: 10.5px;
+    font-weight: 600;
+    color: #D97706;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    text-decoration: none;
+    cursor: default;
+}
+
+.quick-access-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.qa-tile {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 84px;
+    height: 84px;
+    border-radius: 14px;
+    text-decoration: none;
+    color: #FFFFFF;
+    padding: 6px 4px;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+    overflow: hidden;
+    box-sizing: border-box;
+    text-align: center;
+}
+
+.qa-tile:active {
+    transform: scale(0.96);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+}
+
+.qa-icon-bubble {
+    position: relative;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.95);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    flex-shrink: 0;
+}
+
+.qa-tile-title {
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 1.18;
+    color: #FFFFFF;
+    text-align: center;
+    width: 100%;
+    padding: 0 2px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.qa-tile-chevron {
+    position: absolute;
+    right: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 8px;
+    color: rgba(255, 255, 255, 0.6);
+    pointer-events: none;
+}
+
+/* Individual Tile Gradients & Icon Accent Colors */
+.tile-membership {
+    background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+}
+.tile-membership .qa-icon-bubble i {
+    color: #059669;
+    font-size: 14px;
+}
+
+.tile-donations {
+    background: linear-gradient(135deg, #F43F5E 0%, #E11D48 100%);
+}
+.tile-donations .qa-icon-bubble i {
+    color: #E11D48;
+    font-size: 14px;
+}
+
+.tile-diary {
+    background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+}
+.tile-diary .qa-icon-bubble i {
+    color: #D97706;
+    font-size: 13px;
+}
+
+.tile-about {
+    background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%);
+}
+.tile-about .qa-icon-bubble i {
+    color: #1D4ED8;
+    font-size: 14px;
+}
+
+.tile-gallery {
+    background: linear-gradient(135deg, #8B5CF6 0%, #6D28D9 100%);
+}
+.tile-gallery .qa-icon-bubble i {
+    color: #6D28D9;
+    font-size: 13px;
+}
+
+.tile-downloads {
+    background: linear-gradient(135deg, #0EA5E9 0%, #0284C7 100%);
+}
+.tile-downloads .qa-icon-bubble i {
+    color: #0284C7;
+    font-size: 14px;
+}
+
+.tile-contact {
+    background: linear-gradient(135deg, #FB7185 0%, #E11D48 100%);
+}
+.tile-contact .qa-icon-bubble i {
+    color: #E11D48;
+    font-size: 13px;
+}
+
+.tile-meetings {
+    background: linear-gradient(135deg, #14B8A6 0%, #0D9488 100%);
+}
+.tile-meetings .qa-icon-bubble i {
+    color: #0D9488;
+    font-size: 13px;
+}
+
+.tile-notifications {
+    background: linear-gradient(135deg, #818CF8 0%, #4F46E5 100%);
+}
+.tile-notifications .qa-icon-bubble i {
+    color: #4F46E5;
+    font-size: 13px;
+}
+
+/* Notification Tile Red Badge */
+.qa-notif-bubble-badge {
+    position: absolute;
+    top: -4px;
+    right: -5px;
+    background: #DC2626;
+    color: #FFFFFF;
+    font-size: 9px;
+    font-weight: 800;
+    width: 17px;
+    height: 17px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1.5px solid #FFFFFF;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+    line-height: 1;
+}
+
+/* Dark Mode Overrides for Hero Banner & Quick Access */
+body.dark-mode .home-hero-banner {
+    background: linear-gradient(180deg, #0F172A 0%, #1E293B 100%);
+    border-color: #334155;
+}
+body.dark-mode .hero-heading {
+    color: #38BDF8;
+    text-shadow: none;
+}
+body.dark-mode .hero-subheading {
+    color: #CBD5E1;
+}
+body.dark-mode .quick-access-card {
+    background: #1E293B;
+    border-color: #334155;
+}
+body.dark-mode .qa-header-title,
+body.dark-mode .qa-header-icon {
+    color: #38BDF8;
+}
+
+/* Narrow Screen Refinements (< 360px) */
+@media screen and (max-width: 360px) {
+    .hero-heading {
+        font-size: 14px;
+    }
+    .hero-subheading {
+        font-size: 9.5px;
+    }
+    .hero-pylon-bg {
+        font-size: 42px;
+    }
+    .qa-tile {
+        min-height: 76px;
+        height: 76px;
+        padding: 4px 2px;
+    }
+    .qa-icon-bubble {
+        width: 28px;
+        height: 28px;
+        margin-bottom: 3px;
+    }
+    .qa-tile-title {
+        font-size: 8.5px;
+    }
+    .qa-tile-chevron {
+        display: none;
+    }
+}
 
 
 /*=========================================
