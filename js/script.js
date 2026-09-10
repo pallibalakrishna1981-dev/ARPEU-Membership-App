@@ -2545,6 +2545,38 @@ async function submitMembership() {
 let statsAutoRefreshTimer = null;
 window.companyStatsData = {};
 
+// Locked Master Baseline Data (2025 Official Audit Report)
+const baseline2025Data = {
+    APGENCO: {
+        "Dr. NTTPS": 34,
+        "Dr. MVR RTPP": 66,
+        "SDSTPS": 38
+    },
+    APSPDCL: {
+        "Kadapa": 121,
+        "Nellore": 75,
+        "Anantapur": 0,
+        "Annamayya": 0,
+        "Tirupati": 0
+    },
+    APCPDCL: {
+        "Tenali Division": 85,
+        "Prakasam": 46,
+        "CRDA": 0,
+        "Guntur": 0,
+        "Palnadu": 0,
+        "Bapatla": 0
+    },
+    APEPDCL: {
+        "Visakhapatnam": 44,
+        "Eluru": 10,
+        "Anakapalli": 0
+    },
+    APTRANSCO: {
+        "Kadapa / Annamayya": 18
+    }
+};
+
 async function loadMembershipStatistics() {
     try {
         const url = `${BACKEND_URL}?action=getMembershipStatistics`;
@@ -2556,12 +2588,26 @@ async function loadMembershipStatistics() {
         const stats = result.statistics;
         window.companyStatsData = stats.companyDetails || {};
 
-        // లైవ్ నంబర్ల అప్‌డేట్
-        if (document.getElementById("totalMembers")) document.getElementById("totalMembers").textContent = stats.totalMembers || 0;
-        if (document.getElementById("todayMembers")) document.getElementById("todayMembers").textContent = stats.todayMembers || 0;
-        if (document.getElementById("monthMembers")) document.getElementById("monthMembers").textContent = stats.monthMembers || 0;
-        if (document.getElementById("yearMembers")) document.getElementById("yearMembers").textContent = stats.yearMembers || 0;
+        const total = stats.totalMembers || 0;
+        const today = stats.todayMembers || 0;
+        const month = stats.monthMembers || 0;
+        const lastYear = 537; // Locked Baseline for 2025
+        const growth = total - lastYear;
 
+        // Live Metric Counters Update
+        if (document.getElementById("todayMembers")) document.getElementById("todayMembers").textContent = today;
+        if (document.getElementById("monthMembers")) document.getElementById("monthMembers").textContent = month;
+        if (document.getElementById("totalMembers")) document.getElementById("totalMembers").textContent = total;
+        if (document.getElementById("lastYearMembers")) document.getElementById("lastYearMembers").textContent = lastYear;
+
+        // Growth Calculation and Dynamic Color Indicator
+        const growthEl = document.getElementById("growthMembers");
+        if (growthEl) {
+            growthEl.textContent = growth >= 0 ? `+${growth}` : `${growth}`;
+            growthEl.style.color = growth >= 0 ? "#059669" : "#DC2626";
+        }
+
+        // Company-wise Membership Counters
         if (stats.companies) {
             if (document.getElementById("apgencoCount")) document.getElementById("apgencoCount").textContent = stats.companies.APGENCO || 0;
             if (document.getElementById("aptranscoCount")) document.getElementById("aptranscoCount").textContent = stats.companies.APTRANSCO || 0;
@@ -2574,46 +2620,122 @@ async function loadMembershipStatistics() {
     }
 }
 
-// 📌 కంపెనీ కార్డ్ క్లిక్ చేసినప్పుడు డీటైల్స్ చూపించే ఫంక్షన్
+// Function to Show Station / Circle Breakdown with 2025 vs 2026 Comparison
 function showCompany(companyKey) {
     const detailsDiv = document.getElementById("companyDetails");
     if (!detailsDiv) return;
 
     const keyUpper = companyKey.toUpperCase();
-    const details = window.companyStatsData ? window.companyStatsData[keyUpper] : null;
+    const baseline = baseline2025Data[keyUpper] || {};
+    const liveDetails = (window.companyStatsData && window.companyStatsData[keyUpper]) ? window.companyStatsData[keyUpper] : {};
 
-    if (!details || Object.keys(details).length === 0) {
-        detailsDiv.innerHTML = `<h3><i class="fas fa-building" style="color:#ff6600;"></i> ${keyUpper} Details</h3><p style="color:#666; font-size:13px; margin-top:8px;">No station/circle registrations found yet.</p>`;
-        detailsDiv.style.display = "block";
-        return;
-    }
+    // Combine All Station / Circle Units
+    const allUnitsSet = new Set([...Object.keys(baseline), ...Object.keys(liveDetails)]);
+    const allUnits = Array.from(allUnitsSet);
 
-    let html = `<h3><i class="fas fa-building" style="color:#ff6600;"></i> ${keyUpper} Station / Circle Breakdown</h3>`;
-    for (const [name, count] of Object.entries(details)) {
-        html += `
-            <div class="detail-row">
-                <span class="detail-name"><i class="fas fa-bolt"></i> ${name}</span>
-                <span class="detail-count">${count} Members</span>
+    let total2025 = 0;
+    let total2026 = 0;
+
+    let rowsHtml = "";
+    allUnits.forEach(unit => {
+        const count2025 = baseline[unit] || 0;
+
+        // Match Live 2026 Count
+        let count2026 = liveDetails[unit] || 0;
+        if (!count2026) {
+            for (const [k, v] of Object.entries(liveDetails)) {
+                if (k.toLowerCase().includes(unit.toLowerCase()) || unit.toLowerCase().includes(k.toLowerCase())) {
+                    count2026 = v;
+                    break;
+                }
+            }
+        }
+
+        const diff = count2026 - count2025;
+        const growthBadgeClass = diff >= 0 ? "chip-growth-pos" : "chip-growth-neg";
+        const growthSign = diff > 0 ? `+${diff}` : `${diff}`;
+
+        total2025 += count2025;
+        total2026 += count2026;
+
+        rowsHtml += `
+            <div class="breakdown-row">
+                <span class="unit-name"><i class="fas fa-bolt"></i> ${unit}</span>
+                <div class="unit-stats-group">
+                    <div class="stat-chip chip-2025" title="2025 Members">
+                        <span class="chip-label">2025</span>
+                        <span class="chip-val">${count2025}</span>
+                    </div>
+                    <div class="stat-chip chip-2026" title="2026 Live Members">
+                        <span class="chip-label">2026</span>
+                        <span class="chip-val">${count2026}</span>
+                    </div>
+                    <div class="stat-chip ${growthBadgeClass}" title="Growth vs Last Year">
+                        <span class="chip-label">Growth</span>
+                        <span class="chip-val">${growthSign}</span>
+                    </div>
+                </div>
             </div>
         `;
-    }
+    });
 
-    detailsDiv.innerHTML = html;
+    const totalDiff = total2026 - total2025;
+    const totalGrowthClass = totalDiff >= 0 ? "chip-growth-pos" : "chip-growth-neg";
+    const totalGrowthSign = totalDiff > 0 ? `+${totalDiff}` : `${totalDiff}`;
+
+    // Render Full Breakdown View
+    const fullHtml = `
+        <div class="comp-details-header">
+            <h3><i class="fas fa-building" style="color:#0B4EA2;"></i> ${keyUpper} Details</h3>
+            <button type="button" class="btn-close-comp-details" onclick="closeCompanyDetails()" title="Close Details">&times;</button>
+        </div>
+        <div class="comp-breakdown-table">
+            ${rowsHtml}
+            <div class="breakdown-row total-summary-row">
+                <span class="unit-name"><i class="fas fa-calculator"></i> ${keyUpper} TOTAL</span>
+                <div class="unit-stats-group">
+                    <div class="stat-chip chip-2025">
+                        <span class="chip-label">2025</span>
+                        <span class="chip-val">${total2025}</span>
+                    </div>
+                    <div class="stat-chip chip-2026">
+                        <span class="chip-label">2026</span>
+                        <span class="chip-val">${total2026}</span>
+                    </div>
+                    <div class="stat-chip ${totalGrowthClass}">
+                        <span class="chip-label">Growth</span>
+                        <span class="chip-val">${totalGrowthSign}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    detailsDiv.innerHTML = fullHtml;
     detailsDiv.style.display = "block";
     detailsDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
-// 📌 ప్రతీ 15 సెకన్లకు ఆటోమేటిక్‌గా రీఫ్రెష్ అయ్యే లైవ్ టైమర్
+// Function to Close Company Details View
+function closeCompanyDetails() {
+    const detailsDiv = document.getElementById("companyDetails");
+    if (detailsDiv) {
+        detailsDiv.style.display = "none";
+        detailsDiv.innerHTML = "";
+    }
+}
+
+// Live Polling Timer to Auto-Refresh Statistics Every 15 Seconds
 function startLiveStatsPolling() {
-    loadMembershipStatistics(); // తక్షణమే మొదటిసారి తెస్తుంది
+    loadMembershipStatistics();
     if (!statsAutoRefreshTimer) {
         statsAutoRefreshTimer = setInterval(function () {
-            loadMembershipStatistics(); // ప్రతీ 15 సెకన్లకు బ్యాక్‌గ్రౌండ్‌లో సింక్ అవుతుంది
+            loadMembershipStatistics();
         }, 15000);
     }
 }
 
-// 📌 Application Initialization లో లైవ్ సింకింగ్ స్టార్ట్ అవుతుంది
+// Application Initialization Hook for Live Statistics Polling
 document.addEventListener("DOMContentLoaded", function () {
     startLiveStatsPolling();
 });
@@ -7675,5 +7797,28 @@ function processDiaryOrderPayment(type) {
             titlePill.textContent = "ADVERTISEMENT RECEIPT";
             titlePill.style.backgroundColor = "#EA580C";
         }
+    }
+}
+
+/* ==========================================================
+   ANNUAL EVENTS — TOGGLE PAST EVENTS SHOW/HIDE
+   ========================================================== */
+function togglePastEvents() {
+    const wrapper = document.getElementById("pastEventsWrapper");
+    const btnText = document.getElementById("pastEventsBtnText");
+    const arrow   = document.getElementById("pastEventsArrow");
+
+    if (!wrapper || !btnText || !arrow) return;
+
+    const isHidden = (wrapper.style.display === "none" || wrapper.style.display === "");
+
+    if (isHidden) {
+        wrapper.style.display = "flex";
+        btnText.textContent = "Show Less";
+        arrow.className = "fa-solid fa-chevron-up";
+    } else {
+        wrapper.style.display = "none";
+        btnText.textContent = "View Passed Events (4)";
+        arrow.className = "fa-solid fa-chevron-down";
     }
 }

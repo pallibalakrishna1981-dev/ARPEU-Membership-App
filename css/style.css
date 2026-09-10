@@ -1444,11 +1444,29 @@ margin-top:15px;
     border-bottom-color:rgba(251,140,0,.18);
 }
 
-.year-row{
-    border-left-color:#8E24AA;
-    border-top-color:rgba(142,36,170,.18);
-    border-right-color:rgba(142,36,170,.18);
-    border-bottom-color:rgba(142,36,170,.18);
+.year-row {
+    border-left-color: #8E24AA;
+    border-top-color: rgba(142, 36, 170, .18);
+    border-right-color: rgba(142, 36, 170, .18);
+    border-bottom-color: rgba(142, 36, 170, .18);
+}
+
+.last-year-row {
+    border-left-color: #64748B;
+    border-top-color: rgba(100, 116, 139, .18);
+    border-right-color: rgba(100, 116, 139, .18);
+    border-bottom-color: rgba(100, 116, 139, .18);
+}
+
+.growth-row {
+    border-left-color: #059669;
+    border-top-color: rgba(5, 150, 105, .18);
+    border-right-color: rgba(5, 150, 105, .18);
+    border-bottom-color: rgba(5, 150, 105, .18);
+}
+
+.growth-row .stats-count {
+    color: #059669;
 }
 
 @media(max-width:382px){
@@ -1569,7 +1587,7 @@ margin-top:15px;
 .company-info{
     display:flex;
     flex-direction:column;
-    align-items:flex-end;
+    align-items:center;
     justify-content:center;
     gap:6px;
 }
@@ -1606,54 +1624,188 @@ margin-top:15px;
     color:#ff6600;
 }
 
-/* ---------- DETAILS ---------- */
+/* ==========================================================
+   COMPANY DETAILS CARD & 2025 vs 2026 BREAKDOWN
+   ========================================================== */
 
-.company-details{
-    margin-top:12px;
-    background:#ffffff;
-    border:1px solid rgba(0,0,0,.08);
-    border-radius:12px;
-    padding:16px;
-    box-shadow:0 3px 10px rgba(0,0,0,.08);
-    animation:fadeIn .25s ease;
+.company-details {
+    margin-top: 14px;
+    background: #ffffff;
+    border: 1.5px solid #cbd5e1;
+    border-radius: 14px;
+    padding: 12px 14px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+    animation: fadeIn 0.25s ease-in-out;
 }
 
-.company-details h3{
-    margin:0 0 12px;
-    font-size:17px;
-    font-weight:700;
-    color:#1f2937;
+.comp-details-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1.5px solid #e2e8f0;
+    padding-bottom: 8px;
+    margin-bottom: 10px;
 }
 
-.detail-row{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    padding:10px 0;
-    border-bottom:1px solid rgba(0,0,0,.08);
+.comp-details-header h3 {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 800;
+    color: #0B4EA2;
+    display: flex;
+    align-items: center;
+    gap: 7px;
 }
 
-.detail-row:last-child{
-    border-bottom:none;
+.btn-close-comp-details {
+    background: #fee2e2;
+    color: #dc2626;
+    border: 1px solid #fca5a5;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    font-size: 13px;
+    font-weight: 800;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.15s ease;
 }
 
-.detail-name{
-    display:flex;
-    align-items:center;
-    gap:8px;
-    font-size:14px;
-    font-weight:600;
-    color:#333;
+.btn-close-comp-details:active {
+    transform: scale(0.9);
 }
 
-.detail-name i{
-    color:#ff6600;
+.comp-breakdown-table {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    width: 100%;
 }
 
-.detail-count{
-    font-size:15px;
-    font-weight:700;
-    color:#ff6600;
+.breakdown-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 7px 10px;
+}
+
+.unit-name {
+    font-size: 12px;
+    font-weight: 700;
+    color: #1e293b;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex: 1;
+    min-width: 0;
+}
+
+.unit-name i {
+    color: #f57c00;
+    font-size: 11px;
+}
+
+.unit-stats-group {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.stat-chip {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2px 7px;
+    border-radius: 6px;
+    min-width: 44px;
+    text-align: center;
+}
+
+.stat-chip .chip-label {
+    font-size: 8px;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 2px;
+}
+
+.stat-chip .chip-val {
+    font-size: 12px;
+    font-weight: 800;
+    line-height: 1;
+}
+
+/* 2025 chip - Slate Grey */
+.stat-chip.chip-2025 {
+    background: #f1f5f9;
+    border: 1px solid #cbd5e1;
+}
+.stat-chip.chip-2025 .chip-label { color: #64748b; }
+.stat-chip.chip-2025 .chip-val { color: #334155; }
+
+/* 2026 chip - Brand Blue */
+.stat-chip.chip-2026 {
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+}
+.stat-chip.chip-2026 .chip-label { color: #1d4ed8; }
+.stat-chip.chip-2026 .chip-val { color: #0B4EA2; }
+
+/* Growth Chip */
+.stat-chip.chip-growth-pos {
+    background: #ecfdf5;
+    border: 1px solid #a7f3d0;
+}
+.stat-chip.chip-growth-pos .chip-label { color: #047857; }
+.stat-chip.chip-growth-pos .chip-val { color: #059669; }
+
+.stat-chip.chip-growth-neg {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+}
+.stat-chip.chip-growth-neg .chip-label { color: #b91c1c; }
+.stat-chip.chip-growth-neg .chip-val { color: #dc2626; }
+
+/* Total Summary Row */
+.breakdown-row.total-summary-row {
+    background: #fffbeb;
+    border: 1.5px solid #fde68a;
+    margin-top: 4px;
+}
+
+.breakdown-row.total-summary-row .unit-name {
+    color: #b45309;
+    font-weight: 800;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Dark mode adjustments */
+body.dark-mode .company-details {
+    background: #1e293b;
+    border-color: #334155;
+}
+body.dark-mode .comp-details-header h3 {
+    color: #38bdf8;
+}
+body.dark-mode .breakdown-row {
+    background: #0f172a;
+    border-color: #334155;
+}
+body.dark-mode .unit-name {
+    color: #f8fafc;
+}
+body.dark-mode .breakdown-row.total-summary-row {
+    background: #1e293b;
+    border-color: #f59e0b;
 }
 
 /* ---------- ANIMATION ---------- */
@@ -3203,122 +3355,6 @@ body{
     width: 100%;
 }
 
-/* Auto-Hiding Banner Container */
-.home-banner-container {
-    width: 100%;
-    transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-    overflow: hidden;
-    max-height: 500px;
-    opacity: 1;
-    margin-bottom: 10px;
-}
-
-.welcome-card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.dismiss-banner-btn {
-    background: rgba(255,255,255,0.2);
-    border: none;
-    color: #fff;
-    font-size: 11px;
-    padding: 3px 8px;
-    border-radius: 12px;
-    cursor: pointer;
-    font-weight: 600;
-}
-
-
-/* 4. Compact Live Counters (Top-Right Split) */
-.home-counters-section {
-    margin-top: 15px;
-    width: 100%;
-}
-
-.counters-card-compact {
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
-    border-radius: 14px;
-    padding: 12px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-}
-
-.counters-header-split {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
-}
-
-.counters-title-box {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.live-dot-pulse {
-    width: 8px;
-    height: 8px;
-    background: #2e7d32;
-    border-radius: 50%;
-    box-shadow: 0 0 0 0 rgba(46, 125, 50, 0.7);
-    animation: pulseGlow 1.5s infinite;
-}
-
-@keyframes pulseGlow {
-    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(46, 125, 50, 0.7); }
-    70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(46, 125, 50, 0); }
-    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(46, 125, 50, 0); }
-}
-
-.counters-title {
-    font-size: 12.5px;
-    font-weight: 800;
-    color: #0B4EA2;
-}
-
-.view-stats-link-top {
-    font-size: 10.5px;
-    font-weight: 800;
-    color: #f57c00;
-    text-decoration: none;
-    white-space: nowrap;
-}
-
-.view-stats-link-top:hover {
-    text-decoration: underline;
-}
-
-.counters-grid-compact {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 6px;
-    text-align: center;
-}
-
-.counter-box {
-    background: #f8fafc;
-    border: 1px solid #f1f5f9;
-    padding: 8px 4px;
-    border-radius: 8px;
-}
-
-.c-val {
-    display: block;
-    font-size: 15px;
-    font-weight: 800;
-    color: #0B4EA2;
-}
-
-.c-lbl {
-    font-size: 9.5px;
-    font-weight: 700;
-    color: #64748b;
-}
-
-.counter-box.growth .c-val { color: #2e7d32; }
 
 /* 8. Notice Board Ticker (45s + Pause on Hover) */
 .notice-board-section {
@@ -3439,67 +3475,197 @@ body{
     margin: 0;
 }
 
-/* 6. Upcoming Events (1:1 Square Ratio / Tall 140px Height) */
-.events-grid-2col {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
+/* ==========================================================
+   HOME PAGE — SINGLE LINE EVENTS COMPACT LIST
+   ========================================================== */
+
+.events-compact-list {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    width: 100%;
 }
 
-.event-card-compact {
+.event-strip-row {
+    display: flex;
+    align-items: center;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 7px 10px;
+    gap: 10px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
+    transition: transform 0.15s ease;
+}
+
+/* Toggle Passed Events Button */
+.btn-toggle-past-events {
+    width: 100%;
+    background: #f8fafc;
+    border: 1.5px dashed #cbd5e1;
+    border-radius: 10px;
+    padding: 9px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    color: #0b4ea2;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 4px;
+    transition: all 0.2s ease;
+}
+
+.btn-toggle-past-events:active {
+    background: #eef5ff;
+    transform: scale(0.98);
+}
+
+.btn-toggle-past-events i {
+    font-size: 11px;
+    transition: transform 0.25s ease;
+}
+
+/* Dark Mode */
+body.dark-mode .btn-toggle-past-events {
+    background: #0f172a;
+    border-color: #334155;
+    color: #38bdf8;
+}
+
+/* Upcoming Events Highlight (Active) */
+.event-strip-row.active-event {
+    border-left: 3.5px solid #F57C00;
+    background: #ffffff;
+}
+
+.event-strip-row.active-event .event-strip-date {
+    background: #fff8f0;
+    border: 1px solid #fed7aa;
+    color: #ea580c;
+}
+
+/* Past Events Muted (Passed) */
+.event-strip-row.past-event {
+    border-left: 3.5px solid #94a3b8;
+    background: #f8fafc;
+    opacity: 0.85;
+}
+
+.event-strip-row.past-event .event-strip-date {
+    background: #f1f5f9;
+    border: 1px solid #cbd5e1;
+    color: #64748b;
+}
+
+/* Date Box */
+.event-strip-date {
+    width: 38px;
+    height: 40px;
+    min-width: 38px;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.event-strip-date strong {
+    font-size: 14px;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.event-strip-date span {
+    font-size: 8px;
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-top: 1px;
+}
+
+/* Event Text Details */
+.event-strip-details {
+    flex: 1;
+    min-width: 0;
+    padding: 2px 0;
+}
+
+.event-strip-details h4 {
+    font-size: 11.5px;
+    font-weight: 800;
+    color: #1e293b;
+    margin: 0 0 3px 0;
+    line-height: 1.35;
+    white-space: normal; /* 👈 కట్ కాకుండా మల్టీ-లైన్ లోకి వస్తుంది */
+    word-break: break-word;
+}
+
+.event-strip-details p {
+    font-size: 10px;
+    font-weight: 500;
+    color: #64748b;
+    margin: 0;
+    line-height: 1.3;
+    white-space: normal; /* 👈 కింద వివరణ కూడా కట్ కాకుండా పూర్తిగా కనిపిస్తుంది */
+    word-break: break-word;
+}
+
+/* Event Strip Row Padding Fix for 2 Lines */
+.event-strip-row {
+    display: flex;
+    align-items: center;
     background: #ffffff;
     border: 1px solid #e2e8f0;
     border-radius: 12px;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    padding: 10px 12px; /* 👈 ప్యాడింగ్ పెంచడం వల్ల కార్డు హైట్ నీట్‌గా సర్దుకుంటుంది */
+    gap: 12px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+    transition: transform 0.15s ease;
 }
 
-.event-thumb-box {
-    position: relative;
-    height: 280px !important; /* 👈 1:1 SQUARE / TALL HIGH QUALITY HEIGHT */
-    background: #1e293b;
-    overflow: hidden;
-}
-
-.event-img-fit {
-    width: 100%;
-    height: 100%;
-    object-fit: cover !important;
-    object-position: center;
-}
-
-.e-badge {
-    position: absolute;
-    top: 6px;
-    right: 6px;
-    background: #d32f2f;
-    color: #fff;
-    font-size: 9px;
+/* Badges */
+.event-strip-badge {
+    font-size: 8.5px;
     font-weight: 800;
-    padding: 3px 7px;
-    border-radius: 6px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    padding: 2px 7px;
+    border-radius: 10px;
+    flex-shrink: 0;
+    white-space: nowrap;
 }
 
-.event-body-compact {
-    padding: 10px;
+.event-strip-badge.upcoming {
+    background: #ecfdf5;
+    color: #059669;
+    border: 1px solid #a7f3d0;
 }
 
-.event-body-compact h4 {
-    font-size: 11.5px;
-    font-weight: 800;
-    color: #0B4EA2;
-    line-height: 1.3;
-    margin-bottom: 4px;
-}
-
-.event-body-compact small {
-    font-size: 9.5px;
+.event-strip-badge.done {
+    background: #f1f5f9;
     color: #64748b;
-    font-weight: 600;
-    display: block;
+    border: 1px solid #e2e8f0;
+}
+
+/* Dark Mode Overrides */
+body.dark-mode .event-strip-row {
+    background: #1e293b;
+    border-color: #334155;
+}
+body.dark-mode .event-strip-details h4 {
+    color: #f8fafc;
+}
+body.dark-mode .event-strip-details p {
+    color: #94a3b8;
+}
+body.dark-mode .event-strip-row.active-event .event-strip-date {
+    background: #0f172a;
+    border-color: #ea580c;
+}
+body.dark-mode .event-strip-row.past-event {
+    background: #0f172a;
+    border-color: #334155;
 }
 
 /* 7. Recent Activities (Facebook) */
@@ -5320,18 +5486,19 @@ NEW QUICK LINKS INTEGRATED CARD STYLES
 }
 
 .profile-title-banner h2 {
-  margin: 0 0 5px 0;
-  font-size: 20px;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  gap: 10px;
+    margin: 0 0 3px 0;
+    font-size: 16px; /* పాత 20px నుండి 16px చేయడం వల్ల సింగిల్ లైన్ లో సెట్ అవుతుంది */
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
 }
 
-.profile-title-banner p {
-  margin: 0;
-  font-size: 13px;
-  opacity: 0.85;
+.profile-title-banner {
+    padding: 12px 14px; /* ప్యాడింగ్ తగ్గించి స్లీక్ లుక్ ఇచ్చాం */
+    border-radius: 12px;
+    margin-bottom: 12px;
 }
 
 /* Universal Profile Search Card */
@@ -8871,6 +9038,82 @@ textarea.mtg-custom-field {
     overflow-x: hidden !important;
 }
 
+/* 🌟 TOP 6 COMPANY SELECTION BOXES (ENLARGED & BALANCED) */
+.arpeu-company-boxes-grid {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 8px !important;
+    width: 100% !important;
+    margin-bottom: 14px !important;
+    box-sizing: border-box !important;
+}
+
+.arpeu-comp-box {
+    height: 118px !important; /* పాత 80px నుండి 118px కి పెంచబడింది */
+    background: #ffffff !important;
+    border: 1.5px solid #cbd5e1 !important;
+    border-radius: 12px !important;
+    padding: 8px 4px 6px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    cursor: pointer !important;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05) !important;
+    transition: all 0.2s ease !important;
+    box-sizing: border-box !important;
+}
+
+.arpeu-comp-box:active {
+    transform: scale(0.96) !important;
+}
+
+.arpeu-comp-box img {
+    width: 50px !important; /* లోగో సైజు స్పష్టంగా పెద్దదిగా కనిపిస్తుంది */
+    height: 50px !important;
+    object-fit: contain !important;
+    display: block !important;
+    margin-bottom: 2px !important;
+}
+
+.arpeu-comp-box span {
+    font-size: 11px !important; /* బోల్డ్ టైటిల్ సైజు */
+    font-weight: 800 !important;
+    color: #0b4ea2 !important;
+    text-align: center !important;
+    white-space: nowrap !important;
+    line-height: 1.2 !important;
+}
+
+/* సభ్యుల సంఖ్య పిల్‌ / ట్యాగ్‌లైన్ */
+.comp-count-pill {
+    font-size: 8.5px !important;
+    font-weight: 700 !important;
+    color: #475569 !important;
+    background: #f1f5f9 !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 10px !important;
+    padding: 1px 6px !important;
+    line-height: 1.2 !important;
+    white-space: nowrap !important;
+}
+
+.arpeu-comp-box.active-comp-box {
+    border-color: #ff9800 !important;
+    background: #fff8f0 !important;
+    box-shadow: 0 0 10px rgba(255, 152, 0, 0.35) !important;
+}
+
+.arpeu-comp-box.active-comp-box span {
+    color: #ea580c !important;
+}
+
+.arpeu-comp-box.active-comp-box .comp-count-pill {
+    background: #ffedd5 !important;
+    border-color: #fed7aa !important;
+    color: #c2410c !important;
+}
+
 /* 1. Featured Hon'ble President Card */
 .arpeu-featured-card {
     display: flex !important;
@@ -9035,10 +9278,10 @@ textarea.mtg-custom-field {
     text-overflow: ellipsis !important;
 }
 
-/* 3 Action Buttons Row (Wider Center WhatsApp Button) */
+/* 3 Action Buttons Row */
 .arpeu-contact-row {
     display: grid !important;
-    grid-template-columns: 0.9fr 1.25fr 0.9fr !important; /* Left & Right Compact, Center WhatsApp Wide */
+    grid-template-columns: 0.9fr 1.25fr 0.9fr !important;
     gap: 3px !important;
     width: 100% !important;
     margin-top: auto !important;
@@ -9069,17 +9312,17 @@ textarea.mtg-custom-field {
 }
 
 .arpeu-call-btn { 
-    background: #0b4ea2 !important; /* Navy Blue */
+    background: #0b4ea2 !important;
 }
 
 .arpeu-whatsapp-btn { 
-    background: #16a34a !important; /* WhatsApp Green */
-    font-size: 9px !important; /* Slightly larger text for WhatsApp */
+    background: #16a34a !important;
+    font-size: 9px !important;
     padding: 6px 2px !important;
 }
 
 .arpeu-profile-btn { 
-    background: #ea580c !important; /* Vibrant Orange */
+    background: #ea580c !important;
 }
 
 .arpeu-call-btn:active,
@@ -9094,7 +9337,7 @@ textarea.mtg-custom-field {
 }
 
 .arpeu-whatsapp-btn i {
-    font-size: 10px !important; /* Prominent WhatsApp Icon */
+    font-size: 10px !important;
 }
 
 /* 4. Large Profile Zoom Modal */
@@ -9270,7 +9513,7 @@ textarea.mtg-custom-field {
 }
 
 .arpeu-comp-box {
-    height: 80px !important;
+    height: 130px !important;
     background: #ffffff !important;
     border: 1.5px solid #cbd5e1 !important;
     border-radius: 10px !important;
@@ -9290,16 +9533,16 @@ textarea.mtg-custom-field {
 }
 
 .arpeu-comp-box img {
-    width: 38px !important;
-    height: 38px !important;
-    max-width: 38px !important;
-    max-height: 38px !important;
+    width: 70% !important;
+    height: 70px !important;
+    max-width: 70px !important;
+    max-height: 70px !important;
     object-fit: contain !important;
     display: block !important;
 }
 
 .arpeu-comp-box span {
-    font-size: 9.5px !important;
+    font-size: 14px !important;
     font-weight: 800 !important;
     color: #0b4ea2 !important;
     text-align: center !important;
@@ -9765,68 +10008,82 @@ textarea.mtg-custom-field {
     margin-bottom: 4px !important;
 }
 
+/* ==========================================================
+   PROFILES — STAR VOLUNTEERS & TALENT DIRECTORY (NO OVERFLOW)
+   ========================================================== */
+
 .prof-volunteers-grid {
-    display: grid !important;
-    grid-template-columns: repeat(2, 1fr) !important; /* 2 Cards per Row */
-    gap: 6px !important;
-    width: 100% !important;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr)); /* Strict 50-50 Equal Split */
+    gap: 6px;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .prof-volunteer-card {
-    background: #ffffff !important;
-    border: 1px solid #cbd5e1 !important;
-    border-radius: 10px !important;
-    padding: 6px 8px !important;
-    display: flex !important;
-    align-items: center !important;
-    gap: 8px !important;
-    cursor: pointer !important;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04) !important;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    padding: 6px 6px; /* ఎడమ, కుడి ప్యాడింగ్ తగ్గించబడింది */
+    display: flex;
+    align-items: center;
+    gap: 6px; /* గ్యాప్ తగ్గించి ప్లేస్ ఆదా చేశాం */
+    cursor: pointer;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+    box-sizing: border-box;
+    min-width: 0; /* కంటెంట్ బాక్స్ దాటి పోకుండా ఆపుతుంది */
+    overflow: hidden;
 }
 
 .prof-vol-avatar {
-    width: 40px !important;
-    height: 40px !important;
-    min-width: 40px !important;
-    max-width: 40px !important;
-    border-radius: 50% !important;
-    border: 1.5px solid #16a34a !important;
-    object-fit: cover !important;
-    display: block !important;
+    width: 34px;       /* పాత 40px నుండి 34px కి తగ్గించబడింది */
+    height: 34px;
+    min-width: 34px;   /* ఇమేజ్ ముడుచుకుపోకుండా ఫిక్స్డ్ సైజు */
+    border-radius: 50%;
+    border: 1.5px solid #16a34a;
+    object-fit: cover;
+    flex-shrink: 0;
 }
 
 .prof-vol-info {
-    flex: 1 !important;
-    min-width: 0 !important;
-    text-align: left !important;
+    flex: 1;
+    min-width: 0; /* టెక్స్ట్ కుడివైపుకు దూసుకుపోకుండా ఆపుతుంది */
+    text-align: left;
+    overflow: hidden;
 }
 
 .prof-vol-info strong {
-    display: block !important;
-    font-size: 11px !important;
-    font-weight: 800 !important;
-    color: #0f172a !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
+    display: block;
+    font-size: 10.5px;
+    font-weight: 800;
+    color: #0f172a;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis; /* పేరు పొడవైతే డాట్స్ (...) వస్తాయి కానీ బాక్స్ దాటదు */
+    line-height: 1.2;
 }
 
 .prof-vol-info span {
-    display: block !important;
-    font-size: 8.5px !important;
-    font-weight: 600 !important;
-    color: #64748b !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
+    display: block;
+    font-size: 8.5px;
+    font-weight: 600;
+    color: #64748b;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.2;
+    margin-top: 1px;
 }
 
 .prof-vol-tag-badge {
-    font-size: 8px !important;
-    font-weight: 800 !important;
-    color: #16a34a !important;
-    margin-top: 1px !important;
-    display: block !important;
+    font-size: 7.5px;
+    font-weight: 800;
+    color: #dc2626;
+    margin-top: 2px;
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 /* ==========================================================

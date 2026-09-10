@@ -22,7 +22,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="#0B4EA2">
 <meta name="apple-mobile-web-app-title" content="ARPEU Portal">
 
-<link rel="stylesheet" href="css/style.css?v=2045">
+<link rel="stylesheet" href="css/style.css?v=2046">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
@@ -326,7 +326,10 @@
         </div>
     </div>
 
-    <!-- 8. NOTICE BOARD (SCROLLING TICKER) -->
+
+   <!-- ==========================================================
+       NOTICE BOARD SECTION (SCROLLING TICKER)
+       ========================================================== -->
     <section class="notice-board-section">
         <div class="notice-board-card">
             <div class="notice-ticker-title">
@@ -334,93 +337,153 @@
             </div>
             <div class="notice-ticker-wrapper">
                 <div class="notice-ticker-content">
-                    <span><i class="fas fa-circle-dot"></i> September 10: Last Date for Statewide Digital Membership Drive 2026.</span>
-                    <span><i class="fas fa-circle-dot"></i> September 17: National Workers Day (Sri Vishwakarma Jayanti) Grand Celebrations.</span>
+                    <span><i class="fas fa-circle-dot"></i> September 10: Statewide Digital Membership Drive 2026 ends midnight today.</span>
+                    <span><i class="fas fa-circle-dot"></i> September 17: National Workers Day (Sri Vishwakarma Jayanti) Celebrations.</span>
+                    <span><i class="fas fa-circle-dot"></i> September 27: State Level Membership Verification Key Meeting @ Visakhapatnam.</span>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- 5. LATEST NEWS & ANNOUNCEMENTS (SHRUNK HEIGHT) -->
+    <!-- ==========================================================
+       LATEST NEWS & CIRCULARS SECTION
+       ========================================================== -->
     <section class="news-section">
-        <h3 class="section-title"><i class="fas fa-newspaper"></i> Latest News & Circulars</h3>
+        <h3 class="section-title"><i class="fas fa-newspaper"></i> Latest News &amp; Circulars</h3>
         <div class="news-list">
             
-            <!-- News 1 -->
+            <!-- News 1: Membership Last Date -->
             <div class="news-card">
                 <div class="news-card-header">
                     <span class="news-badge urgent"><i class="fas fa-bolt"></i> Urgent</span>
-                    <span class="news-deadline-pill"><i class="fas fa-clock"></i> Last Date: August 31, 2026</span>
+                    <span class="news-deadline-pill"><i class="fas fa-clock"></i> Last Date: Today (Sept 10, 2026)</span>
                 </div>
                 <h4>Statewide Digital Membership Drive 2026 Active</h4>
-                <p>All electricity employees across APGENCO, APTRANSCO, and DISCOMs are requested to complete online membership registration before August 31.</p>
+                <p>All electricity employees across APGENCO, APTRANSCO, and DISCOMs are requested to complete online membership registration before midnight today.</p>
             </div>
 
-            <!-- News 2 -->
+            <!-- News 2: State Verification Meeting -->
             <div class="news-card">
                 <div class="news-card-header">
-                    <span class="news-badge notice"><i class="fas fa-flag"></i> BMS Protest Call</span>
-                    <span class="news-date-pill"><i class="far fa-calendar-alt"></i> August 17, 2026</span>
+                    <span class="news-badge notice"><i class="fas fa-file-signature"></i> BMS Meeting Call</span>
+                    <span class="news-date-pill"><i class="far fa-calendar-alt"></i> September 27, 2026</span>
                 </div>
-                <h4>August 17 - Nationwide Strike & District Headquarters Dharna</h4>
-                <p>Central BMS (Bharatiya Mazdoor Sangh) call for Nationwide Protest Program and Dharna at all District Headquarters demanding electricity employee rights.</p>
+                <h4>Sept 27 - State Level Membership Verification Meeting @ Visakhapatnam</h4>
+                <p>Important statewide verification meeting scheduled at Visakhapatnam. The President, General Secretary, and Treasurer of all regional units must attend without fail.</p>
             </div>
 
         </div>
     </section>
 
-   <!-- 6. UPCOMING EVENTS (1:1 SQUARE CARDS GRID) -->
+   <!-- ==========================================================
+       UPCOMING EVENTS & PROGRAMMES (COLLAPSIBLE PAST EVENTS)
+       ========================================================== -->
     <section class="events-section">
-        <h3 class="section-title"><i class="fas fa-calendar-alt"></i> Upcoming Events & Programs</h3>
-        <div class="events-grid-2col">
-            
-            <!-- Event 1: Amrita Devi Balidan Divas (Aug 28) -->
-            <div class="event-card-compact">
-                <div class="event-thumb-box">
-                    <img src="images/amrita-devi-balidan.jpg" alt="Environment Day" class="event-img-fit">
-                    <span class="e-badge">Aug 28</span>
+        <h3 class="section-title"><i class="fas fa-calendar-days"></i> Annual Events &amp; Programmes</h3>
+        <div class="events-compact-list">
+
+            <!-- 1. ACTIVE UPCOMING EVENTS (ALWAYS VISIBLE) -->
+            <!-- Event 1: Sept 17 -->
+            <div class="event-strip-row active-event">
+                <div class="event-strip-date">
+                    <strong>17</strong>
+                    <span>SEPT</span>
                 </div>
-                <div class="event-body-compact">
-                    <h4>Mata Amrita Devi Balidan Divas</h4>
-                    <small><i class="fas fa-leaf"></i> Environment Protection Day</small>
+                <div class="event-strip-details">
+                    <h4>Sri Vishwakarma Jayanti (National Workers Day)</h4>
+                    <p>Celebrations across all Power Plants, Sub-Stations &amp; Offices</p>
                 </div>
+                <span class="event-strip-badge upcoming">Upcoming</span>
             </div>
 
-            <!-- Event 2: Vishwakarma Jayanti (Sept 17) -->
-            <div class="event-card-compact">
-                <div class="event-thumb-box">
-                    <img src="images/vishwakarma-jayanti.jpg" alt="Vishwakarma Jayanti" class="event-img-fit">
-                    <span class="e-badge">Sept 17</span>
+            <!-- Event 2: Oct 14 -->
+            <div class="event-strip-row active-event">
+                <div class="event-strip-date">
+                    <strong>14</strong>
+                    <span>OCT</span>
                 </div>
-                <div class="event-body-compact">
-                    <h4>National Workers Day (Vishwakarma Jayanti)</h4>
-                    <small><i class="fas fa-tools"></i> Divine Architect Day</small>
+                <div class="event-strip-details">
+                    <h4>Samajika Samarasa Divas (Dattopant Thengadi Ji)</h4>
+                    <p>BMS Founder Memorial Day &amp; Social Harmony Assembly</p>
                 </div>
+                <span class="event-strip-badge upcoming">Upcoming</span>
             </div>
 
-            <!-- Event 3: Dattopant Thengadi Punyathithi (Oct 14) -->
-            <div class="event-card-compact">
-                <div class="event-thumb-box">
-                    <img src="images/dattopant-thengadi.jpg" alt="Dattopant Thengadi" class="event-img-fit">
-                    <span class="e-badge">Oct 14</span>
+            <!-- Event 3: Dec 12 -->
+            <div class="event-strip-row active-event">
+                <div class="event-strip-date">
+                    <strong>12</strong>
+                    <span>DEC</span>
                 </div>
-                <div class="event-body-compact">
-                    <h4>Samajika Samarasa Divas (Dattopant Thengadi)</h4>
-                    <small><i class="fas fa-users"></i> BMS Founder Memorial</small>
+                <div class="event-strip-details">
+                    <h4>Swadeshi Divas (Babu Genu Balidan Divas)</h4>
+                    <p>National Self-Reliance &amp; Swadeshi Awareness Celebrations</p>
                 </div>
+                <span class="event-strip-badge upcoming">Upcoming</span>
             </div>
 
-            <!-- Event 4: Swadeshi Divas (Dec 12) -->
-            <div class="event-card-compact">
-                <div class="event-thumb-box">
-                    <img src="images/bms-logo.png" alt="Swadeshi Divas" class="event-img-fit">
-                    <span class="e-badge">Dec 12</span>
+            <!-- 2. COLLAPSIBLE PAST EVENTS (DEFAULT HIDDEN) -->
+            <div id="pastEventsWrapper" style="display: none; flex-direction: column; gap: 7px;">
+                
+                <!-- Past Event 4: Aug 28 -->
+                <div class="event-strip-row past-event">
+                    <div class="event-strip-date">
+                        <strong>28</strong>
+                        <span>AUG</span>
+                    </div>
+                    <div class="event-strip-details">
+                        <h4>Environment Protection Day (Amrita Devi Balidan)</h4>
+                        <p>Mass Tree Plantation &amp; Environmental Awareness Campaign</p>
+                    </div>
+                    <span class="event-strip-badge done">Passed</span>
                 </div>
-                <div class="event-body-compact">
-                    <h4>Swadeshi Divas Celebrations</h4>
-                    <small><i class="fas fa-flag"></i> National Self-Reliance Day</small>
+
+                <!-- Past Event 5: July 23 -->
+                <div class="event-strip-row past-event">
+                    <div class="event-strip-date">
+                        <strong>23</strong>
+                        <span>JULY</span>
+                    </div>
+                    <div class="event-strip-details">
+                        <h4>BMS Foundation Day (Bharatiya Mazdoor Sangh)</h4>
+                        <p>Union Flag Hoisting &amp; Power Sector Welfare Assemblies</p>
+                    </div>
+                    <span class="event-strip-badge done">Passed</span>
                 </div>
+
+                <!-- Past Event 6: March 25 -->
+                <div class="event-strip-row past-event">
+                    <div class="event-strip-date">
+                        <strong>25</strong>
+                        <span>MAR</span>
+                    </div>
+                    <div class="event-strip-details">
+                        <h4>Sarvapanth Samadar Divas (Ganesh Shankar Vidyarthi)</h4>
+                        <p>National Integration &amp; Communal Harmony Observance</p>
+                    </div>
+                    <span class="event-strip-badge done">Passed</span>
+                </div>
+
+                <!-- Past Event 7: March 08 -->
+                <div class="event-strip-row past-event">
+                    <div class="event-strip-date">
+                        <strong>08</strong>
+                        <span>MAR</span>
+                    </div>
+                    <div class="event-strip-details">
+                        <h4>International Women's Day</h4>
+                        <p>Felicitation of Women Power Employees &amp; Special Conclave</p>
+                    </div>
+                    <span class="event-strip-badge done">Passed</span>
+                </div>
+
             </div>
+
+            <!-- 3. TOGGLE SHOW MORE / SHOW LESS BUTTON -->
+            <button type="button" class="btn-toggle-past-events" id="btnTogglePastEvents" onclick="togglePastEvents()">
+                <span id="pastEventsBtnText">View Passed Events (4)</span>
+                <i class="fa-solid fa-chevron-down" id="pastEventsArrow"></i>
+            </button>
 
         </div>
     </section>
@@ -1788,7 +1851,7 @@
     
     <!-- PROFILE PAGE HEADER TITLE BAR -->
     <div class="profile-title-banner">
-      <h2><i class="fas fa-id-card"></i> DCMF Professional Digital Profile</h2>
+      <h2><i class="fas fa-id-card"></i> Professional Digital Profile</h2>
       <p>Single Organisational Identity & Digital Skill Repository</p>
     </div>
 
@@ -2555,19 +2618,6 @@
 
     <div class="stats-list">
 
-        <div class="stats-row total-row">
-
-            <div class="stats-info">
-                <i class="fas fa-users"></i>
-                <span>Total Members</span>
-            </div>
-
-            <div class="stats-count" id="totalMembers">
-                0
-            </div>
-
-        </div>
-
         <div class="stats-row today-row">
 
             <div class="stats-info">
@@ -2594,14 +2644,40 @@
 
         </div>
 
-        <div class="stats-row year-row">
+        <div class="stats-row total-row">
+
+            <div class="stats-info">
+                <i class="fas fa-users"></i>
+                <span>Total Members (This Year)</span>
+            </div>
+
+            <div class="stats-count" id="totalMembers">
+                0
+            </div>
+
+        </div>
+
+        <div class="stats-row last-year-row">
+
+            <div class="stats-info">
+                <i class="fas fa-history"></i>
+                <span>Last Year Members (2025)</span>
+            </div>
+
+            <div class="stats-count" id="lastYearMembers">
+                537
+            </div>
+
+        </div>
+
+        <div class="stats-row growth-row">
 
             <div class="stats-info">
                 <i class="fas fa-chart-line"></i>
-                <span>This Year</span>
+                <span>Membership Growth</span>
             </div>
 
-            <div class="stats-count" id="yearMembers">
+            <div class="stats-count" id="growthMembers">
                 0
             </div>
 
@@ -3784,26 +3860,32 @@
         <div class="arpeu-comp-box active-comp-box" onclick="selectCompanyHub('state', this)">
             <img src="images/arpeu-logo.png" alt="State Body" onerror="this.src='https://pallibalakrishna1981-dev.github.io/ARPEU-Membership-App/images/arpeu-logo.png'">
             <span>STATE BODY</span>
+            <small class="comp-count-pill">29 Members</small>
         </div>
         <div class="arpeu-comp-box" onclick="selectCompanyHub('apgenco', this)">
             <img src="images/apgenco.png" alt="APGENCO" onerror="this.src='images/arpeu-logo.png'">
             <span>APGENCO</span>
+            <small class="comp-count-pill">15 Members</small>
         </div>
         <div class="arpeu-comp-box" onclick="selectCompanyHub('aptransco', this)">
             <img src="images/aptransco.png" alt="APTRANSCO" onerror="this.src='images/arpeu-logo.png'">
             <span>APTRANSCO</span>
+            <small class="comp-count-pill">15 Members</small>
         </div>
         <div class="arpeu-comp-box" onclick="selectCompanyHub('apspdcl', this)">
             <img src="images/apspdcl.png" alt="APSPDCL" onerror="this.src='images/arpeu-logo.png'">
             <span>APSPDCL</span>
+            <small class="comp-count-pill">15 Members</small>
         </div>
         <div class="arpeu-comp-box" onclick="selectCompanyHub('apepdcl', this)">
             <img src="images/apepdcl.png" alt="APEPDCL" onerror="this.src='images/arpeu-logo.png'">
             <span>APEPDCL</span>
+            <small class="comp-count-pill">9 Members</small>
         </div>
         <div class="arpeu-comp-box" onclick="selectCompanyHub('apcpdcl', this)">
             <img src="images/apcpdcl.png" alt="APCPDCL" onerror="this.src='images/arpeu-logo.png'">
             <span>APCPDCL</span>
+            <small class="comp-count-pill">19 Members</small>
         </div>
     </div>
 
@@ -3833,7 +3915,6 @@
     </button>
 
 </section>
-
 
 <!-- =========================================================
      NOTIFICATIONS & BROADCAST CENTER
@@ -5327,7 +5408,7 @@
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-<script src="js/script.js?v=121"></script>
+<script src="js/script.js?v=122"></script>
 </body>
 
 </html>
