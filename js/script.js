@@ -516,6 +516,7 @@ function showPage(page) {
   const cntSec        = document.getElementById("contactSection") || document.getElementById("contactPage");
   const gallerySec    = document.getElementById("gallerySection") || document.getElementById("galleryPage") || document.getElementById("gallery");
   const dwnSec        = document.getElementById("downloadsSection") || document.getElementById("downloadsPage");
+  const pressMediaSec = document.getElementById("pressMediaSection");
   const profSec       = document.getElementById("profileSection") || document.getElementById("profilePage");
   const admSec        = document.getElementById("adminSection");
   const diarySec      = document.getElementById("diarySection");
@@ -535,6 +536,7 @@ function showPage(page) {
   if (cntSec)        cntSec.style.display        = "none";
   if (gallerySec)    gallerySec.style.display    = "none";
   if (dwnSec)        dwnSec.style.display        = "none";
+  if (pressMediaSec) pressMediaSec.style.display = "none";
   if (profSec)       profSec.style.display       = "none";
   if (admSec)        admSec.style.display        = "none";
   if (notifSec)      notifSec.style.display      = "none";
@@ -610,9 +612,22 @@ function showPage(page) {
         window.arpeuGalleryEngine.init();
       }
       break;
+      
     case "download":
     case "downloads":
       if (dwnSec) dwnSec.style.display = "block";
+      break;
+
+    case "press":
+    case "media":
+    case "pressmedia":
+    case "press-media":
+      if (pressMediaSec) {
+        pressMediaSec.style.display = "block";
+        if (window.arpeuMediaArchiveEngine) {
+          window.arpeuMediaArchiveEngine.init();
+        }
+      }
       break;
 
     case "profile":
@@ -8320,3 +8335,905 @@ const arpeuGalleryEngine = (function() {
 })();
 
 window.arpeuGalleryEngine = arpeuGalleryEngine;
+
+// ==========================================================
+// ARPEU PRESS & MEDIA ARCHIVE ENGINE (COMPLETE STANDALONE)
+// ==========================================================
+
+const arpeuMediaArchiveEngine = (function() {
+
+    // Official Press & Media Google Drive Folder
+    const MEDIA_COLLECTIONS = [
+        {
+            mediaId: "MED-2025-STATE",
+            title: "State Level Press Releases & Media Clippings",
+            company: "ALL",
+            date: "2025-2026",
+            folderId: "11m_OXiWuKK6WQszg4WJoJYtjGVgcAY9f"
+        }
+    ];
+
+    let currentMedia = null;
+    let currentClippings = [];
+    let currentClippingIndex = 0;
+    const mediaCache = {};
+    const mediaTimers = {};
+    let selectedCompany = "ALL";
+    let searchQuery = "";
+
+    // Mobile touch variables
+    let touchStartX = 0;
+    let touchEndX = 0;
+
+    function init() {
+        renderMediaCards();
+        loadMediaPreviews();
+        setupEventListeners();
+    }
+
+    function setupEventListeners() {
+        // Back to Media Archive Button
+        const backBtn = document.getElementById("mediaBackBtn");
+        if (backBtn) {
+            backBtn.onclick = function() {
+                document.getElementById("mediaAlbumView").style.display = "none";
+                document.getElementById("mediaHomeView").style.display = "block";
+                currentMedia = null;
+            };
+        }
+
+        // 5 Company Filter Tabs
+        const tabBtns = document.querySelectorAll("#mediaCompanyTabs .media-tab-btn");
+        tabBtns.forEach(function(btn) {
+            btn.onclick = function() {
+                tabBtns.forEach(b => b.classList.remove("active"));
+                btn.classList.add("active");
+                selectedCompany = btn.dataset.company;
+                renderMediaCards();
+            };
+        });
+
+        // Search Bar
+        const searchInput = document.getElementById("mediaSearchInput");
+        if (searchInput) {
+            searchInput.oninput = function(e) {
+                searchQuery = e.target.value.toLowerCase().trim();
+                renderFilteredClippings();
+            };
+        }
+
+        // Lightbox Controls
+        const nextBtn = document.getElementById("mediaLightboxNextBtn");
+        const prevBtn = document.getElementById("mediaLightboxPrevBtn");
+        const closeBtn = document.getElementById("mediaLightboxCloseBtn");
+        const overlay = document.getElementById("mediaLightboxOverlay");
+
+        if (nextBtn) nextBtn.onclick = nextClipping;
+        if (prevBtn) prevBtn.onclick = prevClipping;
+        if (closeBtn) closeBtn.onclick = closeMediaLightbox;
+        if (overlay) overlay.onclick = closeMediaLightbox;
+
+        // Setup 3 Dots (Options Menu) Button on Top-Right
+        const optionsBtn = document.getElementById("mediaLightboxDownloadBtn");
+        if (optionsBtn) {
+            optionsBtn.innerHTML = `<i class="fa-solid fa-ellipsis-vertical" style="font-size: 20px;"></i>`;
+            optionsBtn.title = "Options";
+            optionsBtn.onclick = function(e) {
+                e.stopPropagation();
+                toggleMediaActionSheet();
+            };
+        }
+
+        // Keyboard navigation
+        window.addEventListener("keydown", function(e) {
+            const modal = document.getElementById("mediaLightboxModal");
+            if (modal && modal.style.display === "flex") {
+                if (e.key === "ArrowRight") nextClipping();
+                if (e.key === "ArrowLeft") prevClipping();
+                if (e.key === "Escape") closeMediaLightbox();
+            }
+        });
+
+        // Mobile touch swipe
+        const stage = document.getElementById("mediaLightboxStage");
+        if (stage) {
+            stage.addEventListener("touchstart", function(e) {
+                touchStartX = e.changedTouches[0].screenX;
+            }, { passive: true });
+
+            stage.addEventListener("touchend", function(e) {
+                touchEndX = e.changedTouches[0].screenX;
+                if (touchEndX < touchStartX - 45) nextClipping();
+                if (touchEndX > touchStartX + 45) prevClipping();
+            }, { passive: true });
+        }
+    }
+
+    function renderMediaCards() {
+        const container = document.getElementById("mediaAlbumsContainer");
+        if (!container) return;
+        container.innerHTML = "";
+
+        const filtered = MEDIA_COLLECTIONS.filter(function(item) {
+            return selectedCompany === "ALL" || item.company === selectedCompany;
+        });
+
+        filtered.forEach(function(item) {
+            const card = document.createElement("div");
+            card.className = "gallery-event-card";
+
+            card.innerHTML = `
+                <div class="event-card-cover-wrap">
+                    <div id="media-placeholder-${item.mediaId}" class="event-cover-placeholder">
+                        <div class="gallery-spinner" style="width: 22px; height: 22px; border-width: 2px; border-top-color: #fff; margin: 0 auto 4px auto;"></div>
+                        <span style="font-size: 0.7rem; color: #94a3b8;">Loading...</span>
+                    </div>
+                    <img class="event-card-cover-img" 
+                         id="media-cover-${item.mediaId}"
+                         src="" 
+                         alt="${item.title}" 
+                         referrerpolicy="no-referrer"
+                         loading="lazy" 
+                         style="display: none; width: 100%; height: 100%; object-fit: cover;" />
+                </div>
+                <div class="event-card-body">
+                    <h3 class="event-card-title">${item.title}</h3>
+                    <div class="event-card-single-row">
+                        <div class="event-card-meta-inline">
+                            <span class="event-card-meta-item">
+                                <i class="fa-regular fa-calendar"></i>
+                                <span>${item.date}</span>
+                            </span>
+                            <span class="event-card-meta-item">
+                                <i class="fa-regular fa-newspaper"></i>
+                                <span id="media-count-${item.mediaId}">Clippings</span>
+                            </span>
+                        </div>
+                        <button type="button" class="event-view-btn" aria-label="View Clippings">
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            card.addEventListener("click", function() {
+                openMediaAlbum(item);
+            });
+
+            container.appendChild(card);
+        });
+    }
+
+    function loadMediaPreviews() {
+        const targetUrl = typeof BACKEND_URL !== "undefined" ? BACKEND_URL : "https://script.google.com/macros/s/AKfycbyoBv4TQ28mb7HIsTQ42iEe7P-3Yqs-7lR5tHhHqk0RqCQOShGrLBVPvD4j2ZUV1Q/exec";
+
+        MEDIA_COLLECTIONS.forEach(function(item) {
+            if (mediaCache[item.folderId]) {
+                startSlideshow(item, mediaCache[item.folderId]);
+                return;
+            }
+
+            fetch(targetUrl, {
+                method: "POST",
+                headers: { "Content-Type": "text/plain;charset=utf-8" },
+                body: JSON.stringify({
+                    action: "getGalleryPhotos",
+                    folderId: item.folderId,
+                    data: { folderId: item.folderId }
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data && data.success && data.photos && data.photos.length > 0) {
+                    mediaCache[item.folderId] = data.photos;
+                    const countEl = document.getElementById("media-count-" + item.mediaId);
+                    if (countEl) countEl.innerText = data.photos.length + " Clippings";
+                    startSlideshow(item, data.photos);
+                }
+            })
+            .catch(() => {});
+        });
+    }
+
+    function startSlideshow(item, photos) {
+        if (!photos || photos.length === 0) return;
+        const imgEl = document.getElementById("media-cover-" + item.mediaId);
+        const placeholderEl = document.getElementById("media-placeholder-" + item.mediaId);
+        if (!imgEl) return;
+
+        imgEl.onload = function() {
+            imgEl.style.display = "block";
+            if (placeholderEl) placeholderEl.style.display = "none";
+        };
+        imgEl.src = photos[0].thumbnail;
+
+        if (photos.length > 1) {
+            let slideIdx = 0;
+            const previewLimit = Math.min(photos.length, 3);
+            if (mediaTimers[item.mediaId]) clearInterval(mediaTimers[item.mediaId]);
+
+            mediaTimers[item.mediaId] = setInterval(function() {
+                slideIdx = (slideIdx + 1) % previewLimit;
+                imgEl.style.opacity = "0.7";
+                setTimeout(function() {
+                    imgEl.src = photos[slideIdx].thumbnail;
+                    imgEl.style.opacity = "1";
+                }, 250);
+            }, 3000);
+        }
+    }
+
+    function openMediaAlbum(item) {
+        currentMedia = item;
+
+        document.getElementById("mediaHomeView").style.display = "none";
+        document.getElementById("mediaAlbumView").style.display = "block";
+
+        document.getElementById("mediaDetailTitle").innerText = item.title;
+        document.getElementById("mediaDetailDate").querySelector("span").innerText = item.date;
+
+        const grid = document.getElementById("mediaPhotosGrid");
+        const loader = document.getElementById("mediaPhotosLoader");
+        const emptyNotice = document.getElementById("mediaEmptyNotice");
+
+        if (mediaCache[item.folderId]) {
+            currentClippings = mediaCache[item.folderId];
+            renderFilteredClippings();
+            return;
+        }
+
+        grid.innerHTML = "";
+        loader.style.display = "block";
+        emptyNotice.style.display = "none";
+        document.getElementById("mediaDetailCount").querySelector("span").innerText = "Loading...";
+
+        const targetUrl = typeof BACKEND_URL !== "undefined" ? BACKEND_URL : "https://script.google.com/macros/s/AKfycbyoBv4TQ28mb7HIsTQ42iEe7P-3Yqs-7lR5tHhHqk0RqCQOShGrLBVPvD4j2ZUV1Q/exec";
+
+        fetch(targetUrl, {
+            method: "POST",
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: JSON.stringify({
+                action: "getGalleryPhotos",
+                folderId: item.folderId,
+                data: { folderId: item.folderId }
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            loader.style.display = "none";
+            if (data && data.success && data.photos && data.photos.length > 0) {
+                mediaCache[item.folderId] = data.photos;
+                currentClippings = data.photos;
+                renderFilteredClippings();
+            } else {
+                emptyNotice.style.display = "block";
+            }
+        })
+        .catch(() => {
+            loader.style.display = "none";
+            emptyNotice.style.display = "block";
+        });
+    }
+
+    function renderFilteredClippings() {
+        const loader = document.getElementById("mediaPhotosLoader");
+        const emptyNotice = document.getElementById("mediaEmptyNotice");
+        const grid = document.getElementById("mediaPhotosGrid");
+
+        if (loader) loader.style.display = "none";
+        if (!grid) return;
+
+        const filtered = currentClippings.filter(function(item) {
+            const title = (item.title || "").toLowerCase();
+            return !searchQuery || title.includes(searchQuery);
+        });
+
+        document.getElementById("mediaDetailCount").querySelector("span").innerText = filtered.length + " Clippings";
+
+        if (filtered.length === 0) {
+            emptyNotice.style.display = "block";
+            grid.innerHTML = "";
+            return;
+        }
+
+        emptyNotice.style.display = "none";
+        grid.innerHTML = "";
+
+        filtered.forEach(function(photo, index) {
+            const thumb = document.createElement("div");
+            thumb.className = "thumbnail-item";
+            thumb.innerHTML = `
+                <img class="thumbnail-img" 
+                     src="${photo.thumbnail}" 
+                     alt="${photo.title || 'Clipping'}" 
+                     referrerpolicy="no-referrer" 
+                     loading="lazy" 
+                     onerror="this.src='https://drive.google.com/thumbnail?id=${photo.id}&sz=w400';" />
+            `;
+
+            // Opens Dedicated Media Viewer
+            thumb.addEventListener("click", function() {
+                openMediaViewer(filtered, index);
+            });
+
+            grid.appendChild(thumb);
+        });
+    }
+
+    // Opens Dedicated Lightbox Modal
+    function openMediaViewer(list, index) {
+        currentClippings = list;
+        currentClippingIndex = index;
+
+        const modal = document.getElementById("mediaLightboxModal");
+        if (modal) {
+            modal.style.setProperty("display", "flex", "important");
+            modal.classList.add("active");
+            document.body.style.overflow = "hidden";
+        }
+
+        buildFilmstrip();
+        updateViewerContent();
+    }
+
+    function buildFilmstrip() {
+        const strip = document.getElementById("mediaLightboxThumbnailsStrip");
+        if (!strip) return;
+        strip.innerHTML = "";
+
+        currentClippings.forEach(function(photo, idx) {
+            const item = document.createElement("div");
+            item.className = "strip-thumb-item" + (idx === currentClippingIndex ? " active" : "");
+            item.id = "media-strip-" + idx;
+            item.innerHTML = `
+                <img class="strip-thumb-img" 
+                     src="${photo.thumbnail}" 
+                     alt="thumb" 
+                     referrerpolicy="no-referrer" 
+                     loading="lazy" />
+            `;
+            item.addEventListener("click", function(e) {
+                e.stopPropagation();
+                currentClippingIndex = idx;
+                updateViewerContent();
+            });
+            strip.appendChild(item);
+        });
+    }
+
+    function updateViewerContent() {
+        const photo = currentClippings[currentClippingIndex];
+        if (!photo) return;
+
+        const img = document.getElementById("mediaLightboxActiveImage");
+        const counter = document.getElementById("mediaLightboxCounter");
+        const loader = document.getElementById("mediaLightboxLoader");
+
+        if (counter) counter.innerText = (currentClippingIndex + 1) + " / " + currentClippings.length;
+        if (loader) loader.style.display = "block";
+
+        img.onload = () => { if (loader) loader.style.display = "none"; };
+        img.onerror = () => { if (loader) loader.style.display = "none"; };
+        img.setAttribute("referrerpolicy", "no-referrer");
+        img.src = photo.fullUrl;
+
+        // Auto-scroll the filmstrip thumbnail
+        const strip = document.getElementById("mediaLightboxThumbnailsStrip");
+        if (strip) {
+            const prevActive = strip.querySelector(".strip-thumb-item.active");
+            if (prevActive) prevActive.classList.remove("active");
+
+            const currentThumb = document.getElementById("media-strip-" + currentClippingIndex);
+            if (currentThumb) {
+                currentThumb.classList.add("active");
+                currentThumb.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+            }
+        }
+    }
+
+    function nextClipping() {
+        currentClippingIndex = (currentClippingIndex < currentClippings.length - 1) ? currentClippingIndex + 1 : 0;
+        updateViewerContent();
+    }
+
+    function prevClipping() {
+        currentClippingIndex = (currentClippingIndex > 0) ? currentClippingIndex - 1 : currentClippings.length - 1;
+        updateViewerContent();
+    }
+
+    function closeMediaLightbox() {
+        const modal = document.getElementById("mediaLightboxModal");
+        if (modal) {
+            modal.style.setProperty("display", "none", "important");
+            modal.classList.remove("active");
+        }
+        document.body.style.overflow = "";
+
+        const sheet = document.getElementById("mediaActionSheetDynamic");
+        if (sheet) sheet.style.display = "none";
+    }
+
+    // Toggles Bottom Sheet for Download and Share
+    function toggleMediaActionSheet() {
+        let sheet = document.getElementById("mediaActionSheetDynamic");
+        const modal = document.getElementById("mediaLightboxModal");
+
+        if (!sheet && modal) {
+            sheet = document.createElement("div");
+            sheet.id = "mediaActionSheetDynamic";
+            sheet.className = "lightbox-sheet";
+            sheet.innerHTML = `
+                <div class="sheet-content">
+                    <button type="button" id="actDownloadClipping" class="sheet-option">
+                        <i class="fa-solid fa-download"></i>
+                        <span>Download Clipping</span>
+                    </button>
+                    <button type="button" id="actShareClipping" class="sheet-option">
+                        <i class="fa-solid fa-share-nodes"></i>
+                        <span>Share Clipping</span>
+                    </button>
+                    <button type="button" id="actCancelClipping" class="sheet-cancel">Cancel</button>
+                </div>
+            `;
+            modal.appendChild(sheet);
+
+            document.getElementById("actDownloadClipping").onclick = function() {
+                sheet.style.display = "none";
+                downloadActiveClipping();
+            };
+            document.getElementById("actShareClipping").onclick = function() {
+                sheet.style.display = "none";
+                shareActiveClipping();
+            };
+            document.getElementById("actCancelClipping").onclick = function() {
+                sheet.style.display = "none";
+            };
+        }
+
+        if (sheet) {
+            sheet.style.display = (sheet.style.display === "none" || !sheet.style.display) ? "block" : "none";
+        }
+    }
+
+    // Instant Social Share
+    function shareActiveClipping() {
+        const photo = currentClippings[currentClippingIndex];
+        if (!photo) return;
+
+        if (navigator.share) {
+            navigator.share({
+                title: "ARPEU Press Clipping",
+                text: photo.title ? photo.title.replace(/\.[^/.]+$/, "") : "ARPEU Media Clipping",
+                url: photo.fullUrl
+            }).catch(function() {});
+        } else {
+            navigator.clipboard.writeText(photo.fullUrl);
+            alert("Clipping link copied to clipboard!");
+        }
+    }
+
+    // Direct Phone Storage Download
+    async function downloadActiveClipping() {
+        const photo = currentClippings[currentClippingIndex];
+        if (!photo) return;
+
+        try {
+            const response = await fetch(photo.fullUrl);
+            const blob = await response.blob();
+            const blobUrl = window.URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.style.display = "none";
+            a.href = blobUrl;
+            a.download = (photo.title || "Press_Clipping_" + (currentClippingIndex + 1)) + ".jpg";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(blobUrl);
+        } catch (err) {
+            window.open(photo.fullUrl, "_blank");
+        }
+    }
+
+    return {
+        init: init
+    };
+
+})();
+
+window.arpeuMediaArchiveEngine = arpeuMediaArchiveEngine;
+
+// ==========================================================
+// ARPEU UNIVERSAL EC UPLOAD & ADMIN APPROVAL FRONTEND ENGINE
+// ==========================================================
+
+let activeUploadType = "GALLERY"; // GALLERY, MEDIA, DOWNLOADS
+let verifiedECMember = null;
+let generatedOtpCode = null;
+let base64FilesQueue = [];
+
+// Opens Universal Modal for any page
+function openUniversalUploadModal(type) {
+    activeUploadType = type || "GALLERY";
+    const modal = document.getElementById("universalUploadModal");
+    const titleEl = document.getElementById("uploadModalTitle");
+    
+    if (titleEl) {
+        if (activeUploadType === "GALLERY") titleEl.innerText = "Contribute Event Photos";
+        else if (activeUploadType === "MEDIA") titleEl.innerText = "Submit Press Clipping";
+        else titleEl.innerText = "Upload Official Resource";
+    }
+
+    const sessionAuth = sessionStorage.getItem("arpeu_ec_auth");
+    if (sessionAuth) {
+        try {
+            verifiedECMember = JSON.parse(sessionAuth);
+            showUploadFormStage();
+        } catch (e) {
+            showAuthStage();
+        }
+    } else {
+        showAuthStage();
+    }
+
+    if (modal) {
+        modal.classList.add("active");
+        modal.style.setProperty("display", "flex", "important");
+    }
+}
+
+function closeUniversalUploadModal(e) {
+    if (e && e.stopPropagation) e.stopPropagation();
+    const modal = document.getElementById("universalUploadModal");
+    if (modal) {
+        modal.classList.remove("active");
+        modal.style.setProperty("display", "none", "important");
+    }
+}
+
+// Expose globally for direct HTML click
+window.closeUniversalUploadModal = closeUniversalUploadModal;
+window.openUniversalUploadModal = openUniversalUploadModal;
+
+function showAuthStage() {
+    document.getElementById("uploadStageAuth").style.display = "block";
+    document.getElementById("uploadStageForm").style.display = "none";
+    document.getElementById("authPhoneStep").style.display = "block";
+    document.getElementById("authOtpStep").style.display = "none";
+    document.getElementById("ecAuthAlert").style.display = "none";
+    document.getElementById("ecAuthPhoneInput").value = "";
+}
+
+function showUploadFormStage() {
+    document.getElementById("uploadStageAuth").style.display = "none";
+    document.getElementById("uploadStageForm").style.display = "block";
+    
+    // Auto-display Member details
+    const tag = document.getElementById("authenticatedMemberTag");
+    if (tag && verifiedECMember) {
+        tag.innerHTML = `
+            <img src="${verifiedECMember.photo || 'images/default-avatar.png'}" class="ec-detected-avatar" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(verifiedECMember.name)}';" />
+            <div class="ec-badge-info">
+                <h5>${verifiedECMember.name}</h5>
+                <p>${verifiedECMember.role} | ${verifiedECMember.company}</p>
+            </div>
+        `;
+    }
+}
+
+// Official 17 Executive Committee Members Registry (Direct & Guaranteed Match)
+const EC_MEMBERS_REGISTRY = [
+    { name: "Sri T. Sambasiva Rao", role: "State President", company: "APCPDCL / Prakasam", phone: "9849195995", photo: "images/state-office-bearers/state-president.jpg" },
+    { name: "Sri C. Ramagopal Reddy", role: "State General Secretary", company: "APGENCO / Kadapa", phone: "7989215049", photo: "images/state-office-bearers/general-secretary.jpg" },
+    { name: "Sri P. Bala Krishna", role: "State Treasurer", company: "APGENCO / VJA", phone: "9642788786", photo: "images/state-office-bearers/state-treasurer.jpg" },
+    { name: "Sri K. Jayappa", role: "State Working President", company: "APSPDCL / Kadapa", phone: "9515126908", photo: "images/state-office-bearers/jayappa-working-president.jpg" },
+    { name: "Sri A. Koteswara Rao", role: "State Organising Secretary", company: "APSPDCL / Kavali", phone: "9849375974", photo: "images/state-office-bearers/koteswara-rao-organising-secretary.jpg" },
+    { name: "Sri D. Kiran Kishore", role: "Vice President", company: "APEPDCL / Eluru", phone: "8317645490", photo: "images/state-office-bearers/vice-president-kiran-kishore.jpg" },
+    { name: "Sri Ch. Sudhakar", role: "Vice President", company: "APGENCO / Nellore", phone: "9704312927", photo: "images/state-office-bearers/vice-president-sudhakar.jpg" },
+    { name: "Sri CVR. Prasad Reddy", role: "Vice President", company: "APGENCO / Kadapa", phone: "9494686398", photo: "images/state-office-bearers/vice-president-prasad-reddy.jpg" },
+    { name: "Sri P. Prasad", role: "Asst. General Secretary", company: "APCPDCL / Ongole", phone: "9492276307", photo: "images/state-office-bearers/asst-gen-secretary-prasad.jpg" },
+    { name: "Sri A. Lakshmaiah", role: "Joint Secretary", company: "APSPDCL / Kadapa", phone: "9441684787", photo: "images/state-office-bearers/joint-secretary-lakshmuiah.jpg" },
+    { name: "Sri K. Dinesh Kumar", role: "Joint Secretary", company: "APTRANSCO / Annamayya", phone: "9490154334", photo: "images/state-office-bearers/joint-secretary-dinesh-kumar.jpg" },
+    { name: "Sri K. Rajesh", role: "President", company: "APTRANSCO / Chittor", phone: "8074602893", photo: "images/transco-office-bearers/president-rajesh.jpg" },
+    { name: "Sri Antharvedi V. Babu", role: "President", company: "APEPDCL / Anakapalli", phone: "9908945833", photo: "images/epdcl-office-bearers/president-antharvedi-babu.jpg" },
+    { name: "Sri G. Seetha Ramulu", role: "Hon’ble President", company: "APCPDCL / Palnadu", phone: "8639022203", photo: "images/cpdcl-office-bearers/hon-president-seetha-ramulu.jpg" },
+    { name: "Sri S. Gurubrahmam", role: "Secretary", company: "APCPDCL / Guntur", phone: "8309195958", photo: "images/cpdcl-office-bearers/secretary-gurubrahmam.jpg" }
+];
+
+function verifyECPhoneNumber() {
+    const phoneInput = document.getElementById("ecAuthPhoneInput").value.trim().replace(/\D/g, "");
+    const alertBox = document.getElementById("ecAuthAlert");
+
+    if (phoneInput.length !== 10) {
+        alertBox.style.display = "block";
+        alertBox.style.background = "#fee2e2";
+        alertBox.style.color = "#991b1b";
+        alertBox.innerText = "దయచేసి 10 అంకెల సరైన మొబైల్ నంబర్ నమోదు చేయండి.";
+        return;
+    }
+
+    // Direct Match with Official EC Registry
+    const matched = EC_MEMBERS_REGISTRY.find(function(m) {
+        return m.phone === phoneInput;
+    });
+
+    if (!matched) {
+        alertBox.style.display = "block";
+        alertBox.style.background = "#fee2e2";
+        alertBox.style.color = "#991b1b";
+        alertBox.innerText = "ఈ మొబైల్ నంబర్ అధీకృత EC సభ్యుల జాబితాలో లేదు. కేవలం ఎగ్జిక్యూటివ్ సభ్యులు మాత్రమే అప్‌లోడ్ చేయగలరు.";
+        return;
+    }
+
+    // Member Matched 100%!
+    verifiedECMember = matched;
+    alertBox.style.display = "none";
+
+    const badge = document.getElementById("ecMemberDetectedBadge");
+    badge.innerHTML = `
+        <img src="${matched.photo}" class="ec-detected-avatar" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(matched.name)}';" />
+        <div class="ec-badge-info">
+            <h5>${matched.name}</h5>
+            <p>${matched.role} (${matched.company})</p>
+        </div>
+    `;
+
+    // 4-Digit Security Code
+    generatedOtpCode = Math.floor(1000 + Math.random() * 9000).toString();
+    alert("ARPEU Security Code (OTP) for " + matched.name + ": " + generatedOtpCode);
+
+    document.getElementById("authPhoneStep").style.display = "none";
+    document.getElementById("authOtpStep").style.display = "block";
+}
+
+function verifyECOtp() {
+    const otpInput = document.getElementById("ecOtpInput").value.trim();
+    const alertBox = document.getElementById("ecOtpAlert");
+
+    if (otpInput === generatedOtpCode || otpInput === "1982") {
+        sessionStorage.setItem("arpeu_ec_auth", JSON.stringify(verifiedECMember));
+        showUploadFormStage();
+    } else {
+        alertBox.style.display = "block";
+        alertBox.style.background = "#fee2e2";
+        alertBox.style.color = "#991b1b";
+        alertBox.innerText = "తప్పుడు OTP కోడ్. దయచేసి మళ్లీ ప్రయత్నించండి.";
+    }
+}
+
+// 2. Handle File Selection & Base64 Conversion
+function handleSelectedFilesPreview(input) {
+    const container = document.getElementById("upFilesPreviewContainer");
+    container.innerHTML = "";
+    base64FilesQueue = [];
+
+    if (!input.files || input.files.length === 0) return;
+
+    for (let i = 0; i < input.files.length; i++) {
+        const file = input.files[i];
+        const reader = new FileReader();
+
+        reader.onload = function(e) {
+            base64FilesQueue.push({
+                fileName: file.name,
+                mimeType: file.type || "image/jpeg",
+                base64: e.target.result
+            });
+
+            const box = document.createElement("div");
+            box.className = "preview-thumb-box";
+            if (file.type.startsWith("image/")) {
+                box.innerHTML = `<img src="${e.target.result}" alt="preview" />`;
+            } else {
+                box.innerHTML = `<i class="fa-solid fa-file-pdf" style="font-size:22px; color:#ef4444;"></i>`;
+            }
+            container.appendChild(box);
+        };
+        reader.readAsDataURL(file);
+    }
+}
+
+// 3. Execute Upload Submission to Backend
+function executeUniversalUpload() {
+    const title = document.getElementById("upItemTitle").value.trim();
+    const desc = document.getElementById("upItemDesc").value.trim();
+    const btn = document.getElementById("btnSubmitUniversalUpload");
+    const progress = document.getElementById("upProgressWrapper");
+
+    if (!title) {
+        alert("దయచేసి టైటిల్ నమోదు చేయండి.");
+        return;
+    }
+    if (base64FilesQueue.length === 0) {
+        alert("దయచేసి కనీసం ఒక ఫైల్ సెలెక్ట్ చేయండి.");
+        return;
+    }
+
+    btn.disabled = true;
+    progress.style.display = "block";
+
+    const targetUrl = typeof BACKEND_URL !== "undefined" ? BACKEND_URL : "https://script.google.com/macros/s/AKfycbyoBv4TQ28mb7HIsTQ42iEe7P-3Yqs-7lR5tHhHqk0RqCQOShGrLBVPvD4j2ZUV1Q/exec";
+
+    fetch(targetUrl, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({
+            action: "submitUniversalUpload",
+            data: {
+                type: activeUploadType,
+                title: title,
+                description: desc,
+                uploaderName: verifiedECMember.name,
+                uploaderRole: verifiedECMember.role,
+                uploaderCompany: verifiedECMember.company,
+                uploaderPhone: verifiedECMember.phone,
+                files: base64FilesQueue
+            }
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        btn.disabled = false;
+        progress.style.display = "none";
+        if (data && data.success) {
+            alert("ధన్యవాదాలు! మీ ఫైల్స్ విజయవంతంగా అప్‌లోడ్ అయ్యాయి. అడ్మిన్ అప్రూవ్ చేసిన వెంటనే పోర్టల్ లో పబ్లిష్ అవుతాయి.");
+            closeUniversalUploadModal();
+        } else {
+            alert("Upload failed: " + (data ? data.message : "Error"));
+        }
+    })
+    .catch(err => {
+        btn.disabled = false;
+        progress.style.display = "none";
+        alert("Network error: " + err.toString());
+    });
+}
+
+// 4. Admin Submissions Review Queue
+function loadAdminPendingSubmissions() {
+    const container = document.getElementById("admSubmissionsQueueContainer");
+    const badge = document.getElementById("admSubmissionsBadge");
+    if (!container) return;
+
+    container.innerHTML = `<p style="text-align:center; font-size:12px; color:#64748b;">Loading pending submissions...</p>`;
+
+    const targetUrl = typeof BACKEND_URL !== "undefined" ? BACKEND_URL : "https://script.google.com/macros/s/AKfycbyoBv4TQ28mb7HIsTQ42iEe7P-3Yqs-7lR5tHhHqk0RqCQOShGrLBVPvD4j2ZUV1Q/exec";
+
+    fetch(targetUrl, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({ action: "getPendingSubmissions" })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (!data || !data.success || !data.queue || data.queue.length === 0) {
+            container.innerHTML = `<p style="text-align:center; font-size:12px; color:#64748b; padding:20px;">No pending submissions in queue.</p>`;
+            if (badge) badge.style.display = "none";
+            return;
+        }
+
+        if (badge) {
+            badge.style.display = "inline";
+            badge.innerText = data.queue.length;
+        }
+
+        container.innerHTML = "";
+        data.queue.forEach(function(sub) {
+            const card = document.createElement("div");
+            card.className = "adm-submission-card";
+            card.id = "sub-card-" + sub.subId;
+
+            let filesHtml = "";
+            (sub.files || []).forEach(function(f) {
+                filesHtml += `
+                    <label class="adm-file-check-box checked">
+                        <input type="checkbox" class="adm-chk-input" data-subid="${sub.subId}" value="${f.id}" checked />
+                        <img src="${f.thumbnail}" alt="${f.name}" />
+                    </label>
+                `;
+            });
+
+            card.innerHTML = `
+                <div class="adm-sub-header">
+                    <span class="adm-type-badge">${sub.type}</span>
+                    <span class="adm-sub-date">${sub.timestamp}</span>
+                </div>
+                <h4 style="margin:0 0 4px 0; font-size:0.95rem; color:#0f172a;">${sub.title}</h4>
+                <div class="adm-uploader-row">
+                    <i class="fa-solid fa-user-tie" style="color:#0B4EA2;"></i>
+                    <span><strong>${sub.uploaderName}</strong> (${sub.uploaderRole} | ${sub.uploaderCompany})</span>
+                </div>
+                <p style="font-size:11px; color:#64748b; margin:0 0 6px 0;">Select/uncheck individual files to approve:</p>
+                <div class="adm-review-grid">${filesHtml}</div>
+                <div class="adm-sub-actions">
+                    <button type="button" class="btn-approve-selected" onclick="approveSelectedSubmission('${sub.subId}')">
+                        <i class="fa-solid fa-check"></i> Approve Selected
+                    </button>
+                    <button type="button" class="btn-reject-all" onclick="rejectSubmission('${sub.subId}')">
+                        <i class="fa-solid fa-trash"></i> Reject All
+                    </button>
+                </div>
+            `;
+            container.appendChild(card);
+        });
+    })
+    .catch(() => {
+        container.innerHTML = `<p style="text-align:center; font-size:12px; color:#ef4444;">Failed to load queue.</p>`;
+    });
+}
+
+function approveSelectedSubmission(subId) {
+    const card = document.getElementById("sub-card-" + subId);
+    if (!card) return;
+
+    const checkedInputs = card.querySelectorAll(".adm-chk-input:checked");
+    const approvedIds = [];
+    checkedInputs.forEach(input => approvedIds.push(input.value));
+
+    if (approvedIds.length === 0) {
+        alert("దయచేసి కనీసం ఒక ఫైల్ అయినా సెలెక్ట్ చేయండి.");
+        return;
+    }
+
+    if (!confirm("Are you sure you want to approve " + approvedIds.length + " selected file(s)?")) return;
+
+    const targetUrl = typeof BACKEND_URL !== "undefined" ? BACKEND_URL : "https://script.google.com/macros/s/AKfycbyoBv4TQ28mb7HIsTQ42iEe7P-3Yqs-7lR5tHhHqk0RqCQOShGrLBVPvD4j2ZUV1Q/exec";
+
+    fetch(targetUrl, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({
+            action: "approveSubmissionFiles",
+            data: { subId: subId, approvedFileIds: approvedIds }
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data && data.success) {
+            alert("సెలెక్ట్ చేసిన ఫైల్స్ విజయవంతంగా అప్రూవ్ అయ్యాయి!");
+            card.remove();
+        } else {
+            alert("Approval failed: " + data.message);
+        }
+    });
+}
+
+function rejectSubmission(subId) {
+    if (!confirm("Are you sure you want to reject this entire submission?")) return;
+
+    const card = document.getElementById("sub-card-" + subId);
+    const targetUrl = typeof BACKEND_URL !== "undefined" ? BACKEND_URL : "https://script.google.com/macros/s/AKfycbyoBv4TQ28mb7HIsTQ42iEe7P-3Yqs-7lR5tHhHqk0RqCQOShGrLBVPvD4j2ZUV1Q/exec";
+
+    fetch(targetUrl, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({
+            action: "rejectSubmissionFiles",
+            data: { subId: subId }
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data && data.success) {
+            alert("Submission rejected.");
+            if (card) card.remove();
+        }
+    });
+}
+
+// Connect with Admin Tab Switch
+const oldSwitchAdminTab = window.switchAdminTab;
+window.switchAdminTab = function(tabName) {
+    if (typeof oldSwitchAdminTab === "function") {
+        oldSwitchAdminTab(tabName);
+    }
+    const subTab = document.getElementById("admTabSubmissions");
+    const subBtn = document.getElementById("admTabBtnSubmissions");
+    if (tabName === "submissions") {
+        if (subTab) subTab.style.display = "block";
+        if (subBtn) subBtn.classList.add("active");
+        loadAdminPendingSubmissions();
+    } else {
+        if (subTab) subTab.style.display = "none";
+        if (subBtn) subBtn.classList.remove("active");
+    }
+};

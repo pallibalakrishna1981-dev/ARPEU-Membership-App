@@ -22,7 +22,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="#0B4EA2">
 <meta name="apple-mobile-web-app-title" content="ARPEU Portal">
 
-<link rel="stylesheet" href="css/style.css?v=2050">
+<link rel="stylesheet" href="css/style.css?v=2051">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
@@ -172,7 +172,11 @@
                 <i class="fa-solid fa-download"></i>
                 <span>Downloads</span>
             </a>
-
+            <!-- Press & Media Archive Menu Link -->
+            <a href="#" id="navPressMedia" onclick="showPage('pressMedia'); return false;">
+                <i class="fa-solid fa-newspaper"></i>
+                <span>Press & Media Archive</span>
+            </a>
             <!-- 🌟 Diary & Advertisements -->
             <a href="#" class="dropdown-item" onclick="showPage('diary'); return false;">
                 <i class="fa-solid fa-book-bookmark text-warning"></i>
@@ -2956,6 +2960,9 @@
             <div class="gallery-banner-content">
                 <h1 class="gallery-heading">Gallery</h1>
                 <p class="gallery-subheading">Moments that Strengthen Our Union</p>
+                <button type="button" class="btn-upload-banner" onclick="openUniversalUploadModal('GALLERY')">
+                    <i class="fa-solid fa-cloud-arrow-up"></i> Contribute Photos
+                </button>
             </div>
         </div>
 
@@ -3287,20 +3294,28 @@
 ========================================================= -->
 <section id="downloadsSection" class="downloads-page" style="display:none;">
 
-    <!-- 1. Hero / Title Banner Section -->
+ <!-- 1. Hero / Title Banner Section -->
     <div class="dl-hero-banner">
-        <div class="dl-hero-left">
+        <!-- Top Row: Left Icon + Center Title + Right Icon -->
+        <div class="dl-hero-top-row">
             <div class="dl-hero-icon-box">
                 <i class="fa-solid fa-download"></i>
             </div>
-            <div class="dl-hero-text">
-                <h2>DOWNLOADS & RESOURCES</h2>
-                <p>Official logos, documents, forms, posters and useful resources for ARPEU members and offices.</p>
+            <h2 class="dl-hero-title">DOWNLOADS & RESOURCES</h2>
+            <div class="dl-hero-right">
+                <i class="fa-solid fa-folder-open"></i>
             </div>
         </div>
-        <div class="dl-hero-right">
-            <i class="fa-solid fa-folder-open"></i>
-        </div>
+        
+        <!-- Full-Width 2 Lines Description -->
+        <p class="dl-hero-desc">
+            Official logos, documents, forms, posters and useful resources for ARPEU members and offices.
+        </p>
+
+        <!-- Upload Resource Button -->
+        <button type="button" class="btn-upload-banner" onclick="openUniversalUploadModal('DOWNLOADS')" style="background: #0B4EA2; color: #ffffff; border: none; padding: 7px 16px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; margin-top: 6px; width: fit-content; box-shadow: 0 3px 8px rgba(11,78,162,0.3);">
+            <i class="fa-solid fa-cloud-arrow-up"></i> Upload Resource
+        </button>
     </div>
 
     <!-- 2. Section: Official Logos (JPG) -->
@@ -3317,7 +3332,7 @@
             <!-- ARPEU Founder (JPG) -->
             <div class="dl-card">
                 <div class="dl-card-preview-box">
-                    <img src="images/founder-arpeu.jpg"alt="ARPEU Founder" class="dl-preview-image">
+                    <img src="images/founder-arpeu.jpg" alt="ARPEU Founder" class="dl-preview-image">
                 </div>
                 <div class="dl-card-info">
                     <h4>ARPEU Founder</h4>
@@ -3337,14 +3352,12 @@
             <!-- BMS Founder (JPG) -->
             <div class="dl-card">
                 <div class="dl-card-preview-box">
-                     <img src="images/founder-bms.jpg"
-                        alt="BMS Founder - Dattopant Thengadi Ji"
-                        class="dl-preview-image">
-                    </div>
+                     <img src="images/founder-bms.jpg" alt="BMS Founder - Dattopant Thengadi Ji" class="dl-preview-image">
+                </div>
                 <div class="dl-card-info">
                     <h4>BMS Founder</h4>
                     <span class="dl-meta">(Dattopant Thengadi Ji)</span>
-                    <span class="dl-version">PG | 1.1 MB | Ver 1.0</span>
+                    <span class="dl-version">JPG | 1.1 MB | Ver 1.0</span>
                 </div>
                 <div class="dl-btn-row">
                     <button type="button" class="dl-btn btn-preview" onclick="openDownloadsPreview('founder-bms (Dattopant Thengadi Ji)', 'JPG', 'founder-bms.jpg')">
@@ -3417,7 +3430,7 @@
             <div class="dl-card dl-special-portrait">
                 <div class="dl-card-preview-box">
                     <div class="dl-svg-logo-wrap tricolor">
-                         <img src="images/bharat-mata.png"  alt="Bharat Mata Logo" class="dl-original-logo">
+                         <img src="images/bharat-mata.png" alt="Bharat Mata Logo" class="dl-original-logo">
                     </div>
                 </div>
                 <div class="dl-card-info">
@@ -3599,17 +3612,9 @@
         </div>
     </div>
 
-
-
-   <!-- =========================================================
-         MERGED 2-COLUMN LISTS START (FORMS, LETTERS, POSTERS, MOBILE)
-         ========================================================= -->
+    <!-- 5. Merged 2-Column Lists -->
     <div class="dl-nested-sections-grid">
-
-        <!-- కంటైనర్ 1: Forms (ఎడమ) & Official Letters (కుడి) -->
         <div class="dl-merged-card">
-            
-            <!-- ఎడమ కాలమ్: Forms -->
             <div class="dl-column-half">
                 <div class="dl-compact-header">
                     <div class="dl-list-title">
@@ -3626,11 +3631,7 @@
                     <li><span class="dl-list-icon purple-text"><i class="fa-solid fa-file-lines"></i></span> <span>Leave Letter Templates</span></li>
                 </ul>
             </div>
-
-            <!-- వర్టికల్ డివైడర్ లైన్ -->
             <div class="dl-vertical-divider"></div>
-
-            <!-- కుడి కాలమ్: Official Letters -->
             <div class="dl-column-half">
                 <div class="dl-compact-header">
                     <div class="dl-list-title">
@@ -3647,13 +3648,9 @@
                     <li><span class="dl-list-icon blue-text"><i class="fa-solid fa-envelope-open-text"></i></span> <span>Others</span></li>
                 </ul>
             </div>
-
         </div>
 
-        <!-- కంటైనర్ 2: Posters & Designs (ఎడమ) & Mobile Resources (కుడి) -->
         <div class="dl-merged-card">
-            
-            <!-- ఎడమ కాలమ్: Posters & Designs -->
             <div class="dl-column-half">
                 <div class="dl-compact-header">
                     <div class="dl-list-title">
@@ -3670,11 +3667,7 @@
                     <li><span class="dl-list-icon pink-text"><i class="fa-solid fa-image"></i></span> <span>Social Templates</span></li>
                 </ul>
             </div>
-
-            <!-- వర్టికల్ డివైడర్ లైన్ -->
             <div class="dl-vertical-divider"></div>
-
-            <!-- కుడి కాలమ్: Mobile Resources -->
             <div class="dl-column-half">
                 <div class="dl-compact-header">
                     <div class="dl-list-title">
@@ -3697,19 +3690,10 @@
                     <li><span class="dl-list-icon green-text"><i class="fa-solid fa-address-card"></i></span> <span>Digital Card Template</span></li>
                 </ul>
             </div>
-
         </div>
-
     </div>
-    <!-- =========================================================
-         MERGED 2-COLUMN LISTS END
-         ========================================================= -->
-
 
     <!-- 6. Section: Quick Links -->
-    <<!-- =========================================================
-         NEW QUICK LINKS SECTION START
-         ========================================================= -->
     <div class="dl-quick-links-section">
         <div class="dl-section-header">
             <div class="dl-title-left">
@@ -3719,7 +3703,6 @@
         </div>
 
         <div class="dl-ql-container-card">
-            <!-- వరుస 1: 6 సోషల్ మీడియా ఐకాన్లు ఒకే సరళరేఖలో -->
             <div class="dl-ql-social-row">
                 <a href="https://www.facebook.com/profile.php?id=61583326633639" target="_blank" class="dl-ql-social-btn fb-color" title="Facebook">
                     <i class="fa-brands fa-facebook-f"></i>
@@ -3741,23 +3724,16 @@
                 </a>
             </div>
 
-            <!-- అడ్డ గీత (Horizontal Divider) -->
             <div class="dl-ql-divider-horizontal"></div>
 
-            <!-- వరుస 2: ఎడమ వైపు ARPEU, కుడి వైపు BMS పక్కపక్కనే -->
             <div class="dl-ql-web-row">
-                <!-- ARPEU Website (ఎడమ) -->
                 <a href="#" class="dl-ql-web-item">
                     <div class="dl-ql-web-icon arpeu-blue-bg">
                         <i class="fa-solid fa-globe"></i>
                     </div>
                     <span class="dl-ql-web-name">ARPEU Website</span>
                 </a>
-
-                <!-- నిలువు గీత (Vertical Divider) -->
                 <div class="dl-ql-divider-vertical"></div>
-
-                <!-- BMS Andhra Pradesh Website (कुడి) -->
                 <a href="#" class="dl-ql-web-item">
                     <div class="dl-ql-web-icon bms-orange-bg">
                         <i class="fa-solid fa-globe"></i>
@@ -3767,9 +3743,6 @@
             </div>
         </div>
     </div>
-    <!-- =========================================================
-         NEW QUICK LINKS SECTION END
-         ========================================================= -->
 
 </section>
 
@@ -4187,7 +4160,118 @@
      DOWNLOADS & RESOURCES SECTION END
 ========================================================= -->
 
+<!-- ==========================================================
+     PRESS & MEDIA ARCHIVE (100% STANDALONE & SAFE)
+     ========================================================== -->
+<section id="pressMediaSection" class="page gallery-page-container" style="display: none;">
+    
+    <!-- Media Home View -->
+    <div id="mediaHomeView" class="gallery-subview">
+        <div class="gallery-banner" style="background: linear-gradient(135deg, #0d3b66 0%, #001e3d 100%);">
+            <div class="gallery-banner-content">
+                <h1 class="gallery-heading">Press & Media Archive</h1>
+                <p class="gallery-subheading">Preserving Our Union's History, News & Publications</p>
+                <button type="button" class="btn-upload-banner" onclick="openUniversalUploadModal('MEDIA')">
+                    <i class="fa-solid fa-cloud-arrow-up"></i> Submit Press Clipping
+                </button>
+            </div>
+        </div>
 
+        <!-- 5 Companies Filter Bar -->
+        <div class="media-filter-bar">
+            <div class="media-year-tabs" id="mediaCompanyTabs">
+                <button type="button" class="media-tab-btn active" data-company="ALL">All Clippings</button>
+                <button type="button" class="media-tab-btn" data-company="GENCO">APGENCO</button>
+                <button type="button" class="media-tab-btn" data-company="TRANSCO">APTRANSCO</button>
+                <button type="button" class="media-tab-btn" data-company="SPDCL">APSPDCL</button>
+                <button type="button" class="media-tab-btn" data-company="CPDCL">APCPDCL</button>
+                <button type="button" class="media-tab-btn" data-company="EPDCL">APEPDCL</button>
+            </div>
+            <div class="media-search-box">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="mediaSearchInput" placeholder="Search clippings..." />
+            </div>
+        </div>
+
+        <!-- Cards Container -->
+        <div class="gallery-events-wrap">
+            <div id="mediaAlbumsContainer" class="gallery-events-grid"></div>
+        </div>
+    </div>
+
+    <!-- Media Album Detail View (Grid) -->
+    <div id="mediaAlbumView" class="gallery-subview" style="display: none;">
+        <div class="album-header-bar">
+            <button type="button" class="album-back-btn" id="mediaBackBtn">
+                <i class="fa-solid fa-arrow-left"></i>
+                <span>Back to Media Archive</span>
+            </button>
+        </div>
+
+        <div class="album-meta-box">
+            <h2 id="mediaDetailTitle" class="album-title">Press Clippings</h2>
+            <div class="album-meta-tags">
+                <span id="mediaDetailDate" class="album-meta-tag">
+                    <i class="fa-regular fa-calendar"></i>
+                    <span>2025-2026</span>
+                </span>
+                <span id="mediaDetailCount" class="album-meta-tag">
+                    <i class="fa-regular fa-newspaper"></i>
+                    <span>0 Clippings</span>
+                </span>
+            </div>
+        </div>
+
+        <!-- Loader -->
+        <div id="mediaPhotosLoader" class="gallery-loader-wrapper" style="display: none;">
+            <div class="gallery-spinner"></div>
+            <p>Loading news clippings...</p>
+        </div>
+
+        <!-- Clippings Grid -->
+        <div id="mediaPhotosGrid" class="album-thumbnails-grid"></div>
+        
+        <div id="mediaEmptyNotice" class="gallery-empty-state" style="display: none; text-align: center; padding: 40px 10px;">
+            <p style="color: #64748b;">No clippings found in this collection.</p>
+        </div>
+    </div>
+
+    <!-- Dedicated Lightbox Modal for Press & Media (Zero Conflict!) -->
+    <div id="mediaLightboxModal" class="gallery-lightbox" style="display: none;">
+        <div class="lightbox-overlay" id="mediaLightboxOverlay"></div>
+        
+        <div class="lightbox-top-bar">
+            <button type="button" class="lightbox-action-btn" id="mediaLightboxCloseBtn" title="Close">
+                <i class="fa-solid fa-xmark" style="font-size: 22px;"></i>
+            </button>
+            <div class="lightbox-counter" id="mediaLightboxCounter">1 / 1</div>
+            <button type="button" class="lightbox-action-btn" id="mediaLightboxDownloadBtn" title="Download">
+                <i class="fa-solid fa-download"></i>
+            </button>
+        </div>
+
+        <div class="lightbox-stage" id="mediaLightboxStage">
+            <button type="button" class="lightbox-nav-btn lightbox-prev-btn" id="mediaLightboxPrevBtn">
+                <i class="fa-solid fa-chevron-left"></i>
+            </button>
+
+            <div class="lightbox-image-container">
+                <img id="mediaLightboxActiveImage" src="" alt="Clipping" class="lightbox-img" />
+                <div id="mediaLightboxLoader" class="lightbox-img-loader" style="display: none;">
+                    <div class="gallery-spinner"></div>
+                </div>
+            </div>
+
+            <button type="button" class="lightbox-nav-btn lightbox-next-btn" id="mediaLightboxNextBtn">
+                <i class="fa-solid fa-chevron-right"></i>
+            </button>
+        </div>
+
+        <!-- Horizontal Filmstrip at Bottom -->
+        <div class="lightbox-thumbnails-strip" id="mediaLightboxThumbnailsStrip"></div>
+    </div>
+
+</section>
 
 <!-- =========================================
      PHOTO CROPPER MODAL (WHATSAPP STYLE)
@@ -5447,6 +5531,10 @@
             <button type="button" class="adm-tab-btn" id="admTabBtnAudit" onclick="switchAdminTab('audit')">
                 <i class="fa-solid fa-shield-halved"></i> Audit Logs
             </button>
+            <button type="button" class="adm-tab-btn" id="admTabBtnSubmissions" onclick="switchAdminTab('submissions')">
+             <i class="fa-solid fa-list-check"></i> Content Approvals
+             <span id="admSubmissionsBadge" class="adm-badge-count" style="display:none; background:#ef4444; color:#fff; border-radius:10px; padding:2px 7px; font-size:11px;">0</span>
+         </button>
         </div>
 
         <!-- TAB 1: PROFILE APPROVALS (DIFF COMPARISON VIEW) -->
@@ -5505,12 +5593,116 @@
             </div>
         </div>
 
+        <!-- TAB 5: UNIVERSAL CONTENT APPROVALS QUEUE -->
+     <div id="admTabSubmissions" class="adm-tab-content" style="display: none;">
+         <div class="form-card">
+             <div class="card-header" style="justify-content: space-between; align-items: center;">
+                 <div style="display:flex; align-items:center; gap:8px;">
+                     <i class="fa-solid fa-file-circle-check" style="color:#0B4EA2;"></i>
+                     <span class="card-title">Pending Member Submissions (Multi-File Selection)</span>
+                 </div>
+                 <button type="button" class="btn-refresh-queue" onclick="loadAdminPendingSubmissions()" style="background:#f1f5f9; border:none; padding:6px 12px; border-radius:6px; cursor:pointer; font-size:12px; font-weight:600; color:#0b57d0;">
+                     <i class="fa-solid fa-rotate"></i> Refresh
+                 </button>
+             </div>
+             <div id="admSubmissionsQueueContainer" class="adm-queue-list" style="padding: 12px;">
+                 <p style="font-size:12px; color:#64748b; text-align:center; padding:20px;">Loading submissions queue...</p>
+             </div>
+         </div>
+     </div>
+
     </div>
 
 </section>
 <!-- =========================================================
      ARPEU ADMIN PANEL & MANAGEMENT MODULE (END)
 ========================================================= -->
+
+<!-- ==========================================================
+     UNIVERSAL EC UPLOAD & OTP AUTH MODAL
+     ========================================================== -->
+<div id="universalUploadModal" class="portal-modal-backdrop" style="display: none;">
+    <div class="portal-modal-card">
+        <!-- Modal Header -->
+        <div class="portal-modal-header">
+            <div class="modal-header-left">
+                <i class="fa-solid fa-cloud-arrow-up modal-header-icon"></i>
+                <h3 id="uploadModalTitle">Upload Material</h3>
+            </div>
+            <button type="button" class="modal-close-btn" onclick="closeUniversalUploadModal()">&times;</button>
+        </div>
+
+        <!-- STAGE 1: EC MEMBER PHONE & OTP AUTHENTICATION -->
+        <div id="uploadStageAuth" class="upload-stage-view">
+            <p class="upload-gate-notice">
+                <i class="fa-solid fa-shield-halved"></i> 
+                Authorized Executive Committee (EC) Members Only.
+            </p>
+
+            <!-- Phone Verification Form -->
+            <div id="authPhoneStep">
+                <div class="form-group" style="margin-bottom:14px;">
+                    <label>Registered EC Mobile Number <span style="color:#ef4444;">*</span></label>
+                    <input type="tel" id="ecAuthPhoneInput" maxlength="10" placeholder="Enter 10-digit mobile number" class="form-control" autocomplete="off" />
+                </div>
+                <div id="ecAuthAlert" style="display:none; padding:8px 12px; border-radius:6px; font-size:12px; margin-bottom:12px;"></div>
+                <button type="button" class="btn-modal-action" onclick="verifyECPhoneNumber()">
+                    <i class="fa-solid fa-arrow-right"></i> Verify Mobile
+                </button>
+            </div>
+
+            <!-- OTP Step -->
+            <div id="authOtpStep" style="display: none;">
+                <!-- Auto-Detected Member Profile Badge -->
+                <div id="ecMemberDetectedBadge" class="ec-detected-badge"></div>
+
+                <div class="form-group" style="margin-bottom:14px;">
+                    <label>Enter 4-Digit Security Code (OTP) <span style="color:#ef4444;">*</span></label>
+                    <input type="text" id="ecOtpInput" maxlength="4" placeholder="Enter 4-digit code" class="form-control" style="letter-spacing: 4px; font-size: 1.1rem; text-align: center;" />
+                </div>
+                <div id="ecOtpAlert" style="display:none; padding:8px 12px; border-radius:6px; font-size:12px; margin-bottom:12px;"></div>
+                <button type="button" class="btn-modal-action" onclick="verifyECOtp()">
+                    <i class="fa-solid fa-unlock-keyhole"></i> Confirm & Proceed
+                </button>
+            </div>
+        </div>
+
+        <!-- STAGE 2: UPLOAD FORM (AFTER AUTHENTICATION) -->
+        <div id="uploadStageForm" class="upload-stage-view" style="display: none;">
+            <!-- Active Member Badge -->
+            <div id="authenticatedMemberTag" class="active-member-tag"></div>
+
+            <div class="form-group" style="margin-bottom:12px;">
+                <label>Resource / Event Title <span style="color:#ef4444;">*</span></label>
+                <input type="text" id="upItemTitle" placeholder="e.g., District Meeting / Official Logo / Press Cutout" class="form-control" />
+            </div>
+
+            <div class="form-group" style="margin-bottom:12px;">
+                <label>Description / Details</label>
+                <textarea id="upItemDesc" rows="2" placeholder="Brief note about this material..." class="form-control"></textarea>
+            </div>
+
+            <div class="form-group" style="margin-bottom:14px;">
+                <label>Select Files (Images / PDFs) <span style="color:#ef4444;">*</span></label>
+                <input type="file" id="upFileInput" multiple accept="image/*,.pdf" class="form-control" onchange="handleSelectedFilesPreview(this)" />
+                <span style="font-size:11px; color:#64748b;">You can select multiple files at once.</span>
+            </div>
+
+            <!-- Selected Files Thumbnail Preview List -->
+            <div id="upFilesPreviewContainer" class="upload-files-preview-grid"></div>
+
+            <div id="upProgressWrapper" style="display:none; margin: 12px 0;">
+                <div class="gallery-spinner" style="width:24px; height:24px; border-width:2px;"></div>
+                <p id="upProgressText" style="text-align:center; font-size:12px; color:#0b57d0; margin-top:6px;">Uploading to Google Drive...</p>
+            </div>
+
+            <button type="button" id="btnSubmitUniversalUpload" class="btn-modal-action" onclick="executeUniversalUpload()" style="margin-top:10px;">
+                <i class="fa-solid fa-cloud-arrow-up"></i> Submit for Admin Review
+            </button>
+        </div>
+    </div>
+</div>
+
 
 </main>
 
@@ -5523,7 +5715,7 @@
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-<script src="js/script.js?v=126"></script>
+<script src="js/script.js?v=127"></script>
 </body>
 
 </html>

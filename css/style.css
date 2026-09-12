@@ -4536,56 +4536,105 @@ DOWNLOADS & RESOURCES SECTION STYLES
 .dl-hero-banner {
     background: #edf5ff;
     border: 1px solid #dbeafe;
-    border-radius: 16px;
-    padding: 16px 14px;
+    border-radius: 14px;
+    padding: 12px 14px 14px 14px;
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 12px;
+    flex-direction: column;
     box-shadow: 0 4px 12px rgba(11, 78, 162, 0.05);
     margin-bottom: 20px;
 }
 
-.dl-hero-left {
+/* Top Row: Left Icon, Center Title, Right Icon */
+.dl-hero-top-row {
     display: flex;
     align-items: center;
-    gap: 12px;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 8px;
 }
 
 .dl-hero-icon-box {
-    width: 48px;
-    height: 48px;
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
     background: #0B4EA2;
     color: #ffffff;
-    border-radius: 12px;
+    border-radius: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 20px;
+    font-size: 14px;
     flex-shrink: 0;
-    box-shadow: 0 4px 10px rgba(11, 78, 162, 0.15);
+    box-shadow: 0 3px 8px rgba(11, 78, 162, 0.15);
+}
+
+.dl-hero-title {
+    font-size: 15.5px !important; /* 👉 ఫాంట్ సైజు కొంచెం పెంచి సెంటర్ లో పెట్టాం */
+    font-weight: 800 !important;
+    color: #0B4EA2 !important;
+    margin: 0 !important;
+    white-space: nowrap !important;
+    letter-spacing: 0.3px !important;
+    text-align: center;
+    flex: 1;
+}
+
+.dl-hero-right {
+    font-size: 26px;
+    color: rgba(11, 78, 162, 0.2);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+/* Full Width Description */
+.dl-hero-desc {
+    font-size: 11px !important;
+    color: #475569 !important;
+    font-weight: 500 !important;
+    line-height: 1.45 !important;
+    margin: 0 0 4px 0 !important;
+    width: 100% !important;
+}
+
+.dl-hero-left {
+    display: flex;
+    align-items: flex-start; /* 👉 సెమీకోలన్ ఫిక్స్ చేశాం */
+    gap: 10px;
+    flex: 1;
+}
+
+
+.dl-hero-text {
+    flex: 1;
 }
 
 .dl-hero-text h2 {
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 800;
     color: #0B4EA2;
     margin: 0;
+    line-height: 30px; /* 👉 ఐకాన్ ఎత్తుకి సరిగ్గా సమానంగా టాప్ లో ఉంటుంది */
+    white-space: nowrap;
 }
 
 .dl-hero-text p {
     font-size: 10.5px;
     color: #475569;
     font-weight: 500;
-    line-height: 1.35;
-    margin-top: 3px;
+    line-height: 1.4;
+    margin-top: 4px;
     margin-bottom: 0;
 }
 
 .dl-hero-right {
-    font-size: 42px;
-    color: rgba(11, 78, 162, 0.1);
+    font-size: 24px;
+    line-height: 30px; /* 👉 రైట్ ఫోల్డర్ ఐకాన్ కూడా అదే టాప్ లెవెల్ లో ఉంటుంది */
+    color: rgba(11, 78, 162, 0.15);
     flex-shrink: 0;
+    display: flex;
+    align-items: center;
 }
 
 /* 2. Sub Section Headers */
@@ -10761,3 +10810,512 @@ textarea.mtg-custom-field {
 /* ==========================================================
    ARPEU GALLERY PAGE STYLES END
    ========================================================== */
+
+   /* ==========================================================
+   PRESS & MEDIA ARCHIVE STYLES
+   ========================================================== */
+
+.media-filter-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 20px;
+    background: #ffffff;
+    padding: 12px 16px;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.media-year-tabs {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    overflow-x: auto;
+}
+
+.media-tab-btn {
+    background: #f1f5f9;
+    color: #475569;
+    border: 1px solid #e2e8f0;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+}
+.media-tab-btn.active, .media-tab-btn:hover {
+    background: #0b57d0;
+    color: #ffffff;
+    border-color: #0b57d0;
+}
+
+.media-search-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #f8fafc;
+    border: 1px solid #cbd5e1;
+    border-radius: 20px;
+    padding: 6px 14px;
+    flex: 1;
+    min-width: 200px;
+    max-width: 320px;
+}
+.media-search-box i {
+    color: #94a3b8;
+    font-size: 0.85rem;
+}
+.media-search-box input {
+    border: none;
+    background: transparent;
+    outline: none;
+    font-size: 0.85rem;
+    width: 100%;
+    color: #1e293b;
+}
+
+/* Media Cards Grid */
+.media-clippings-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 16px;
+}
+
+.media-clipping-card {
+    background: #ffffff;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.media-clipping-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+}
+
+.media-card-img-wrap {
+    width: 100%;
+    height: 190px;
+    background-color: #f1f5f9;
+    position: relative;
+    overflow: hidden;
+}
+.media-card-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.3s ease;
+}
+.media-clipping-card:hover .media-card-img {
+    transform: scale(1.04);
+}
+
+.media-card-body {
+    padding: 12px 14px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+.media-card-title {
+    font-size: 0.9rem !important;
+    font-weight: 600;
+    color: #0f172a;
+    margin: 0 0 6px 0;
+    line-height: 1.35;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+.media-card-footer {
+    margin-top: auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 8px;
+    border-top: 1px solid #f1f5f9;
+    font-size: 0.78rem;
+    color: #64748b;
+}
+.media-view-badge {
+    color: #0b57d0;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* ==========================================================
+   UNIVERSAL UPLOAD & ADMIN APPROVAL STYLES
+   ========================================================== */
+
+/* Banner Upload Buttons */
+.btn-upload-banner, .btn-upload-resource {
+    background: rgba(255, 255, 255, 0.18);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    padding: 7px 14px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 10px;
+    transition: all 0.2s;
+}
+.btn-upload-banner:hover, .btn-upload-resource:hover {
+    background: #ffffff;
+    color: #0b57d0;
+}
+
+/* Modal Backdrop & Card */
+.portal-modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.75);
+    z-index: 9999999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 14px;
+    box-sizing: border-box;
+}
+
+.portal-modal-card {
+    width: 92% !important;
+    max-width: 400px !important;
+    margin: 0 auto !important;
+    box-sizing: border-box !important;
+}
+
+.portal-modal-header {
+    background: #0B4EA2;
+    color: #ffffff;
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.modal-header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.modal-header-left h3 {
+    font-size: 1.05rem;
+    margin: 0;
+    font-weight: 700;
+}
+.modal-close-btn {
+    background: transparent;
+    border: none;
+    color: #ffffff;
+    font-size: 1.6rem;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.upload-stage-view {
+    padding: 18px 20px;
+    overflow-y: auto;
+}
+
+.upload-gate-notice {
+    background: #f8fafc;
+    border-left: 3px solid #0B4EA2;
+    padding: 10px 12px;
+    font-size: 0.8rem;
+    color: #475569;
+    margin: 0 0 16px 0;
+    border-radius: 0 6px 6px 0;
+}
+
+/* EC Detected Member Profile Badge */
+.ec-detected-badge, .active-member-tag {
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    border-radius: 10px;
+    padding: 10px 12px;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.ec-detected-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1.5px solid #0B4EA2;
+}
+.ec-badge-info h5 {
+    margin: 0 0 2px 0;
+    font-size: 0.9rem;
+    color: #1e3a8a;
+}
+.ec-badge-info p {
+    margin: 0;
+    font-size: 0.78rem;
+    color: #64748b;
+}
+
+.btn-modal-action {
+    width: 100%;
+    background: #0B4EA2;
+    color: #ffffff;
+    border: none;
+    padding: 12px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.92rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+.btn-modal-action:hover {
+    background: #083b7c;
+}
+
+/* File Previews */
+.upload-files-preview-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(65px, 1fr));
+    gap: 8px;
+    margin-bottom: 12px;
+}
+.preview-thumb-box {
+    width: 100%;
+    height: 65px;
+    border-radius: 6px;
+    overflow: hidden;
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.preview-thumb-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Admin Approval Submission Queue Card */
+.adm-submission-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 14px;
+    margin-bottom: 14px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+.adm-sub-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+.adm-type-badge {
+    background: #e0f2fe;
+    color: #0369a1;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 0.72rem;
+    font-weight: 700;
+}
+.adm-sub-date {
+    font-size: 0.75rem;
+    color: #94a3b8;
+}
+.adm-uploader-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.82rem;
+    color: #1e293b;
+    margin-bottom: 10px;
+}
+
+/* Admin Multi-File Checkbox Grid */
+.adm-review-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+    gap: 10px;
+    margin: 12px 0;
+}
+.adm-file-check-box {
+    position: relative;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 2px solid #e2e8f0;
+    cursor: pointer;
+}
+.adm-file-check-box.checked {
+    border-color: #0b57d0;
+}
+.adm-file-check-box img {
+    width: 100%;
+    height: 80px;
+    object-fit: cover;
+    display: block;
+}
+.adm-chk-input {
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: #0b57d0;
+    z-index: 10;
+}
+.adm-sub-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+.btn-approve-selected {
+    background: #16a34a;
+    color: #ffffff;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+.btn-reject-all {
+    background: #ef4444;
+    color: #ffffff;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* Solid Premium White Modal Card Styling (Zero Transparency) */
+.portal-modal-backdrop {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100% !important;
+    height: 100dvh !important;
+    background: rgba(0, 0, 0, 0.78) !important; /* Dark solid backdrop */
+    z-index: 9999999 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 16px !important;
+    box-sizing: border-box !important;
+}
+
+.portal-modal-card {
+    background: #ffffff !important; /* 👉 100% Solid White Card */
+    width: 92% !important;
+    max-width: 400px !important;
+    border-radius: 16px !important;
+    overflow: hidden !important;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4) !important;
+    border: 1px solid #e2e8f0 !important;
+    max-height: 88vh !important;
+    display: flex !important;
+    flex-direction: column !important;
+    box-sizing: border-box !important;
+}
+
+.upload-stage-view {
+    background: #ffffff !important; /* 👉 100% Solid White Body */
+    padding: 18px 20px !important;
+    overflow-y: auto !important;
+    box-sizing: border-box !important;
+}
+
+.form-group label {
+    display: block !important;
+    font-size: 0.82rem !important;
+    font-weight: 600 !important;
+    color: #1e293b !important;
+    margin-bottom: 6px !important;
+}
+
+.form-control {
+    width: 100% !important;
+    background: #f8fafc !important;
+    border: 1.5px solid #cbd5e1 !important;
+    border-radius: 8px !important;
+    padding: 10px 12px !important;
+    font-size: 0.9rem !important;
+    color: #0f172a !important;
+    box-sizing: border-box !important;
+}
+.form-control:focus {
+    border-color: #0B4EA2 !important;
+    background: #ffffff !important;
+    outline: none !important;
+}
+
+/* Universal Modal Display & Margin Fix */
+.portal-modal-backdrop {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100% !important;
+    height: 100dvh !important;
+    background: rgba(0, 0, 0, 0.75) !important;
+    z-index: 9999999 !important;
+    display: none; /* 👉 Hidden by default! */
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 16px !important;
+    box-sizing: border-box !important;
+}
+
+.portal-modal-backdrop.active {
+    display: flex !important; /* 👉 Shows ONLY when opened */
+}
+
+.portal-modal-card {
+    background: #ffffff !important;
+    width: 88% !important; /* 👉 Leaves clean space on left & right on Mobile */
+    max-width: 360px !important;
+    margin: 0 auto !important;
+    border-radius: 16px !important;
+    overflow: hidden !important;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5) !important;
+    box-sizing: border-box !important;
+}
+
+.modal-close-btn {
+    min-width: 44px !important;
+    min-height: 44px !important;
+    background: transparent !important;
+    border: none !important;
+    color: #ffffff !important;
+    font-size: 1.8rem !important;
+    cursor: pointer !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    z-index: 10 !important;
+}
