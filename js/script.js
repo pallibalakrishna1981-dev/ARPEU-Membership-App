@@ -550,6 +550,25 @@ function showPage(page) {
   // Hide standalone contentArea children if any
   document.querySelectorAll("#contentArea > section").forEach(s => s.style.display = "none");
 
+  // Manage page-specific persistent receipt visibility
+  if (rc) {
+    const originPage = rc.getAttribute("data-origin-page");
+    if (originPage) {
+      const normalizedTarget = String(page).toLowerCase().replace(/section|page/g, '').trim();
+      const normalizedOrigin = originPage.toLowerCase().replace(/section|page/g, '').trim();
+      
+      const isDonationMatch = (normalizedTarget.startsWith("donat") && normalizedOrigin.startsWith("donat"));
+      const isDiaryMatch = (normalizedTarget.startsWith("diar") && normalizedOrigin.startsWith("diar"));
+      const isMembMatch = (normalizedTarget.startsWith("memb") && normalizedOrigin.startsWith("memb"));
+
+      if (isDonationMatch || isDiaryMatch || isMembMatch || normalizedTarget === normalizedOrigin) {
+        rc.style.display = "block";
+      } else {
+        rc.style.display = "none";
+      }
+    }
+  }
+
   // 3. Remove 'active' state from navigation links
   const navLinks = document.querySelectorAll(".nav-link, .nav-tab-link, .dropdown-item, .navbar-nav a, .nav-item");
   navLinks.forEach(link => link.classList.remove("active"));
@@ -2082,37 +2101,39 @@ const debounceTimers = {
 };
 
 /* ==========================================================
-   ULTRA-CLEAN GET DUPLICATE CHECK ENGINE (NO CORS BLOCKS)
-========================================================== */
-
-// Common Fetch for Submit Check
-async function fetchDuplicateCheck(field, value) {
-    if (!value || value.trim() === "") return { success: true, exists: false };
-    try {
-        const url = `${BACKEND_URL}?action=checkDuplicate&field=${encodeURIComponent(field)}&value=${encodeURIComponent(value)}`;
-        const response = await fetch(url);
-        return await response.json();
-    } catch (e) {
-        console.error(`[${field}] Check Error:`, e);
-        return { success: true, exists: false }; // Fail-safe
-    }
-}
-
-/* ==========================================================
-   REAL-TIME FAIL-SAFE DUPLICATE CHECK ENGINE
+   OPTIMIZED FAIL-SAFE DUPLICATE CHECK ENGINE (PARALLEL & ABORT)
    ========================================================== */
+
+const activeDuplicateControllers = {};
 
 async function executeDuplicateCheck(field, value, statusElementId) {
   const statusEl = document.getElementById(statusElementId);
   if (!statusEl) return;
 
+  const trimmedVal = value ? value.toString().trim() : "";
+  if (!trimmedVal) {
+    statusEl.className = "field-status";
+    statusEl.innerHTML = "";
+    return;
+  }
+
+  if (activeDuplicateControllers[field]) {
+    activeDuplicateControllers[field].abort();
+  }
+
+  const controller = new AbortController();
+  activeDuplicateControllers[field] = controller;
+
   statusEl.className = "field-status checking";
   statusEl.style.color = "#0B4EA2";
   statusEl.innerHTML = "Checking availability...";
 
+  const timeoutId = setTimeout(() => controller.abort(), 7000);
+
   try {
-    const url = `${BACKEND_URL}?action=checkDuplicate&field=${encodeURIComponent(field)}&value=${encodeURIComponent(value.toString().trim())}`;
-    const response = await fetch(url);
+    const url = `${BACKEND_URL}?action=checkDuplicate&field=${encodeURIComponent(field)}&value=${encodeURIComponent(trimmedVal)}`;
+    const response = await fetch(url, { signal: controller.signal });
+    clearTimeout(timeoutId);
     const result = await response.json();
 
     if (result && result.success && result.exists) {
@@ -2125,30 +2146,58 @@ async function executeDuplicateCheck(field, value, statusElementId) {
       statusEl.innerHTML = "✔ Available";
     }
   } catch (error) {
+    if (error.name === "AbortError") {
+      return;
+    }
+
     console.error(`[${field}] Duplicate Check Error:`, error);
-    // If network fails, do not falsely show available
     statusEl.className = "field-status";
     statusEl.innerHTML = "";
+  } finally {
+    if (activeDuplicateControllers[field] === controller) {
+      delete activeDuplicateControllers[field];
+    }
   }
 }
 
-// Submit Check Wrappers
+async function fetchDuplicateCheck(field, value) {
+  const trimmedVal = value ? value.toString().trim() : "";
+  if (!trimmedVal) return { success: true, exists: false };
+
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 7000);
+
+  try {
+    const url = `${BACKEND_URL}?action=checkDuplicate&field=${encodeURIComponent(field)}&value=${encodeURIComponent(trimmedVal)}`;
+    const response = await fetch(url, { signal: controller.signal });
+    clearTimeout(timeoutId);
+    return await response.json();
+  } catch (e) {
+    clearTimeout(timeoutId);
+
+    if (e.name !== "AbortError") {
+      console.error(`[${field}] Check Error:`, e);
+    }
+
+    return { success: true, exists: false };
+  }
+}
+
 async function checkMobileDuplicate(mobile) {
-    return await fetchDuplicateCheck("mobile", mobile);
+  return await fetchDuplicateCheck("mobile", mobile);
 }
 
 async function checkEmployeeIdDuplicate(employeeId) {
-    return await fetchDuplicateCheck("employeeid", employeeId);
+  return await fetchDuplicateCheck("employeeid", employeeId);
 }
 
 async function checkAadhaarDuplicate(aadhaar) {
-    return await fetchDuplicateCheck("aadhaar", aadhaar);
+  return await fetchDuplicateCheck("aadhaar", aadhaar);
 }
 
 async function checkTransactionIdDuplicate(transactionId) {
-    return await fetchDuplicateCheck("transactionid", transactionId);
+  return await fetchDuplicateCheck("transactionid", transactionId);
 }
-
 
 
 /* ==========================================================
@@ -2413,35 +2462,53 @@ async function submitMembership() {
   }
 
   /* ---------------------------------------------------------
-     BACKEND DUPLICATE CHECKS
-  --------------------------------------------------------- */
-  const mobileDup = await checkMobileDuplicate(mobile);
-  if (mobileDup && mobileDup.exists) {
-    if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = originalButtonText; }
-    alert(`Mobile Number Already Registered:\n\nMobile: ${mobile}`);
-    return;
-  }
+   BACKEND DUPLICATE CHECKS - PARALLEL
+   --------------------------------------------------------- */
 
-  const empDup = await checkEmployeeIdDuplicate(document.getElementById("employeeId").value.trim());
-  if (empDup && empDup.exists) {
-    if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = originalButtonText; }
-    alert(`Employee ID Already Registered:\n\nEmployee ID: ${document.getElementById("employeeId").value.trim()}`);
-    return;
-  }
+const employeeId = document.getElementById("employeeId").value.trim();
 
-  const aadhaarDup = await checkAadhaarDuplicate(aadhaar);
-  if (aadhaarDup && aadhaarDup.exists) {
-    if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = originalButtonText; }
-    alert(`Aadhaar Number Already Registered:\n\nAadhaar: ${aadhaar}`);
-    return;
-  }
+const [mobileDup, empDup, aadhaarDup, txnDup] = await Promise.all([
+  checkMobileDuplicate(mobile),
+  checkEmployeeIdDuplicate(employeeId),
+  checkAadhaarDuplicate(aadhaar),
+  checkTransactionIdDuplicate(transactionId)
+]);
 
-  const txnDup = await checkTransactionIdDuplicate(transactionId);
-  if (txnDup && txnDup.exists) {
-    if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = originalButtonText; }
-    alert(`Transaction ID Already Registered:\n\nTransaction ID: ${transactionId}`);
-    return;
+if (mobileDup && mobileDup.exists) {
+  if (submitBtn) {
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = originalButtonText;
   }
+  alert(`Mobile Number Already Registered:\n\nMobile: ${mobile}`);
+  return;
+}
+
+if (empDup && empDup.exists) {
+  if (submitBtn) {
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = originalButtonText;
+  }
+  alert(`Employee ID Already Registered:\n\nEmployee ID: ${employeeId}`);
+  return;
+}
+
+if (aadhaarDup && aadhaarDup.exists) {
+  if (submitBtn) {
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = originalButtonText;
+  }
+  alert(`Aadhaar Number Already Registered:\n\nAadhaar: ${aadhaar}`);
+  return;
+}
+
+if (txnDup && txnDup.exists) {
+  if (submitBtn) {
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = originalButtonText;
+  }
+  alert(`Transaction ID Already Registered:\n\nTransaction ID: ${transactionId}`);
+  return;
+}
 
   /* ---------------------------------------------------------
      PAYLOAD DATA PREPARATION & BASE64 CONVERSION
@@ -2959,15 +3026,21 @@ function generateUniversalReceipt(data) {
     });
   }
 
-  // 8. Unhide Universal Receipt View
- const rc = document.getElementById("receiptContainer");
+  // 8. Track originating page and display Modal
+  const rc = document.getElementById("receiptContainer");
   if (rc) {
+    let originPage = "membership";
+    if (typeKey.includes("donation")) {
+      originPage = "donations";
+    } else if (typeKey.includes("diary")) {
+      originPage = "diary";
+    }
+    rc.setAttribute("data-origin-page", originPage);
     rc.style.display = "block";
-    rc.setAttribute("data-membership-active", "true"); /* Locks active membership receipt */
-    rc.removeAttribute("data-donation-active");
   }
 
   window.scrollTo({ top: 0, behavior: "smooth" });
+
 }
 
 
@@ -5038,30 +5111,30 @@ async function handleProfileDecision(requestId, decision) {
 
 window.closeReceipt = function () {
   const rc = document.getElementById("receiptContainer");
-  const wasDonation = rc && (rc.getAttribute("data-donation-active") === "true");
+  const originPage = rc ? rc.getAttribute("data-origin-page") : "";
 
-  /* 1. Force Hide Receipt Container & Remove All Flags */
   if (rc) {
     rc.style.setProperty("display", "none", "important");
+    rc.removeAttribute("data-origin-page");
     rc.removeAttribute("data-membership-active");
     rc.removeAttribute("data-donation-active");
     rc.removeAttribute("data-receipt-open");
     rc.removeAttribute("data-active");
   }
 
-  /* 2. Reset Title Ribbon to Default Membership Blue */
   const titlePill = document.getElementById("receiptTitle");
   if (titlePill) {
     titlePill.textContent = "MEMBERSHIP RECEIPT";
     titlePill.style.backgroundColor = "#0B4EA2";
   }
 
-  /* 3. Clean Redirection to Fresh Form */
-  if (wasDonation) {
+  if (originPage === "donations" || originPage === "donation") {
     if (typeof resetDonationForm === "function") {
       resetDonationForm();
     }
     showPage("donations");
+  } else if (originPage === "diary") {
+    showPage("diary");
   } else {
     if (typeof resetMembershipForm === "function") {
       resetMembershipForm();
