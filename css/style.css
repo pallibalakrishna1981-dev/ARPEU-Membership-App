@@ -278,8 +278,19 @@ background:#ffffff;
 border:1px solid #e5e7eb;
 border-radius:14px;
 box-shadow:0 8px 24px rgba(0,0,0,.15);
-overflow:hidden;
+max-height: calc(100dvh - 160px); /* 👉 నావిగేషన్ కి ఫూటర్ కి మధ్యలో సరిగ్గా ఆగుతుంది */
+overflow-y: auto;                  /* 👉 లోపలే ఇంటర్నల్ స్క్రోలింగ్ అవుతుంది */
+-webkit-overflow-scrolling: touch;
 z-index:9999;
+}
+
+/* Slim Clean Scrollbar for More Dropdown */
+.more-dropdown::-webkit-scrollbar {
+width: 4px;
+}
+.more-dropdown::-webkit-scrollbar-thumb {
+background: #cbd5e1;
+border-radius: 4px;
 }
 .more-dropdown.show{
 display:block;
@@ -11318,4 +11329,19 @@ textarea.mtg-custom-field {
     align-items: center !important;
     justify-content: center !important;
     z-index: 10 !important;
+}
+
+/* STRICT CONTROLLER: LOCKS MODAL ON PAGE LOAD */
+#universalUploadModal:not(.active) {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
+#universalUploadModal.active {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
 }
