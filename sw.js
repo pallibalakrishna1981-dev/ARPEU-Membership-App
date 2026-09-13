@@ -3,7 +3,7 @@
    Version: 1.0 (Official Build)
    ========================================================== */
 
-const CACHE_NAME = 'arpeu-portal-v50.0';
+const CACHE_NAME = 'arpeu-portal-v51.0';
 
 /* Install & Activate Immediately without Waiting */
 self.addEventListener('install', event => {
@@ -21,6 +21,11 @@ self.addEventListener('activate', event => {
 
 /* Fetch Strategy: Cache local assets, bypass external Google Apps Script API calls */
 self.addEventListener('fetch', event => {
+
+  // Only handle local website files, completely ignore external Google APIs
+  if (!event.request.url.startsWith(self.location.origin)) {
+    return;
+  }
   const url = event.request.url;
 
   // Do NOT intercept Google Apps Script or external API calls
