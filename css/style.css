@@ -4952,112 +4952,6 @@ DOWNLOADS & RESOURCES SECTION STYLES
     margin-top: 4px;
 }
 
-/* 5. Nested Columns Lists */
-.dl-nested-sections-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    margin-top: 15px;
-}
-
-.dl-list-box {
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
-    border-radius: 14px;
-    padding: 12px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.02);
-}
-
-.dl-list-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid #f1f5f9;
-    padding-bottom: 6px;
-    margin-bottom: 8px;
-}
-
-.dl-list-title {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.dl-list-indicator {
-    width: 3px;
-    height: 12px;
-    border-radius: 1.5px;
-}
-
-.purple-bg { background: #8b5cf6; }
-.pink-bg { background: #ec4899; }
-.blue-bg { background: #3b82f6; }
-.green-bg { background: #10b981; }
-
-.dl-list-title h4 {
-    font-size: 12px;
-    font-weight: 800;
-    color: #1e293b;
-    margin: 0;
-}
-
-.dl-list-all {
-    font-size: 9.5px;
-    font-weight: 700;
-    color: #0B4EA2;
-}
-
-.dl-list-items {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.dl-list-items li {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 6px 4px;
-    border-bottom: 1px solid #fafafa;
-    font-size: 11px;
-    font-weight: 600;
-    color: #334155;
-}
-
-.dl-list-items li:last-child {
-    border-bottom: none;
-}
-
-.dl-list-icon {
-    font-size: 12px;
-    width: 14px;
-    text-align: center;
-}
-
-.purple-text { color: #8b5cf6; }
-.pink-text { color: #ec4899; }
-.blue-text { color: #3b82f6; }
-.green-text { color: #10b981; }
-
-.dl-item-flex-between {
-    justify-content: space-between !important;
-}
-
-.dl-item-left-group {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.dl-mini-badge-soon {
-    font-size: 8px;
-    font-weight: 800;
-    color: #64748b;
-    background: #f1f5f9;
-    padding: 1px 6px;
-    border-radius: 8px;
-}
-
 /* 6. Quick Links Section */
 .dl-quick-links-section {
     margin-top: 15px;
@@ -5189,16 +5083,29 @@ DOWNLOADS & RESOURCES SECTION STYLES
     background: #f8fafc;
     border: 1px solid #f1f5f9;
     border-radius: 10px;
-    height: 150px;
+    min-height: 140px;
+    max-height: 60vh;
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
     margin-bottom: 12px;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+.dl-modal-visual-box img {
+    max-width: 100%;
+    max-height: 55vh;
+    width: auto;
+    height: auto;
+    object-fit: contain !important;
+    display: block;
+    margin: 0 auto;
 }
 
 .dl-modal-visual-box svg {
-    max-height: 110px;
+    max-height: 140px;
     width: auto;
 }
 
@@ -5287,54 +5194,6 @@ DOWNLOADS & RESOURCES SECTION STYLES
     animation: fa-spin 1s linear infinite;
 }
 
-/* Merged 2-Column Card Styles */
-.dl-merged-card {
-    display: grid;
-    grid-template-columns: 1fr 1px 1fr; /* ఎడమ వైపు 1fr, మధ్యలో 1px లైన్, కుడి వైపు 1fr */
-    gap: 12px;
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
-    border-radius: 14px;
-    padding: 12px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.03);
-    margin-bottom: 12px;
-}
-
-.dl-vertical-divider {
-    width: 1px;
-    background: #e5e7eb; /* మధ్యలో ఉండే వర్టికల్ లైన్ రంగు */
-    align-self: stretch;
-    margin: 4px 0;
-}
-
-.dl-column-half {
-    display: flex;
-    flex-direction: column;
-}
-
-/* Title and View All in a tight row */
-.dl-compact-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid #f1f5f9;
-    padding-bottom: 4px;
-    margin-bottom: 6px;
-}
-
-.dl-compact-header h4 {
-    font-size: 11.5px !important;
-    font-weight: 800;
-    color: #1e293b;
-    margin: 0;
-}
-
-.dl-compact-header .dl-list-all {
-    font-size: 9px;
-    font-weight: 700;
-    color: #0B4EA2;
-    white-space: nowrap;
-}
 
 /*=========================================
 NEW QUICK LINKS INTEGRATED CARD STYLES

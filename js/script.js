@@ -3597,6 +3597,22 @@ if (typeof showPage === "function") {
     };
 }
 
+// Smart Google Drive URL Parser
+function parseDriveFileId(url) {
+    if (!url) return "";
+    const m = String(url).match(/\/d\/([a-zA-Z0-9_-]+)/);
+    return m ? m[1] : url.trim();
+}
+
+function makeDriveEntry(rawLink) {
+    const id = parseDriveFileId(rawLink);
+    return {
+        preview: `https://drive.google.com/file/d/${id}/preview`,
+        download: `https://drive.google.com/uc?export=download&id=${id}`,
+        view: `https://drive.google.com/file/d/${id}/view?usp=sharing`
+    };
+}
+
 // 2. Real Asset File Registry
 const dlFileRegistry = {
     "founder-arpeu.jpg": "images/founder-arpeu.jpg",
@@ -3609,21 +3625,35 @@ const dlFileRegistry = {
     "bms": "images/bms-logo.png",
     "bharatmata": "images/bharat-mata.png",
     "bmsflag": "images/bms-flag.jpg",
-    
-    // PDF Documents
-    "Shramik_Magazine_2026.pdf": "documents/Shramik_Magazine_2026.pdf",
-    "ARPEU_Constitution.pdf": "documents/ARPEU_Constitution.pdf",
-    "Membership_Rules.pdf": "documents/Membership_Rules.pdf",
-    "Membership_Form.pdf": "documents/Membership_Form.pdf",
-    "BMS_Intro_Book.pdf": "documents/BMS_Intro_Book.pdf",
-    "ARPEU_Profile_Book.pdf": "documents/ARPEU_Profile_Book.pdf"
+
+    // 1. Shramik Geeth
+    "shramik": makeDriveEntry("https://drive.google.com/file/d/1uOdOlpzrTozBdAJoqyuI9qLYXwkkuzyz/view?usp=sharing"),
+
+    // 2. ARPEU Constitution
+    "constitution": makeDriveEntry("https://drive.google.com/file/d/1LhwVGfYXraFdLVQrou85o5lsszy8UF-P/view?usp=drive_link"),
+
+    // 3. FORM C of ARPEU (Already working)
+    "formc": makeDriveEntry("https://drive.google.com/file/d/12KrGH0FJ6-xnYBwxoGAd5SQxt4X7zlje/view"),
+
+    // 4. Affiliation Certificate (Already working)
+    "affiliation": makeDriveEntry("https://drive.google.com/file/d/1VyJVrcGaUJqVX8w511p7PgEnvuFSVPvQ/view")
 };
+
+// Smart Helper: Auto-resolves correct Google Drive link by Title or Key
+function getSmartDocEntry(titleOrKey) {
+    const s = String(titleOrKey || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+    if (s.includes("shramik") || s.includes("geeth")) return dlFileRegistry["shramik"];
+    if (s.includes("constitution") || s.includes("rule") || s.includes("bylaw")) return dlFileRegistry["constitution"];
+    if (s.includes("formc") || s.includes("registration")) return dlFileRegistry["formc"];
+    if (s.includes("affiliation") || s.includes("certificate")) return dlFileRegistry["affiliation"];
+    return dlFileRegistry[titleOrKey];
+}
 
 // 3. Open Real High-Resolution Preview Modal
 function openDownloadsPreview(title, type, fileKey) {
     const modal = document.getElementById('downloadsPreviewModal');
     const container = document.getElementById('dlModalContainer');
-    
+
     if (!modal || !container) return;
 
     document.getElementById('dlModalTitle').innerText = title;
@@ -3631,29 +3661,32 @@ function openDownloadsPreview(title, type, fileKey) {
     document.getElementById('dlModalFormat').innerText = type;
 
     const visualBox = document.getElementById('dlModalVisual');
-    const actualFilePath = dlFileRegistry[fileKey] || ("images/" + fileKey);
+    const entry = getSmartDocEntry(title) || getSmartDocEntry(fileKey);
 
     // Render Preview based on Type
     if (type === "PDF") {
+        const previewUrl = (entry && typeof entry === "object") ? entry.preview : (entry || "");
+        const viewUrl = (entry && typeof entry === "object") ? entry.view : previewUrl;
+
         visualBox.innerHTML = `
-            <div style="text-align:center; padding: 15px;">
-                <i class="fa-solid fa-file-pdf" style="font-size: 64px; color: #ef4444;"></i>
-                <p style="font-size:12px; font-weight:700; color:#1e293b; margin-top:10px;">${title}</p>
-                <a href="${actualFilePath}" target="_blank" style="display:inline-block; margin-top:8px; font-size:11px; color:#0B4EA2; font-weight:700; text-decoration:underline;">Click to Open Document</a>
+            <div style="width:100%; display:flex; flex-direction:column; align-items:center;">
+                <iframe src="${previewUrl}" style="width:100%; height:360px; border:1px solid #e2e8f0; border-radius:8px;" allow="autoplay"></iframe>
+                <a href="${viewUrl}" target="_blank" style="margin-top:8px; font-size:11px; color:#0B4EA2; font-weight:700; text-decoration:underline; display:flex; align-items:center; gap:4px;">
+                    <i class="fa-solid fa-arrow-up-right-from-square"></i> Open in Google Drive
+                </a>
             </div>
         `;
     } else {
-        // High-Quality Image Preview
+        const actualFilePath = (entry && typeof entry === "string") ? entry : ("images/" + fileKey);
         visualBox.innerHTML = `
-            <img src="${actualFilePath}" alt="${title}" style="max-width:100%; max-height:220px; object-fit:contain; border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,0.08);">
+            <img src="${actualFilePath}" alt="${title}" style="max-width:100%; max-height:55vh; width:auto; height:auto; object-fit:contain; border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,0.08);">
         `;
     }
 
     // Modal Download Button Action
     const modalDownloadBtn = document.getElementById('dlModalDownloadActionBtn');
-    modalDownloadBtn.onclick = function() {
-        const downloadName = fileKey.includes(".") ? fileKey : `${title.replace(/\s+/g, '_')}.${type.toLowerCase()}`;
-        triggerDownloadsFile(downloadName);
+    modalDownloadBtn.onclick = function () {
+        triggerDownloadsFile(title);
         closeDownloadsPreview();
     };
 
@@ -3669,12 +3702,12 @@ function openDownloadsPreview(title, type, fileKey) {
 function closeDownloadsPreview() {
     const modal = document.getElementById('downloadsPreviewModal');
     const container = document.getElementById('dlModalContainer');
-    
+
     if (!modal || !container) return;
 
     modal.style.opacity = "0";
     container.style.transform = "scale(0.95)";
-    
+
     setTimeout(() => {
         modal.style.display = "none";
     }, 300);
@@ -3683,7 +3716,7 @@ function closeDownloadsPreview() {
 // Overlay Click Dismiss Listener
 const previewModalEl = document.getElementById('downloadsPreviewModal');
 if (previewModalEl) {
-    previewModalEl.addEventListener('click', function(e) {
+    previewModalEl.addEventListener('click', function (e) {
         if (e.target === this) {
             closeDownloadsPreview();
         }
@@ -3691,16 +3724,24 @@ if (previewModalEl) {
 }
 
 // 5. Trigger Real Original File Download
-function triggerDownloadsFile(filename) {
-    showDownloadsToast(`Downloading "${filename}"...`);
-    
-    const realFilePath = dlFileRegistry[filename] || ("images/" + filename);
+function triggerDownloadsFile(filenameOrTitle) {
+    showDownloadsToast(`Downloading "${filenameOrTitle}"...`);
 
-    // Native High-Quality Direct Download
+    const entry = getSmartDocEntry(filenameOrTitle);
+    let downloadUrl = "";
+
+    if (entry && typeof entry === "object") {
+        downloadUrl = entry.download;
+    } else if (entry && typeof entry === "string") {
+        downloadUrl = entry;
+    } else {
+        downloadUrl = "images/" + filenameOrTitle;
+    }
+
     setTimeout(() => {
         const tempLink = document.createElement("a");
-        tempLink.href = realFilePath;
-        tempLink.download = filename;
+        tempLink.href = downloadUrl;
+        tempLink.download = `${filenameOrTitle}.pdf`;
         tempLink.target = "_blank";
         document.body.appendChild(tempLink);
         tempLink.click();
