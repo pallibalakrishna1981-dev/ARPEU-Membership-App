@@ -8875,7 +8875,7 @@ function openUniversalUploadModal(type) {
         showAuthStage();
     }
 
-    if (modal) {
+     if (modal) {
         modal.classList.add("active");
         modal.style.setProperty("display", "flex", "important");
     }
