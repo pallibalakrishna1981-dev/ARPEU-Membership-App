@@ -3723,7 +3723,7 @@ if (previewModalEl) {
     });
 }
 
-// 5. Trigger Real Original File Download
+// 5. Trigger Real Original File Download (Direct to Phone Internal Storage - No Account Picker)
 function triggerDownloadsFile(filenameOrTitle) {
     showDownloadsToast(`Downloading "${filenameOrTitle}"...`);
 
@@ -3738,15 +3738,22 @@ function triggerDownloadsFile(filenameOrTitle) {
         downloadUrl = "images/" + filenameOrTitle;
     }
 
+    // Bypass Android Google Drive App intent (stops asking for Mail ID)
+    if (downloadUrl.includes("drive.google.com/uc?")) {
+        downloadUrl = downloadUrl.replace("drive.google.com/uc?", "docs.google.com/uc?");
+    }
+
+    // Direct Browser Background Download into Mobile Internal Storage
     setTimeout(() => {
-        const tempLink = document.createElement("a");
-        tempLink.href = downloadUrl;
-        tempLink.download = `${filenameOrTitle}.pdf`;
-        tempLink.target = "_blank";
-        document.body.appendChild(tempLink);
-        tempLink.click();
-        document.body.removeChild(tempLink);
-    }, 400);
+        let dlFrame = document.getElementById("hiddenDownloadIframe");
+        if (!dlFrame) {
+            dlFrame = document.createElement("iframe");
+            dlFrame.id = "hiddenDownloadIframe";
+            dlFrame.style.display = "none";
+            document.body.appendChild(dlFrame);
+        }
+        dlFrame.src = downloadUrl;
+    }, 300);
 }
 
 // 6. Toast Notification Engine
