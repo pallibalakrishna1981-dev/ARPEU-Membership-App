@@ -595,11 +595,6 @@ function showPage(page) {
     stopLiveStatsPolling();
   }
 
-  const activeReceipt = document.getElementById("receiptContainer");
-  if (activeReceipt && targetPage !== "membership") {
-    activeReceipt.style.display = "none";
-  }
-
   // 6. SHOW ONLY TARGETED PAGE
   switch (targetPage) {
     case "home":
@@ -617,9 +612,17 @@ function showPage(page) {
     }
     break;
 
-    case "donation":
+   case "donation":
     case "donations":
-      if (donSec) donSec.style.display = "block";
+      if (rc && rc.getAttribute("data-donation-active") === "true") {
+        rc.style.display = "block";
+        if (donSec) donSec.style.display = "none";
+      } else {
+        if (donSec) donSec.style.display = "block";
+        if (rc && rc.getAttribute("data-origin-page") === "donations") {
+          rc.style.display = "none";
+        }
+      }
       break;
 
    case "statistic":
@@ -700,10 +703,16 @@ function showPage(page) {
 
     case "diary":
     case "diaries":
-      if (diarySec) {
-        diarySec.style.display = "block";
-        if (typeof updateDiaryPriceCalculations === "function") updateDiaryPriceCalculations();
+      if (rc && rc.getAttribute("data-diary-active") === "true") {
+        rc.style.display = "block";
+        if (diarySec) diarySec.style.display = "none";
+      } else {
+        if (diarySec) diarySec.style.display = "block";
+        if (rc && rc.getAttribute("data-origin-page") === "diary") {
+          rc.style.display = "none";
         }
+        if (typeof updateDiaryPriceCalculations === "function") updateDiaryPriceCalculations();
+      }
       break;
 
     case "setting":
@@ -1966,34 +1975,38 @@ function initializeDatePickers() {
 
     const el = document.querySelector(id);
 
-    if (el) {
-      flatpickr(el, { 
-        ...base, 
-        dateFormat: "d-m-Y",
+if (el) {
+  flatpickr(el, { 
+    ...base, 
+    dateFormat: "d-m-Y",
 
-        defaultDate: id === "#mtgDate" ? "today" : null,
+    defaultDate: id === "#mtgDate" ? "today" : null,
 
-        // Already Paid: Today and previous dates only
-        maxDate: id === "#manualDate" ? "today" : undefined,
+    minDate: id === "#donPayNowDate" ? "today" : undefined,
 
-        monthSelectorType: "dropdown",
+    // Already Paid: Today and previous dates only
+    maxDate: id === "#donPayNowDate"
+      ? "today"
+      : (id === "#donDate" ? "today" : (id === "#manualDate" ? "today" : undefined)),
 
-        onChange: (selectedDates, dateStr, instance) => {
+    monthSelectorType: "dropdown",
 
-          el.value = dateStr;
+    onChange: (selectedDates, dateStr, instance) => {
 
-          el.dispatchEvent(
-            new Event('input', { bubbles: true })
-          );
+      el.value = dateStr;
 
-          el.dispatchEvent(
-            new Event('change', { bubbles: true })
-          );
+      el.dispatchEvent(
+        new Event('input', { bubbles: true })
+      );
 
-          if (instance) instance.close();
-        }
-      });
+      el.dispatchEvent(
+        new Event('change', { bubbles: true })
+      );
+
+      if (instance) instance.close();
     }
+  });
+}
 
   });
 
@@ -4065,14 +4078,44 @@ function handleDivDesigSelect(currentCheckbox) {
    ========================================================== */
 
 function toggleDonorTypeFields(selectedType) {
-  const memberBox = document.getElementById("donorMemberDetailsBox");
-  if (!memberBox) return;
+    const memberIdGroup = document.getElementById("donorMemberIdGroup");
+    const otherDonorBox = document.getElementById("otherDonorDetailsBox");
 
-  if (selectedType === "ARPEU Member" || selectedType === "Electricity Employee" || selectedType === "Retired Employee") {
-    memberBox.style.display = "block";
-  } else {
-    memberBox.style.display = "none";
-  }
+    if (!memberIdGroup || !otherDonorBox) return;
+
+    const memberId = document.getElementById("donorMemberId");
+    const email = document.getElementById("donorEmail");
+    const pan = document.getElementById("donorPan");
+
+    const isMemberEmployee =
+        selectedType === "ARPEU Member" ||
+        selectedType === "Electricity Employee" ||
+        selectedType === "Retired Employee";
+
+    if (isMemberEmployee) {
+        memberIdGroup.style.display = "block";
+        otherDonorBox.style.display = "none";
+
+        if (email) email.value = "";
+        if (pan) pan.value = "";
+    } else if (
+        selectedType === "Well Wisher / Public" ||
+        selectedType === "Shop Owner / Business Establishment" ||
+        selectedType === "Business Establishment" ||
+        selectedType === "Sponsor / Organization"
+    ) {
+        memberIdGroup.style.display = "none";
+        otherDonorBox.style.display = "block";
+
+        if (memberId) memberId.value = "";
+    } else {
+        memberIdGroup.style.display = "none";
+        otherDonorBox.style.display = "none";
+
+        if (memberId) memberId.value = "";
+        if (email) email.value = "";
+        if (pan) pan.value = "";
+    }
 }
 
 /* Real-time Mobile Input Handler for Donations */
@@ -4095,7 +4138,7 @@ function handleDonorMobileInput(inputEl) {
       }
 
       // Execute Universal Search Engine Immediately
-      searchDonorOrMember(val);
+      searchDonorOrMember(val, document.getElementById("donorType")?.value || "");
     }
   } else {
     lastDonorSearchedMobile = "";
@@ -4110,15 +4153,16 @@ function handleDonorMobileInput(inputEl) {
  * Universal Search API Trigger
  * Searches Members and Donors in Google Sheets Backend
  * @param {string} queryKey - Mobile number or Identifier
+ * @param {string} donorType - The type of donor
  */
-async function searchDonorOrMember(queryKey) {
+async function searchDonorOrMember(queryKey, donorType) {
   const statusEl = document.getElementById("donorMobileStatus") || document.getElementById("profileSearchStatus");
   if (!queryKey) return;
 
   const targetUrl = typeof BACKEND_URL !== "undefined" ? BACKEND_URL : PORTAL_BACKEND_URL;
 
   try {
-    const url = `${targetUrl}?action=searchDonorOrMember&query=${encodeURIComponent(queryKey)}`;
+    const url = `${targetUrl}?action=searchDonorOrMember&query=${encodeURIComponent(queryKey)}&donorType=${encodeURIComponent(donorType || "")}`;
     const response = await fetch(url);
     const result = await response.json();
 
@@ -4188,8 +4232,9 @@ function closeDonorSearchModal() {
   if (modal) modal.style.display = "none";
 
   // Enforce mandatory auto-fill if an existing record was detected
-  if (typeof foundSearchRecord !== "undefined" && foundSearchRecord) {
-    applyAutoFillData();
+  function closeDonorSearchModal() {
+    const modal = document.getElementById("donorSearchModal");
+    if (modal) modal.style.display = "none";
   }
 }
 
@@ -4201,7 +4246,7 @@ function applyAutoFillData() {
   const d = foundSearchRecord;
 
   // 1. Donation Form Auto-Fill
-  if (d.donorType && document.getElementById("donorType"))           document.getElementById("donorType").value = d.donorType;
+  if (document.getElementById("donorType")) toggleDonorTypeFields(document.getElementById("donorType").value);
   if (d.name && document.getElementById("donorName"))               document.getElementById("donorName").value = d.name;
   if (d.mobile && document.getElementById("donorMobile"))           document.getElementById("donorMobile").value = d.mobile;
   if (d.email && document.getElementById("donorEmail"))             document.getElementById("donorEmail").value = d.email;
@@ -4209,6 +4254,8 @@ function applyAutoFillData() {
     document.getElementById("donorOrganization").value = d.organization || d.station || "";
   }
   if (d.address && document.getElementById("donorAddress"))         document.getElementById("donorAddress").value = d.address;
+  if (d.company && document.getElementById("donorCompany")) document.getElementById("donorCompany").value = d.company;
+  if ((d.membershipId || d.memberId) && document.getElementById("donorMemberId")) document.getElementById("donorMemberId").value = d.membershipId || d.memberId;
   if (d.pan && document.getElementById("donorPan"))                 document.getElementById("donorPan").value = d.pan;
 
   // 2. Profile Form Auto-Fill
@@ -4302,6 +4349,7 @@ async function submitDonationForm() {
     donorMobile:    donorMobile,
     donorEmail:     document.getElementById("donorEmail") ? document.getElementById("donorEmail").value.trim() : "",
     organization:   document.getElementById("donorOrganization") ? document.getElementById("donorOrganization").value.trim() : "",
+    membershipId:   document.getElementById("donorMemberId") ? document.getElementById("donorMemberId").value.trim() : "",
     address:        document.getElementById("donorAddress") ? document.getElementById("donorAddress").value.trim() : "",
     pan:            document.getElementById("donorPan") ? document.getElementById("donorPan").value.trim().toUpperCase() : "",
     donationType:   donationType,
@@ -4366,26 +4414,22 @@ async function submitDonationForm() {
 }
 
 /* ==========================================================
-   MASTER UNIVERSAL RECEIPT GENERATOR (EXACT 1:1 CLONE)
+   DONATION RECEIPT GENERATOR (SURGICAL FIX)
    ========================================================== */
-
 function openDonationReceipt(data) {
   if (!data) return;
 
-  // 1. Switch Title Ribbon to Orange "DONATION RECEIPT"
   const titlePill = document.getElementById("receiptTitle");
   if (titlePill) {
     titlePill.textContent = "DONATION RECEIPT";
     titlePill.style.backgroundColor = "#F57C00";
   }
 
-  // 2. Text Content Helper
   const setVal = (id, val) => {
     const el = document.getElementById(id);
     if (el) el.textContent = val || "-";
   };
 
-  // 3. Receipt Metadata Setup (Exact Membership Meta Grid)
   const currentYear = new Date().getFullYear();
   setVal("rReceiptNo", data.receiptNo || `ARPEU/DON/${currentYear}/1`);
   setVal("rMembershipId", data.donationId || `DON${currentYear}0001`);
@@ -4400,43 +4444,34 @@ function openDonationReceipt(data) {
   setVal("rStage", "-");
   setVal("rDivision", data.donationType || "General Donation");
 
-  // Force Layout Visibility matching Master Membership Receipt
   const gencoFields = document.getElementById("gencoReceiptFields");
   const discomFields = document.getElementById("discomReceiptFields");
   if (gencoFields) gencoFields.style.display = "flex";
   if (discomFields) discomFields.style.display = "none";
 
-  // 4. Particulars Table (Matching Exact Membership Receipt Table)
   const totalAmount = parseFloat(data.amount) || 0;
-  setVal("rAdmissionFee", totalAmount);
-  setVal("rAnnualSub", 0);
-  setVal("rDonation", 0);
-  setVal("rOthers", 0);
-  setVal("rTotal", totalAmount);
-
-  // Dynamic Label Swap in Table Body
   const tableBody = document.querySelector("#receiptContainer .receipt-table tbody");
   if (tableBody) {
     tableBody.innerHTML = `
       <tr>
         <td>${data.donationType || "Donation"}${data.purpose ? ` (${data.purpose})` : ""}</td>
-        <td class="amt-col">Rs. <span id="rAdmissionFee">${totalAmount}</span></td>
+        <td class="amt-col">Rs. <span>${totalAmount}</span></td>
       </tr>
       <tr>
         <td>Administrative & Welfare Fund</td>
-        <td class="amt-col">Rs. <span id="rAnnualSub">0</span></td>
+        <td class="amt-col">Rs. 0</td>
       </tr>
       <tr>
         <td>Special Contribution</td>
-        <td class="amt-col">Rs. <span id="rDonation">0</span></td>
+        <td class="amt-col">Rs. 0</td>
       </tr>
       <tr>
         <td>Others</td>
-        <td class="amt-col">Rs. <span id="rOthers">0</span></td>
+        <td class="amt-col">Rs. 0</td>
       </tr>
       <tr class="total-row">
         <td class="total-lbl">Total</td>
-        <td class="amt-col total-val">Rs. <span id="rTotal">${totalAmount}</span></td>
+        <td class="amt-col total-val">Rs. ${totalAmount}</td>
       </tr>
       <tr class="words-row">
         <td colspan="2">
@@ -4447,12 +4482,10 @@ function openDonationReceipt(data) {
     `;
   }
 
-  // 5. Payment Information
   setVal("rPaymentMode", data.paymentMode || "UPI");
   setVal("rTransactionId", data.transactionId || "VERIFIED");
   setVal("rPaymentStatus", "SUCCESSFUL / RECEIVED");
 
-  // 6. QR Code (Exact Same Size 85x85)
   const qrBox = document.getElementById("receiptQrCode");
   if (qrBox && typeof QRCode === "function") {
     qrBox.innerHTML = "";
@@ -4466,18 +4499,26 @@ function openDonationReceipt(data) {
     });
   }
 
-  // 7. Hide Form and Mark Master Receipt Active
-  const donSec = document.getElementById("donationsSection");
-  if (donSec) donSec.style.display = "none";
+  const membPage = document.getElementById("membershipPage");
+  const homeSec  = document.getElementById("homeSection");
+  const donSec   = document.getElementById("donationsSection");
+
+  if (membPage) membPage.style.display = "none";
+  if (homeSec)  homeSec.style.display  = "none";
+  if (donSec)   donSec.style.display   = "none";
 
   const masterRc = document.getElementById("receiptContainer");
   if (masterRc) {
     masterRc.style.display = "block";
-    masterRc.setAttribute("data-donation-active", "true"); // Saves donation receipt active status
+    masterRc.setAttribute("data-donation-active", "true");
+    masterRc.setAttribute("data-origin-page", "donations");
+    masterRc.removeAttribute("data-membership-active");
   }
 
-  window.scrollTo({ top: 0, behavior: "smooth" });
+  const contentArea = document.getElementById("contentArea") || window;
+  contentArea.scrollTo({ top: 0, behavior: "smooth" });
 }
+
 
 /* ==========================================================
    COMPLETE DONATION FORM RESET ENGINE
@@ -5351,6 +5392,7 @@ window.closeReceipt = function () {
     rc.removeAttribute("data-origin-page");
     rc.removeAttribute("data-membership-active");
     rc.removeAttribute("data-donation-active");
+    rc.removeAttribute("data-diary-active"); // 👉 ఇక్కడ డైరీ యాట్రిబ్యూట్ క్లియర్ అవుతుంది
     rc.removeAttribute("data-receipt-open");
     rc.removeAttribute("data-active");
   }
@@ -5366,7 +5408,11 @@ window.closeReceipt = function () {
       resetDonationForm();
     }
     showPage("donations");
+    
   } else if (originPage === "diary") {
+    if (typeof closeDiaryFlowForm === "function") {
+      closeDiaryFlowForm(); // 👉 డైరీ ఫారమ్ ఇన్-పుట్స్ అన్నీ క్లీన్ అయి డ్యాష్‌బోర్డ్ వస్తుంది
+    }
     showPage("diary");
   } else {
     if (typeof resetMembershipForm === "function") {
@@ -8087,6 +8133,18 @@ async function submitDiaryOrderForm() {
                 titlePill.textContent = "DIARY ORDER RECEIPT";
                 titlePill.style.backgroundColor = "#0B4EA2";
             }
+
+            // 👉 SURGICAL FIX FOR DIARY ISOLATION
+            const diarySec = document.getElementById("diarySection");
+            if (diarySec) diarySec.style.display = "none";
+
+            const rc = document.getElementById("receiptContainer");
+            if (rc) {
+                rc.setAttribute("data-diary-active", "true");
+                rc.setAttribute("data-origin-page", "diary");
+                rc.removeAttribute("data-donation-active");
+                rc.removeAttribute("data-membership-active");
+            }
         }
     }, 600);
 }
@@ -8126,6 +8184,18 @@ function processDiaryOrderPayment(type) {
         if (titlePill) {
             titlePill.textContent = "ADVERTISEMENT RECEIPT";
             titlePill.style.backgroundColor = "#EA580C";
+        }
+
+        // 👉 SURGICAL FIX FOR DIARY ADVT ISOLATION
+        const diarySec = document.getElementById("diarySection");
+        if (diarySec) diarySec.style.display = "none";
+
+        const rc = document.getElementById("receiptContainer");
+        if (rc) {
+            rc.setAttribute("data-diary-active", "true");
+            rc.setAttribute("data-origin-page", "diary");
+            rc.removeAttribute("data-donation-active");
+            rc.removeAttribute("data-membership-active");
         }
     }
 }
