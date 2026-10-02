@@ -8381,7 +8381,7 @@ const arpeuGalleryEngine = (function() {
         });
     }
 
-    function startCardSlideshow(event, photos) {
+  function startCardSlideshow(event, photos) {
         if (!photos || photos.length === 0) return;
         const imgEl = document.getElementById("cover-" + event.eventId);
         const placeholderEl = document.getElementById("placeholder-" + event.eventId);
@@ -8395,20 +8395,27 @@ const arpeuGalleryEngine = (function() {
 
         if (photos.length > 1) {
             let slideIdx = 0;
-            const previewLimit = Math.min(photos.length, 3);
+            const previewLimit = Math.min(photos.length, 4);
 
             if (slideshowTimers[event.eventId]) {
                 clearInterval(slideshowTimers[event.eventId]);
             }
 
-            slideshowTimers[event.eventId] = setInterval(function() {
-                slideIdx = (slideIdx + 1) % previewLimit;
-                imgEl.style.opacity = "0.7";
-                setTimeout(function() {
-                    imgEl.src = photos[slideIdx].thumbnail;
-                    imgEl.style.opacity = "1";
-                }, 250);
-            }, 3000);
+            // 👉 ఒక్కో కార్డుకి వేర్వేరు సమయాలు (3.2s, 4.5s, 5.8s etc.) & రాండమ్ ఆఫ్-సెట్
+            const eventHash = (event.eventId || "").split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
+            const dynamicInterval = 2200 + (eventHash % 4) * 900; // వేర్వేరు టైమింగ్స్
+            const startDelay = (eventHash % 5) * 400;             // వేర్వేరు స్టార్ట్ డిలే
+
+            setTimeout(() => {
+                slideshowTimers[event.eventId] = setInterval(function() {
+                    slideIdx = (slideIdx + 1) % previewLimit;
+                    imgEl.style.opacity = "0.7";
+                    setTimeout(function() {
+                        imgEl.src = photos[slideIdx].thumbnail;
+                        imgEl.style.opacity = "1";
+                    }, 300);
+                }, dynamicInterval);
+            }, startDelay);
         }
     }
 
@@ -8713,19 +8720,20 @@ const arpeuGalleryEngine = (function() {
 window.arpeuGalleryEngine = arpeuGalleryEngine;
 
 // ==========================================================
-// ARPEU PRESS & MEDIA ARCHIVE ENGINE (COMPLETE STANDALONE)
+// ARPEU PRESS & MEDIA ARCHIVE ENGINE (JET-SPEED CACHED VERSION)
 // ==========================================================
 
 const arpeuMediaArchiveEngine = (function() {
 
-    // Official Press & Media Google Drive Folder
+    // Official Press & Media Google Drive Folder with Direct Fallback
     const MEDIA_COLLECTIONS = [
         {
             mediaId: "MED-2025-STATE",
             title: "State Level Press Releases & Media Clippings",
             company: "ALL",
             date: "2025-2026",
-            folderId: "11m_OXiWuKK6WQszg4WJoJYtjGVgcAY9f"
+            folderId: "11m_OXiWuKK6WQszg4WJoJYtjGVgcAY9f",
+            defaultCover: "https://drive.google.com/thumbnail?id=11m_OXiWuKK6WQszg4WJoJYtjGVgcAY9f&sz=w600"
         }
     ];
 
@@ -8740,6 +8748,28 @@ const arpeuMediaArchiveEngine = (function() {
     // Mobile touch variables
     let touchStartX = 0;
     let touchEndX = 0;
+
+    // 👉 1. BULLETPROOF 48-HOUR LOCAL CACHE (JET SPEED)
+    function getStoredMedia(folderId) {
+        try {
+            const raw = localStorage.getItem("arpeu_media_v2_" + folderId);
+            if (!raw) return null;
+            const parsed = JSON.parse(raw);
+            if (Date.now() - parsed.timestamp < 48 * 60 * 60 * 1000) {
+                return parsed.photos;
+            }
+        } catch (e) {}
+        return null;
+    }
+
+    function setStoredMedia(folderId, photos) {
+        try {
+            localStorage.setItem("arpeu_media_v2_" + folderId, JSON.stringify({
+                timestamp: Date.now(),
+                photos: photos
+            }));
+        } catch (e) {}
+    }
 
     function init() {
         renderMediaCards();
@@ -8825,6 +8855,7 @@ const arpeuMediaArchiveEngine = (function() {
         }
     }
 
+    // 👉 2. RENDER CARDS INSTANTLY FROM CACHE
     function renderMediaCards() {
         const container = document.getElementById("mediaAlbumsContainer");
         if (!container) return;
@@ -8834,23 +8865,32 @@ const arpeuMediaArchiveEngine = (function() {
             return selectedCompany === "ALL" || item.company === selectedCompany;
         });
 
-        filtered.forEach(function(item) {
+       filtered.forEach(function(item) {
+            const cachedPhotos = getStoredMedia(item.folderId);
+            if (cachedPhotos && cachedPhotos.length > 0) {
+                mediaCache[item.folderId] = cachedPhotos;
+            }
+
+            // 👉 బ్యాక్‌ఎండ్ లేకపోయినా వెంటనే కవర్ ఫోటో కనిపిస్తుంది, లోడింగ్ అని ఆగదు
+            const initialPhoto = (cachedPhotos && cachedPhotos.length > 0) 
+                ? cachedPhotos[0].thumbnail 
+                : (item.defaultCover || "images/arpeu-logo.png");
+
+            const initialCount = cachedPhotos ? cachedPhotos.length + " Clippings" : "View Clippings";
+
             const card = document.createElement("div");
             card.className = "gallery-event-card";
 
             card.innerHTML = `
                 <div class="event-card-cover-wrap">
-                    <div id="media-placeholder-${item.mediaId}" class="event-cover-placeholder">
-                        <div class="gallery-spinner" style="width: 22px; height: 22px; border-width: 2px; border-top-color: #fff; margin: 0 auto 4px auto;"></div>
-                        <span style="font-size: 0.7rem; color: #94a3b8;">Loading...</span>
-                    </div>
                     <img class="event-card-cover-img" 
                          id="media-cover-${item.mediaId}"
-                         src="" 
+                         src="${initialPhoto}" 
                          alt="${item.title}" 
                          referrerpolicy="no-referrer"
                          loading="lazy" 
-                         style="display: none; width: 100%; height: 100%; object-fit: cover;" />
+                         style="display: block; width: 100%; height: 100%; object-fit: cover;" 
+                         onerror="this.src='images/arpeu-logo.png';" />
                 </div>
                 <div class="event-card-body">
                     <h3 class="event-card-title">${item.title}</h3>
@@ -8862,7 +8902,7 @@ const arpeuMediaArchiveEngine = (function() {
                             </span>
                             <span class="event-card-meta-item">
                                 <i class="fa-regular fa-newspaper"></i>
-                                <span id="media-count-${item.mediaId}">Clippings</span>
+                                <span id="media-count-${item.mediaId}">${initialCount}</span>
                             </span>
                         </div>
                         <button type="button" class="event-view-btn" aria-label="View Clippings">
@@ -8880,6 +8920,7 @@ const arpeuMediaArchiveEngine = (function() {
         });
     }
 
+    // 👉 3. BACKGROUND FETCH (STALE-WHILE-REVALIDATE)
     function loadMediaPreviews() {
         const targetUrl = typeof BACKEND_URL !== "undefined" ? BACKEND_URL : "https://script.google.com/macros/s/AKfycbyoBv4TQ28mb7HIsTQ42iEe7P-3Yqs-7lR5tHhHqk0RqCQOShGrLBVPvD4j2ZUV1Q/exec";
 
@@ -8902,6 +8943,7 @@ const arpeuMediaArchiveEngine = (function() {
             .then(data => {
                 if (data && data.success && data.photos && data.photos.length > 0) {
                     mediaCache[item.folderId] = data.photos;
+                    setStoredMedia(item.folderId, data.photos);
                     const countEl = document.getElementById("media-count-" + item.mediaId);
                     if (countEl) countEl.innerText = data.photos.length + " Clippings";
                     startSlideshow(item, data.photos);
@@ -8935,10 +8977,11 @@ const arpeuMediaArchiveEngine = (function() {
                     imgEl.src = photos[slideIdx].thumbnail;
                     imgEl.style.opacity = "1";
                 }, 250);
-            }, 3000);
+            }, 3600);
         }
     }
 
+    // 👉 4. OPEN ALBUM INSTANTLY FROM CACHE
     function openMediaAlbum(item) {
         currentMedia = item;
 
@@ -8952,8 +8995,11 @@ const arpeuMediaArchiveEngine = (function() {
         const loader = document.getElementById("mediaPhotosLoader");
         const emptyNotice = document.getElementById("mediaEmptyNotice");
 
-        if (mediaCache[item.folderId]) {
-            currentClippings = mediaCache[item.folderId];
+        // Instant Cache Show
+        const cached = mediaCache[item.folderId] || getStoredMedia(item.folderId);
+        if (cached && cached.length > 0) {
+            mediaCache[item.folderId] = cached;
+            currentClippings = cached;
             renderFilteredClippings();
             return;
         }
@@ -8979,6 +9025,7 @@ const arpeuMediaArchiveEngine = (function() {
             loader.style.display = "none";
             if (data && data.success && data.photos && data.photos.length > 0) {
                 mediaCache[item.folderId] = data.photos;
+                setStoredMedia(item.folderId, data.photos);
                 currentClippings = data.photos;
                 renderFilteredClippings();
             } else {
@@ -9027,7 +9074,6 @@ const arpeuMediaArchiveEngine = (function() {
                      onerror="this.src='https://drive.google.com/thumbnail?id=${photo.id}&sz=w400';" />
             `;
 
-            // Opens Dedicated Media Viewer
             thumb.addEventListener("click", function() {
                 openMediaViewer(filtered, index);
             });
@@ -9036,7 +9082,6 @@ const arpeuMediaArchiveEngine = (function() {
         });
     }
 
-    // Opens Dedicated Lightbox Modal
     function openMediaViewer(list, index) {
         currentClippings = list;
         currentClippingIndex = index;
@@ -9093,7 +9138,6 @@ const arpeuMediaArchiveEngine = (function() {
         img.setAttribute("referrerpolicy", "no-referrer");
         img.src = photo.fullUrl;
 
-        // Auto-scroll the filmstrip thumbnail
         const strip = document.getElementById("mediaLightboxThumbnailsStrip");
         if (strip) {
             const prevActive = strip.querySelector(".strip-thumb-item.active");
@@ -9129,7 +9173,6 @@ const arpeuMediaArchiveEngine = (function() {
         if (sheet) sheet.style.display = "none";
     }
 
-    // Toggles Bottom Sheet for Download and Share
     function toggleMediaActionSheet() {
         let sheet = document.getElementById("mediaActionSheetDynamic");
         const modal = document.getElementById("mediaLightboxModal");
@@ -9171,7 +9214,6 @@ const arpeuMediaArchiveEngine = (function() {
         }
     }
 
-    // Instant Social Share
     function shareActiveClipping() {
         const photo = currentClippings[currentClippingIndex];
         if (!photo) return;
@@ -9188,7 +9230,6 @@ const arpeuMediaArchiveEngine = (function() {
         }
     }
 
-    // Direct Phone Storage Download
     async function downloadActiveClipping() {
         const photo = currentClippings[currentClippingIndex];
         if (!photo) return;
