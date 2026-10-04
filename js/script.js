@@ -6239,6 +6239,26 @@ function listenForIncomingCalls(myMobile) {
 }
 
 /**
+ * 4. Initiate a Group Video Call to all Committee Members
+ */
+function startCoreCommitteeGroupCall() {
+    console.log("Initiating Group Video Call to all leaders...");
+    
+    if (typeof coreCommitteeCadreMaster !== 'undefined') {
+        coreCommitteeCadreMaster.forEach(leader => {
+            // Send call signal to everyone except yourself
+            if (leader.mobile && leader.mobile !== "9642788786") {
+                placeCall(leader.mobile, "Sri P. Balakrishna");
+            }
+        });
+    }
+    
+    // Open the conference stage for you (Host)
+    launchInstantConference('Core Committee', 'video');
+}
+
+
+/**
  * 3. Place a Call (Triggered when you tap a leader card)
  */
 function placeCall(targetMobile, callerName) {

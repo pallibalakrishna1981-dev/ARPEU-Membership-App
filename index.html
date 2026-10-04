@@ -3233,12 +3233,15 @@
                     <h4>CORE COMMITTEE MEETING</h4>
                 </div>
                 <div class="pod-three-buttons-row">
-                    <button type="button" class="btn-pod-action btn-pod-video" onclick="launchInstantConference('Core Committee', 'video')">
+                    <!-- Updated to trigger Firebase Group Call -->
+                    <button type="button" class="btn-pod-action btn-pod-video" onclick="startCoreCommitteeGroupCall()">
                         <i class="fas fa-video"></i> Video Call
                     </button>
+                    
                     <button type="button" class="btn-pod-action btn-pod-audio" onclick="launchInstantConference('Core Committee', 'audio')">
                         <i class="fas fa-phone-alt"></i> Audio Call
                     </button>
+                    
                     <button type="button" class="btn-pod-action btn-pod-manage" onclick="openEditMembersModal('core')">
                         <i class="fas fa-cog"></i> Manage List
                     </button>
