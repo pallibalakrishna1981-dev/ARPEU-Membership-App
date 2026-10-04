@@ -6218,6 +6218,20 @@ NEW QUICK LINKS INTEGRATED CARD STYLES
     z-index: 999 !important;
 }
 
+/* 5. Online Presence Indicator (Green Dot) */
+.cadre-thumb-card.is-online::after {
+    content: "" !important;
+    position: absolute !important;
+    top: 6px !important;
+    right: 6px !important;
+    width: 10px !important;
+    height: 10px !important;
+    background: #10b981 !important; /* Emerald Green */
+    border: 1.5px solid #ffffff !important;
+    border-radius: 50% !important;
+    z-index: 20 !important;
+    box-shadow: 0 0 8px rgba(16, 185, 129, 0.8) !important;
+}
 
 .arpeu-call-modal-overlay {
     position: fixed;

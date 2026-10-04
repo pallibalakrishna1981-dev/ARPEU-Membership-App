@@ -6229,6 +6229,8 @@ function listenForIncomingCalls(myMobile) {
                 arpeuRingtone.currentTime = 0;
                 database.ref('calls/' + myMobile).update({ status: 'accepted' });
                 launchInstantConference('Core Committee', 'video'); // Join the meeting
+                const leaderCard = document.querySelector(`[onclick*="${myMobile}"]`);
+                if (leaderCard) leaderCard.classList.add('is-online');
             } else {
                 arpeuRingtone.pause();
                 arpeuRingtone.currentTime = 0;
@@ -6338,6 +6340,20 @@ let previousAgendaState = [
  * Launch 100% In-House Native ARPEU WebRTC Conference
  */
 async function launchInstantConference(committeeName = 'Core Committee', mode = 'video', directRoomCode = null) {
+
+    // 1. Identify who is using the app (For testing, it asks for number)
+    let myNumber = localStorage.getItem('arpeu_my_number');
+    if (!myNumber) {
+        myNumber = prompt("Please enter your Mobile Number to receive calls:", "9110771171");
+        localStorage.setItem('arpeu_my_number', myNumber);
+    }
+
+    // 2. Start listening for incoming calls for THIS specific number
+    listenForIncomingCalls(myNumber);
+    
+    // 3. Set this user as Online
+    setUserOnline(myNumber);
+    
     const isVideo = (mode === 'video');
     const roomCode = directRoomCode || `ARPEU-${committeeName.replace(/\s+/g, '-').toUpperCase()}-${Math.floor(100 + Math.random() * 900)}`;
 
