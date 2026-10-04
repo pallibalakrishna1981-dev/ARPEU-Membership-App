@@ -6440,12 +6440,12 @@ function listenToOnlineLeaders() {
 listenToOnlineLeaders();
 
 // ==========================================================================
-// LAUNCH CONFERENCE WITH FULL TWO-WAY WEBRTC STREAMING
+// LAUNCH CONFERENCE (CLEAN SEPARATION OF LOCAL & REMOTE VIDEO)
 // ==========================================================================
 async function launchInstantConference(committeeName = 'Core Committee', mode = 'video', directRoomCode = null, hostStatus = false) {
     isWebrtcHost = hostStatus;
     const isVideo = (mode === 'video');
-    currentActiveRoomCode = directRoomCode || `ARPEU-${committeeName.replace(/\s+/g, '-').toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`;
+    const roomCode = directRoomCode || `ARPEU-${committeeName.replace(/\s+/g, '-').toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`;
 
     const modal = document.getElementById('arpeuNativeConferenceModal');
     const roomTitle = document.getElementById('webrtcRoomTitle');
@@ -6455,67 +6455,84 @@ async function launchInstantConference(committeeName = 'Core Committee', mode = 
 
     if (!modal) return;
     if (roomTitle) roomTitle.textContent = `${committeeName} Live`;
-    if (roomCodeText) roomCodeText.textContent = `ROOM: ${currentActiveRoomCode}`;
+    if (roomCodeText) roomCodeText.textContent = `ROOM: ${roomCode}`;
 
     modal.style.display = 'flex';
     document.body.style.overflow = 'hidden';
 
     try {
-        // 1. Get Local Camera & Mic Media
         const constraints = {
-            audio: { echoCancellation: true, noiseSuppression: true },
+            audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
             video: isVideo ? { width: { ideal: 640 }, height: { ideal: 480 }, facingMode: 'user' } : false
         };
 
         webrtcLocalStream = await navigator.mediaDevices.getUserMedia(constraints);
 
-        // Render Self View in Picture-in-Picture window
+        // Self View in PIP
         if (localVideo) {
             localVideo.srcObject = webrtcLocalStream;
             localVideo.muted = true;
-            localVideo.play().catch(e => console.log('Local video play:', e));
+            localVideo.play().catch(e => console.log('Local video error:', e));
         }
 
-        // 2. Initialize WebRTC PeerConnection Bridge
-        setupWebRtcPeerConnection(currentActiveRoomCode, isWebrtcHost, mainVideo);
+        // Main Video: Do NOT overwrite with local stream! Wait for Remote Leader
+        if (mainVideo) {
+            mainVideo.srcObject = null;
+        }
+
+        if (typeof initConferenceAgendaHUD === 'function') initConferenceAgendaHUD();
+
+        // Connect Two-Way WebRTC Stream
+        setupWebRtcPeerConnection(roomCode, isWebrtcHost, mainVideo);
 
     } catch (err) {
         console.error('Camera/Mic Access Denied:', err);
-        alert('Please allow Camera and Microphone permissions in browser settings.');
+        alert('Could not access Camera/Microphone.');
     }
 }
 
+/**
+ * Updates Active Speaker Identity Ribbon and handles strict visibility.
+ */
 // ==========================================================================
-// WEBRTC PEER CONNECTION PIPELINE (OFFER / ANSWER / ICE SIGNALING VIA FIREBASE)
+// 2-WAY PEER CONNECTION BRIDGE (EXCHANGES VIDEO BETWEEN HOST & GUEST)
 // ==========================================================================
+const rtcIceServers = {
+    iceServers: [{ urls: 'stun:stun.l.google.com:19302' }, { urls: 'stun:stun1.l.google.com:19302' }]
+};
+
 async function setupWebRtcPeerConnection(roomCode, isHost, mainVideoElement) {
+    if (peerConnection) {
+        peerConnection.close();
+        peerConnection = null;
+    }
+
     peerConnection = new RTCPeerConnection(rtcIceServers);
 
-    // Push local tracks (Video/Audio) into the connection
     if (webrtcLocalStream) {
         webrtcLocalStream.getTracks().forEach(track => {
             peerConnection.addTrack(track, webrtcLocalStream);
         });
     }
 
-    // Remote Video Received (Host sees Guest, Guest sees Host!)
+    // Remote Video Received -> Show on Main Screen
     peerConnection.ontrack = (event) => {
-        console.log("Remote peer video stream received successfully!");
-        if (mainVideoElement) {
+        console.log("Remote peer video stream connected!");
+        if (mainVideoElement && event.streams && event.streams[0]) {
             mainVideoElement.srcObject = event.streams[0];
             mainVideoElement.muted = false;
-            mainVideoElement.play().catch(e => console.log('Main stream play error:', e));
+            mainVideoElement.play().catch(e => {
+                mainVideoElement.muted = true;
+                mainVideoElement.play();
+            });
         }
     };
 
     const roomRef = database.ref('conferenceRooms/' + roomCode);
 
     if (isHost) {
-        // HOST PIPELINE: Create Offer and Send to Firebase
-        peerConnection.onicecandidate = (event) => {
-            if (event.candidate) {
-                roomRef.child('hostCandidates').push(event.candidate.toJSON());
-            }
+        peerConnection.onicecandidate = (e) => {
+            if (e.candidate) roomRef.child('hostCandidates').push(e.candidate.toJSON());
         };
 
         const offer = await peerConnection.createOffer();
@@ -6526,61 +6543,44 @@ async function setupWebRtcPeerConnection(roomCode, isHost, mainVideoElement) {
             created: firebase.database.ServerValue.TIMESTAMP
         });
 
-        // Listen for Guest's Answer
-        roomRef.child('answer').on('value', async (snapshot) => {
-            const answer = snapshot.val();
+        roomRef.child('answer').on('value', async (snap) => {
+            const answer = snap.val();
             if (answer && !peerConnection.currentRemoteDescription) {
-                const rtcDesc = new RTCSessionDescription(answer);
-                await peerConnection.setRemoteDescription(rtcDesc);
-                console.log("Host connected to Guest successfully!");
+                await peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
             }
         });
 
-        // Listen for Guest ICE Candidates
-        roomRef.child('guestCandidates').on('child_added', async (snapshot) => {
-            const candidate = snapshot.val();
-            if (candidate) {
-                await peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
+        roomRef.child('guestCandidates').on('child_added', (snap) => {
+            const candidate = snap.val();
+            if (candidate && peerConnection) {
+                peerConnection.addIceCandidate(new RTCIceCandidate(candidate)).catch(e => {});
             }
         });
 
     } else {
-        // GUEST PIPELINE: Wait for Host Offer, Create Answer
-        peerConnection.onicecandidate = (event) => {
-            if (event.candidate) {
-                roomRef.child('guestCandidates').push(event.candidate.toJSON());
-            }
+        peerConnection.onicecandidate = (e) => {
+            if (e.candidate) roomRef.child('guestCandidates').push(e.candidate.toJSON());
         };
 
-        roomRef.child('offer').on('value', async (snapshot) => {
-            const offer = snapshot.val();
+        roomRef.child('offer').once('value', async (snap) => {
+            const offer = snap.val();
             if (offer && !peerConnection.currentRemoteDescription) {
                 await peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
-                
                 const answer = await peerConnection.createAnswer();
                 await peerConnection.setLocalDescription(answer);
-
-                await roomRef.child('answer').set({
-                    type: answer.type,
-                    sdp: answer.sdp
-                });
-                console.log("Guest connected to Host successfully!");
+                await roomRef.child('answer').set({ type: answer.type, sdp: answer.sdp });
             }
         });
 
-        // Listen for Host ICE Candidates
-        roomRef.child('hostCandidates').on('child_added', async (snapshot) => {
-            const candidate = snapshot.val();
-            if (candidate) {
-                await peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
+        roomRef.child('hostCandidates').on('child_added', (snap) => {
+            const candidate = snap.val();
+            if (candidate && peerConnection) {
+                peerConnection.addIceCandidate(new RTCIceCandidate(candidate)).catch(e => {});
             }
         });
     }
 }
 
-/**
- * Updates Active Speaker Identity Ribbon and handles strict visibility.
- */
 function updateActiveSpeakerIdentity(name, designation, unit) {
     const ribbon = document.getElementById('speakerIdentityRibbon');
     const nameEl = document.getElementById('mainSpeakerName');
@@ -7118,9 +7118,9 @@ function webrtcToggleMic() {
     }
 }
 
-/**
- * Toggles camera and manages placeholder image visibility.
- */
+// ==========================================================================
+// DYNAMIC ACTIVE SPEAKER CAMERA TOGGLE (SHOWS ACTIVE SPEAKER PHOTO ON MUTE)
+// ==========================================================================
 function webrtcToggleCam() {
     const btn = document.getElementById('btnToggleCam');
     const mainVideo = document.getElementById('mainSpeakerVideo');
@@ -7129,28 +7129,52 @@ function webrtcToggleCam() {
 
     let isVideoEnabled = false;
 
+    // Toggle local video track state
     if (webrtcLocalStream && webrtcLocalStream.getVideoTracks().length > 0) {
         const videoTrack = webrtcLocalStream.getVideoTracks()[0];
         videoTrack.enabled = !videoTrack.enabled;
         isVideoEnabled = videoTrack.enabled;
     }
 
-    // UI Updates
+    // Update Cam Button Icon and Class
     if (btn) {
         btn.classList.toggle('muted', !isVideoEnabled);
         if (btnIcon) btnIcon.className = isVideoEnabled ? 'fas fa-video' : 'fas fa-video-slash';
     }
 
-    // Toggle Placeholder Image
+    // Toggle Active Speaker Video vs Active Speaker Photo Placeholder
     if (mainVideo && placeholder) {
         if (!isVideoEnabled) {
-            // Show photo when camera is off
-            const currentPhoto = mainVideo.dataset.currentPhoto || 'images/bms-state-office-bearers/t-raghuram-bms-state-president.jpg';
-            placeholder.src = currentPhoto;
+            // 1. Get currently displayed active speaker's name from screen ribbon
+            const activeSpeakerName = document.getElementById('mainSpeakerName')?.textContent?.trim() || "";
+            
+            // 2. Fetch photo directly from dataset or match with cadre master list
+            let resolvedSpeakerPhoto = mainVideo.dataset.currentPhoto;
+
+            if (!resolvedSpeakerPhoto && typeof coreCommitteeCadreMaster !== 'undefined') {
+                const matchedLeader = coreCommitteeCadreMaster.find(leader => 
+                    activeSpeakerName && (leader.name.toLowerCase().includes(activeSpeakerName.toLowerCase()) || 
+                    activeSpeakerName.toLowerCase().includes(leader.name.toLowerCase()))
+                );
+                if (matchedLeader && matchedLeader.photo) {
+                    resolvedSpeakerPhoto = matchedLeader.photo;
+                }
+            }
+
+            // 3. Fallback: Check if tapped leader photo exists
+            if (!resolvedSpeakerPhoto) {
+                const tappedImg = document.querySelector('#tappedLeaderPhotoWrap img');
+                if (tappedImg && tappedImg.src) resolvedSpeakerPhoto = tappedImg.src;
+            }
+
+            // 4. Apply Active Speaker's Photo (Fallback to neutral logo if no photo found)
+            placeholder.src = resolvedSpeakerPhoto || 'images/arpeu-logo.png';
             placeholder.style.display = 'block';
-            mainVideo.style.opacity = '0'; // Hide the black video stream
+            mainVideo.style.opacity = '0';
+            
+            console.log(`Camera Off: Displaying Active Speaker Photo for [${activeSpeakerName}] -> ${placeholder.src}`);
         } else {
-            // Show live video
+            // Restore live video when camera is switched back on
             placeholder.style.display = 'none';
             mainVideo.style.opacity = '1';
         }
