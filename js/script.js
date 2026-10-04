@@ -6252,7 +6252,6 @@ async function launchInstantConference(committeeName = 'Core Committee', mode = 
 
     // Dynamically Set Initial Speaker Identity (Host Data)
     const initialSpeaker = coreCommitteeCadreMaster[0];
-    updateActiveSpeakerIdentity(initialSpeaker.name, initialSpeaker.designation, initialSpeaker.unit);
 
     updateOnlineParticipantsCount(liveOnlineParticipants);
 
@@ -6296,16 +6295,30 @@ async function launchInstantConference(committeeName = 'Core Committee', mode = 
 }
 
 /**
- * Update Dynamic Active Speaker Identity Ribbon (Bottom of Video Stage)
+ * Updates Active Speaker Identity Ribbon and handles strict visibility.
  */
 function updateActiveSpeakerIdentity(name, designation, unit) {
+    const ribbon = document.getElementById('speakerIdentityRibbon');
     const nameEl = document.getElementById('mainSpeakerName');
     const roleEl = document.getElementById('mainSpeakerRole');
     const unitEl = document.getElementById('mainSpeakerUnit');
 
-    if (nameEl) nameEl.textContent = name || 'State Leader';
-    if (roleEl) roleEl.textContent = designation || 'Office Bearer';
-    if (unitEl) unitEl.textContent = unit || 'ARPEU State Committee';
+    // Check if name exists and is not empty
+    if (name && name.trim() !== "") {
+        if (nameEl) nameEl.textContent = name;
+        if (roleEl) roleEl.textContent = designation || "";
+        if (unitEl) unitEl.textContent = unit || "";
+        
+        // Show ribbon only when there is a name
+        if (ribbon) {
+            ribbon.style.setProperty('display', 'flex', 'important');
+        }
+    } else {
+        // Completely hide the ribbon container if no name
+        if (ribbon) {
+            ribbon.style.setProperty('display', 'none', 'important');
+        }
+    }
 }
 
 /**
@@ -7160,22 +7173,32 @@ let secondarySpeakerTimeout = null;
  * 1. Personal Focus / Local Tap-to-Pin Feature
  * (Runs only on the local device that clicked, does not affect others)
  */
-function handleCadreThumbClick(cadreId, cadreName, cadreRole, cadreUnit) {
-    const mainVideo = document.getElementById('mainSpeakerVideo');
-    const pinBadge = document.getElementById('personalPinIndicator');
-    const pinnedNameEl = document.getElementById('pinnedLeaderName');
+function handleCadreThumbClick(cadreId, cadreName, cadreRole, cadreUnit, photoSrc) {
+    console.log("Step 1: Function Started for", cadreName);
 
-    isPersonallyPinned = true;
-
-    // Update Ribbon with Pinned Leader Info Locally
-    updateActiveSpeakerIdentity(cadreName, cadreRole, cadreUnit);
-
-    if (pinBadge && pinnedNameEl) {
-        pinnedNameEl.textContent = cadreName;
-        pinBadge.style.display = 'flex';
+    // 1. Highlight Card
+    document.querySelectorAll('.cadre-thumb-card').forEach(card => card.classList.remove('selected-leader'));
+    const currentCard = document.getElementById('card-' + cadreId);
+    if (currentCard) {
+        currentCard.classList.add('selected-leader');
+        console.log("Step 2: Border Class Added to card-" + cadreId);
+    } else {
+        console.error("Step 2 Error: Card ID not found: card-" + cadreId);
     }
 
-    console.log(`[Local Focus View] Pinned leader: ${cadreName} on this screen.`);
+    // 2. Show PiP Photo
+    const photoWrap = document.getElementById('tappedLeaderPhotoWrap');
+    if (photoWrap) {
+        photoWrap.innerHTML = `<img src="${photoSrc}" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='images/arpeu-logo.png'">`;
+        photoWrap.style.display = 'block';
+        console.log("Step 3: PiP Photo Displayed");
+    } else {
+        console.error("Step 3 Error: tappedLeaderPhotoWrap ID not found!");
+    }
+
+    // 3. Update Ribbon
+    updateActiveSpeakerIdentity(cadreName, cadreRole, cadreUnit);
+    console.log("Step 4: Ribbon Updated");
 }
 
 function resetPersonalFocusView() {

@@ -3864,6 +3864,7 @@
             <div class="speaker-stage" id="speakerStageContainer">
                 <!-- Main Focus Speaker Stage -->
                 <video id="mainSpeakerVideo" autoplay playsinline muted></video>
+                <div id="tappedLeaderPhotoWrap" class="tapped-leader-photo" style="display: none;"></div>
                 <canvas id="virtualBgCanvas" style="display: none;"></canvas>
 
                 <!-- 🌟 SECONDARY SPEAKER PIP OVERLAY (1/4th Screen Corner Window) -->
@@ -3910,15 +3911,12 @@
                 </div>
 
                 
-                <!-- DYNAMIC ACTIVE SPEAKER RIBBON -->
-                <div class="speaker-identity-ribbon" id="speakerIdentityRibbon">
-                    <div class="ribbon-avatar-box">
-                        <img id="mainSpeakerAvatar" src="images/arpeu-logo.png" alt="Leader Avatar" class="ribbon-avatar-img" onerror="this.src='https://pallibalakrishna1981-dev.github.io/ARPEU-Membership-App/images/arpeu-logo.png'">
-                    </div>
+                <!-- DYNAMIC ACTIVE SPEAKER RIBBON (HIDDEN BY DEFAULT) -->
+                <div class="speaker-identity-ribbon" id="speakerIdentityRibbon" style="display: none;">
                     <div class="ribbon-text-col">
-                        <div class="ribbon-name" id="mainSpeakerName">SRI P. BALAKRISHNA</div>
-                        <div class="ribbon-desig" id="mainSpeakerRole">State Treasurer</div>
-                        <div class="ribbon-unit" id="mainSpeakerUnit">APGENCO – Dr. NTTPS</div>
+                        <div class="ribbon-name" id="mainSpeakerName"></div>
+                        <div class="ribbon-desig" id="mainSpeakerRole"></div>
+                        <div class="ribbon-unit" id="mainSpeakerUnit"></div>
                     </div>
                 </div>
 
@@ -3926,6 +3924,7 @@
                 <div class="stage-hand-alert" id="stageHandAlert" style="display: none;">
                     <i class="fas fa-hand-paper hand-alert-icon"></i> <span id="handAlertCadreName">You Raised Hand</span>
                 </div>
+                
             </div>
 
             <!-- B. DOCUMENT PROJECTOR STAGE (CLEAN & PROPERLY CLOSED) -->
@@ -3980,75 +3979,52 @@
         </div>
 
        <!-- 3. HORIZONTAL CAROUSEL (EXACTLY 8 CORE COMMITTEE LEADERS - NO YOU CARD) -->
-<div class="horizontal-cadre-carousel" id="horizontalCadreCarousel">
-    <div class="cadre-strip-track" id="cadreStripTrack">
-        
-        <!-- Leader 1 -->
-        <div class="cadre-thumb-card" id="card-0" onclick="selectCoreLeader(0)">
-            <img src="images/state-office-bearers/raghuram-state-president-bms.jpg" alt="T. Raghuram" onerror="this.src='images/arpeu-logo.png'">
-            <div class="thumb-label">
-                <span class="thumb-name">T. Raghuram</span>
-            </div>
+        <div class="horizontal-cadre-carousel" id="horizontalCadreCarousel">
+            <div class="cadre-strip-track" id="cadreStripTrack">
+                
+                <!-- Leader 1: T. Raghuram -->
+        <div class="cadre-thumb-card" id="card-0" onclick="handleCadreThumbClick(0, 'T. Raghuram', 'BMS State President', 'BMS Andhra Pradesh', 'images/bms-state-office-bearers/t-raghuram-bms-state-president.jpg')">
+            <img src="images/bms-state-office-bearers/t-raghuram-bms-state-president.jpg" alt="T. Raghuram" onerror="this.src='images/arpeu-logo.png'">
         </div>
 
-        <!-- Leader 2 -->
-        <div class="cadre-thumb-card" id="card-1" onclick="selectCoreLeader(1)">
-            <img src="images/state-office-bearers/raghuram-state-president-bms.jpg" alt="M.V.S. Naidu" onerror="this.src='images/arpeu-logo.png'">
-            <div class="thumb-label">
-                <span class="thumb-name">M.V.S. Naidu</span>
-            </div>
+        <!-- Leader 2: M.V.S. Naidu -->
+        <div class="cadre-thumb-card" id="card-1" onclick="handleCadreThumbClick(1, 'M.V.S. Naidu', 'BMS State General Secretary', 'BMS Andhra Pradesh', 'images/bms-state-office-bearers/mvs-naidu-bms-gen-secretary.jpg')">
+            <img src="images/bms-state-office-bearers/mvs-naidu-bms-gen-secretary.jpg" alt="M.V.S. Naidu" onerror="this.src='images/arpeu-logo.png'">
         </div>
 
-        <!-- Leader 3 -->
-        <div class="cadre-thumb-card" id="card-2" onclick="selectCoreLeader(2)">
-            <img src="images/arpeu-logo.png" alt="K. Lova Reddy">
-            <div class="thumb-label">
-                <span class="thumb-name">K. Lova Reddy</span>
-            </div>
+        <!-- Leader 3: K. Lova Reddy -->
+        <div class="cadre-thumb-card" id="card-2" onclick="handleCadreThumbClick(2, 'K. Lova Reddy', 'BMS State Organising Secretary', 'BMS Andhra Pradesh', 'images/bms-state-office-bearers/k-lova-reddy-bms-state-organizing-secretary.jpg')">
+            <img src="images/bms-state-office-bearers/k-lova-reddy-bms-state-organizing-secretary.jpg" alt="K. Lova Reddy" onerror="this.src='images/arpeu-logo.png'">
         </div>
 
-        <!-- Leader 4 -->
-        <div class="cadre-thumb-card" id="card-3" onclick="selectCoreLeader(3)">
-            <img src="images/state-office-bearers/state-president.jpg" alt="T. Sambasiva Rao" onerror="this.src='images/arpeu-logo.png'">
-            <div class="thumb-label">
-                <span class="thumb-name">T. Sambasiva</span>
+                <!-- Leader 4 -->
+                <div class="cadre-thumb-card" id="card-3" onclick="handleCadreThumbClick(3, 'T. Sambasiva Rao', 'ARPEU State President', 'APCPDCL – Ongole', 'images/state-office-bearers/state-president.jpg')">
+                    <img src="images/state-office-bearers/state-president.jpg" alt="T. Sambasiva Rao" onerror="this.src='images/arpeu-logo.png'">
+                </div>
+
+                <!-- Leader 5 -->
+                <div class="cadre-thumb-card" id="card-4" onclick="handleCadreThumbClick(4, 'C. Ramagopal Reddy', 'ARPEU State General Secretary', 'APSPDCL – Tirupati', 'images/state-office-bearers/general-secretary.jpg')">
+                    <img src="images/state-office-bearers/general-secretary.jpg" alt="C. Ramagopal Reddy" onerror="this.src='images/arpeu-logo.png'">
+                </div>
+
+                <!-- Leader 6 -->
+                <div class="cadre-thumb-card" id="card-5" onclick="handleCadreThumbClick(5, 'P. Balakrishna', 'ARPEU State Treasurer', 'APGENCO – Dr. NTTPS', 'images/state-office-bearers/state-treasurer.jpg')">
+                    <img src="images/state-office-bearers/state-treasurer.jpg" alt="P. Balakrishna" onerror="this.src='images/arpeu-logo.png'">
+                </div>
+
+                <!-- Leader 7 -->
+                <div class="cadre-thumb-card" id="card-6" onclick="handleCadreThumbClick(6, 'K. Jayappa', 'ARPEU Working President', 'APEPDCL – Vizag', 'images/state-office-bearers/jayappa-working-president.jpg')">
+                    <img src="images/state-office-bearers/jayappa-working-president.jpg" alt="K. Jayappa" onerror="this.src='images/arpeu-logo.png'">
+                </div>
+
+                <!-- Leader 8 -->
+                <div class="cadre-thumb-card" id="card-7" onclick="handleCadreThumbClick(7, 'A. Koteswara Rao', 'ARPEU Organising Secretary', 'APTRANSCO – Vijayawada', 'images/state-office-bearers/koteswara-rao-organising-secretary.jpg')">
+                    <img src="images/state-office-bearers/koteswara-rao-organising-secretary.jpg" alt="A. Koteswara Rao" onerror="this.src='images/arpeu-logo.png'">
+                </div>
+
             </div>
         </div>
-
-        <!-- Leader 5 -->
-        <div class="cadre-thumb-card" id="card-4" onclick="selectCoreLeader(4)">
-            <img src="images/state-office-bearers/general-secretary.jpg" alt="C. Ramagopal Reddy" onerror="this.src='images/arpeu-logo.png'">
-            <div class="thumb-label">
-                <span class="thumb-name">C. Ramagopal</span>
-            </div>
-        </div>
-
-        <!-- Leader 6 (Active by default) -->
-        <div class="cadre-thumb-card active" id="card-5" onclick="selectCoreLeader(5)">
-            <img src="images/state-office-bearers/state-treasurer.jpg" alt="P. Balakrishna" onerror="this.src='images/arpeu-logo.png'">
-            <div class="thumb-label">
-                <span class="thumb-name">P. Balakrishna</span>
-            </div>
-        </div>
-
-        <!-- Leader 7 -->
-        <div class="cadre-thumb-card" id="card-6" onclick="selectCoreLeader(6)">
-            <img src="images/state-office-bearers/jayappa-working-president.jpg" alt="K. Jayappa" onerror="this.src='images/arpeu-logo.png'">
-            <div class="thumb-label">
-                <span class="thumb-name">K. Jayappa</span>
-            </div>
-        </div>
-
-        <!-- Leader 8 -->
-        <div class="cadre-thumb-card" id="card-7" onclick="selectCoreLeader(7)">
-            <img src="images/state-office-bearers/koteswara-rao-organising-secretary.jpg" alt="A. Koteswara Rao" onerror="this.src='images/arpeu-logo.png'">
-            <div class="thumb-label">
-                <span class="thumb-name">A. Koteswara</span>
-            </div>
-        </div>
-
-    </div>
-</div>
+    
 
         <!-- 4. BOTTOM TOOLBAR -->
         <div class="arpeu-call-toolbar">
