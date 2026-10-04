@@ -527,913 +527,491 @@
 
 
 <!-- =========================================================
-     MEMBERSHIP PAGE START
-     HTML PART - 1A
+     MEMBERSHIP PAGE (NEW PROFESSIONAL UI/UX ARCHITECTURE)
 ========================================================= -->
-
-<section
-    id="membershipPage"
-    class="membership-page"
-    style="display:none;">
+<section id="membershipPage" class="membership-page" style="display:none;">
 
     <!-- =========================================================
-         MEMBERSHIP HEADER
+         1. MEMBERSHIP HEADER & MODE TOGGLE
     ========================================================== -->
-
     <div class="member-page-header">
-
         <div class="member-title-box">
-
-            <!-- =========================================================
-                 MEMBERSHIP MODE TOGGLE
-            ========================================================== -->
-
             <div class="membership-toggle-card">
-
-                <div
-                    id="membershipToggle"
-                    class="membership-toggle">
-
+                <div id="membershipToggle" class="membership-toggle">
                     <div class="toggle-slider"></div>
-
-                    <button
-                        type="button"
-                        id="toggleNewMember"
-                        class="toggle-btn active">
-
+                    <button type="button" id="toggleNewMember" class="toggle-btn active">
                         <i class="fas fa-user"></i>
-
-                        <span>
-                            New Member
-                        </span>
-
+                        <span>New Member</span>
                     </button>
-
-                    <button
-                        type="button"
-                        id="toggleRenewal"
-                        class="toggle-btn">
-
+                    <button type="button" id="toggleRenewal" class="toggle-btn">
                         <i class="fas fa-sync-alt"></i>
-
-                        <span>
-                            Renewal
-                        </span>
-
+                        <span>Renewal</span>
                     </button>
-
                 </div>
-
             </div>
 
- <!-- =========================================================
-         MEMBERSHIP TITLE
- ========================================================= -->
+            <span id="membershipTitle" class="member-title">NEW MEMBER</span>
+            <p id="membershipDescription" class="member-subtitle">
+                Join ARPEU and become a registered member.
+            </p>
+        </div>
+    </div>
 
-    <span
-        id="membershipTitle"
-        class="member-title">
+    <!-- MAIN FORM SECTION -->
+    <section id="newMemberSection">
 
-        NEW MEMBER
+        <!-- =========================================================
+             2. PERSONAL INFORMATION CARD
+        ========================================================= -->
+        <div class="form-card">
+            <div class="card-header">
+                <span class="card-icon">👤</span>
+                <span class="card-title">Personal Information</span>
+            </div>
 
-    </span>
+            <div class="card-body">
+                <div class="form-group">
+                    <label for="employeeName">Employee Name <span class="required">*</span></label>
+                    <input type="text" id="employeeName" name="employeeName" placeholder="Enter Employee Name" autocomplete="off">
+                </div>
 
-    <p
-        id="membershipDescription"
-        class="member-subtitle">
+                <div class="form-group">
+                    <label for="gender">Gender <span class="required">*</span></label>
+                    <select id="gender" name="gender">
+                        <option value="">Select Gender</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
 
-        Join ARPEU and become a registered member.
+               <!-- Date of Birth & Calculated Age ALWAYS SIDE-BY-SIDE IN SINGLE LINE -->
+                <div class="dob-age-grid" style="display: flex !important; flex-direction: row !important; gap: 10px !important; width: 100% !important;">
+                    <div class="form-group" style="flex: 1 !important; min-width: 0 !important; margin-bottom: 0 !important;">
+                        <label for="dob">Date of Birth <span class="required">*</span></label>
+                        <div class="dob-box">
+                            <input type="text" id="dob" name="dob" class="dt-field-final" placeholder="Select Date" readonly>
+                            <i class="fas fa-calendar-alt dob-icon"></i>
+                        </div>
+                    </div>
 
-    </p>
+                    <div class="form-group" style="flex: 1 !important; min-width: 0 !important; margin-bottom: 0 !important;">
+                        <label for="age">Calculated Age</label>
+                        <input type="text" id="age" name="age" class="dt-field-final" style="background:#f9f9f9;" placeholder="0Y 0M 0D" readonly>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-<section id="newMemberSection">
+      <!-- =========================================================
+             3. ADDRESS DETAILS CARD
+        ========================================================= -->
+        <div class="form-card">
+            <div class="card-header">
+                <span class="card-icon">🏠</span>
+                <span class="card-title">ADDRESS DETAILS</span>
+            </div>
+
+            <div class="card-body">
+                <!-- Row 1: Door No + Street -->
+                <div class="form-grid-2col">
+                    <div class="form-group">
+                        <input type="text" id="doorNo" name="doorNo" placeholder="Door / House No.">
+                    </div>
+                    <div class="form-group">
+                        <input type="text" id="street" name="street" placeholder="Street / Area">
+                    </div>
+                </div>
+
+                <!-- Row 2: Village + Mandal -->
+                <div class="form-grid-2col">
+                    <div class="form-group">
+                        <input type="text" id="village" name="village" placeholder="Village / Town *">
+                    </div>
+                    <div class="form-group">
+                        <input type="text" id="mandal" name="mandal" placeholder="Mandal *">
+                    </div>
+                </div>
+
+                <!-- Row 3: District + State -->
+                <div class="form-grid-2col">
+                    <div class="form-group">
+                        <select id="district" name="district">
+                            <option value="">Select District *</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" id="state" name="state" value="Andhra Pradesh" readonly>
+                    </div>
+                </div>
+
+                <!-- Row 4: PIN Code + Post Office -->
+                <div class="form-grid-2col">
+                    <div class="form-group">
+                        <input type="number" id="pincode" name="pincode" placeholder="PIN Code *">
+                    </div>
+                    <div class="form-group">
+                        <input type="text" id="postOffice" name="postOffice" placeholder="Post Office *">
+                    </div>
+                </div>
+            </div>
+        </div>
+
 <!-- =========================================================
-     PERSONAL INFORMATION CARD
-========================================================= -->
-
-<div class="form-card">
-
-    <div class="card-header">
-
-        <span class="card-icon">👤</span>
-
-        <span class="card-title">
-            Personal Information
-        </span>
-
-    </div>
-
-    <div class="card-body">
-
-        <!-- Employee Name -->
-
-        <div class="form-group">
-
-            <label for="employeeName">
-                Employee Name
-                <span class="required">*</span>
-            </label>
-
-            <input
-                type="text"
-                id="employeeName"
-                name="employeeName"
-                placeholder="Enter Employee Name"
-                autocomplete="off">
-
-        </div>
-
-        <!-- Gender -->
-
-        <div class="form-group">
-
-            <label for="gender">
-                Gender
-                <span class="required">*</span>
-            </label>
-
-            <select
-                id="gender"
-                name="gender">
-
-                <option value="">
-                    Select Gender
-                </option>
-
-                <option value="Male">
-                    Male
-                </option>
-
-                <option value="Female">
-                    Female
-                </option>
-
-                <option value="Other">
-                    Other
-                </option>
-
-            </select>
-
-        </div>
-
-        <!-- Date of Birth + Age -->
-
-        <div class="dob-age-grid">
-            <div class="form-group">
-                <label for="dob">Date of Birth <span class="required">*</span></label>
-                <div class="dt-box-wrap">
-                    <input type="text" id="dob" name="dob" class="dt-field-final" placeholder="Select Date" readonly>
-                    <i class="fas fa-calendar-alt dt-icon-right"></i>
-                </div>
+             4. CONTACT DETAILS CARD (COMPACT SLEEK SPACING)
+        ========================================================= -->
+        <div class="form-card">
+            <div class="card-header">
+                <span class="card-icon">📞</span>
+                <span class="card-title">CONTACT DETAILS</span>
             </div>
 
-            <div class="form-group">
-                <label for="age">Calculated Age</label>
-                <input type="text" id="age" name="age" class="dt-field-final" style="background:#f9f9f9;" placeholder="0Y 0M 0D" readonly>
-            </div>
-        </div>
-    </div>
-    
-    <!-- =========================================================
-     ADDRESS DETAILS CARD
-    ========================================================= -->
-
-    <div class="form-card">
-
-        <div class="card-header">
-            <span class="card-icon">🏠</span>
-            <span class="card-title">
-                Address Details
-            </span>
-        </div>
-
-        <div class="card-body">
-
-            <!-- Door No -->
-
-            <div class="form-group">
-
-                <label for="doorNo">
-                    Door / House No.
-                </label>
-
-                <input
-                    type="text"
-                    id="doorNo"
-                    name="doorNo"
-                    placeholder="Enter Door / House No.">
-
-            </div>
-
-            <!-- Street -->
-
-            <div class="form-group">
-
-                <label for="street">
-                    Street / Area
-                </label>
-
-                <input
-                    type="text"
-                    id="street"
-                    name="street"
-                    placeholder="Enter Street / Area">
-
-            </div>
-
-            <!-- Village -->
-
-            <div class="form-group">
-
-                <label for="village">
-                    Village / Town / City
-                    <span class="required">*</span>
-                </label>
-
-                <input
-                    type="text"
-                    id="village"
-                    name="village"
-                    placeholder="Enter Village / Town / City">
-
-            </div>
-            
-            
-                        <!-- Mandal -->
-
-            <div class="form-group">
-
-                <label for="mandal">
-                    Mandal
-                    <span class="required">*</span>
-                </label>
-
-                <input
-                    type="text"
-                    id="mandal"
-                    name="mandal"
-                    placeholder="Enter Mandal">
-
-            </div>
-
-            <!-- District -->
-
-            <div class="form-group">
-
-                <label for="district">
-                    District
-                    <span class="required">*</span>
-                </label>
-
-                <select
-                    id="district"
-                    name="district">
-
-                    <option value="">
-                        Select District
-                    </option>
-
-                </select>
-
-            </div>
-
-            <!-- State -->
-
-            <div class="form-group">
-
-                <label for="state">
-                    State
-                    <span class="required">*</span>
-                </label>
-
-                <input
-                    type="text"
-                    id="state"
-                    name="state"
-                    value="Andhra Pradesh"
-                    readonly>
-
-            </div>
-
-            <!-- PIN Code -->
-
-            <div class="form-group">
-
-                <label for="pincode">
-                    PIN Code
-                    <span class="required">*</span>
-                </label>
-
-                <input
-                    type="number"
-                    id="pincode"
-                    name="pincode"
-                    placeholder="Enter PIN Code">
-
-            </div>
-
-            <!-- Post Office -->
-
-            <div class="form-group">
-
-                <label for="postOffice">
-                     Post Office
-                    <span class="required">*</span>
-                </label>
-
-                <input
-                    type="text"
-                    id="postOffice"
-                    name="postOffice"
-                    placeholder="Enter Post Office">
-
-            </div>
-
-        </div>
-
-    </div>
-
-    <!-- Contact Details Card -->
-
-    <div class="form-card">
-
-        <div class="card-header">
-
-            <span class="card-icon">📞</span>
-
-            <span class="card-title">
-                Contact Details
-            </span>
-
-        </div>
-
-        <div class="card-body">
-
-            <!-- Mobile Number -->
-
-            <div class="form-group">
-
-                <label for="mobile">
-                    Mobile Number
-                    <span class="required">*</span>
-                </label>
-
-                <input
-                    type="tel"
-                    id="mobile"
-                    name="mobile"
-                    maxlength="10"
-                    placeholder="Enter Mobile Number">
-
+            <div class="card-body">
+                <div class="form-group">
+                    <label for="mobile">Mobile Number <span class="required">*</span></label>
+                    <input type="tel" id="mobile" name="mobile" maxlength="10" placeholder="Enter 10-Digit Mobile Number">
                     <div id="mobileStatus" class="field-status"></div>
+                </div>
 
-            </div>
+                <div class="form-group">
+                    <label for="email">Email ID <span class="optional">(Optional)</span></label>
+                    <input type="email" id="email" name="email" placeholder="name@example.com">
+                </div>
 
-            <!-- Email -->
-
-            <div class="form-group">
-
-                <label for="email">
-                    Email ID
-                </label>
-
-                <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    placeholder="Enter Email ID">
-
-            </div>
-
-            <!-- Aadhaar Number -->
-
-            <div class="form-group">
-
-                <label for="aadhaar">
-                    Aadhaar Number
-                    <span class="required">*</span>
-                </label>
-
-                <input
-                    type="text"
-                    id="aadhaar"
-                    name="aadhaar"
-                    inputmode="numeric"
-                    autocomplete="off"
-                    placeholder="Enter Aadhaar Number">
+                <div class="form-group">
+                    <label for="aadhaar">Aadhaar Number <span class="required">*</span></label>
+                    <input type="text" id="aadhaar" name="aadhaar" inputmode="numeric" autocomplete="off" placeholder="XXXX XXXX XXXX">
                     <div id="aadhaarStatus" class="field-status"></div>
+                </div>
+            </div>
+        </div>
 
+<!-- =========================================================
+             5. EMPLOYMENT DETAILS CARD (ZERO GAPS & TIGHT SPACING)
+        ========================================================= -->
+        <div class="form-card">
+            <div class="card-header" style="padding-bottom: 4px; margin-bottom: 8px;">
+                <span class="card-icon">🏢</span>
+                <span class="card-title">EMPLOYMENT DETAILS</span>
             </div>
 
+            <div class="card-body">
+                <!-- 1. Company (Full Width - గ్యాప్ కేవలం 5px మాత్రమే) -->
+                <div class="form-group" style="margin-bottom: 5px;">
+                    <label for="company" style="display: block; margin-bottom: 1px; line-height: 1.1; font-size: 11.5px; font-weight: 700; color: #1e293b;">Company <span class="required">*</span></label>
+                    <select id="company" name="company" style="height: 35px;">
+                        <option value="">Select Company</option>
+                        <option value="APGENCO">APGENCO</option>
+                        <option value="APTRANSCO">APTRANSCO</option>
+                        <option value="APSPDCL">APSPDCL</option>
+                        <option value="APCPDCL">APCPDCL</option>
+                        <option value="APEPDCL">APEPDCL</option>
+                    </select>
+                </div>
+
+                <!-- 2. APGENCO : Station & Stage (Hidden - నో గోస్ట్ గ్యాప్) -->
+                <div id="apgencoRow" style="display: none; gap: 10px; margin-bottom: 5px;">
+                    <div class="form-group" id="stationGroup" style="flex: 1; min-width: 0; margin-bottom: 0;">
+                        <label for="station" style="display: block; margin-bottom: 1px; line-height: 1.1; font-size: 11.5px; font-weight: 700; color: #1e293b;">Station <span class="required">*</span></label>
+                        <select id="station" name="station" style="height: 35px;">
+                            <option value="">Select Station</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group" id="stageGroup" style="flex: 1; min-width: 0; margin-bottom: 0;">
+                        <label for="stage" style="display: block; margin-bottom: 1px; line-height: 1.1; font-size: 11.5px; font-weight: 700; color: #1e293b;">Stage <span class="required">*</span></label>
+                        <select id="stage" name="stage" style="height: 35px;">
+                            <option value="">Select Stage</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- 3. Circle & Division (2 Columns - గ్యాప్ 5px) -->
+                <div style="display: flex; gap: 10px; margin-bottom: 5px;">
+                    <div class="form-group" id="circleGroup" style="flex: 1; min-width: 0; margin-bottom: 0;">
+                        <label for="circle" style="display: block; margin-bottom: 1px; line-height: 1.1; font-size: 11.5px; font-weight: 700; color: #1e293b;">Circle <span class="required">*</span></label>
+                        <select id="circle" name="circle" style="height: 35px;">
+                            <option value="">Select Circle</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group" id="divisionGroup" style="flex: 1; min-width: 0; margin-bottom: 0;">
+                        <label for="division" style="display: block; margin-bottom: 1px; line-height: 1.1; font-size: 11.5px; font-weight: 700; color: #1e293b;">Division <span class="required">*</span></label>
+                        <select id="division" name="division" style="height: 35px;">
+                            <option value="">Select Division</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- 4. Sub Division & Section (2 Columns - గ్యాప్ 5px) -->
+                <div style="display: flex; gap: 10px; margin-bottom: 5px;">
+                    <div class="form-group" id="subDivisionGroup" style="flex: 1; min-width: 0; margin-bottom: 0;">
+                        <label for="subDivision" style="display: block; margin-bottom: 1px; line-height: 1.1; font-size: 11.5px; font-weight: 700; color: #1e293b;">Sub Division <span class="required">*</span></label>
+                        <select id="subDivision" name="subDivision" style="height: 35px;">
+                            <option value="">Select Sub Division</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group" id="sectionGroup" style="flex: 1; min-width: 0; margin-bottom: 0;">
+                        <label for="section" style="display: block; margin-bottom: 1px; line-height: 1.1; font-size: 11.5px; font-weight: 700; color: #1e293b;">Section <span class="optional">(Optional)</span></label>
+                        <input type="text" id="section" name="section" placeholder="e.g. Section 1" autocomplete="off" style="height: 35px;">
+                    </div>
+                </div>
+
+                <!-- 5. Sub Station & Location (2 Columns - గ్యాప్ 5px) -->
+                <div style="display: flex; gap: 10px; margin-bottom: 5px;">
+                    <div class="form-group" id="subStationGroup" style="flex: 1; min-width: 0; margin-bottom: 0;">
+                        <label for="subStation" style="display: block; margin-bottom: 1px; line-height: 1.1; font-size: 11.5px; font-weight: 700; color: #1e293b;">Sub Station <span class="optional">(Optional)</span></label>
+                        <input type="text" id="subStation" name="subStation" placeholder="e.g. 132/33 KV Sub Station" autocomplete="off" style="height: 35px;">
+                    </div>
+
+                    <div class="form-group" id="locationGroup" style="flex: 1; min-width: 0; margin-bottom: 0;">
+                        <label for="location" style="display: block; margin-bottom: 1px; line-height: 1.1; font-size: 11.5px; font-weight: 700; color: #1e293b;">Location <span class="optional">(Optional)</span></label>
+                        <input type="text" id="location" name="location" placeholder="e.g. Ongole" autocomplete="off" style="height: 35px;">
+                    </div>
+                </div>
+
+                <!-- 6. Designation & Employee ID (2 Columns - చివరన గ్యాప్ 0) -->
+                <div style="display: flex; gap: 10px; margin-bottom: 0;">
+                    <div class="form-group" id="designationGroup" style="flex: 1; min-width: 0; margin-bottom: 0;">
+                        <label for="designation" style="display: block; margin-bottom: 1px; line-height: 1.1; font-size: 11.5px; font-weight: 700; color: #1e293b;">Designation <span class="required">*</span></label>
+                        <select id="designation" name="designation" style="height: 35px;">
+                            <option value="">Select Designation</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group" id="employeeIdGroup" style="flex: 1; min-width: 0; margin-bottom: 0;">
+                        <label for="employeeId" style="display: block; margin-bottom: 1px; line-height: 1.1; font-size: 11.5px; font-weight: 700; color: #1e293b;">Employee ID <span class="required">*</span></label>
+                        <input type="text" id="employeeId" name="employeeId" placeholder="e.g. 1045892" autocomplete="off" style="height: 35px;">
+                        <div id="employeeIdStatus" class="field-status"></div>
+                    </div>
+                </div>
+            </div>
         </div>
 
-    </div>
-</div>
-<!-- =========================================================
-     HTML PART - 1B END
-========================================================= -->
+        <!-- =========================================================
+             6. PASSPORT SIZE PHOTO UPLOAD CARD
+        ========================================================= -->
+        <div class="form-card">
+            <div class="card-header">
+                <i class="fas fa-camera card-icon"></i>
+                <span class="card-title">Passport Size Photo</span>
+            </div>
 
+            <div class="photo-upload-container">
+                <div class="photo-upload-section">
+                    <label for="memberPhoto">Passport Size Photo <span class="required">*</span></label>
+                    <div class="upload-row">
+                        <input type="file" id="memberPhoto" name="memberPhoto" accept="image/*" hidden>
+                        <input type="file" id="memberCameraPhoto" accept="image/*" capture="environment" hidden>
 
-<!-- =========================================================
-     EMPLOYMENT DETAILS CARD
-========================================================= -->
+                        <button type="button" class="photo-btn" onclick="document.getElementById('memberPhoto').click();">
+                            Upload Photo
+                        </button>
+                        <input type="text" id="photoFileName" class="photo-file-name" value="No file selected" readonly>
+                    </div>
+                    <div class="photo-info">JPG • PNG • WEBP &nbsp; | &nbsp; Max Size : 4 MB</div>
+                    <button type="button" id="takePhotoBtn" class="take-photo-btn" onclick="document.getElementById('memberCameraPhoto').click();">
+                        📷 Take Photo
+                    </button>
+                </div>
 
-<div class="form-card">
-
-    <div class="card-header">
-
-        <span class="card-icon">🏢</span>
-
-        <span class="card-title">
-            Employment Details
-        </span>
-
-    </div>
-
-    <div class="card-body">
-
-        <!-- Company -->
-
-        <div class="form-group">
-
-            <label for="company">
-                Company
-                <span class="required">*</span>
-            </label>
-
-            <select
-                id="company"
-                name="company">
-
-                <option value="">Select Company</option>
-
-                <option value="APGENCO">APGENCO</option>
-                <option value="APTRANSCO">APTRANSCO</option>
-                <option value="APSPDCL">APSPDCL</option>
-                <option value="APCPDCL">APCPDCL</option>
-                <option value="APEPDCL">APEPDCL</option>
-
-            </select>
-
+                <!-- Preview Box (3:4 Passport Ratio) -->
+                <div class="photo-preview" style="position: relative;">
+                    <img id="photoPreview" src="" alt="" style="display:none; width:100%; height:100%; object-fit:cover; position:absolute; top:0; left:0; z-index:10;">
+                    <span class="preview-text" style="position:relative; z-index:1;">No Photo<br>Selected</span>
+                </div>
+            </div>
         </div>
 
-        <!-- APGENCO : Station -->
-
-        <div
-            class="form-group"
-            id="stationGroup"
-            style="display:none;">
-
-            <label for="station">
-                Station
-                <span class="required">*</span>
-            </label>
-
-            <select
-                id="station"
-                name="station">
-
-                <option value="">
-                    Select Station
-                </option>
-
-            </select>
-
-        </div>
-
-        <!-- APGENCO : Stage -->
-
-        <div
-            class="form-group"
-            id="stageGroup"
-            style="display:none;">
-
-            <label for="stage">
-                Stage
-                <span class="required">*</span>
-            </label>
-
-            <select
-                id="stage"
-                name="stage">
-
-                <option value="">
-                    Select Stage
-                </option>
-
-            </select>
-
-        </div>
-
-        <!-- Circle -->
-
-        <div
-            class="form-group"
-            id="circleGroup">
-
-            <label for="circle">
-                Circle
-                <span class="required">*</span>
-            </label>
-
-            <select
-                id="circle"
-                name="circle">
-
-                <option value="">
-                    Select Circle
-                </option>
-
-            </select>
-
-        </div>
-
-        <!-- Division -->
-
-        <div
-            class="form-group"
-            id="divisionGroup">
-
-            <label for="division">
-                Division
-                <span class="required">*</span>
-            </label>
-
-            <select
-                id="division"
-                name="division">
-
-                <option value="">
-                    Select Division
-                </option>
-
-            </select>
-
-        </div>
-
-        <!-- Sub Division -->
-
-        <div
-            class="form-group"
-            id="subDivisionGroup">
-
-            <label for="subDivision">
-                Sub Division
-                <span class="required">*</span>
-            </label>
-
-            <select
-                id="subDivision"
-                name="subDivision">
-
-                <option value="">
-                    Select Sub Division
-                </option>
-
-            </select>
-
-        </div>
-
-        <!-- Sub Station -->
-
-        <div
-            class="form-group"
-            id="subStationGroup">
-
-            <label for="subStation">
-                Sub Station
-                <span class="optional"></span>
-            </label>
-
-            <input
-                type="text"
-                id="subStation"
-                name="subStation"
-                placeholder="Enter Sub Station"
-                autocomplete="off">
-
-        </div>
-
-        <!-- Section -->
-
-        <div
-            class="form-group"
-            id="sectionGroup">
-
-            <label for="section">
-                Section
-                <span class="optional"></span>
-            </label>
-
-            <input
-                type="text"
-                id="section"
-                name="section"
-                placeholder="Enter Section"
-                autocomplete="off">
-
-        </div>
-
-        <!-- Location -->
-
-<div
-    class="form-group"
-    id="locationGroup">
-
-    <label for="location">
-        Location
-        <span class="optional">(Optional)</span>
-    </label>
-
-    <input
-        type="text"
-        id="location"
-        name="location"
-        placeholder="Enter Location (Optional)"
-        autocomplete="off">
-
-</div>
-
-        <!-- Designation -->
-
-        <div
-            class="form-group"
-            id="designationGroup">
-
-            <label for="designation">
-                Designation
-                <span class="required">*</span>
-            </label>
-
-            <select
-                id="designation"
-                name="designation">
-
-                <option value="">
-                    Select Designation
-                </option>
-
-            </select>
-
-        </div>
-
-        <!-- Employee ID -->
-
-        <div class="form-group">
-
-            <label for="employeeId">
-                Employee ID
-                <span class="required">*</span>
-            </label>
-
-            <input
-                type="text"
-                id="employeeId"
-                name="employeeId"
-                placeholder="Enter Employee ID"
-                autocomplete="off">
-
-               <div id="employeeIdStatus" class="field-status"></div>
-
-        </div>
-
-    </div>
-
-</div>
-
-
-<!-- =========================================================
-     PASSPORT SIZE PHOTO UPLOAD CARD (MEMBERSHIP)
-========================================================= -->
-<div class="form-card">
-    <div class="card-header">
-        <i class="fas fa-camera"></i>
-        <span class="card-title">Passport Size Photo</span>
-    </div>
-
-    <div class="photo-upload-container">
-        <!-- Left Side: Action Buttons -->
-        <div class="photo-upload-section">
-            <label for="memberPhoto">Passport Size Photo <span class="required">*</span></label>
-            <div class="upload-row">
-                <input type="file" id="memberPhoto" name="memberPhoto" accept="image/*" hidden>
-                <input type="file" id="memberCameraPhoto" accept="image/*" capture="environment" hidden>
-
-                <button type="button" class="photo-btn" onclick="document.getElementById('memberPhoto').click();">
-                    Upload Photo
+        <!-- =========================================================
+             7. PAYMENT MODULE V25
+        ========================================================= -->
+        <div id="paymentModuleCard" class="form-card">
+            <div class="card-header">
+                <i class="fas fa-credit-card card-icon"></i>
+                <span class="card-title">Payment Details</span>
+            </div>
+
+            <!-- 50-50 Payment Toggle -->
+            <div class="main-payment-toggle-row">
+                <label class="main-method-btn" for="payNowOption">
+                    <input type="radio" name="paymentMethod" id="payNowOption" value="payNow">
+                    <span>Pay Now (Online)</span>
+                </label>
+                <label class="main-method-btn" for="alreadyPaidOption">
+                    <input type="radio" name="paymentMethod" id="alreadyPaidOption" value="alreadyPaid">
+                    <span>Already Paid</span>
+                </label>
+            </div>
+
+            <!-- SECTION 1: PAY NOW -->
+            <div id="payNowSection" style="display: none; margin-top: 15px;">
+                <div class="form-group">
+                    <label>Amount You are Paying <span class="required">*</span></label>
+                    <input type="number" id="payNowAmount" placeholder="Min ₹460 or More">
+                </div>
+
+                <div id="payNowBreakdown" class="breakdown-box" style="display: none;">
+                    <div class="summary-row"><span>Admission Fee:</span> <strong>₹100</strong></div>
+                    <div class="summary-row"><span>Annual Subscription:</span> <strong>₹360</strong></div>
+                    <div id="payNowDonRow" class="summary-row donation-text" style="display: none;"><span>Donation:</span> <strong id="payNowDonVal">₹0</strong></div>
+                    <div class="total-row-display"><span>Total Entered:</span> <strong id="payNowTotal">₹0</strong></div>
+                    <div class="center-content">
+                        <button type="button" id="continueToPayBtn" class="submit-btn" style="width: auto; padding: 0 40px; display: none;">CONTINUE TO PAYMENT</button>
+                    </div>
+                </div>
+
+                <div id="payNowStep2" style="display: none; margin-top: 15px;">
+                    <div class="upi-box-large">
+                        <div class="qr-container">
+                            <img id="dynamicQR" src="" alt="Scan QR">
+                            <p style="font-size: 10px; font-weight: 700; margin-top: 5px;">SCAN QR</p>
+                        </div>
+                        <div class="apps-container">
+                            <p class="upi-id-single-line" onclick="triggerUpiPayment('all')" style="cursor: pointer;" title="Click to pay with any UPI App">
+                                UPI ID: <span>andhrarastrapowerempunion@sbi</span>
+                            </p>
+                            <div class="large-icon-grid">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/f/f2/Google_Pay_Logo.svg" 
+                                     alt="Google Pay" 
+                                     class="app-icon-gpay" 
+                                     onclick="triggerUpiPayment('gpay')" 
+                                     style="cursor: pointer;" 
+                                     title="Pay with Google Pay">
+                                
+                                <svg class="app-icon-phonepe" 
+                                     viewBox="0 0 160 40" 
+                                     fill="none" 
+                                     xmlns="http://www.w3.org/2000/svg" 
+                                     onclick="triggerUpiPayment('phonepe')" 
+                                     style="cursor: pointer;" 
+                                     title="Pay with PhonePe">
+                                    <rect width="36" height="36" rx="8" fill="#5F259F" y="2"/>
+                                    <path d="M25.5 16C25.5 12.1 22.6 9 18.7 9H13.3C12.7 9 12.2 9.5 12.2 10.1V27.9C12.2 28.5 12.7 29 13.3 29H16C16.6 29 17.1 28.5 17.1 27.9V22.9H18.7C22.6 22.9 25.5 19.9 25.5 16ZM20.5 18.1H17.1V13.9H20.5C21.7 13.9 22.6 14.8 22.6 16C22.6 17.2 21.7 18.1 20.5 18.1Z" fill="white"/>
+                                    <text x="44" y="26" font-family="'Poppins', sans-serif" font-size="18" font-weight="800" fill="#5F259F" letter-spacing="-0.5">PhonePe</text>
+                                </svg>
+
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/2/24/Paytm_Logo_%28standalone%29.svg" 
+                                     alt="Paytm" 
+                                     class="app-icon-paytm" 
+                                     onclick="triggerUpiPayment('paytm')" 
+                                     style="cursor: pointer;" 
+                                     title="Pay with Paytm">
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" id="payNowCompletedBtn" class="completed-btn" style="margin-top: 15px;">I HAVE COMPLETED PAYMENT</button>
+                </div>
+
+                <div id="payNowStep3" style="display: none; margin-top: 20px;">
+                    <div class="dt-container-final">
+                        <div class="dt-header-labels">
+                            <label class="dt-label-main">Payment Date & Time *</label>
+                        </div>
+                        <div class="dt-input-grid">
+                            <div class="dt-box-wrap">
+                            <input type="text" id="dob" name="dob" class="dt-field-final" placeholder="Select Date" readonly>
+                            </div>
+                           <div class="dt-box-wrap">
+                                <input type="text" id="payNowTimeDisplay" class="dt-field-final final-val" placeholder="Set Time" readonly>
+                                <i class="fas fa-clock dt-icon-right"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group" style="margin-top:15px;">
+                        <label>Transaction ID / UTR No / Reference No <span class="required">*</span></label>
+                        <input type="text" id="payNowTransactionId" placeholder="Alphanumeric Only" class="final-val utr-field">
+                        <div id="transactionIdStatus" class="field-status"></div>
+                    </div>
+                    <div class="form-group">
+                        <label>Upload Receipt <span class="required">*</span></label>
+                        <input type="file" id="payNowReceipt" class="final-val">
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION 2: ALREADY PAID -->
+            <div id="alreadyPaidSection" style="display: none; margin-top: 15px;">
+                <div class="form-group">
+                    <label>Amount Already Paid <span class="required">*</span></label>
+                    <input type="number" id="manualAmount" placeholder="Enter Amount" class="final-val">
+                </div>
+
+                <div id="manualBreakdown" class="breakdown-box" style="display: none;">
+                    <div class="summary-row"><span>Admission Fee:</span> <strong>₹100</strong></div>
+                    <div class="summary-row"><span>Annual Subscription:</span> <strong>₹360</strong></div>
+                    <div id="manualBalRow" class="summary-row" style="display: none; color: #cf1322;"><span>Balance Due:</span> <strong id="manualBalVal">₹0</strong></div>
+                    <div id="manualDonRow" class="summary-row donation-text" style="display: none;"><span>Donation:</span> <strong id="manualDonVal">₹0</strong></div>
+                    <div class="total-row-display"><span>Total Paid:</span> <strong id="manualTotal">₹0</strong></div>
+                    <button type="button" id="payBalanceBtn" class="balance-trigger" style="margin-top: 15px; display: none;">PAY BALANCE NOW</button>
+                </div>
+
+                <div id="inlineBalanceBox" class="inline-pay-box" style="display: none;">
+                    <p style="font-weight: 700; font-size: 13px; color:#cf1322; margin-bottom:12px;">Pay Balance: <span id="balanceAmtDisp">₹0</span></p>
+                    <div class="upi-box-large">
+                        <div class="qr-container"><img id="inlineQR" src="" style="width: 90px;"></div>
+                        <div class="apps-container">
+                            <div class="large-icon-grid">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/f/f2/Google_Pay_Logo.svg" style="height:25px;">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/7/71/PhonePe_Logo.png" style="height:25px;">
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" id="inlinePaidDoneBtn" class="completed-btn" style="margin-top: 15px;">I HAVE PAID BALANCE</button>
+                </div>
+
+                <div id="manualFields" style="display: none; margin-top: 15px;">
+                    <div class="dt-container-final">
+                        <div class="dt-header-labels">
+                            <label class="dt-label-main">Payment Date & Time *</label>
+                        </div>
+                        <div class="dt-input-grid">
+                            <div class="dt-box-wrap">
+                                <input type="text" id="manualDate" class="dt-field-final final-val" placeholder="Select Date" readonly>
+                                <i class="fas fa-calendar-alt dt-icon-right"></i>
+                            </div>
+                            <div class="dt-box-wrap">
+                                <input type="text" id="manualTimeDisplay" class="dt-field-final final-val" placeholder="Set Time" readonly>
+                                <i class="fas fa-clock dt-icon-right"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group" style="margin-top:15px;">
+                        <label>Transaction ID / UTR No / Reference No <span class="required">*</span></label>
+                        <input type="text" id="manualTransactionId" placeholder="Alphanumeric Only" class="final-val utr-field">
+                        <div id="manualTransactionIdStatus" class="field-status"></div>
+                    </div>
+                    <div class="form-group">
+                        <label>Upload Receipt <span class="required">*</span></label>
+                        <input type="file" id="manualReceipt" class="final-val">
+                    </div>
+                </div>
+            </div>
+
+            <!-- GLOBAL FINAL SUBMIT -->
+            <div id="finalSubmitSection" style="display: none; margin-top: 30px;">
+                <div class="declaration-box">
+                    <label class="declaration-label">
+                        <input type="checkbox" id="declarationCheck">
+                        <span>
+                            I hereby declare that the information furnished by me is true and correct to the best of my knowledge. I understand that if any information is found to be false, incorrect or misleading, my Membership Application may be rejected or cancelled by Andhra Rastra Power Employees Union (ARPEU).
+                        </span>
+                    </label>
+                </div>
+
+                <button
+                    type="button"
+                    id="submitMembershipBtn"
+                    class="submit-btn"
+                    onclick="submitMembership()"
+                    style="background:#0B4EA2; height:50px;">
+                    SUBMIT MEMBERSHIP APPLICATION
                 </button>
-                <input type="text" id="photoFileName" class="photo-file-name" value="No file selected" readonly>
-            </div>
-            <div class="photo-info">JPG • PNG • WEBP &nbsp; | &nbsp; Max Size : 4 MB</div>
-            <button type="button" id="takePhotoBtn" class="take-photo-btn" onclick="document.getElementById('memberCameraPhoto').click();">
-                📷 Take Photo
-            </button>
-        </div>
-
-        <!-- Right Side: Preview Box -->
-        <div class="photo-preview" style="position: relative;">
-            <img id="photoPreview" src="" alt="" style="display:none; width:100%; height:100%; object-fit:cover; position:absolute; top:0; left:0; z-index:10;">
-            <span class="preview-text" style="position:relative; z-index:1;">No Photo<br>Selected</span>
-        </div>
-    </div>
-</div>
-
-
-<!-- =========================================================
-   PAYMENT MODULE V25 - NATIVE OVERLAY PICKERS (FINAL FIX)
-========================================================= -->
-<div id="paymentModuleCard" class="form-card">
-    <div class="card-header"><i class="fas fa-credit-card"></i> PAYMENT DETAILS</div>
-
-    <!-- 1. Selection Options (Centered & Wide 50-50 Split) -->
-    <div class="main-payment-toggle-row">
-        <label class="main-method-btn" for="payNowOption">
-            <input type="radio" name="paymentMethod" id="payNowOption" value="payNow">
-            <span>Pay Now (Online)</span>
-        </label>
-        <label class="main-method-btn" for="alreadyPaidOption">
-            <input type="radio" name="paymentMethod" id="alreadyPaidOption" value="alreadyPaid">
-            <span>Already Paid</span>
-        </label>
-    </div>
-
-    <!-- SECTION 1: PAY NOW -->
-    <div id="payNowSection" style="display: none; margin-top: 15px;">
-        <div class="form-group">
-            <label>Amount You are Paying <span class="required">*</span></label>
-            <input type="number" id="payNowAmount" placeholder="Min ₹460 or More">
-        </div>
-
-        <div id="payNowBreakdown" class="breakdown-box" style="display: none;">
-            <div class="summary-row"><span>Admission Fee:</span> <strong>₹100</strong></div>
-            <div class="summary-row"><span>Annual Subscription:</span> <strong>₹360</strong></div>
-            <div id="payNowDonRow" class="summary-row donation-text" style="display: none;"><span>Donation:</span> <strong id="payNowDonVal">₹0</strong></div>
-            <div class="total-row-display"><span>Total Entered:</span> <strong id="payNowTotal">₹0</strong></div>
-            <div class="center-content">
-                <button type="button" id="continueToPayBtn" class="submit-btn" style="width: auto; padding: 0 40px; display: none;">CONTINUE TO PAYMENT</button>
             </div>
         </div>
 
-        <div id="payNowStep2" style="display: none; margin-top: 15px;">
-            <div class="upi-box-large">
-                <div class="qr-container">
-                    <img id="dynamicQR" src="" alt="Scan QR">
-                    <p style="font-size: 10px; font-weight: 700; margin-top: 5px;">SCAN QR</p>
-                </div>
-               <div class="apps-container">
-    <p class="upi-id-single-line" onclick="triggerUpiPayment('all')" style="cursor: pointer;" title="Click to pay with any UPI App">
-        UPI ID: <span>andhrarastrapowerempunion@sbi</span>
-    </p>
-    <div class="large-icon-grid">
-        <!-- Google Pay Clickable -->
-        <img src="https://upload.wikimedia.org/wikipedia/commons/f/f2/Google_Pay_Logo.svg" 
-             alt="Google Pay" 
-             class="app-icon-gpay" 
-             onclick="triggerUpiPayment('gpay')" 
-             style="cursor: pointer;" 
-             title="Pay with Google Pay">
-        
-        <!-- PhonePe Vector Clickable -->
-        <svg class="app-icon-phonepe" 
-             viewBox="0 0 160 40" 
-             fill="none" 
-             xmlns="http://www.w3.org/2000/svg" 
-             onclick="triggerUpiPayment('phonepe')" 
-             style="cursor: pointer;" 
-             title="Pay with PhonePe">
-            <rect width="36" height="36" rx="8" fill="#5F259F" y="2"/>
-            <path d="M25.5 16C25.5 12.1 22.6 9 18.7 9H13.3C12.7 9 12.2 9.5 12.2 10.1V27.9C12.2 28.5 12.7 29 13.3 29H16C16.6 29 17.1 28.5 17.1 27.9V22.9H18.7C22.6 22.9 25.5 19.9 25.5 16ZM20.5 18.1H17.1V13.9H20.5C21.7 13.9 22.6 14.8 22.6 16C22.6 17.2 21.7 18.1 20.5 18.1Z" fill="white"/>
-            <text x="44" y="26" font-family="'Poppins', sans-serif" font-size="18" font-weight="800" fill="#5F259F" letter-spacing="-0.5">PhonePe</text>
-        </svg>
-
-        <!-- Paytm Clickable -->
-        <img src="https://upload.wikimedia.org/wikipedia/commons/2/24/Paytm_Logo_%28standalone%29.svg" 
-             alt="Paytm" 
-             class="app-icon-paytm" 
-             onclick="triggerUpiPayment('paytm')" 
-             style="cursor: pointer;" 
-             title="Pay with Paytm">
-    </div>
-</div>
-            </div>
-            <button type="button" id="payNowCompletedBtn" class="completed-btn" style="margin-top: 15px;">I HAVE COMPLETED PAYMENT</button>
-        </div>
-
-        <div id="payNowStep3" style="display: none; margin-top: 20px;">
-            <div class="dt-container-final">
-                <div class="dt-header-labels">
-                    <label class="dt-label-main">Payment Date & Time *</label>
-                </div>
-                <div class="dt-input-grid">
-                    <div class="dt-box-wrap">
-                       <input type="text" id="payNowDate" class="dt-field-final final-val" placeholder="Select Date" readonly>
-                        <i class="fas fa-calendar-alt dt-icon-right"></i>
-                    </div>
-                   <div class="dt-box-wrap">
-                        <input type="text" id="payNowTimeDisplay" class="dt-field-final final-val" placeholder="Set Time" readonly>
-                        <i class="fas fa-clock dt-icon-right"></i>
-                    </div>
-                </div>
-            </div>
-            <div class="form-group" style="margin-top:15px;">
-                <label>Transaction ID / UTR No / Reference No <span class="required">*</span></label>
-                <input type="text" id="payNowTransactionId" placeholder="Alphanumeric Only" class="final-val utr-field">
-                <div id="transactionIdStatus" class="field-status"></div>
-            </div>
-            <div class="form-group"><label>Upload Receipt <span class="required">*</span></label><input type="file" id="payNowReceipt" class="final-val"></div>
-        </div>
-    </div>
-
-    <!-- SECTION 2: ALREADY PAID -->
-    <div id="alreadyPaidSection" style="display: none; margin-top: 15px;">
-        <div class="form-group">
-            <label>Amount Already Paid <span class="required">*</span></label>
-            <input type="number" id="manualAmount" placeholder="Enter Amount" class="final-val">
-        </div>
-
-        <div id="manualBreakdown" class="breakdown-box" style="display: none;">
-            <div class="summary-row"><span>Admission Fee:</span> <strong>₹100</strong></div>
-            <div class="summary-row"><span>Annual Subscription:</span> <strong>₹360</strong></div>
-            <div id="manualBalRow" class="summary-row" style="display: none; color: #cf1322;"><span>Balance Due:</span> <strong id="manualBalVal">₹0</strong></div>
-            <div id="manualDonRow" class="summary-row donation-text" style="display: none;"><span>Donation:</span> <strong id="manualDonVal">₹0</strong></div>
-            <div class="total-row-display"><span>Total Paid:</span> <strong id="manualTotal">₹0</strong></div>
-            <button type="button" id="payBalanceBtn" class="balance-trigger" style="margin-top: 15px; display: none;">PAY BALANCE NOW</button>
-        </div>
-
-        <div id="inlineBalanceBox" class="inline-pay-box" style="display: none;">
-            <p style="font-weight: 700; font-size: 13px; color:#cf1322; margin-bottom:12px;">Pay Balance: <span id="balanceAmtDisp">₹0</span></p>
-            <div class="upi-box-large">
-                <div class="qr-container"><img id="inlineQR" src="" style="width: 90px;"></div>
-                <div class="apps-container">
-                    <div class="large-icon-grid">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/f/f2/Google_Pay_Logo.svg" style="height:25px;">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/7/71/PhonePe_Logo.png" style="height:25px;">
-                    </div>
-                </div>
-            </div>
-            <button type="button" id="inlinePaidDoneBtn" class="completed-btn" style="margin-top: 15px;">I HAVE PAID BALANCE</button>
-        </div>
-
-        <div id="manualFields" style="display: none; margin-top: 15px;">
-            <div class="dt-container-final">
-                <div class="dt-header-labels">
-                    <label class="dt-label-main">Payment Date & Time *</label>
-                </div>
-                <div class="dt-input-grid">
-                    <div class="dt-box-wrap">
-                        <input type="text" id="manualDate" class="dt-field-final final-val" placeholder="Select Date" readonly>
-                        <i class="fas fa-calendar-alt dt-icon-right"></i>
-                    </div>
-                    <div class="dt-box-wrap">
-                        <input type="text" id="manualTimeDisplay" class="dt-field-final final-val" placeholder="Set Time" readonly>
-                        <i class="fas fa-clock dt-icon-right"></i>
-                    </div>
-                </div>
-            </div>
-            <div class="form-group" style="margin-top:15px;">
-                <label>Transaction ID / UTR No / Reference No <span class="required">*</span></label>
-                <input type="text" id="manualTransactionId" placeholder="Alphanumeric Only" class="final-val utr-field">
-                <div id="manualTransactionIdStatus" class="field-status"></div>
-            </div>
-            <div class="form-group"><label>Upload Receipt <span class="required">*</span></label><input type="file" id="manualReceipt" class="final-val"></div>
-        </div>
-    </div>
-
-
-
-    <!-- GLOBAL FINAL SUBMIT -->
-<div id="finalSubmitSection" style="display: none; margin-top: 30px;">
-
-    <!-- Declaration -->
-    <div class="declaration-box">
-
-        <label class="declaration-label">
-
-            <input type="checkbox" id="declarationCheck">
-
-            <span>
-                I hereby declare that the information furnished by me is true and correct to the best of my knowledge. I understand that if any information is found to be false, incorrect or misleading, my Membership Application may be rejected or cancelled by Andhra Rastra Power Employees Union (ARPEU).
-            </span>
-
-        </label>
-
-    </div>
-
-    <button
-        type="button"
-        id="submitMembershipBtn"
-        class="submit-btn"
-        onclick="submitMembership()"
-        style="background:#0B4EA2; height:50px;">
-        SUBMIT MEMBERSHIP APPLICATION
-    </button>
-
-</div>
-
-</div>
-
-
-
+    </section>
 </section>
 
 <!-- =========================================================
@@ -4331,6 +3909,7 @@
                     <textarea id="liveNotepadTextarea" class="notepad-textarea" placeholder="Type meeting notes here..."></textarea>
                 </div>
 
+                
                 <!-- DYNAMIC ACTIVE SPEAKER RIBBON -->
                 <div class="speaker-identity-ribbon" id="speakerIdentityRibbon">
                     <div class="ribbon-avatar-box">
@@ -4400,18 +3979,76 @@
 
         </div>
 
-        <!-- 3. MULTI-PAGE HORIZONTAL CAROUSEL -->
-        <div class="horizontal-cadre-carousel" id="horizontalCadreCarousel">
-            <div class="cadre-strip-track" id="cadreStripTrack">
-                <div class="cadre-thumb-card self-card" id="thumbUserSelf">
-                    <video id="localUserVideo" autoplay playsinline muted></video>
-                    <div class="thumb-label">
-                        <span class="thumb-name">You</span>
-                        <span class="thumb-mic-status" id="selfMicIcon"><i class="fas fa-microphone"></i></span>
-                    </div>
-                </div>
+       <!-- 3. HORIZONTAL CAROUSEL (EXACTLY 8 CORE COMMITTEE LEADERS - NO YOU CARD) -->
+<div class="horizontal-cadre-carousel" id="horizontalCadreCarousel">
+    <div class="cadre-strip-track" id="cadreStripTrack">
+        
+        <!-- Leader 1 -->
+        <div class="cadre-thumb-card" id="card-0" onclick="selectCoreLeader(0)">
+            <img src="images/state-office-bearers/raghuram-state-president-bms.jpg" alt="T. Raghuram" onerror="this.src='images/arpeu-logo.png'">
+            <div class="thumb-label">
+                <span class="thumb-name">T. Raghuram</span>
             </div>
         </div>
+
+        <!-- Leader 2 -->
+        <div class="cadre-thumb-card" id="card-1" onclick="selectCoreLeader(1)">
+            <img src="images/state-office-bearers/raghuram-state-president-bms.jpg" alt="M.V.S. Naidu" onerror="this.src='images/arpeu-logo.png'">
+            <div class="thumb-label">
+                <span class="thumb-name">M.V.S. Naidu</span>
+            </div>
+        </div>
+
+        <!-- Leader 3 -->
+        <div class="cadre-thumb-card" id="card-2" onclick="selectCoreLeader(2)">
+            <img src="images/arpeu-logo.png" alt="K. Lova Reddy">
+            <div class="thumb-label">
+                <span class="thumb-name">K. Lova Reddy</span>
+            </div>
+        </div>
+
+        <!-- Leader 4 -->
+        <div class="cadre-thumb-card" id="card-3" onclick="selectCoreLeader(3)">
+            <img src="images/state-office-bearers/state-president.jpg" alt="T. Sambasiva Rao" onerror="this.src='images/arpeu-logo.png'">
+            <div class="thumb-label">
+                <span class="thumb-name">T. Sambasiva</span>
+            </div>
+        </div>
+
+        <!-- Leader 5 -->
+        <div class="cadre-thumb-card" id="card-4" onclick="selectCoreLeader(4)">
+            <img src="images/state-office-bearers/general-secretary.jpg" alt="C. Ramagopal Reddy" onerror="this.src='images/arpeu-logo.png'">
+            <div class="thumb-label">
+                <span class="thumb-name">C. Ramagopal</span>
+            </div>
+        </div>
+
+        <!-- Leader 6 (Active by default) -->
+        <div class="cadre-thumb-card active" id="card-5" onclick="selectCoreLeader(5)">
+            <img src="images/state-office-bearers/state-treasurer.jpg" alt="P. Balakrishna" onerror="this.src='images/arpeu-logo.png'">
+            <div class="thumb-label">
+                <span class="thumb-name">P. Balakrishna</span>
+            </div>
+        </div>
+
+        <!-- Leader 7 -->
+        <div class="cadre-thumb-card" id="card-6" onclick="selectCoreLeader(6)">
+            <img src="images/state-office-bearers/jayappa-working-president.jpg" alt="K. Jayappa" onerror="this.src='images/arpeu-logo.png'">
+            <div class="thumb-label">
+                <span class="thumb-name">K. Jayappa</span>
+            </div>
+        </div>
+
+        <!-- Leader 8 -->
+        <div class="cadre-thumb-card" id="card-7" onclick="selectCoreLeader(7)">
+            <img src="images/state-office-bearers/koteswara-rao-organising-secretary.jpg" alt="A. Koteswara Rao" onerror="this.src='images/arpeu-logo.png'">
+            <div class="thumb-label">
+                <span class="thumb-name">A. Koteswara</span>
+            </div>
+        </div>
+
+    </div>
+</div>
 
         <!-- 4. BOTTOM TOOLBAR -->
         <div class="arpeu-call-toolbar">

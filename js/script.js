@@ -1733,6 +1733,22 @@ function initializeEmploymentModule() {
    MEMBERSHIP PAYMENT MODULE (STRICT STEP-BY-STEP UNHIDE)
    ========================================================== */
 
+/**
+ * Triggers native UPI payment via specific apps or generic UPI intent
+ * @param {string} app - Target app: 'gpay', 'phonepe', 'paytm' or 'all'
+ */
+function triggerUpiPayment(app) {
+  const amountInput = document.getElementById("payNowAmount");
+  const amount = amountInput ? (parseFloat(amountInput.value) || 460) : 460;
+  const upiId = "andhrarastrapowerempunion@sbi";
+  const name = "ARPEU";
+  const note = "ARPEU Membership Fee";
+  
+  const upiUrl = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(name)}&am=${amount}&cu=INR&tn=${encodeURIComponent(note)}`;
+  
+  window.location.href = upiUrl;
+}
+
 const PaymentModuleV25 = {
   init: function () {
     const payNowOpt = document.getElementById("payNowOption");
@@ -9637,6 +9653,7 @@ function rejectSubmission(subId) {
     });
 }
 
+
 // Connect with Admin Tab Switch
 const oldSwitchAdminTab = window.switchAdminTab;
 window.switchAdminTab = function(tabName) {
@@ -9654,3 +9671,47 @@ window.switchAdminTab = function(tabName) {
         if (subBtn) subBtn.classList.remove("active");
     }
 };
+
+
+
+// Function called when any of the 8 cards is clicked
+function selectCoreLeader(index) {
+    const leaders = [
+        { name: "SRI T. RAGHURAM", desig: "Hon'ble President (ARPEU) | State President (BMS)", unit: "Bank of Baroda / BMS State", photo: "images/state-office-bearers/raghuram-state-president-bms.jpg" },
+        { name: "SRI M.V.S. NAIDU", desig: "BMS State General Secretary", unit: "BMS Andhra Pradesh", photo: "images/state-office-bearers/raghuram-state-president-bms.jpg" },
+        { name: "SRI K. LOVA REDDY", desig: "BMS State Organising Secretary", unit: "BMS Andhra Pradesh", photo: "images/arpeu-logo.png" },
+        { name: "SRI T. SAMBASIVA RAO", desig: "ARPEU State President", unit: "APCPDCL – Ongole", photo: "images/state-office-bearers/state-president.jpg" },
+        { name: "SRI C. RAMAGOPAL REDDY", desig: "ARPEU State General Secretary", unit: "APGENCO – Dr. MVR RTPP", photo: "images/state-office-bearers/general-secretary.jpg" },
+        { name: "SRI P. BALAKRISHNA", desig: "ARPEU State Treasurer", unit: "APGENCO – Dr. NTTPS", photo: "images/state-office-bearers/state-treasurer.jpg" },
+        { name: "SRI K. JAYAPPA", desig: "ARPEU Working President", unit: "APSPDCL – Kadapa", photo: "images/state-office-bearers/jayappa-working-president.jpg" },
+        { name: "SRI A. KOTESWARA RAO", desig: "ARPEU Organising Secretary", unit: "APSPDCL – Kavali", photo: "images/state-office-bearers/koteswara-rao-organising-secretary.jpg" }
+    ];
+
+    const leader = leaders[index];
+    if (!leader) return;
+
+    // 1. Update the 3 lines and avatar in your Ribbon
+    const nameEl = document.getElementById("mainSpeakerName");
+    const roleEl = document.getElementById("mainSpeakerRole");
+    const unitEl = document.getElementById("mainSpeakerUnit");
+    const avatarEl = document.getElementById("mainSpeakerAvatar");
+
+    if (nameEl) nameEl.innerText = leader.name;
+    if (roleEl) roleEl.innerText = leader.desig;
+    if (unitEl) unitEl.innerText = leader.unit;
+    if (avatarEl) avatarEl.src = leader.photo;
+
+    // 2. Highlight clicked card with golden ring
+    const allCards = document.querySelectorAll(".core-cadre-card");
+    allCards.forEach((c, idx) => {
+        if (idx === index) {
+            c.style.borderColor = "#facc15";
+            c.style.boxShadow = "0 0 10px rgba(250,204,21,0.6)";
+            c.style.transform = "scale(1.05)";
+        } else {
+            c.style.borderColor = "rgba(255,255,255,0.2)";
+            c.style.boxShadow = "none";
+            c.style.transform = "scale(1)";
+        }
+    });
+}

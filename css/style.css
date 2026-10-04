@@ -1148,121 +1148,313 @@ SUBMIT SECTION
 margin-top:15px;
 }
 
-/* =========================================================
-   MEMBERSHIP MODE TOGGLE
-========================================================= */
-
-.membership-toggle-card{
-    display:flex;
-    justify-content:center;
-    margin:6px 0 18px;
+/* ==========================================================================
+   ARPEU MASTER DESIGN SYSTEM (MOBILE PWA OPTIMIZED)
+   ========================================================================== */
+:root {
+  --arpeu-blue: #0B4EA2;
+  --arpeu-blue-dark: #073674;
+  --arpeu-blue-light: #EBF3FC;
+  --arpeu-orange: #FF6600;
+  --arpeu-gold: #F59E0B;
+  --arpeu-emerald: #10B981;
+  --arpeu-rose: #E11D48;
+  --bg-page: #F4F6F9;
+  --bg-card: #FFFFFF;
+  --border-light: #E2E8F0;
+  --border-focus: #0B4EA2;
+  --text-main: #0F172A;
+  --text-muted: #64748B;
+  --radius-card: 16px;
+  --radius-input: 10px;
+  --radius-btn: 12px;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+  --shadow-card: 0 4px 12px rgba(11, 78, 162, 0.06);
 }
 
-.membership-toggle{
-    position:relative;
-    display:flex;
-    align-items:center;
-    width:220px;
-    height:38px;
-    padding:3px;
-    background:linear-gradient(to bottom,#f8fafc,#edf2f7);
-    border:1px solid #d8dee8;
-    border-radius:30px;
-    box-shadow:0 4px 12px rgba(0,0,0,.08),inset 0 1px 2px rgba(255,255,255,.70);
-    overflow:hidden;
+/* ==========================================================================
+   MEMBERSHIP CONTAINER & CARD ARCHITECTURE
+   ========================================================================== */
+.membership-page {
+  max-width: 540px;
+  margin: 0 auto;
+  padding: 12px 14px 40px 14px;
+  background: var(--bg-page);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  color: var(--text-main);
+  box-sizing: border-box;
 }
 
-.toggle-slider{
-    position:absolute;
-    top:3px;
-    left:3px;
-    width:calc(50% - 3px);
-    height:32px;
-    background:#0B4EA2;
-    border-radius:24px;
-    box-shadow:0 4px 10px rgba(11,78,162,.30);
-    transition:all .30s ease;
-    z-index:1;
+/* Page Header & Toggle */
+.member-page-header {
+  margin-bottom: 16px;
 }
 
-.membership-toggle.renewal .toggle-slider{
-    transform:translateX(100%);
-    background:#FF6600;
-    box-shadow:0 4px 10px rgba(255,102,0,.35);
+.membership-toggle-card {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 12px;
 }
 
-.toggle-btn{
-    flex:1;
-    height:100%;
-    border:none;
-    outline:none;
-    background:transparent;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    gap:6px;
-    cursor:pointer;
-    position:relative;
-    z-index:2;
-    font-size:13px;
-    font-weight:600;
-    color:#6b7280;
-    transition:color .25s ease;
+.membership-toggle {
+  display: flex;
+  background: #E2E8F0;
+  padding: 3px;
+  border-radius: 9999px;
+  width: 100%;
+  max-width: 300px;
+  position: relative;
 }
 
-.toggle-btn i{
-    font-size:13px;
+.toggle-btn {
+  flex: 1;
+  padding: 8px 14px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 700;
+  border-radius: 9999px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.2s ease;
 }
 
-#toggleNewMember.active,
-#toggleRenewal.active{
-    color:#ffffff;
+.toggle-btn.active {
+  background: var(--arpeu-blue);
+  color: #FFFFFF;
+  box-shadow: 0 2px 6px rgba(11, 78, 162, 0.3);
 }
 
-#toggleNewMember:not(.active),
-#toggleRenewal:not(.active){
-    color:#6b7280;
+.membership-toggle.renewal .toggle-btn.active {
+  background: var(--arpeu-orange);
+  box-shadow: 0 2px 6px rgba(255, 102, 0, 0.35);
 }
 
-.toggle-btn:hover{
-    color:inherit;
+.member-title {
+  display: block;
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--arpeu-blue);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  text-align: center;
 }
 
-.member-title-box{
-    margin-bottom:18px;
+.member-subtitle {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 3px;
+  margin-bottom: 14px;
+  text-align: center;
 }
 
-.membership-toggle-card,
-.member-title,
-.member-subtitle{
-    text-align:center;
+/* Individual Form Card with Compact Sleek Padding */
+.form-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-card);
+  padding: 12px 14px 12px 14px; /* బాటమ్ ప్యాడింగ్ తగ్గించి సమానం చేశాం */
+  margin-bottom: 12px;
+  box-shadow: var(--shadow-card);
+  box-sizing: border-box;
 }
 
-.member-title{
-    display:block;
-    margin:0 0 4px;
-    font-size:22px;
-    font-weight:700;
-    letter-spacing:.5px;
-    text-transform:uppercase;
-    color:#0B4EA2;
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 1.5px solid var(--arpeu-blue);
+  padding-bottom: 5px;
+  margin-bottom: 9px; /* హెడర్ కింద గ్యాప్ తగ్గించాం */
 }
 
-.member-subtitle{
-    margin:0;
-    font-size:14px;
-    font-weight:500;
-    line-height:1.5;
-    color:#6B7280;
+.card-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--arpeu-blue);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
 }
 
-@media(max-width:576px){
+.card-icon {
+  font-size: 14px;
+  color: var(--arpeu-gold);
+}
 
-    .membership-toggle{
-        width:100%;
-        max-width:240px;
-    }
+.card-body {
+  padding: 0;
+  margin: 0;
+}
 
+/* Form Groups & Compact Spacing */
+.form-group {
+  margin-bottom: 6px !important;
+  margin-top: 0 !important;
+}
+
+.form-group:last-child {
+  margin-bottom: 0 !important; /* చివరి ఫీల్డ్ కింద గ్యాప్ జీరో */
+}
+
+.form-group label {
+  display: block !important;
+  font-size: 11.5px !important;
+  font-weight: 700 !important;
+  color: #1e293b !important;
+  margin-top: 0 !important;
+  margin-bottom: 1px !important; /* బాక్స్ కి అంటుకుని ఉంటుంది */
+  padding: 0 !important;
+  line-height: 1.1 !important; /* ఎక్స్‌ట్రా హైట్ ను పూర్తిగా కట్ చేస్తుంది */
+}
+
+.form-group .required {
+  color: var(--arpeu-rose);
+  font-weight: 800;
+}
+
+.form-group .optional {
+  color: var(--text-muted);
+  font-size: 10px;
+  font-weight: 500;
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  height: 35px; /* స్లీక్ 35px హైట్ */
+  padding: 0 10px;
+  font-size: 12px;
+  color: var(--text-main);
+  background: #FFFFFF;
+  border: 1.5px solid var(--border-light);
+  border-radius: var(--radius-input);
+  outline: none;
+  box-sizing: border-box;
+  transition: all 0.2s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  border-color: var(--arpeu-blue);
+  box-shadow: 0 0 0 2px rgba(11, 78, 162, 0.12);
+}
+
+/* Date of Birth Field & Calendar Icon */
+.dob-box {
+  position: relative;
+  width: 100%;
+}
+
+.dob-box input {
+  width: 100%;
+  padding-right: 32px;
+}
+
+.dob-box .dob-icon {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--arpeu-blue, #0B4EA2);
+  pointer-events: none;
+  font-size: 13px;
+  line-height: 1;
+}
+
+/* Field Status - ఖాళీగా ఉన్నప్పుడు జీరో స్పేస్ (గ్యాప్ మాయం) */
+.field-status {
+  font-size: 10px;
+  margin-top: 2px;
+  font-weight: 600;
+}
+
+.field-status:empty {
+  display: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  height: 0 !important;
+}
+
+/* Photo Upload Box (3:4 Passport Ratio) */
+.photo-upload-container {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.photo-upload-section {
+  flex: 1;
+}
+
+.photo-preview {
+  width: 78px;
+  height: 96px;
+  border: 2px dashed var(--arpeu-blue);
+  border-radius: 10px;
+  overflow: hidden;
+  background: #F1F5F9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.preview-text {
+  font-size: 9px;
+  color: var(--text-muted);
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.upload-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 6px 0;
+}
+
+.photo-btn {
+  background: var(--arpeu-blue);
+  color: #FFFFFF;
+  border: none;
+  padding: 7px 12px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.photo-file-name {
+  font-size: 10px !important;
+  color: var(--text-muted) !important;
+  background: #F8FAFC !important;
+  border: 1px solid var(--border-light) !important;
+  padding: 6px 8px !important;
+  border-radius: 6px !important;
+  flex: 1;
+}
+
+.photo-info {
+  font-size: 9px;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+
+.take-photo-btn {
+  background: #F8FAFC;
+  color: #334155;
+  border: 1px solid var(--border-light);
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 10.5px;
+  font-weight: 700;
+  cursor: pointer;
 }
 
 /* =========================================================
@@ -1925,488 +2117,222 @@ body.dark-mode .breakdown-row.total-summary-row {
 }
 
 
-/* ==========================================================
-   MAIN PAYMENT TOGGLE BUTTONS (CENTERED & WIDE 50-50)
-   ========================================================== */
-
+/* ==========================================================================
+   PAYMENT MODULE V25 ENHANCEMENT (50-50 CENTERED & NATIVE PICKERS)
+   ========================================================================== */
 .main-payment-toggle-row {
-    display: flex !important;
-    justify-content: space-between !important;
-    gap: 12px !important;
-    width: 100% !important;
-    margin: 8px 0 16px 0 !important;
-    box-sizing: border-box !important;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 8px;
+  margin-bottom: 12px;
 }
 
 .main-method-btn {
-    flex: 1 !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    height: 48px !important;
-    border: 1.5px solid #cbd5e1 !important;
-    border-radius: 12px !important;
-    background: #ffffff !important;
-    cursor: pointer !important;
-    font-weight: 700 !important;
-    font-size: 13px !important;
-    color: #334155 !important;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.04) !important;
-    transition: all 0.25s ease !important;
-    box-sizing: border-box !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px;
+  border: 1.5px solid var(--border-light);
+  border-radius: 10px;
+  background: #FFFFFF;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #334155;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-.main-method-btn input[type="radio"] {
-    margin-right: 8px !important;
-    width: 16px !important;
-    height: 16px !important;
-    cursor: pointer !important;
+.main-method-btn input[type="radio"]:checked + span,
+.main-method-btn:has(input[type="radio"]:checked) {
+  border-color: var(--arpeu-blue);
+  background: var(--arpeu-blue-light);
+  color: var(--arpeu-blue);
 }
 
-.main-method-btn:has(input:checked) {
-    border-color: #0B4EA2 !important;
-    background: #eef5ff !important;
-    color: #0B4EA2 !important;
-    box-shadow: 0 4px 10px rgba(11, 78, 162, 0.15) !important;
-}
-
-/* =========================================================
-   PAYMENT MODULE V24 - FINAL COMPACT & FIXED GRID
-   Compatibility: Mobile, Tablet & Desktop (PWA Ready)
-========================================================= */
-
-/* 1. Method Selection Buttons */
-.payment-method-row,
-.don-method-selection-bar {
-    display: grid !important;
-    grid-template-columns: 1fr 1fr !important; /* Equal 50% + 50% width */
-    gap: 12px !important;
-    width: 100% !important;
-    margin: 8px 0 16px 0 !important;
-    box-sizing: border-box;
-}
-
-.compact-method-btn,
-.don-large-option-btn {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    height: 46px !important; /* Perfect sleek height */
-    width: 100% !important;
-    border: 1.5px solid #cbd5e1 !important;
-    border-radius: 12px !important;
-    background: #ffffff !important;
-    cursor: pointer !important;
-    font-weight: 700 !important;
-    font-size: 12.5px !important;
-    color: #334155 !important;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.04) !important;
-    transition: all 0.25s ease !important;
-    box-sizing: border-box;
-}
-
-.compact-method-btn input[type="radio"],
-.don-large-option-btn input[type="radio"] {
-    margin-right: 8px !important;
-    width: 16px !important;
-    height: 16px !important;
-    cursor: pointer !important;
-}
-
-/* Active Highlight Style */
-.compact-method-btn:has(input:checked),
-.don-large-option-btn:has(input:checked) {
-    border-color: #0B4EA2 !important;
-    background: #eef5ff !important;
-    color: #0B4EA2 !important;
-    box-shadow: 0 4px 10px rgba(11, 78, 162, 0.15) !important;
-}
-
-.compact-method-btn:has(input:checked) {
-    border-color: var(--primary);
-    background: #f0f7ff;
-    color: var(--primary);
-    box-shadow: 0 4px 10px rgba(11, 78, 162, 0.1);
-}
-
-/* 2. Format Selector (Mini Dropdown) */
-.format-select-mini {
-    border: 1px solid #ffccbc;
-    background: #fff8f0;
-    color: #f57c00;
-    font-size: 11px;
-    font-weight: 700;
-    padding: 3px 10px;
-    border-radius: 20px;
-    cursor: pointer;
-    outline: none;
-}
-
-/* 3. 50% + 50% Grid for Date & Time (Fixed) */
-.date-time-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    width: 100%;
-}
-
-.grid-col {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    position: relative; /* Time picker లోపలే ఓపెన్ అవ్వడానికి */
-}
-
-.inner-label {
-    font-size: 11px;
-    font-weight: 600;
-    color: #666;
-}
-
-.dt-box-v2 {
-    width: 100%;
-    height: 44px;
-    padding: 0 10px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    font-size: 13px;
-    background: #fff;
-    cursor: pointer;
-    box-sizing: border-box;
-}
-
-.dt-box-v2[readonly] {
-    background: #f9f9f9;
-}
-
-/* 4. Action Buttons (Professional) */
-.submit-btn, .completed-btn, .balance-trigger {
-    width: 100%; border: none; border-radius: 10px; font-weight: 700; height: 48px;
-    color: #fff !important; text-transform: uppercase; cursor: pointer; transition: 0.3s;
-    /* సెంటర్ అలైన్మెంట్ కోసం ఈ కిందవి యాడ్ చేశాను */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-}
-
-.submit-btn { background: var(--primary); }
-.completed-btn { background: #2e7d32; }
-.balance-trigger { background: var(--secondary); }
-
-/* 5. Breakdown & Info Boxes */
 .breakdown-box {
-    background: #f8faff;
-    padding: 15px;
-    border-radius: 15px;
-    border: 1px solid #dce7ff;
-    margin-top: 10px;
+  background: #F8FAFC;
+  border: 1px solid var(--border-light);
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin-top: 10px;
 }
 
 .summary-row {
-    display: flex;
-    justify-content: space-between;
-    font-size: 13px;
-    margin-bottom: 6px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: #475569;
+  margin-bottom: 4px;
 }
 
 .donation-text {
-    color: #2e7d32;
-    border-top: 1px dashed #ccc;
-    padding-top: 8px;
-    margin-top: 5px;
-    font-weight: 600;
+  color: #2e7d32;
+  border-top: 1px dashed #cbd5e1;
+  padding-top: 6px;
+  margin-top: 4px;
+  font-weight: 600;
 }
 
 .total-row-display {
-    display: flex;
-    justify-content: space-between;
-    font-size: 17px;
-    font-weight: 800;
-    color: var(--primary);
-    border-top: 2px solid var(--primary);
-    padding-top: 10px;
-    margin-top: 8px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--arpeu-blue);
+  border-top: 1px dashed var(--border-light);
+  padding-top: 6px;
+  margin-top: 6px;
 }
 
-/* ==========================================================
-   UPI QR & APPS CONTAINER (RESPONSIVE & CLICKABLE FIX)
-   ========================================================== */
-
 .upi-box-large {
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-    gap: 10px !important;
-    padding: 10px 12px !important;
-    border: 1.5px solid #e2e8f0 !important;
-    border-radius: 14px !important;
-    background: #ffffff !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04) !important;
-    width: 100% !important;
-    box-sizing: border-box !important;
-    overflow: hidden !important;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  background: #FFFFFF;
+  border: 1px solid var(--border-light);
+  border-radius: 12px;
 }
 
 .qr-container {
-    flex: 0 0 90px !important;
-    text-align: center !important;
-    border-right: 1.5px dashed #e2e8f0 !important;
-    padding-right: 8px !important;
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: center !important;
-    align-items: center !important;
+  text-align: center;
 }
 
 .qr-container img {
-    width: 85px !important;
-    height: 85px !important;
-    object-fit: contain !important;
-    display: block !important;
+  width: 90px;
+  height: 90px;
+  object-fit: contain;
 }
 
 .apps-container {
-    flex: 1 !important;
-    min-width: 0 !important; /* Crucial: Prevents flex child overflow */
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: center !important;
-    gap: 6px !important;
-    padding-left: 4px !important;
+  width: 100%;
+  text-align: center;
 }
 
-/* UPI ID: Clean Wrap, No Overflow, Interactive */
 .upi-id-single-line {
-    font-size: 11px !important;
-    font-weight: 700 !important;
-    color: #1e293b !important;
-    margin: 0 !important;
-    line-height: 1.3 !important;
-    text-align: left !important;
-    word-break: break-all !important; /* Allows smooth wrap on smaller phones */
-    cursor: pointer !important;
+  font-size: 11px;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 6px;
+  word-break: break-all;
 }
 
 .upi-id-single-line span {
-    color: #0B4EA2 !important;
-    font-weight: 800 !important;
-    font-size: 11px !important;
-    text-decoration: underline !important;
+  color: var(--arpeu-blue);
+  text-decoration: underline;
 }
 
-/* 3 Interactive App Logos in a Responsive Row */
 .large-icon-grid {
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: center !important;
-    justify-content: flex-start !important;
-    gap: 6px !important;
-    width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  margin-top: 6px;
 }
 
-.app-icon-gpay {
-    height: 20px !important;
-    max-width: 44px !important;
-    object-fit: contain !important;
-    cursor: pointer !important;
-    transition: transform 0.15s ease !important;
+.large-icon-grid img,
+.large-icon-grid svg {
+  height: 26px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
 }
 
-.app-icon-phonepe {
-    height: 24px !important;
-    max-width: 72px !important;
-    display: block !important;
-    cursor: pointer !important;
-    transition: transform 0.15s ease !important;
+.large-icon-grid img:hover,
+.large-icon-grid svg:hover {
+  transform: scale(1.08);
 }
 
-.app-icon-paytm {
-    height: 18px !important;
-    max-width: 44px !important;
-    object-fit: contain !important;
-    cursor: pointer !important;
-    transition: transform 0.15s ease !important;
+.large-icon-grid img:active,
+.large-icon-grid svg:active {
+  transform: scale(0.92);
 }
 
-/* Active Tap / Touch Feedback */
-.app-icon-gpay:active,
-.app-icon-phonepe:active,
-.app-icon-paytm:active,
-.upi-id-single-line:active {
-    transform: scale(0.90) !important;
-    opacity: 0.8 !important;
+/* Date-Time Container */
+.dt-container-final {
+  width: 100%;
+  border: 1px solid var(--border-light);
+  padding: 12px;
+  border-radius: 12px;
+  background: #FFFFFF;
+  box-sizing: border-box;
 }
 
-/* =========================================================
-   PAYMENT MODULE V25 - ANCHORED PICKER STYLES
-========================================================= */
-
-.center-content { display: flex; justify-content: center; width: 100%; }
-.payment-method-row { display: flex; gap: 10px; margin-bottom: 15px; }
-.compact-method-btn {
-    flex: 1; display: flex; align-items: center; justify-content: center; height: 46px;
-    border: 2px solid #ddd; border-radius: 12px; background: #fff; cursor: pointer;
-    font-weight: 600; font-size: 13px; transition: 0.3s;
-}
-.compact-method-btn:has(input:checked) { border-color: #0b4ea2; background: #f0f7ff; color: #0b4ea2; }
-
-/* Breakdown & UPI Boxes */
-.breakdown-box { background: #f8faff; padding: 15px; border-radius: 15px; border: 1px solid #dce7ff; margin-top: 10px; }
-.summary-row { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 6px; }
-.total-row-display { display: flex; justify-content: space-between; font-size: 17px; font-weight: 800; color: #0b4ea2; border-top: 2px solid #0b4ea2; padding-top: 10px; margin-top: 8px; }
-.upi-box-large {
-    display: flex !important; flex-direction: row !important; align-items: center;
-    justify-content: space-between; gap: 15px; padding: 18px; border: 1px solid #eee;
-    border-radius: 15px; background: #ffffff; box-shadow: 0 4px 12px rgba(0,0,0,0.05); width: 100%;
-}
-.qr-container { flex: 0 0 100px; text-align: center; border-right: 1px solid #f0f3f8; padding-right: 12px; }
-.qr-container img { width: 100%; height: auto; border-radius: 5px; }
-.large-icon-grid img { height: 28px; max-width: 50px; margin-right: 10px; }
-
-/* DATE-TIME ANCHOR UI */
-.dt-container-final { width: 100%; border: 1px solid #e0e0e0; padding: 15px; border-radius: 15px; background: #fff; }
-.dt-header-labels { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-.dt-label-main { font-size: 14px; font-weight: 700; color: #333; }
-.dt-format-box { height: 36px; border: 1px solid #ddd; border-radius: 8px; padding: 0 8px; font-size: 12px; font-weight: 600; cursor: pointer; outline: none; background: #fdfdfd; }
-
-.dt-input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.dob-age-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    width: 100%;
-    margin-bottom: 15px;
-}
-.dt-box-wrap { position: relative; display: flex; align-items: center; border-radius: 10px; }
-.dt-field-final { width: 100%; height: 46px; padding: 0 35px 0 12px; border: 1px solid #ddd; border-radius: 10px; font-size: 14px; background: #fff; box-sizing: border-box; cursor: pointer !important; }
-
-.dt-box-wrap { 
-    position: relative !important; 
-    display: flex !important; 
-    align-items: center !important; 
-    border-radius: 10px !important; 
-    overflow: visible !important; 
-    width: 100%;
+.dt-header-labels {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
 }
 
-.dt-icon-right {
-    position: absolute !important;
-    right: 12px !important;
-    pointer-events: none !important;
-    z-index: 2;
+.dt-label-main {
+  font-size: 11px;
+  font-weight: 700;
+  color: #334155;
 }
 
-/* INVISIBLE NATIVE PICKER (Force anchoring isolated to dt-box-wrap only) */
-.dt-box-wrap .native-picker-overlay {
-    position: absolute;
-    left: 0; 
-    top: 0; 
-    width: 100%; 
-    height: 100%;
-    opacity: 0; 
-    cursor: pointer !important; 
-    z-index: 2 !important;
+.dt-input-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
 }
 
-/* Native Calendar & Time Icon standard behavior */
-input[type="date"]::-webkit-calendar-picker-indicator,
-input[type="time"]::-webkit-calendar-picker-indicator { 
-    position: relative !important;
-    width: auto !important;
-    height: auto !important;
-    opacity: 1 !important;
-    cursor: pointer !important;
-    z-index: 1 !important;
+/* Declaration & Submit Button */
+.declaration-box {
+  background: #F8FAFC;
+  border: 1px solid var(--border-light);
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin-bottom: 14px;
 }
 
-/* Action Buttons */
-.submit-btn, .completed-btn, .balance-trigger {
-    width: 100%; border: none; border-radius: 10px; font-weight: 700; height: 48px;
-    color: #fff !important; text-transform: uppercase; cursor: pointer; transition: 0.3s;
-}
-.submit-btn { background: #0b4ea2; }
-.completed-btn { background: #2e7d32; }
-.balance-trigger { background: #f57c00; }
-.inline-pay-box { border: 2px solid #ffa39e; padding: 15px; border-radius: 18px; background: #fffaf9; margin-top: 15px; }
-
-
-
-/* =========================================================
-   PAYMENT MODULE V25 END
-========================================================= */
-
-/* =========================================================
-   FLATPICKR UI OVERRIDES & TIME PICKER BOUNDARY FIX
-========================================================= */
-
-/* Main calendar popup container & time picker alignment */
-.flatpickr-calendar { 
-    z-index: 9999999 !important; 
-    box-shadow: 0 10px 25px rgba(0,0,0,0.2) !important;
-    background: #fff !important;
+.declaration-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 10.5px;
+  line-height: 1.45;
+  color: #475569;
+  cursor: pointer;
 }
 
-/* Force time picker popup to stay within card boundaries */
-.flatpickr-calendar.hasTime {
-    max-width: 220px !important;
-    right: 15px !important;
-    left: auto !important;
+.declaration-label input {
+  margin-top: 2px;
+  accent-color: var(--arpeu-blue);
 }
 
-/* Month dropdown styling */
-.flatpickr-monthDropdown-months {
-    background: #fff !important;
-    font-weight: 700 !important;
-    color: #333 !important;
-    cursor: pointer !important;
-    border: none !important;
+.submit-btn,
+.completed-btn {
+  width: 100%;
+  height: 48px;
+  background: var(--arpeu-blue);
+  color: #FFFFFF !important;
+  font-size: 13px;
+  font-weight: 800;
+  border: none;
+  border-radius: var(--radius-btn);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(11, 78, 162, 0.25);
+  transition: all 0.2s ease;
 }
 
-/* Year input box sizing */
-.flatpickr-current-month .numInputWrapper {
-    width: 75px !important;
+.completed-btn {
+  background: #16A34A;
 }
 
-.flatpickr-current-month .numInputWrapper span.arrowUp,
-.flatpickr-current-month .numInputWrapper span.arrowDown {
-    display: block !important;
+.submit-btn:hover {
+  background: var(--arpeu-blue-dark);
 }
 
-/* Calendar arrow styling when opening above */
-.flatpickr-calendar.arrowBottom:before, 
-.flatpickr-calendar.arrowBottom:after {
-    border-top-color: #fff !important;
-}
-/* ===========================================
-   Declaration
-=========================================== */
-
-.declaration-box{
-    margin:20px 0;
-    padding:15px;
-    border:1px solid #d9d9d9;
-    border-radius:8px;
-    background:#fffbea;
-}
-
-.declaration-label{
-    display:flex;
-    align-items:flex-start;
-    gap:10px;
-    cursor:pointer;
-    font-size:14px;
-    line-height:1.7;
-    color:#333;
-}
-
-.declaration-label input[type="checkbox"]{
-    margin-top:3px;
-    width:18px;
-    height:18px;
-    cursor:pointer;
-    flex-shrink:0;
+.submit-btn:active,
+.completed-btn:active {
+  transform: scale(0.98);
 }
 
 /* ==========================================================
@@ -11256,3 +11182,4 @@ textarea.mtg-custom-field {
     opacity: 1 !important;
     pointer-events: auto !important;
 }
+
