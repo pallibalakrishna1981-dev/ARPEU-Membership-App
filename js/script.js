@@ -6166,6 +6166,74 @@ async function loadNotificationsList() {
 /* ==========================================================================
    ARPEU NATIVE WebRTC CONFERENCING ENGINE & CALLING PODS (IN-HOUSE 60-CAPACITY)
    ========================================================================== */
+  /* ==========================================================================
+   ARPEU NATIVE WebRTC - FIREBASE SIGNALING & RINGING ENGINE
+   ========================================================================== */
+
+const firebaseConfig = {
+    apiKey: "AIzaSyDe_KQ4joODTR3nYsXg-Rlwde2jWUC0jv8",
+    authDomain: "arpeu-calling.firebaseapp.com",
+    projectId: "arpeu-calling",
+    storageBucket: "arpeu-calling.firebasestorage.app",
+    messagingSenderId: "958091134237",
+    appId: "1:958091134237:web:424d3dd6c7f9872fcd4df4",
+    measurementId: "G-3RB1B2HQP0",
+    databaseURL: "https://arpeu-calling-default-rtdb.firebaseio.com"
+};
+
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+const database = firebase.database();
+
+let myProfile = { mobile: "9642788786", name: "Sri P. Balakrishna" }; // Your default ID
+
+/**
+ * 1. Set User Status to Online
+ */
+function setUserOnline(mobile) {
+    const userRef = database.ref('onlineLeaders/' + mobile);
+    userRef.set({
+        status: "online",
+        lastSeen: firebase.database.ServerValue.TIMESTAMP
+    });
+    // Remove status when user disconnects
+    userRef.onDisconnect().remove();
+}
+
+/**
+ * 2. Listen for Incoming Calls (Ringing Logic)
+ */
+function listenForCalls(myMobile) {
+    const callRef = database.ref('calls/' + myMobile);
+    callRef.on('value', (snapshot) => {
+        const callData = snapshot.val();
+        if (callData && callData.status === 'ringing') {
+            // Trigger the Ringing UI
+            playRingtone(); 
+            const accept = confirm(`Incoming Video Call from ${callData.callerName}. Accept?`);
+            if (accept) {
+                stopRingtone();
+                acceptCall(callData);
+            } else {
+                rejectCall(myMobile);
+            }
+        }
+    });
+}
+
+/**
+ * 3. Place a Call (Triggered when you tap a leader card)
+ */
+function placeCall(targetMobile, callerName) {
+    database.ref('calls/' + targetMobile).set({
+        callerName: callerName,
+        callerMobile: myProfile.mobile,
+        status: 'ringing',
+        timestamp: firebase.database.ServerValue.TIMESTAMP
+    });
+    console.log("Calling " + targetMobile + "...");
+}
+
 
 // Official Cadre Data Model (Dynamic Auto-Speaker Identity)
 const coreCommitteeCadreMaster = [
