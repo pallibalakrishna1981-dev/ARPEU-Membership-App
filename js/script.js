@@ -6834,10 +6834,14 @@ function webrtcToggleMic() {
     }
 }
 
+/**
+ * Toggles camera and manages placeholder image visibility.
+ */
 function webrtcToggleCam() {
     const btn = document.getElementById('btnToggleCam');
+    const mainVideo = document.getElementById('mainSpeakerVideo');
+    const placeholder = document.getElementById('videoOffPlaceholder');
     const btnIcon = btn ? btn.querySelector('i') : null;
-    const btnLabel = btn ? btn.querySelector('span') : null;
 
     let isVideoEnabled = false;
 
@@ -6845,15 +6849,27 @@ function webrtcToggleCam() {
         const videoTrack = webrtcLocalStream.getVideoTracks()[0];
         videoTrack.enabled = !videoTrack.enabled;
         isVideoEnabled = videoTrack.enabled;
-    } else {
-        // Fallback state toggle
-        isVideoEnabled = btn ? btn.classList.contains('muted') : true;
     }
 
+    // UI Updates
     if (btn) {
         btn.classList.toggle('muted', !isVideoEnabled);
         if (btnIcon) btnIcon.className = isVideoEnabled ? 'fas fa-video' : 'fas fa-video-slash';
-        if (btnLabel) btnLabel.textContent = isVideoEnabled ? 'Camera' : 'Cam Off';
+    }
+
+    // Toggle Placeholder Image
+    if (mainVideo && placeholder) {
+        if (!isVideoEnabled) {
+            // Show photo when camera is off
+            const currentPhoto = mainVideo.dataset.currentPhoto || 'images/bms-state-office-bearers/t-raghuram-bms-state-president.jpg';
+            placeholder.src = currentPhoto;
+            placeholder.style.display = 'block';
+            mainVideo.style.opacity = '0'; // Hide the black video stream
+        } else {
+            // Show live video
+            placeholder.style.display = 'none';
+            mainVideo.style.opacity = '1';
+        }
     }
 }
 
