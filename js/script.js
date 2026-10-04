@@ -6200,87 +6200,145 @@ function setUserOnline(mobile) {
     userRef.onDisconnect().remove();
 }
 
-/**
- * 2. Listen for Incoming Calls (Ringing Logic)
- */
-// Global Audio object for ringtone
+
+// ==========================================================================
+// ARPEU AUDIO ENGINE & MASTER CADRE DATA FOR TESTING (4 NUMBERS)
+// ==========================================================================
 let arpeuRingtone = new Audio('https://palli-balakrishna.github.io/ARPEU-Assets/ringtone.mp3'); 
 arpeuRingtone.loop = true;
 
-/**
- * Enhanced Incoming Call Listener with Audio Alert
- */
-function listenForIncomingCalls(myMobile) {
-    console.log("Listening for calls on mobile: " + myMobile);
-    const callRef = database.ref('calls/' + myMobile);
+const coreCommitteeCadreMaster = [
+    { name: "Sri P. Balakrishna", designation: "State Treasurer", mobile: "9642788786" },
+    { name: "Sri L. Prasadu", designation: "State General Secretary", mobile: "9110771171" },
+    { name: "Sri R. Ravi", designation: "State President", mobile: "9985333734" },
+    { name: "Sri P. Balakrishna", designation: "State Additional Secretary", mobile: "9393788785" }
+];
+
+let activeIncomingCallData = null;
+
+// ==========================================================================
+// AUTO-INITIALIZE USER IDENTITY & START BACKGROUND CALL LISTENER
+// ==========================================================================
+window.addEventListener('DOMContentLoaded', () => {
+    let myNumber = localStorage.getItem('arpeu_my_number');
     
+    // Prompt only once if mobile number is not already saved in browser storage
+    if (!myNumber) {
+        myNumber = prompt("Please enter your 10-digit Mobile Number for receiving calls:", "9642788786");
+        if (myNumber) localStorage.setItem('arpeu_my_number', myNumber.trim());
+    }
+
+    if (myNumber) {
+        myProfile.mobile = myNumber.trim();
+        setUserOnline(myNumber.trim());
+        listenForIncomingCalls(myNumber.trim());
+        console.log("ARPEU Signaling Engine Active for User:", myNumber);
+    }
+});
+
+// ==========================================================================
+// PLACE SINGLE CALL SIGNAL (FIREBASE RTDB)
+// ==========================================================================
+function placeCall(targetMobile, callerName, roomCode, meetingTitle, mode = 'video') {
+    database.ref('calls/' + targetMobile).set({
+        callerName: callerName,
+        callerMobile: myProfile.mobile,
+        meetingTitle: meetingTitle,
+        roomCode: roomCode,
+        callType: mode,
+        status: 'ringing',
+        timestamp: firebase.database.ServerValue.TIMESTAMP
+    });
+    console.log(`Call dispatched to: ${targetMobile} | Room: ${roomCode}`);
+}
+
+// ==========================================================================
+// INITIATE GROUP CALL TO ALL CORE COMMITTEE MEMBERS
+// ==========================================================================
+function startCoreCommitteeGroupCall(mode = 'video') {
+    const hostMobile = localStorage.getItem('arpeu_my_number') || myProfile.mobile;
+    const roomCode = `ARPEU-CORE-${Math.floor(1000 + Math.random() * 9000)}`;
+
+    console.log(`Starting Group Video Call... Room: ${roomCode}`);
+
+    // Broadcast ringing signal to all other leaders in master data
+    coreCommitteeCadreMaster.forEach(leader => {
+        if (leader.mobile && leader.mobile !== hostMobile) {
+            placeCall(leader.mobile, "Sri P. Balakrishna (Host)", roomCode, "Core Committee Meeting", mode);
+        }
+    });
+
+    // Launch instant conference stage for Host
+    launchInstantConference('Core Committee', mode, roomCode);
+}
+
+// ==========================================================================
+// REAL-TIME INCOMING CALL LISTENER & WHATSAPP-STYLE UI TRIGGER
+// ==========================================================================
+function listenForIncomingCalls(myMobile) {
+    console.log("Listening for incoming calls on Mobile: " + myMobile);
+    const callRef = database.ref('calls/' + myMobile);
+
     callRef.on('value', (snapshot) => {
         const callData = snapshot.val();
-        if (callData && callData.status === 'ringing') {
-            
-            // 1. Play Ringtone
-            arpeuRingtone.play().catch(e => console.log("Audio play blocked by browser, waiting for interaction."));
 
-            // 2. Show Alert
-            const accept = confirm(`🔔 INCOMING VIDEO CALL\n\nLeader: ${callData.callerName}\n\nDo you want to accept?`);
-            
-            if (accept) {
-                arpeuRingtone.pause();
-                arpeuRingtone.currentTime = 0;
-                database.ref('calls/' + myMobile).update({ status: 'accepted' });
-                launchInstantConference('Core Committee', 'video'); // Join the meeting
-                const leaderCard = document.querySelector(`[onclick*="${myMobile}"]`);
-                if (leaderCard) leaderCard.classList.add('is-online');
-            } else {
-                arpeuRingtone.pause();
-                arpeuRingtone.currentTime = 0;
-                database.ref('calls/' + myMobile).remove();
-            }
+        if (callData && callData.status === 'ringing') {
+            activeIncomingCallData = callData;
+
+            // Populate Modal UI with Caller Details
+            const nameEl = document.getElementById('incomingCallerName');
+            const titleEl = document.getElementById('incomingCallMeetingTitle');
+            if (nameEl) nameEl.textContent = callData.callerName || "ARPEU Leader";
+            if (titleEl) titleEl.textContent = callData.meetingTitle || "Live Conference";
+
+            // Display WhatsApp-style Incoming Call Screen
+            const modal = document.getElementById('arpeuIncomingCallModal');
+            if (modal) modal.style.display = 'flex';
+
+            // Play Ringtone Audio
+            arpeuRingtone.currentTime = 0;
+            arpeuRingtone.play().catch(e => {
+                console.warn("Audio autoplay blocked by browser policy. Interaction required.", e);
+            });
+
+        } else if (!callData || callData.status === 'rejected' || callData.status === 'ended') {
+            // Dismiss Modal and stop Ringtone if call is ended or rejected
+            closeIncomingCallPopup();
         }
     });
 }
 
-/**
- * 4. Initiate a Group Video Call to all Committee Members
- */
-function startCoreCommitteeGroupCall() {
-    console.log("Initiating Group Video Call to all leaders...");
-    
-    if (typeof coreCommitteeCadreMaster !== 'undefined') {
-        coreCommitteeCadreMaster.forEach(leader => {
-            // Send call signal to everyone except yourself
-            if (leader.mobile && leader.mobile !== "9642788786") {
-                placeCall(leader.mobile, "Sri P. Balakrishna");
-            }
-        });
+// ==========================================================================
+// CALL ACTION HANDLERS (ACCEPT & REJECT)
+// ==========================================================================
+function acceptIncomingCall() {
+    closeIncomingCallPopup();
+
+    const myMobile = localStorage.getItem('arpeu_my_number') || myProfile.mobile;
+    database.ref('calls/' + myMobile).update({ status: 'accepted' });
+
+    if (activeIncomingCallData) {
+        launchInstantConference(
+            activeIncomingCallData.meetingTitle || 'Core Committee',
+            activeIncomingCallData.callType || 'video',
+            activeIncomingCallData.roomCode
+        );
     }
-    
-    // Open the conference stage for you (Host)
-    launchInstantConference('Core Committee', 'video');
 }
 
+function rejectIncomingCall() {
+    closeIncomingCallPopup();
 
-/**
- * 3. Place a Call (Triggered when you tap a leader card)
- */
-function placeCall(targetMobile, callerName) {
-    database.ref('calls/' + targetMobile).set({
-        callerName: callerName,
-        callerMobile: myProfile.mobile,
-        status: 'ringing',
-        timestamp: firebase.database.ServerValue.TIMESTAMP
-    });
-    console.log("Calling " + targetMobile + "...");
+    const myMobile = localStorage.getItem('arpeu_my_number') || myProfile.mobile;
+    database.ref('calls/' + myMobile).remove();
 }
 
-
-// Official Cadre Data Model (Dynamic Auto-Speaker Identity)
-const coreCommitteeCadreMaster = [
-    { name: "Sri P. Balakrishna", designation: "State Treasurer", unit: "APGENCO – Dr. NTTPS", mobile: "9642788786" },
-    { name: "Sri L. Prasadu", designation: "State General Secretary", unit: "APSPDCL – Corporate Office", mobile: "9110771171" },
-    { name: "Sri R. Ravi", designation: "State President", unit: "APCPDCL – Vijayawada Circle", mobile: "9985333734" },
-    { name: "Sri P. Balakrishna", designation: "State Additional Secretary", unit: "APEPDCL – Visakhapatnam", mobile: "9393788785" }
-];
+function closeIncomingCallPopup() {
+    arpeuRingtone.pause();
+    arpeuRingtone.currentTime = 0;
+    const modal = document.getElementById('arpeuIncomingCallModal');
+    if (modal) modal.style.display = 'none';
+}
 
 // WebRTC State Variables
 let webrtcLocalStream = null;
@@ -6353,7 +6411,7 @@ async function launchInstantConference(committeeName = 'Core Committee', mode = 
     
     // 3. Set this user as Online
     setUserOnline(myNumber);
-    
+
     const isVideo = (mode === 'video');
     const roomCode = directRoomCode || `ARPEU-${committeeName.replace(/\s+/g, '-').toUpperCase()}-${Math.floor(100 + Math.random() * 900)}`;
 
@@ -7310,37 +7368,30 @@ let secondarySpeakerTimeout = null;
  * 1. Personal Focus / Local Tap-to-Pin Feature
  * (Runs only on the local device that clicked, does not affect others)
  */
-function handleCadreThumbClick(cadreId, cadreName, cadreRole, cadreUnit, photoSrc) {
+function handleCadreThumbClick(cadreId, cadreName, cadreRole, cadreUnit, photoSrc, cadreMobile) {
     console.log("Step 1: Function Started for", cadreName);
 
     // 1. Highlight Card
     document.querySelectorAll('.cadre-thumb-card').forEach(card => card.classList.remove('selected-leader'));
     const currentCard = document.getElementById('card-' + cadreId);
-    if (currentCard) {
-        currentCard.classList.add('selected-leader');
-        console.log("Step 2: Border Class Added to card-" + cadreId);
-    } else {
-        console.error("Step 2 Error: Card ID not found: card-" + cadreId);
-    }
+    if (currentCard) currentCard.classList.add('selected-leader');
 
     // 2. Show PiP Photo
     const photoWrap = document.getElementById('tappedLeaderPhotoWrap');
     if (photoWrap) {
         photoWrap.innerHTML = `<img src="${photoSrc}" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='images/arpeu-logo.png'">`;
         photoWrap.style.display = 'block';
-        console.log("Step 3: PiP Photo Displayed");
-    } else {
-        console.error("Step 3 Error: tappedLeaderPhotoWrap ID not found!");
     }
 
     // 3. Update Ribbon
     updateActiveSpeakerIdentity(cadreName, cadreRole, cadreUnit);
-    console.log("Step 4: Ribbon Updated");
 
-    // 4: Trigger real-time Firebase call to the selected leader
-    if (typeof triggerFirebaseCall === 'function') {
-        // 'cadreMobile' comes from the function parameter
-        triggerFirebaseCall(cadreMobile, cadreName);
+    // 4. Trigger Real Call
+    if (cadreMobile) {
+        placeCall(cadreMobile, myProfile.name);
+        alert(`${cadreName} (${cadreMobile}) కి కాల్ వెళ్తోంది...`);
+    } else {
+        console.error("Mobile number missing for:", cadreName);
     }
 }
 
