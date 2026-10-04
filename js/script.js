@@ -6203,19 +6203,36 @@ function setUserOnline(mobile) {
 /**
  * 2. Listen for Incoming Calls (Ringing Logic)
  */
-function listenForCalls(myMobile) {
+// Global Audio object for ringtone
+let arpeuRingtone = new Audio('https://palli-balakrishna.github.io/ARPEU-Assets/ringtone.mp3'); 
+arpeuRingtone.loop = true;
+
+/**
+ * Enhanced Incoming Call Listener with Audio Alert
+ */
+function listenForIncomingCalls(myMobile) {
+    console.log("Listening for calls on mobile: " + myMobile);
     const callRef = database.ref('calls/' + myMobile);
+    
     callRef.on('value', (snapshot) => {
         const callData = snapshot.val();
         if (callData && callData.status === 'ringing') {
-            // Trigger the Ringing UI
-            playRingtone(); 
-            const accept = confirm(`Incoming Video Call from ${callData.callerName}. Accept?`);
+            
+            // 1. Play Ringtone
+            arpeuRingtone.play().catch(e => console.log("Audio play blocked by browser, waiting for interaction."));
+
+            // 2. Show Alert
+            const accept = confirm(`🔔 INCOMING VIDEO CALL\n\nLeader: ${callData.callerName}\n\nDo you want to accept?`);
+            
             if (accept) {
-                stopRingtone();
-                acceptCall(callData);
+                arpeuRingtone.pause();
+                arpeuRingtone.currentTime = 0;
+                database.ref('calls/' + myMobile).update({ status: 'accepted' });
+                launchInstantConference('Core Committee', 'video'); // Join the meeting
             } else {
-                rejectCall(myMobile);
+                arpeuRingtone.pause();
+                arpeuRingtone.currentTime = 0;
+                database.ref('calls/' + myMobile).remove();
             }
         }
     });
@@ -7283,6 +7300,12 @@ function handleCadreThumbClick(cadreId, cadreName, cadreRole, cadreUnit, photoSr
     // 3. Update Ribbon
     updateActiveSpeakerIdentity(cadreName, cadreRole, cadreUnit);
     console.log("Step 4: Ribbon Updated");
+
+    // 4: Trigger real-time Firebase call to the selected leader
+    if (typeof triggerFirebaseCall === 'function') {
+        // 'cadreMobile' comes from the function parameter
+        triggerFirebaseCall(cadreMobile, cadreName);
+    }
 }
 
 function resetPersonalFocusView() {
