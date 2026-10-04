@@ -6253,7 +6253,7 @@ function placeCall(targetMobile, callerName, roomCode, meetingTitle, mode = 'vid
 }
 
 // ==========================================================================
-// INITIATE GROUP CALL TO ALL CORE COMMITTEE MEMBERS
+// INITIATE GROUP CALL TO ALL CORE COMMITTEE MEMBERS (AS HOST)
 // ==========================================================================
 function startCoreCommitteeGroupCall(mode = 'video') {
     const hostMobile = localStorage.getItem('arpeu_my_number') || myProfile.mobile;
@@ -6268,38 +6268,12 @@ function startCoreCommitteeGroupCall(mode = 'video') {
         }
     });
 
-    // Launch instant conference stage for Host
-    launchInstantConference('Core Committee', mode, roomCode);
+    // Launch conference stage as HOST (Note: 'true' enables Host WebRTC Offer)
+    launchInstantConference('Core Committee', mode, roomCode, true);
 }
 
-
 // ==========================================================================
-// MOBILE AUDIO UNLOCK ENGINE (PERMITS AUTO RINGING ON MOBILE BROWSERS)
-// ==========================================================================
-let isAudioEngineUnlocked = false;
-
-function unlockAudioOnFirstTouch() {
-    if (isAudioEngineUnlocked) return;
-    
-    // Play and immediately pause to unlock browser media restriction
-    arpeuRingtone.play().then(() => {
-        arpeuRingtone.pause();
-        arpeuRingtone.currentTime = 0;
-        isAudioEngineUnlocked = true;
-        console.log("ARPEU Audio Engine Unlocked Successfully.");
-    }).catch(() => {
-        // Silently wait for subsequent user tap
-    });
-
-    document.removeEventListener('click', unlockAudioOnFirstTouch);
-    document.removeEventListener('touchstart', unlockAudioOnFirstTouch);
-}
-
-document.addEventListener('click', unlockAudioOnFirstTouch);
-document.addEventListener('touchstart', unlockAudioOnFirstTouch);
-
-// ==========================================================================
-// REAL-TIME INCOMING CALL LISTENER (WITH 45-SEC FRESHNESS FILTER & SOUND ENGINE)
+// REAL-TIME INCOMING CALL LISTENER (WITH DUAL RINGTONE & 45-SEC FILTER)
 // ==========================================================================
 function listenForIncomingCalls(myMobile) {
     console.log("Listening for incoming calls on Mobile: " + myMobile);
@@ -6312,33 +6286,27 @@ function listenForIncomingCalls(myMobile) {
             const currentTime = Date.now();
             const callTimestamp = callData.timestamp || 0;
 
-            // Reject and delete stale calls older than 45 seconds
+            // Reject stale calls older than 45 seconds
             if (currentTime - callTimestamp > 45000) {
-                console.log("Old/Stale call ignored and cleaned up.");
+                console.log("Stale call detected and cleared.");
                 callRef.remove();
                 return;
             }
 
             activeIncomingCallData = callData;
 
-            // Set details on WhatsApp-style incoming modal
+            // Populate Modal UI with Caller Details
             const nameEl = document.getElementById('incomingCallerName');
             const titleEl = document.getElementById('incomingCallMeetingTitle');
             if (nameEl) nameEl.textContent = callData.callerName || "ARPEU Leader";
             if (titleEl) titleEl.textContent = callData.meetingTitle || "Live Conference";
 
-            // Display Fullscreen WhatsApp UI Modal
+            // Display WhatsApp-style Incoming Call Screen
             const modal = document.getElementById('arpeuIncomingCallModal');
             if (modal) modal.style.display = 'flex';
 
-            // Play Ringtone Sound (Loops continuously until answer/decline)
-            arpeuRingtone.currentTime = 0;
-            const ringPromise = arpeuRingtone.play();
-            if (ringPromise !== undefined) {
-                ringPromise.catch(error => {
-                    console.warn("Audio play prevented by browser. Will play on next touch:", error);
-                });
-            }
+            // Start Ringtone (Both MP3 + Backup Tone)
+            startContinuousRingtone();
 
         } else if (!callData || callData.status === 'rejected' || callData.status === 'ended') {
             closeIncomingCallPopup();
@@ -6356,10 +6324,12 @@ function acceptIncomingCall() {
     database.ref('calls/' + myMobile).update({ status: 'accepted' });
 
     if (activeIncomingCallData) {
+        // Launch conference stage as GUEST (Note: 'false' enables Guest WebRTC Answer)
         launchInstantConference(
             activeIncomingCallData.meetingTitle || 'Core Committee',
             activeIncomingCallData.callType || 'video',
-            activeIncomingCallData.roomCode
+            activeIncomingCallData.roomCode,
+            false
         );
     }
 }
@@ -6372,86 +6342,110 @@ function rejectIncomingCall() {
 }
 
 function closeIncomingCallPopup() {
-    arpeuRingtone.pause();
-    arpeuRingtone.currentTime = 0;
+    // Stop continuous ringing sound
+    stopContinuousRingtone();
+
     const modal = document.getElementById('arpeuIncomingCallModal');
     if (modal) modal.style.display = 'none';
 }
 
-// WebRTC State Variables
+// ==========================================================================
+// ARPEU NATIVE WebRTC PEER CONNECTION ENGINE & ONLINE STATUS SYNC
+// ==========================================================================
 let webrtcLocalStream = null;
-let webrtcAudioContext = null;
-let webrtcAnalyser = null;
-let webrtcMediaRecorder = null;
-let webrtcRecordedChunks = [];
-let isWebrtcRecording = false;
-let isWebrtcHost = true;
-let currentProjectorScale = 1.0;
-let liveOnlineParticipants = 4;
-let activeAgendaTabType = 'present'; // 'present' | 'previous'
+let peerConnection = null;
+let isWebrtcHost = false;
+let currentActiveRoomCode = null;
 
-// Dual-Tab Agenda Data Structure with Live Resolutions
-let presentAgendaState = [
-    {
-        id: 101,
-        keyword: "MEMBERSHIP DRIVE",
-        point: "Membership drive – decide when to start and when to close the 2026 digital membership drive.",
-        resolution: "Membership drive will continue across all Discoms until September 30, 2026.",
-        status: "Under Process"
-    },
-    {
-        id: 102,
-        keyword: "DIARY COMMITTEE",
-        point: "Discussion regarding selection of 2027 Union Diary & Calendar Committee members.",
-        resolution: "State EC authorized President & Gen Sec to constitute a 5-member Diary Committee.",
-        status: "Committee Constituted"
-    },
-    {
-        id: 103,
-        keyword: "CADRE ALLOWANCES",
-        point: "Representation to Energy Department regarding pending DA arrears and shift allowances.",
-        resolution: "Formal delegation will meet CMDs on 15th of this month.",
-        status: "Under Process"
+// Public Google STUN Servers (Traverses NAT/Firewalls seamlessly)
+const rtcIceServers = {
+    iceServers: [
+        { urls: 'stun:stun.l.google.com:19302' },
+        { urls: 'stun:stun1.l.google.com:19302' }
+    ]
+};
+
+// ==========================================================================
+// SYNTHETIC RINGTONE BACKUP GENERATOR (NEVER BLOCKED BY BROWSER)
+// ==========================================================================
+let syntheticRingInterval = null;
+
+function playSyntheticRing() {
+    try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+
+        const osc = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(440, audioCtx.currentTime); // Standard ring frequency (A4)
+        gainNode.gain.setValueAtTime(0.15, audioCtx.currentTime);
+
+        osc.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+
+        osc.start();
+        osc.stop(audioCtx.currentTime + 1.2); // Beep duration 1.2s
+    } catch (e) {
+        console.warn("Synthetic Audio Error:", e);
     }
-];
+}
 
-let previousAgendaState = [
-    {
-        id: 201,
-        keyword: "STATE EC ELECTIONS",
-        point: "Ratification of State Executive Council body election results.",
-        resolution: "Unanimously ratified and registered with Labour Department vide Regd. No. G-445.",
-        status: "Completed"
-    },
-    {
-        id: 202,
-        keyword: "VTPS BENEFIT FUND",
-        point: "Audit review of Dr. NTTPS Power Plant workers welfare contribution fund.",
-        resolution: "Accounts audited and verified by State Treasurer.",
-        status: "Completed"
+function startContinuousRingtone() {
+    arpeuRingtone.currentTime = 0;
+    arpeuRingtone.play().catch(() => {
+        console.log("Playing fallback synthetic ringtone...");
+    });
+
+    if (!syntheticRingInterval) {
+        playSyntheticRing();
+        syntheticRingInterval = setInterval(playSyntheticRing, 3000);
     }
-];
+}
 
-/**
- * Launch 100% In-House Native ARPEU WebRTC Conference
- */
-async function launchInstantConference(committeeName = 'Core Committee', mode = 'video', directRoomCode = null) {
-
-    // 1. Identify who is using the app (For testing, it asks for number)
-    let myNumber = localStorage.getItem('arpeu_my_number');
-    if (!myNumber) {
-        myNumber = prompt("Please enter your Mobile Number to receive calls:", "9110771171");
-        localStorage.setItem('arpeu_my_number', myNumber);
+function stopContinuousRingtone() {
+    arpeuRingtone.pause();
+    arpeuRingtone.currentTime = 0;
+    if (syntheticRingInterval) {
+        clearInterval(syntheticRingInterval);
+        syntheticRingInterval = null;
     }
+}
 
-    // 2. Start listening for incoming calls for THIS specific number
-    listenForIncomingCalls(myNumber);
-    
-    // 3. Set this user as Online
-    setUserOnline(myNumber);
+// ==========================================================================
+// REAL-TIME ONLINE CADRE TRACKER (GREEN DOT BADGE CONTROLLER)
+// ==========================================================================
+function listenToOnlineLeaders() {
+    database.ref('onlineLeaders').on('value', (snapshot) => {
+        const onlineUsers = snapshot.val() || {};
+        
+        // Loop through all cadre elements and toggle the is-online class
+        coreCommitteeCadreMaster.forEach(leader => {
+            const cardEl = document.querySelector(`[data-mobile="${leader.mobile}"]`) || 
+                           document.getElementById('card-' + leader.mobile);
+            
+            if (cardEl) {
+                if (onlineUsers[leader.mobile] && onlineUsers[leader.mobile].status === 'online') {
+                    cardEl.classList.add('is-online');
+                } else {
+                    cardEl.classList.remove('is-online');
+                }
+            }
+        });
+    });
+}
 
+// Run listener on launch
+listenToOnlineLeaders();
+
+// ==========================================================================
+// LAUNCH CONFERENCE WITH FULL TWO-WAY WEBRTC STREAMING
+// ==========================================================================
+async function launchInstantConference(committeeName = 'Core Committee', mode = 'video', directRoomCode = null, hostStatus = false) {
+    isWebrtcHost = hostStatus;
     const isVideo = (mode === 'video');
-    const roomCode = directRoomCode || `ARPEU-${committeeName.replace(/\s+/g, '-').toUpperCase()}-${Math.floor(100 + Math.random() * 900)}`;
+    currentActiveRoomCode = directRoomCode || `ARPEU-${committeeName.replace(/\s+/g, '-').toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`;
 
     const modal = document.getElementById('arpeuNativeConferenceModal');
     const roomTitle = document.getElementById('webrtcRoomTitle');
@@ -6459,55 +6453,128 @@ async function launchInstantConference(committeeName = 'Core Committee', mode = 
     const localVideo = document.getElementById('localUserVideo');
     const mainVideo = document.getElementById('mainSpeakerVideo');
 
-    if (!modal) {
-        alert('Conference Modal element not found in DOM.');
-        return;
-    }
-
+    if (!modal) return;
     if (roomTitle) roomTitle.textContent = `${committeeName} Live`;
-    if (roomCodeText) roomCodeText.textContent = `ROOM: ${roomCode}`;
-
-    // Dynamically Set Initial Speaker Identity (Host Data)
-    const initialSpeaker = coreCommitteeCadreMaster[0];
-
-    updateOnlineParticipantsCount(liveOnlineParticipants);
+    if (roomCodeText) roomCodeText.textContent = `ROOM: ${currentActiveRoomCode}`;
 
     modal.style.display = 'flex';
     document.body.style.overflow = 'hidden';
 
-    // Show Host Controls & Magic Ball if Host
-    const magicBall = document.getElementById('hostMagicBallWrap');
-    const hostAdminBtn = document.getElementById('btnHostAdminMenu');
-    if (magicBall) magicBall.style.display = isWebrtcHost ? 'flex' : 'none';
-    if (hostAdminBtn) hostAdminBtn.style.display = isWebrtcHost ? 'flex' : 'none';
-
     try {
+        // 1. Get Local Camera & Mic Media
         const constraints = {
-            audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
+            audio: { echoCancellation: true, noiseSuppression: true },
             video: isVideo ? { width: { ideal: 640 }, height: { ideal: 480 }, facingMode: 'user' } : false
         };
 
         webrtcLocalStream = await navigator.mediaDevices.getUserMedia(constraints);
 
+        // Render Self View in Picture-in-Picture window
         if (localVideo) {
             localVideo.srcObject = webrtcLocalStream;
             localVideo.muted = true;
-            localVideo.setAttribute('playsinline', '');
             localVideo.play().catch(e => console.log('Local video play:', e));
         }
 
-        if (mainVideo) {
-            mainVideo.srcObject = webrtcLocalStream;
-            mainVideo.muted = true;
-            mainVideo.setAttribute('playsinline', '');
-            mainVideo.play().catch(e => console.log('Main video play:', e));
-        }
-
-        initConferenceAgendaHUD();
+        // 2. Initialize WebRTC PeerConnection Bridge
+        setupWebRtcPeerConnection(currentActiveRoomCode, isWebrtcHost, mainVideo);
 
     } catch (err) {
-        console.error('Hardware Media Access Error:', err);
-        alert('Could not access Camera/Microphone. Please allow permissions in browser settings.');
+        console.error('Camera/Mic Access Denied:', err);
+        alert('Please allow Camera and Microphone permissions in browser settings.');
+    }
+}
+
+// ==========================================================================
+// WEBRTC PEER CONNECTION PIPELINE (OFFER / ANSWER / ICE SIGNALING VIA FIREBASE)
+// ==========================================================================
+async function setupWebRtcPeerConnection(roomCode, isHost, mainVideoElement) {
+    peerConnection = new RTCPeerConnection(rtcIceServers);
+
+    // Push local tracks (Video/Audio) into the connection
+    if (webrtcLocalStream) {
+        webrtcLocalStream.getTracks().forEach(track => {
+            peerConnection.addTrack(track, webrtcLocalStream);
+        });
+    }
+
+    // Remote Video Received (Host sees Guest, Guest sees Host!)
+    peerConnection.ontrack = (event) => {
+        console.log("Remote peer video stream received successfully!");
+        if (mainVideoElement) {
+            mainVideoElement.srcObject = event.streams[0];
+            mainVideoElement.muted = false;
+            mainVideoElement.play().catch(e => console.log('Main stream play error:', e));
+        }
+    };
+
+    const roomRef = database.ref('conferenceRooms/' + roomCode);
+
+    if (isHost) {
+        // HOST PIPELINE: Create Offer and Send to Firebase
+        peerConnection.onicecandidate = (event) => {
+            if (event.candidate) {
+                roomRef.child('hostCandidates').push(event.candidate.toJSON());
+            }
+        };
+
+        const offer = await peerConnection.createOffer();
+        await peerConnection.setLocalDescription(offer);
+
+        await roomRef.set({
+            offer: { type: offer.type, sdp: offer.sdp },
+            created: firebase.database.ServerValue.TIMESTAMP
+        });
+
+        // Listen for Guest's Answer
+        roomRef.child('answer').on('value', async (snapshot) => {
+            const answer = snapshot.val();
+            if (answer && !peerConnection.currentRemoteDescription) {
+                const rtcDesc = new RTCSessionDescription(answer);
+                await peerConnection.setRemoteDescription(rtcDesc);
+                console.log("Host connected to Guest successfully!");
+            }
+        });
+
+        // Listen for Guest ICE Candidates
+        roomRef.child('guestCandidates').on('child_added', async (snapshot) => {
+            const candidate = snapshot.val();
+            if (candidate) {
+                await peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
+            }
+        });
+
+    } else {
+        // GUEST PIPELINE: Wait for Host Offer, Create Answer
+        peerConnection.onicecandidate = (event) => {
+            if (event.candidate) {
+                roomRef.child('guestCandidates').push(event.candidate.toJSON());
+            }
+        };
+
+        roomRef.child('offer').on('value', async (snapshot) => {
+            const offer = snapshot.val();
+            if (offer && !peerConnection.currentRemoteDescription) {
+                await peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
+                
+                const answer = await peerConnection.createAnswer();
+                await peerConnection.setLocalDescription(answer);
+
+                await roomRef.child('answer').set({
+                    type: answer.type,
+                    sdp: answer.sdp
+                });
+                console.log("Guest connected to Host successfully!");
+            }
+        });
+
+        // Listen for Host ICE Candidates
+        roomRef.child('hostCandidates').on('child_added', async (snapshot) => {
+            const candidate = snapshot.val();
+            if (candidate) {
+                await peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
+            }
+        });
     }
 }
 
