@@ -6207,24 +6207,85 @@ function setUserOnline(mobile) {
 let arpeuRingtone = new Audio('https://palli-balakrishna.github.io/ARPEU-Assets/ringtone.mp3'); 
 arpeuRingtone.loop = true;
 
+// ==========================================================================
+// OFFICIAL ARPEU CORE COMMITTEE CADRE MASTER (8 LEADERS STAGING ENGINE)
+// ==========================================================================
 const coreCommitteeCadreMaster = [
-    { name: "Sri P. Balakrishna", designation: "State Treasurer", mobile: "9642788786" },
-    { name: "Sri L. Prasadu", designation: "State General Secretary", mobile: "9110771171" },
-    { name: "Sri R. Ravi", designation: "State President", mobile: "9985333734" },
-    { name: "Sri P. Balakrishna", designation: "State Additional Secretary", mobile: "9393788785" }
+    {
+        id: "CC-01",
+        name: "Sri T. Raghuram",
+        designation: "BMS State President | ARPEU Hon'ble President",
+        unit: "BMS - Andhra Pradesh",
+        mobile: "", // Empty: Skipped safely
+        photo: "images/bms-state-office-bearers/t-raghuram-bms-state-president.jpg"
+    },
+    {
+        id: "CC-02",
+        name: "Sri M.V.S. Naidu",
+        designation: "BMS State General Secretary",
+        unit: "BMS - Andhra Pradesh",
+        mobile: "", // Empty: Skipped safely
+        photo: "images/bms-state-office-bearers/mvs-naidu.jpg"
+    },
+    {
+        id: "CC-03",
+        name: "Sri K. Lova Reddy",
+        designation: "State Organising Secretary",
+        unit: "BMS - Andhra Pradesh",
+        mobile: "", // Empty: Skipped safely
+        photo: "images/bms-state-office-bearers/k-lova-reddy.jpg"
+    },
+    {
+        id: "CC-04",
+        name: "Sri T. Sambasiva Rao",
+        designation: "State President",
+        unit: "APCPDCL",
+        mobile: "9985333734", // [TEST FRIEND 2] Acting as State President
+        photo: "images/bms-state-office-bearers/t-sambasiva-rao.jpg"
+    },
+    {
+        id: "CC-05",
+        name: "Sri C. Ramagopal Reddy",
+        designation: "State General Secretary",
+        unit: "APGENCO - Dr. MVR RTPP",
+        mobile: "9110771171", // [TEST FRIEND 1] Acting as State General Secretary
+        photo: "images/bms-state-office-bearers/c-ramagopal-reddy.jpg"
+    },
+    {
+        id: "CC-06",
+        name: "Sri P. Balakrishna",
+        designation: "State Treasurer",
+        unit: "APGENCO – Dr. NTTPS",
+        mobile: "9642788786", // [HOST] Your Number (State Treasurer)
+        photo: "images/bms-state-office-bearers/p-balakrishna.jpg"
+    },
+    {
+        id: "CC-07",
+        name: "Sri K. Jayappa",
+        designation: "State Working President",
+        unit: "APSPDCL",
+        mobile: "9393788785", // [TEST FRIEND 3] Acting as Working President
+        photo: "images/bms-state-office-bearers/k-jayappa.jpg"
+    },
+    {
+        id: "CC-08",
+        name: "Sri A. Koteswara Rao",
+        designation: "Organising Secretary",
+        unit: "APSPDCL",
+        mobile: "", // Empty: Skipped safely
+        photo: "images/bms-state-office-bearers/a-koteswara-rao.jpg"
+    }
 ];
 
 let activeIncomingCallData = null;
 
 // ==========================================================================
-// AUTO-INITIALIZE USER IDENTITY & START BACKGROUND CALL LISTENER
+// AUTO-INITIALIZE USER IDENTITY ON APP LOAD
 // ==========================================================================
 window.addEventListener('DOMContentLoaded', () => {
     let myNumber = localStorage.getItem('arpeu_my_number');
-    
-    // Prompt only once if mobile number is not already saved in browser storage
     if (!myNumber) {
-        myNumber = prompt("Please enter your 10-digit Mobile Number for receiving calls:", "9642788786");
+        myNumber = prompt("Please enter your 10-digit Mobile Number for calls:", "9642788786");
         if (myNumber) localStorage.setItem('arpeu_my_number', myNumber.trim());
     }
 
@@ -6232,12 +6293,125 @@ window.addEventListener('DOMContentLoaded', () => {
         myProfile.mobile = myNumber.trim();
         setUserOnline(myNumber.trim());
         listenForIncomingCalls(myNumber.trim());
-        console.log("ARPEU Signaling Engine Active for User:", myNumber);
+        console.log("ARPEU Online Engine Active for:", myNumber);
     }
 });
 
 // ==========================================================================
-// PLACE SINGLE CALL SIGNAL (FIREBASE RTDB)
+// HIGH-DECIBEL LOUD RINGTONE ENGINE (100% MAXIMUM VOLUME + VIBRATION)
+// ==========================================================================
+let ringAudioContext = null;
+let loudRingInterval = null;
+
+function startContinuousRingtone() {
+    if (navigator.vibrate) {
+        navigator.vibrate([1200, 400, 1200, 400, 1200, 400]);
+    }
+
+    const nativeAudio = document.getElementById('arpeuNativeAudio');
+    if (nativeAudio) {
+        nativeAudio.volume = 1.0;
+        nativeAudio.currentTime = 0;
+        nativeAudio.play().catch(() => {});
+    }
+
+    playPiercingTelephoneRing();
+    if (!loudRingInterval) {
+        loudRingInterval = setInterval(playPiercingTelephoneRing, 2800);
+    }
+}
+
+function playPiercingTelephoneRing() {
+    try {
+        if (!ringAudioContext) {
+            ringAudioContext = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (ringAudioContext.state === 'suspended') {
+            ringAudioContext.resume();
+        }
+
+        const osc1 = ringAudioContext.createOscillator();
+        const osc2 = ringAudioContext.createOscillator();
+        const gainNode = ringAudioContext.createGain();
+
+        osc1.type = 'triangle';
+        osc2.type = 'sine';
+
+        osc1.frequency.setValueAtTime(440, ringAudioContext.currentTime);
+        osc2.frequency.setValueAtTime(480, ringAudioContext.currentTime);
+
+        gainNode.gain.setValueAtTime(1.0, ringAudioContext.currentTime);
+
+        osc1.connect(gainNode);
+        osc2.connect(gainNode);
+        gainNode.connect(ringAudioContext.destination);
+
+        osc1.start();
+        osc2.start();
+
+        osc1.stop(ringAudioContext.currentTime + 1.5);
+        osc2.stop(ringAudioContext.currentTime + 1.5);
+    } catch (e) {
+        console.warn("Loud ringtone error:", e);
+    }
+}
+
+function stopContinuousRingtone() {
+    if (navigator.vibrate) navigator.vibrate(0);
+
+    const nativeAudio = document.getElementById('arpeuNativeAudio');
+    if (nativeAudio) {
+        nativeAudio.pause();
+        nativeAudio.currentTime = 0;
+    }
+
+    if (loudRingInterval) {
+        clearInterval(loudRingInterval);
+        loudRingInterval = null;
+    }
+}
+
+// ==========================================================================
+// BULLETPROOF ONLINE STATUS TRACKER (SAFE NULL/EMPTY CHECK PREVENTS CRASH)
+// ==========================================================================
+function listenToOnlineLeaders() {
+    database.ref('onlineLeaders').on('value', (snapshot) => {
+        const onlineUsers = snapshot.val() || {};
+
+        coreCommitteeCadreMaster.forEach(leader => {
+            // CRITICAL FIX: Skip empty mobile numbers to prevent querySelector crash!
+            if (!leader.mobile || leader.mobile.trim() === '') return;
+
+            const allMatchingCards = document.querySelectorAll(
+                `[onclick*="${leader.mobile}"], [data-mobile="${leader.mobile}"], #card-${leader.mobile}`
+            );
+
+            const isLeaderOnline = onlineUsers[leader.mobile] && (onlineUsers[leader.mobile].status === 'online');
+
+            allMatchingCards.forEach(cardEl => {
+                let dot = cardEl.querySelector('.leader-online-badge');
+                if (!dot) {
+                    dot = document.createElement('span');
+                    dot.className = 'leader-online-badge';
+                    cardEl.style.position = 'relative';
+                    cardEl.appendChild(dot);
+                }
+
+                if (isLeaderOnline) {
+                    cardEl.classList.add('is-online');
+                    dot.style.setProperty('display', 'block', 'important');
+                } else {
+                    cardEl.classList.remove('is-online');
+                    dot.style.setProperty('display', 'none', 'important');
+                }
+            });
+        });
+    });
+}
+listenToOnlineLeaders();
+
+// ==========================================================================
+// CALL SIGNAL DISPATCH ENGINE
 // ==========================================================================
 function placeCall(targetMobile, callerName, roomCode, meetingTitle, mode = 'video') {
     database.ref('calls/' + targetMobile).set({
@@ -6249,11 +6423,11 @@ function placeCall(targetMobile, callerName, roomCode, meetingTitle, mode = 'vid
         status: 'ringing',
         timestamp: firebase.database.ServerValue.TIMESTAMP
     });
-    console.log(`Call dispatched to: ${targetMobile} | Room: ${roomCode}`);
+    console.log(`Dispatched call to: ${targetMobile}`);
 }
 
 // ==========================================================================
-// INITIATE GROUP CALL TO ALL CORE COMMITTEE MEMBERS (AS HOST)
+// GROUP CALL INITIATOR (RESTORED)
 // ==========================================================================
 function startCoreCommitteeGroupCall(mode = 'video') {
     const hostMobile = localStorage.getItem('arpeu_my_number') || myProfile.mobile;
@@ -6261,22 +6435,19 @@ function startCoreCommitteeGroupCall(mode = 'video') {
 
     console.log(`Starting Group Video Call... Room: ${roomCode}`);
 
-    // Broadcast ringing signal to all other leaders in master data
     coreCommitteeCadreMaster.forEach(leader => {
-        if (leader.mobile && leader.mobile !== hostMobile) {
+        if (leader.mobile && leader.mobile.trim() !== '' && leader.mobile !== hostMobile) {
             placeCall(leader.mobile, "Sri P. Balakrishna (Host)", roomCode, "Core Committee Meeting", mode);
         }
     });
 
-    // Launch conference stage as HOST (Note: 'true' enables Host WebRTC Offer)
     launchInstantConference('Core Committee', mode, roomCode, true);
 }
 
 // ==========================================================================
-// REAL-TIME INCOMING CALL LISTENER (WITH DUAL RINGTONE & 45-SEC FILTER)
+// INCOMING CALL LISTENER & HANDLERS
 // ==========================================================================
 function listenForIncomingCalls(myMobile) {
-    console.log("Listening for incoming calls on Mobile: " + myMobile);
     const callRef = database.ref('calls/' + myMobile);
 
     callRef.on('value', (snapshot) => {
@@ -6286,26 +6457,21 @@ function listenForIncomingCalls(myMobile) {
             const currentTime = Date.now();
             const callTimestamp = callData.timestamp || 0;
 
-            // Reject stale calls older than 45 seconds
             if (currentTime - callTimestamp > 45000) {
-                console.log("Stale call detected and cleared.");
                 callRef.remove();
                 return;
             }
 
             activeIncomingCallData = callData;
 
-            // Populate Modal UI with Caller Details
             const nameEl = document.getElementById('incomingCallerName');
             const titleEl = document.getElementById('incomingCallMeetingTitle');
             if (nameEl) nameEl.textContent = callData.callerName || "ARPEU Leader";
             if (titleEl) titleEl.textContent = callData.meetingTitle || "Live Conference";
 
-            // Display WhatsApp-style Incoming Call Screen
             const modal = document.getElementById('arpeuIncomingCallModal');
             if (modal) modal.style.display = 'flex';
 
-            // Start Ringtone (Both MP3 + Backup Tone)
             startContinuousRingtone();
 
         } else if (!callData || callData.status === 'rejected' || callData.status === 'ended') {
@@ -6314,17 +6480,12 @@ function listenForIncomingCalls(myMobile) {
     });
 }
 
-// ==========================================================================
-// CALL ACTION HANDLERS (ACCEPT & REJECT)
-// ==========================================================================
 function acceptIncomingCall() {
     closeIncomingCallPopup();
-
     const myMobile = localStorage.getItem('arpeu_my_number') || myProfile.mobile;
     database.ref('calls/' + myMobile).update({ status: 'accepted' });
 
     if (activeIncomingCallData) {
-        // Launch conference stage as GUEST (Note: 'false' enables Guest WebRTC Answer)
         launchInstantConference(
             activeIncomingCallData.meetingTitle || 'Core Committee',
             activeIncomingCallData.callType || 'video',
@@ -6336,112 +6497,28 @@ function acceptIncomingCall() {
 
 function rejectIncomingCall() {
     closeIncomingCallPopup();
-
     const myMobile = localStorage.getItem('arpeu_my_number') || myProfile.mobile;
     database.ref('calls/' + myMobile).remove();
 }
 
 function closeIncomingCallPopup() {
-    // Stop continuous ringing sound
     stopContinuousRingtone();
-
     const modal = document.getElementById('arpeuIncomingCallModal');
     if (modal) modal.style.display = 'none';
 }
 
 // ==========================================================================
-// ARPEU NATIVE WebRTC PEER CONNECTION ENGINE & ONLINE STATUS SYNC
+// LAUNCH CONFERENCE (CLEAN SEPARATION OF LOCAL & REMOTE VIDEO)
+// ==========================================================================
+
+// ==========================================================================
+// WEBRTC CORE STATE VARIABLES
 // ==========================================================================
 let webrtcLocalStream = null;
 let peerConnection = null;
 let isWebrtcHost = false;
 let currentActiveRoomCode = null;
 
-// Public Google STUN Servers (Traverses NAT/Firewalls seamlessly)
-const rtcIceServers = {
-    iceServers: [
-        { urls: 'stun:stun.l.google.com:19302' },
-        { urls: 'stun:stun1.l.google.com:19302' }
-    ]
-};
-
-// ==========================================================================
-// SYNTHETIC RINGTONE BACKUP GENERATOR (NEVER BLOCKED BY BROWSER)
-// ==========================================================================
-let syntheticRingInterval = null;
-
-function playSyntheticRing() {
-    try {
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        if (audioCtx.state === 'suspended') audioCtx.resume();
-
-        const osc = audioCtx.createOscillator();
-        const gainNode = audioCtx.createGain();
-
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(440, audioCtx.currentTime); // Standard ring frequency (A4)
-        gainNode.gain.setValueAtTime(0.15, audioCtx.currentTime);
-
-        osc.connect(gainNode);
-        gainNode.connect(audioCtx.destination);
-
-        osc.start();
-        osc.stop(audioCtx.currentTime + 1.2); // Beep duration 1.2s
-    } catch (e) {
-        console.warn("Synthetic Audio Error:", e);
-    }
-}
-
-function startContinuousRingtone() {
-    arpeuRingtone.currentTime = 0;
-    arpeuRingtone.play().catch(() => {
-        console.log("Playing fallback synthetic ringtone...");
-    });
-
-    if (!syntheticRingInterval) {
-        playSyntheticRing();
-        syntheticRingInterval = setInterval(playSyntheticRing, 3000);
-    }
-}
-
-function stopContinuousRingtone() {
-    arpeuRingtone.pause();
-    arpeuRingtone.currentTime = 0;
-    if (syntheticRingInterval) {
-        clearInterval(syntheticRingInterval);
-        syntheticRingInterval = null;
-    }
-}
-
-// ==========================================================================
-// REAL-TIME ONLINE CADRE TRACKER (GREEN DOT BADGE CONTROLLER)
-// ==========================================================================
-function listenToOnlineLeaders() {
-    database.ref('onlineLeaders').on('value', (snapshot) => {
-        const onlineUsers = snapshot.val() || {};
-        
-        // Loop through all cadre elements and toggle the is-online class
-        coreCommitteeCadreMaster.forEach(leader => {
-            const cardEl = document.querySelector(`[data-mobile="${leader.mobile}"]`) || 
-                           document.getElementById('card-' + leader.mobile);
-            
-            if (cardEl) {
-                if (onlineUsers[leader.mobile] && onlineUsers[leader.mobile].status === 'online') {
-                    cardEl.classList.add('is-online');
-                } else {
-                    cardEl.classList.remove('is-online');
-                }
-            }
-        });
-    });
-}
-
-// Run listener on launch
-listenToOnlineLeaders();
-
-// ==========================================================================
-// LAUNCH CONFERENCE (CLEAN SEPARATION OF LOCAL & REMOTE VIDEO)
-// ==========================================================================
 async function launchInstantConference(committeeName = 'Core Committee', mode = 'video', directRoomCode = null, hostStatus = false) {
     isWebrtcHost = hostStatus;
     const isVideo = (mode === 'video');
@@ -6468,21 +6545,18 @@ async function launchInstantConference(committeeName = 'Core Committee', mode = 
 
         webrtcLocalStream = await navigator.mediaDevices.getUserMedia(constraints);
 
-        // Self View in PIP
         if (localVideo) {
             localVideo.srcObject = webrtcLocalStream;
             localVideo.muted = true;
             localVideo.play().catch(e => console.log('Local video error:', e));
         }
 
-        // Main Video: Do NOT overwrite with local stream! Wait for Remote Leader
         if (mainVideo) {
             mainVideo.srcObject = null;
         }
 
         if (typeof initConferenceAgendaHUD === 'function') initConferenceAgendaHUD();
 
-        // Connect Two-Way WebRTC Stream
         setupWebRtcPeerConnection(roomCode, isWebrtcHost, mainVideo);
 
     } catch (err) {
@@ -6490,6 +6564,7 @@ async function launchInstantConference(committeeName = 'Core Committee', mode = 
         alert('Could not access Camera/Microphone.');
     }
 }
+
 
 /**
  * Updates Active Speaker Identity Ribbon and handles strict visibility.
@@ -7119,7 +7194,7 @@ function webrtcToggleMic() {
 }
 
 // ==========================================================================
-// DYNAMIC ACTIVE SPEAKER CAMERA TOGGLE (SHOWS ACTIVE SPEAKER PHOTO ON MUTE)
+// TWO-WAY DYNAMIC CAMERA MUTE (DISPLAYS SPECIFIC LEADER'S OFFICIAL PHOTO)
 // ==========================================================================
 function webrtcToggleCam() {
     const btn = document.getElementById('btnToggleCam');
@@ -7129,52 +7204,39 @@ function webrtcToggleCam() {
 
     let isVideoEnabled = false;
 
-    // Toggle local video track state
+    // Toggle local hardware camera track
     if (webrtcLocalStream && webrtcLocalStream.getVideoTracks().length > 0) {
         const videoTrack = webrtcLocalStream.getVideoTracks()[0];
         videoTrack.enabled = !videoTrack.enabled;
         isVideoEnabled = videoTrack.enabled;
     }
 
-    // Update Cam Button Icon and Class
     if (btn) {
         btn.classList.toggle('muted', !isVideoEnabled);
         if (btnIcon) btnIcon.className = isVideoEnabled ? 'fas fa-video' : 'fas fa-video-slash';
     }
 
-    // Toggle Active Speaker Video vs Active Speaker Photo Placeholder
+    // Determine current user's profile mobile
+    const myMobile = localStorage.getItem('arpeu_my_number') || myProfile.mobile;
+    const currentLeader = coreCommitteeCadreMaster.find(m => m.mobile === myMobile);
+
+    // Sync Camera Mute state to Firebase Room so Remote Peer also sees photo
+    if (currentActiveRoomCode) {
+        database.ref(`conferenceRooms/${currentActiveRoomCode}/camStatus/${myMobile}`).set({
+            camOff: !isVideoEnabled,
+            photo: (currentLeader && currentLeader.photo) ? currentLeader.photo : 'images/arpeu-logo.png',
+            name: currentLeader ? currentLeader.name : 'Leader'
+        });
+    }
+
+    // Display appropriate Photo on Screen
     if (mainVideo && placeholder) {
         if (!isVideoEnabled) {
-            // 1. Get currently displayed active speaker's name from screen ribbon
-            const activeSpeakerName = document.getElementById('mainSpeakerName')?.textContent?.trim() || "";
-            
-            // 2. Fetch photo directly from dataset or match with cadre master list
-            let resolvedSpeakerPhoto = mainVideo.dataset.currentPhoto;
-
-            if (!resolvedSpeakerPhoto && typeof coreCommitteeCadreMaster !== 'undefined') {
-                const matchedLeader = coreCommitteeCadreMaster.find(leader => 
-                    activeSpeakerName && (leader.name.toLowerCase().includes(activeSpeakerName.toLowerCase()) || 
-                    activeSpeakerName.toLowerCase().includes(leader.name.toLowerCase()))
-                );
-                if (matchedLeader && matchedLeader.photo) {
-                    resolvedSpeakerPhoto = matchedLeader.photo;
-                }
-            }
-
-            // 3. Fallback: Check if tapped leader photo exists
-            if (!resolvedSpeakerPhoto) {
-                const tappedImg = document.querySelector('#tappedLeaderPhotoWrap img');
-                if (tappedImg && tappedImg.src) resolvedSpeakerPhoto = tappedImg.src;
-            }
-
-            // 4. Apply Active Speaker's Photo (Fallback to neutral logo if no photo found)
-            placeholder.src = resolvedSpeakerPhoto || 'images/arpeu-logo.png';
+            // Apply current leader's photo instead of any hardcoded person
+            placeholder.src = (currentLeader && currentLeader.photo) ? currentLeader.photo : 'images/arpeu-logo.png';
             placeholder.style.display = 'block';
             mainVideo.style.opacity = '0';
-            
-            console.log(`Camera Off: Displaying Active Speaker Photo for [${activeSpeakerName}] -> ${placeholder.src}`);
         } else {
-            // Restore live video when camera is switched back on
             placeholder.style.display = 'none';
             mainVideo.style.opacity = '1';
         }
