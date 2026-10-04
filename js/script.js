@@ -6528,6 +6528,105 @@ let peerConnection = null;
 let isWebrtcHost = false;
 let currentActiveRoomCode = null;
 
+// ==========================================================================
+// WEBRTC PEER CONNECTION PIPELINE (CONNECTS MUTUAL VIDEO STREAMS)
+// ==========================================================================
+const rtcIceServers = {
+    iceServers: [
+        { urls: 'stun:stun.l.google.com:19302' },
+        { urls: 'stun:stun1.l.google.com:19302' }
+    ]
+};
+
+async function setupWebRtcPeerConnection(roomCode, isHost, mainVideoElement) {
+    if (peerConnection) {
+        peerConnection.close();
+        peerConnection = null;
+    }
+
+    peerConnection = new RTCPeerConnection(rtcIceServers);
+
+    if (webrtcLocalStream) {
+        webrtcLocalStream.getTracks().forEach(track => {
+            peerConnection.addTrack(track, webrtcLocalStream);
+        });
+    }
+
+    // Remote Video Stream Arrived -> Play on Main Video Screen
+    peerConnection.ontrack = (event) => {
+        console.log("Remote peer video stream connected successfully!");
+        if (mainVideoElement && event.streams && event.streams[0]) {
+            mainVideoElement.srcObject = event.streams[0];
+            mainVideoElement.play().catch(e => {
+                mainVideoElement.muted = true;
+                mainVideoElement.play();
+            });
+        }
+    };
+
+    const roomRef = database.ref('conferenceRooms/' + roomCode);
+
+    if (isHost) {
+        peerConnection.onicecandidate = (event) => {
+            if (event.candidate) {
+                roomRef.child('hostCandidates').push(event.candidate.toJSON());
+            }
+        };
+
+        const offer = await peerConnection.createOffer();
+        await peerConnection.setLocalDescription(offer);
+
+        await roomRef.set({
+            offer: { type: offer.type, sdp: offer.sdp },
+            created: firebase.database.ServerValue.TIMESTAMP
+        });
+
+        roomRef.child('answer').on('value', async (snapshot) => {
+            const answer = snapshot.val();
+            if (answer && !peerConnection.currentRemoteDescription) {
+                await peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
+            }
+        });
+
+        roomRef.child('guestCandidates').on('child_added', async (snapshot) => {
+            const candidate = snapshot.val();
+            if (candidate && peerConnection) {
+                await peerConnection.addIceCandidate(new RTCIceCandidate(candidate)).catch(() => {});
+            }
+        });
+
+    } else {
+        peerConnection.onicecandidate = (event) => {
+            if (event.candidate) {
+                roomRef.child('guestCandidates').push(event.candidate.toJSON());
+            }
+        };
+
+        roomRef.child('offer').once('value', async (snapshot) => {
+            const offer = snapshot.val();
+            if (offer && !peerConnection.currentRemoteDescription) {
+                await peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
+                
+                const answer = await peerConnection.createAnswer();
+                await peerConnection.setLocalDescription(answer);
+
+                await roomRef.child('answer').set({
+                    type: answer.type,
+                    sdp: answer.sdp
+                });
+            }
+        });
+
+        roomRef.child('hostCandidates').on('child_added', async (snapshot) => {
+            const candidate = snapshot.val();
+            if (candidate && peerConnection) {
+                await peerConnection.addIceCandidate(new RTCIceCandidate(candidate)).catch(() => {});
+            }
+        });
+    }
+}
+
+
 async function launchInstantConference(committeeName = 'Core Committee', mode = 'video', directRoomCode = null, hostStatus = false) {
     isWebrtcHost = hostStatus;
     const isVideo = (mode === 'video');
