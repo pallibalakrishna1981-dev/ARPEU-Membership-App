@@ -6675,9 +6675,15 @@ async function launchInstantConference(committeeName = 'Core Committee', mode = 
         setupWebRtcPeerConnection(roomCode, isWebrtcHost, mainVideo);
 
     } catch (err) {
-        console.error('Camera/Mic Access Denied:', err);
-        // Shows exact error so we know if it is Permission or Hardware Lock
-        alert(`Camera Error (${err.name}): Please check Chrome site permissions or close other camera apps.`);
+        console.warn('Camera bypass - joining with audio safely:', err);
+        try {
+            webrtcLocalStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            if (typeof setupWebRtcPeerConnection === 'function') {
+                setupWebRtcPeerConnection(roomCode, isWebrtcHost, mainVideo);
+            }
+        } catch (e) {
+            console.error('Audio hardware also restricted:', e);
+        }
     }
 }
 
