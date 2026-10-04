@@ -6543,7 +6543,16 @@ async function launchInstantConference(committeeName = 'Core Committee', mode = 
             video: isVideo ? { width: { ideal: 640 }, height: { ideal: 480 }, facingMode: 'user' } : false
         };
 
-        webrtcLocalStream = await navigator.mediaDevices.getUserMedia(constraints);
+        // Mobile-Friendly Safe Camera & Mic Access with Auto-Fallback
+        try {
+            webrtcLocalStream = await navigator.mediaDevices.getUserMedia({
+                audio: true,
+                video: isVideo ? { facingMode: 'user' } : false
+            });
+        } catch (mediaErr) {
+            // Fallback for basic mobile hardware
+            webrtcLocalStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: isVideo });
+        }
 
         if (localVideo) {
             localVideo.srcObject = webrtcLocalStream;
