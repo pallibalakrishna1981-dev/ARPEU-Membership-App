@@ -6374,21 +6374,29 @@ function stopContinuousRingtone() {
 // ==========================================================================
 // BULLETPROOF ONLINE STATUS TRACKER (SAFE NULL/EMPTY CHECK PREVENTS CRASH)
 // ==========================================================================
+// ==========================================================================
+// BULLETPROOF SINGLE GREEN DOT CONTROLLER (ELIMINATES DUPLICATE DOTS)
+// ==========================================================================
 function listenToOnlineLeaders() {
     database.ref('onlineLeaders').on('value', (snapshot) => {
         const onlineUsers = snapshot.val() || {};
 
         coreCommitteeCadreMaster.forEach(leader => {
-            // CRITICAL FIX: Skip empty mobile numbers to prevent querySelector crash!
             if (!leader.mobile || leader.mobile.trim() === '') return;
 
-            const allMatchingCards = document.querySelectorAll(
+            const matchedCards = document.querySelectorAll(
                 `[onclick*="${leader.mobile}"], [data-mobile="${leader.mobile}"], #card-${leader.mobile}`
             );
 
-            const isLeaderOnline = onlineUsers[leader.mobile] && (onlineUsers[leader.mobile].status === 'online');
+            const isOnline = onlineUsers[leader.mobile] && (onlineUsers[leader.mobile].status === 'online');
 
-            allMatchingCards.forEach(cardEl => {
+            matchedCards.forEach(cardEl => {
+                // Remove any duplicate badges if present
+                const allBadges = cardEl.querySelectorAll('.leader-online-badge');
+                if (allBadges.length > 1) {
+                    for (let i = 1; i < allBadges.length; i++) allBadges[i].remove();
+                }
+
                 let dot = cardEl.querySelector('.leader-online-badge');
                 if (!dot) {
                     dot = document.createElement('span');
@@ -6397,7 +6405,7 @@ function listenToOnlineLeaders() {
                     cardEl.appendChild(dot);
                 }
 
-                if (isLeaderOnline) {
+                if (isOnline) {
                     cardEl.classList.add('is-online');
                     dot.style.setProperty('display', 'block', 'important');
                 } else {
@@ -6409,6 +6417,7 @@ function listenToOnlineLeaders() {
     });
 }
 listenToOnlineLeaders();
+
 
 // ==========================================================================
 // CALL SIGNAL DISPATCH ENGINE
@@ -6537,27 +6546,25 @@ async function launchInstantConference(committeeName = 'Core Committee', mode = 
     modal.style.display = 'flex';
     document.body.style.overflow = 'hidden';
 
+    // 1. Force Stop previous camera tracks to unlock hardware
+    if (webrtcLocalStream) {
+        webrtcLocalStream.getTracks().forEach(t => t.stop());
+        webrtcLocalStream = null;
+    }
+
     try {
         const constraints = {
-            audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
-            video: isVideo ? { width: { ideal: 640 }, height: { ideal: 480 }, facingMode: 'user' } : false
+            audio: true,
+            video: isVideo ? { facingMode: 'user' } : false
         };
 
-        // Mobile-Friendly Safe Camera & Mic Access with Auto-Fallback
-        try {
-            webrtcLocalStream = await navigator.mediaDevices.getUserMedia({
-                audio: true,
-                video: isVideo ? { facingMode: 'user' } : false
-            });
-        } catch (mediaErr) {
-            // Fallback for basic mobile hardware
-            webrtcLocalStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: isVideo });
-        }
+        webrtcLocalStream = await navigator.mediaDevices.getUserMedia(constraints);
 
         if (localVideo) {
             localVideo.srcObject = webrtcLocalStream;
             localVideo.muted = true;
-            localVideo.play().catch(e => console.log('Local video error:', e));
+            localVideo.setAttribute('playsinline', '');
+            localVideo.play().catch(e => console.log('Local video play:', e));
         }
 
         if (mainVideo) {
@@ -6570,7 +6577,8 @@ async function launchInstantConference(committeeName = 'Core Committee', mode = 
 
     } catch (err) {
         console.error('Camera/Mic Access Denied:', err);
-        alert('Could not access Camera/Microphone.');
+        // Shows exact error so we know if it is Permission or Hardware Lock
+        alert(`Camera Error (${err.name}): Please check Chrome site permissions or close other camera apps.`);
     }
 }
 
