@@ -6272,8 +6272,34 @@ function startCoreCommitteeGroupCall(mode = 'video') {
     launchInstantConference('Core Committee', mode, roomCode);
 }
 
+
 // ==========================================================================
-// REAL-TIME INCOMING CALL LISTENER & WHATSAPP-STYLE UI TRIGGER
+// MOBILE AUDIO UNLOCK ENGINE (PERMITS AUTO RINGING ON MOBILE BROWSERS)
+// ==========================================================================
+let isAudioEngineUnlocked = false;
+
+function unlockAudioOnFirstTouch() {
+    if (isAudioEngineUnlocked) return;
+    
+    // Play and immediately pause to unlock browser media restriction
+    arpeuRingtone.play().then(() => {
+        arpeuRingtone.pause();
+        arpeuRingtone.currentTime = 0;
+        isAudioEngineUnlocked = true;
+        console.log("ARPEU Audio Engine Unlocked Successfully.");
+    }).catch(() => {
+        // Silently wait for subsequent user tap
+    });
+
+    document.removeEventListener('click', unlockAudioOnFirstTouch);
+    document.removeEventListener('touchstart', unlockAudioOnFirstTouch);
+}
+
+document.addEventListener('click', unlockAudioOnFirstTouch);
+document.addEventListener('touchstart', unlockAudioOnFirstTouch);
+
+// ==========================================================================
+// REAL-TIME INCOMING CALL LISTENER (WITH 45-SEC FRESHNESS FILTER & SOUND ENGINE)
 // ==========================================================================
 function listenForIncomingCalls(myMobile) {
     console.log("Listening for incoming calls on Mobile: " + myMobile);
@@ -6283,26 +6309,38 @@ function listenForIncomingCalls(myMobile) {
         const callData = snapshot.val();
 
         if (callData && callData.status === 'ringing') {
+            const currentTime = Date.now();
+            const callTimestamp = callData.timestamp || 0;
+
+            // Reject and delete stale calls older than 45 seconds
+            if (currentTime - callTimestamp > 45000) {
+                console.log("Old/Stale call ignored and cleaned up.");
+                callRef.remove();
+                return;
+            }
+
             activeIncomingCallData = callData;
 
-            // Populate Modal UI with Caller Details
+            // Set details on WhatsApp-style incoming modal
             const nameEl = document.getElementById('incomingCallerName');
             const titleEl = document.getElementById('incomingCallMeetingTitle');
             if (nameEl) nameEl.textContent = callData.callerName || "ARPEU Leader";
             if (titleEl) titleEl.textContent = callData.meetingTitle || "Live Conference";
 
-            // Display WhatsApp-style Incoming Call Screen
+            // Display Fullscreen WhatsApp UI Modal
             const modal = document.getElementById('arpeuIncomingCallModal');
             if (modal) modal.style.display = 'flex';
 
-            // Play Ringtone Audio
+            // Play Ringtone Sound (Loops continuously until answer/decline)
             arpeuRingtone.currentTime = 0;
-            arpeuRingtone.play().catch(e => {
-                console.warn("Audio autoplay blocked by browser policy. Interaction required.", e);
-            });
+            const ringPromise = arpeuRingtone.play();
+            if (ringPromise !== undefined) {
+                ringPromise.catch(error => {
+                    console.warn("Audio play prevented by browser. Will play on next touch:", error);
+                });
+            }
 
         } else if (!callData || callData.status === 'rejected' || callData.status === 'ended') {
-            // Dismiss Modal and stop Ringtone if call is ended or rejected
             closeIncomingCallPopup();
         }
     });
