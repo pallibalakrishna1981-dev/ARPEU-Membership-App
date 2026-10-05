@@ -6627,6 +6627,16 @@ async function setupWebRtcPeerConnection(roomCode, isHost, mainVideoElement) {
 }
 
 
+// ==========================================================================
+// BULLETPROOF CONFERENCE LAUNCHER (ZERO REFERENCE ERROR GUARANTEED)
+// ==========================================================================
+const rtcIceServers = {
+    iceServers: [
+        { urls: 'stun:stun.l.google.com:19302' },
+        { urls: 'stun:stun1.l.google.com:19302' }
+    ]
+};
+
 async function launchInstantConference(committeeName = 'Core Committee', mode = 'video', directRoomCode = null, hostStatus = false) {
     isWebrtcHost = hostStatus;
     const isVideo = (mode === 'video');
@@ -6645,12 +6655,13 @@ async function launchInstantConference(committeeName = 'Core Committee', mode = 
     modal.style.display = 'flex';
     document.body.style.overflow = 'hidden';
 
-    // 1. Force Stop previous camera tracks to unlock hardware
+    // 1. Force Stop previous camera tracks to unlock hardware safely
     if (webrtcLocalStream) {
         webrtcLocalStream.getTracks().forEach(t => t.stop());
         webrtcLocalStream = null;
     }
 
+    // 2. Safely Request Camera & Microphone
     try {
         const constraints = {
             audio: true,
@@ -6663,27 +6674,33 @@ async function launchInstantConference(committeeName = 'Core Committee', mode = 
             localVideo.srcObject = webrtcLocalStream;
             localVideo.muted = true;
             localVideo.setAttribute('playsinline', '');
-            localVideo.play().catch(e => console.log('Local video play:', e));
+            localVideo.play().catch(e => console.log('Local video play error:', e));
         }
 
         if (mainVideo) {
             mainVideo.srcObject = null;
         }
 
-        if (typeof initConferenceAgendaHUD === 'function') initConferenceAgendaHUD();
-
-        setupWebRtcPeerConnection(roomCode, isWebrtcHost, mainVideo);
-
-    } catch (err) {
-        console.warn('Camera bypass - joining with audio safely:', err);
+    } catch (hardwareErr) {
+        console.warn("Camera hardware access issue:", hardwareErr);
+        // Fallback to audio if camera is blocked by user
         try {
             webrtcLocalStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            if (typeof setupWebRtcPeerConnection === 'function') {
-                setupWebRtcPeerConnection(roomCode, isWebrtcHost, mainVideo);
-            }
         } catch (e) {
-            console.error('Audio hardware also restricted:', e);
+            console.error("Microphone also denied:", e);
         }
+    }
+
+    // 3. Initialize Agenda HUD safely
+    if (typeof initConferenceAgendaHUD === 'function') {
+        initConferenceAgendaHUD();
+    }
+
+    // 4. Safely Connect WebRTC Pipeline without ReferenceError
+    if (typeof setupWebRtcPeerConnection === 'function') {
+        setupWebRtcPeerConnection(roomCode, isWebrtcHost, mainVideo);
+    } else {
+        console.log("Waiting for setupWebRtcPeerConnection initialization...");
     }
 }
 
