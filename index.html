@@ -22,7 +22,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="#0B4EA2">
 <meta name="apple-mobile-web-app-title" content="ARPEU Portal">
 
-<link rel="stylesheet" href="css/style.css?v=2073">
+<link rel="stylesheet" href="css/style.css?v=2074">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
@@ -3234,10 +3234,9 @@
                         <h4 style="margin: 0;">CORE COMMITTEE MEETING</h4>
                     </div>
                     
-                    <!-- Compact Top-Right Dynamic Join Now Button -->
-                    <button type="button" id="coreLiveJoinBtn" onclick="joinOngoingCoreMeeting()" style="display: none; background: #ef4444; color: #ffffff; border: 1px solid #ffffff; border-radius: 20px; padding: 2px 8px; font-size: 10px; font-weight: 700; cursor: pointer; align-items: center; gap: 4px; box-shadow: 0 0 8px rgba(239, 68, 68, 0.7); animation: liveJoinPulse 1.5s infinite; white-space: nowrap !important; flex-shrink: 0 !important;">
-                        <span style="width: 6px; height: 6px; background-color: #ffffff; border-radius: 50%; display: inline-block;"></span>
-                        🔴 LIVE : JOIN NOW
+                    <!-- Universal Compact Join Badge (Never Overflows) -->
+                    <button type="button" id="coreLiveJoinBtn" onclick="joinOngoingCoreMeeting()" style="display: none; background: #ef4444; color: #ffffff; border: 1px solid #ffffff; border-radius: 12px; padding: 2px 7px; font-size: 10px; font-weight: 700; cursor: pointer; white-space: nowrap !important; flex-shrink: 0 !important; box-shadow: 0 0 8px rgba(239, 68, 68, 0.7); animation: liveJoinPulse 1.5s infinite;">
+                        🔴 JOIN NOW
                     </button>
                 </div>
                 
@@ -3874,7 +3873,7 @@
                 <!-- Main Focus Speaker Stage -->
                 <video id="mainSpeakerVideo" autoplay playsinline muted></video>
                 <!-- Main Stage Active Speaker Photo (Purely Dedicated to Speaker) -->
-                <img id="videoOffPlaceholder" src="" style="display: none; width: 100%; height: 100%; object-fit: contain; background: #0b131e; position: absolute; top: 0; left: 0; z-index: 5;" alt="Active Speaker Photo">
+                <img id="videoOffPlaceholder" style="display: none; width: 100%; height: 100%; object-fit: contain; background: #0b131e; position: absolute; top: 0; left: 0; z-index: 5;">
                 <div id="tappedLeaderPhotoWrap" class="tapped-leader-photo" style="display: none;"></div>
                 <canvas id="virtualBgCanvas" style="display: none;"></canvas>
 
@@ -5234,7 +5233,7 @@
 <!-- Firebase Core SDK and Realtime Database -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-<script src="js/script.js?v=149"></script>
+<script src="js/script.js?v=150"></script>
 
 <script>
     // Permanently remove splash screen from DOM so all buttons touch smoothly

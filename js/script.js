@@ -6372,15 +6372,27 @@ function stopContinuousRingtone() {
 }
 
 // ==========================================================================
-// BULLETPROOF ONLINE STATUS TRACKER (SAFE NULL/EMPTY CHECK PREVENTS CRASH)
-// ==========================================================================
-// ==========================================================================
-// BULLETPROOF SINGLE GREEN DOT CONTROLLER (ELIMINATES DUPLICATE DOTS)
+// REAL-TIME ONLINE LEADER TRACKER & DYNAMIC ATTENDEE COUNTER (2 OF 2, NOT 4)
 // ==========================================================================
 function listenToOnlineLeaders() {
     database.ref('onlineLeaders').on('value', (snapshot) => {
         const onlineUsers = snapshot.val() || {};
 
+        // 1. Calculate Real-time Online Leaders Count Dynamically
+        let activeCount = 0;
+        Object.keys(onlineUsers).forEach(key => {
+            if (onlineUsers[key] && onlineUsers[key].status === 'online') {
+                activeCount++;
+            }
+        });
+
+        // Update Conference Top Bar Badge (Shows 2 if 2 online, 8 if 8 online)
+        const badgeEl = document.getElementById('onlineCountNumber');
+        if (badgeEl) {
+            badgeEl.textContent = activeCount > 0 ? activeCount : 1;
+        }
+
+        // 2. Sync Green Dots on Leader Cards (Single Dot, No Duplicates)
         coreCommitteeCadreMaster.forEach(leader => {
             if (!leader.mobile || leader.mobile.trim() === '') return;
 
@@ -6391,7 +6403,7 @@ function listenToOnlineLeaders() {
             const isOnline = onlineUsers[leader.mobile] && (onlineUsers[leader.mobile].status === 'online');
 
             matchedCards.forEach(cardEl => {
-                // Remove any duplicate badges if present
+                // Remove duplicate badges if any exist
                 const allBadges = cardEl.querySelectorAll('.leader-online-badge');
                 if (allBadges.length > 1) {
                     for (let i = 1; i < allBadges.length; i++) allBadges[i].remove();
@@ -6416,6 +6428,8 @@ function listenToOnlineLeaders() {
         });
     });
 }
+
+// Initialize Online Presence Tracker
 listenToOnlineLeaders();
 
 
@@ -6436,36 +6450,45 @@ function placeCall(targetMobile, callerName, roomCode, meetingTitle, mode = 'vid
 }
 
 // ==========================================================================
-// ONGOING LIVE MEETING REAL-TIME SIGNALING & ONE-TAP LATECOMER JOIN
+// AUTO-EXPIRING LIVE MEETING SESSION ENGINE (SHOWS ONLY DURING ACTIVE CALL)
 // ==========================================================================
 
-// 1. Host broadcasts active room status to Firebase
+// 1. Host Starts or Ends the Live Session
 function broadcastLiveMeetingStatus(roomCode, mode, isLive) {
+    const sessionRef = database.ref('liveMeetingSession/core_committee');
+
     if (isLive) {
-        database.ref('liveMeetingSession/core_committee').set({
+        // Publish live meeting state
+        sessionRef.set({
             status: 'active',
             roomCode: roomCode,
             mode: mode,
             startedAt: firebase.database.ServerValue.TIMESTAMP
         });
+
+        // SAFETY: If Host accidentally closes browser/tab, automatically remove button!
+        sessionRef.onDisconnect().remove();
         console.log(`Live Meeting Session Published: ${roomCode}`);
     } else {
-        database.ref('liveMeetingSession/core_committee').remove();
-        console.log("Live Meeting Session Cleared.");
+        // Host ends meeting -> Immediately wipe from Firebase
+        sessionRef.remove();
+        console.log("Live Meeting Session Ended and Cleared.");
     }
 }
 
-// 2. Real-time Firebase Listener: Toggles Green Join Button on Hub
+// 2. Real-time Firebase Listener: Toggles Button Strictly on Live State
 database.ref('liveMeetingSession/core_committee').on('value', (snapshot) => {
     const session = snapshot.val();
     const joinBtn = document.getElementById('coreLiveJoinBtn');
-    const now = Date.now();
 
-    // Show button ONLY if meeting is active AND started within last 90 minutes
-    if (session && session.status === 'active' && session.startedAt && (now - session.startedAt < 5400000)) {
-        if (joinBtn) joinBtn.style.setProperty('display', 'inline-flex', 'important');
+    if (!joinBtn) return;
+
+    // Show button ONLY when session exists and is actively ongoing
+    if (session && session.status === 'active') {
+        joinBtn.style.setProperty('display', 'inline-flex', 'important');
     } else {
-        if (joinBtn) joinBtn.style.setProperty('display', 'none', 'important');
+        // Hide completely when no meeting is running
+        joinBtn.style.setProperty('display', 'none', 'important');
     }
 });
 
@@ -6473,14 +6496,16 @@ database.ref('liveMeetingSession/core_committee').on('value', (snapshot) => {
 function joinOngoingCoreMeeting() {
     database.ref('liveMeetingSession/core_committee').once('value', (snapshot) => {
         const session = snapshot.val();
-        if (session && session.roomCode) {
-            // Enter room directly as Guest (hostStatus = false)
+        if (session && session.roomCode && session.status === 'active') {
             launchInstantConference('Core Committee', session.mode || 'video', session.roomCode, false);
         } else {
             alert('Meeting has already concluded or is not currently active.');
+            const joinBtn = document.getElementById('coreLiveJoinBtn');
+            if (joinBtn) joinBtn.style.setProperty('display', 'none', 'important');
         }
     });
 }
+
 
 // ==========================================================================
 // GROUP CALL INITIATOR (RESTORED)
@@ -6696,6 +6721,33 @@ async function launchInstantConference(committeeName = 'Core Committee', mode = 
 
     modal.style.display = 'flex';
     document.body.style.overflow = 'hidden';
+
+    // ======================================================================
+    // RESTORE HOST CONTROLS (TOP MAGIC BALL & BOTTOM TOOLBAR HOST BUTTON)
+    // ======================================================================
+    const myMobile = localStorage.getItem('arpeu_my_number') || myProfile.mobile;
+    
+    // Auto-detect Host identity (Either via hostStatus flag or Host Mobile Number)
+    if (hostStatus === true || myMobile === "9642788786") {
+        isWebrtcHost = true;
+    }
+
+    // 1. Top Screen Host Magic Ball
+    const magicBall = document.getElementById('hostMagicBallWrap');
+    if (magicBall) {
+        magicBall.style.setProperty('display', isWebrtcHost ? 'flex' : 'none', 'important');
+    }
+
+    // 2. Bottom Toolbar Host Controls Buttons (Checks all common Host Button IDs)
+    const hostAdminBtn = document.getElementById('btnHostAdminMenu');
+    const hostControlsBtn = document.getElementById('btnHostControls');
+    
+    if (hostAdminBtn) {
+        hostAdminBtn.style.setProperty('display', isWebrtcHost ? 'flex' : 'none', 'important');
+    }
+    if (hostControlsBtn) {
+        hostControlsBtn.style.setProperty('display', isWebrtcHost ? 'flex' : 'none', 'important');
+    }
 
     // 1. Force Stop previous camera tracks to unlock hardware safely
     if (webrtcLocalStream) {
@@ -7373,7 +7425,7 @@ function webrtcToggleMic() {
 }
 
 // ==========================================================================
-// DYNAMIC ACTIVE SPEAKER CAMERA MUTE (DISPLAYS ONLY CURRENT SPEAKER'S PHOTO)
+// BULLETPROOF CAMERA TOGGLE (SMOOTH ON/OFF TOGGLE & FULLSCREEN SPEAKER PHOTO)
 // ==========================================================================
 function webrtcToggleCam() {
     const btn = document.getElementById('btnToggleCam');
@@ -7381,39 +7433,34 @@ function webrtcToggleCam() {
     const placeholder = document.getElementById('videoOffPlaceholder');
     const btnIcon = btn ? btn.querySelector('i') : null;
 
-    let isVideoEnabled = false;
+    // Determine current state based on button class
+    const isCurrentlyMuted = btn ? btn.classList.contains('muted') : false;
+    const shouldTurnCameraOn = isCurrentlyMuted; // Toggle to opposite state
 
-    // Toggle hardware camera
+    // 1. Hardware Video Tracks Control
     if (webrtcLocalStream && webrtcLocalStream.getVideoTracks().length > 0) {
-        const videoTrack = webrtcLocalStream.getVideoTracks()[0];
-        videoTrack.enabled = !videoTrack.enabled;
-        isVideoEnabled = videoTrack.enabled;
+        webrtcLocalStream.getVideoTracks().forEach(track => {
+            track.enabled = shouldTurnCameraOn;
+        });
     }
 
+    // 2. Update Camera Button UI State (Toggle Green / Red Slash)
     if (btn) {
-        btn.classList.toggle('muted', !isVideoEnabled);
-        if (btnIcon) btnIcon.className = isVideoEnabled ? 'fas fa-video' : 'fas fa-video-slash';
+        btn.classList.toggle('muted', !shouldTurnCameraOn);
+        if (btnIcon) {
+            btnIcon.className = shouldTurnCameraOn ? 'fas fa-video' : 'fas fa-video-slash';
+        }
     }
 
+    // 3. Toggle Screen Display (Live Video vs Fullscreen Active Speaker Photo)
     if (mainVideo && placeholder) {
-        if (!isVideoEnabled) {
-            // 1. Get Active Speaker's Name from the live ribbon
-            const activeSpeakerName = document.getElementById('mainSpeakerName')?.textContent?.trim() || "";
+        if (!shouldTurnCameraOn) {
+            // CAMERA TURNED OFF -> Display Active Speaker's Photo
             let speakerPhoto = "";
 
-            // 2. Fetch Active Speaker's verified photo from their thumbnail
-            if (activeSpeakerName) {
-                const allCards = document.querySelectorAll('.cadre-thumb-card');
-                allCards.forEach(card => {
-                    if (card.textContent.includes(activeSpeakerName)) {
-                        const img = card.querySelector('img');
-                        if (img && img.src) speakerPhoto = img.src;
-                    }
-                });
-            }
-
-            // 3. If not found in card, fetch from master data by Speaker Name
-            if (!speakerPhoto && activeSpeakerName && typeof coreCommitteeCadreMaster !== 'undefined') {
+            // A. Try to fetch from current active speaker ribbon name
+            const activeSpeakerName = document.getElementById('mainSpeakerName')?.textContent?.trim() || "";
+            if (activeSpeakerName && typeof coreCommitteeCadreMaster !== 'undefined') {
                 const matched = coreCommitteeCadreMaster.find(m => 
                     m.name.toLowerCase().includes(activeSpeakerName.toLowerCase()) || 
                     activeSpeakerName.toLowerCase().includes(m.name.toLowerCase())
@@ -7421,27 +7468,48 @@ function webrtcToggleCam() {
                 if (matched && matched.photo) speakerPhoto = matched.photo;
             }
 
-            // 4. If current host themselves is speaking
+            // B. Try to fetch by user's own mobile number
             if (!speakerPhoto) {
                 const myMobile = localStorage.getItem('arpeu_my_number') || myProfile.mobile;
                 const myLeader = coreCommitteeCadreMaster.find(m => m.mobile === myMobile);
                 if (myLeader && myLeader.photo) speakerPhoto = myLeader.photo;
             }
 
-            // 5. DIRECTLY APPLY ONLY THE ACTIVE SPEAKER'S OFFICIAL PHOTO
-            placeholder.src = speakerPhoto;
-            placeholder.style.display = 'block';
-            mainVideo.style.opacity = '0';
+            // C. Guaranteed Fallback: Pick directly from bottom verified thumbnail cards
+            if (!speakerPhoto) {
+                const loadedThumb = document.querySelector('.cadre-thumb-card img');
+                if (loadedThumb && loadedThumb.src) speakerPhoto = loadedThumb.src;
+            }
 
-            console.log(`Active Speaker Muted: Showing Official Photo for [${activeSpeakerName}] -> ${speakerPhoto}`);
+           // 4. Pick user's verified photo directly from their own active green-dot card
+            const myLiveCard = document.querySelector('.cadre-thumb-card.is-online img') || 
+                               document.querySelector('.cadre-thumb-card img');
+            
+            if (myLiveCard && myLiveCard.src) {
+                speakerPhoto = myLiveCard.src;
+            }
+
+            // 5. Force Top-Layer Display with High z-index (Guaranteed Full Screen)
+            if (speakerPhoto && speakerPhoto.trim() !== "") {
+                placeholder.src = speakerPhoto;
+                placeholder.style.cssText = "display: block !important; width: 100% !important; height: 100% !important; object-fit: contain !important; position: absolute !important; top: 0 !important; left: 0 !important; z-index: 999 !important; background: #0b131e !important;";
+                mainVideo.style.opacity = '0';
+                console.log("Camera Muted: Successfully Displaying Photo -> " + speakerPhoto);
+            }
 
         } else {
-            // Restore live video when camera turns back on
-            placeholder.style.display = 'none';
+            // CAMERA TURNED BACK ON -> Restore Live Video
+            placeholder.style.setProperty('display', 'none', 'important');
+            mainVideo.style.opacity = '1';
+            console.log("Camera Turned Back ON: Restoring Live Video");
+
+             // Restore live video
+            placeholder.style.cssText = "display: none !important;";
             mainVideo.style.opacity = '1';
         }
     }
 }
+
 
 function webrtcRaiseHand() {
     const btn = document.getElementById('btnRaiseHand');
@@ -7499,6 +7567,12 @@ function hostClearAllHands() {
  * 🔴 LEAVE / CLOSE CONFERENCE CALL (INSTANT FULL CLEANUP)
  */
 function leaveArpeuConference() {
+
+    // Auto-clear Live Join Button if Host leaves the meeting
+    if (typeof isWebrtcHost !== 'undefined' && isWebrtcHost) {
+        broadcastLiveMeetingStatus(null, null, false);
+    }
+
     const modal = document.getElementById('arpeuNativeConferenceModal');
     
     // 1. Stop Recording if Active
