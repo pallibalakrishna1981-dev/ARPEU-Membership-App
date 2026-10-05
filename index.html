@@ -22,7 +22,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="#0B4EA2">
 <meta name="apple-mobile-web-app-title" content="ARPEU Portal">
 
-<link rel="stylesheet" href="css/style.css?v=2071">
+<link rel="stylesheet" href="css/style.css?v=2072">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
@@ -3228,22 +3228,26 @@
         <div class="mtg-quick-call-card">
             <!-- 1. Core Committee Meeting Pod -->
             <div class="call-pod-card core-pod">
-                <div class="pod-title-full-row">
-                    <span class="pod-icon-dot core-dot"></span>
-                    <h4>CORE COMMITTEE MEETING</h4>
+                <div class="pod-title-full-row" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span class="pod-icon-dot core-dot"></span>
+                        <h4 style="margin: 0;">CORE COMMITTEE MEETING</h4>
+                    </div>
+                    
+                    <!-- Compact Top-Right Dynamic Join Now Button -->
+                    <button type="button" id="coreLiveJoinBtn" onclick="joinOngoingCoreMeeting()" style="display: none; background: #ef4444; color: #ffffff; border: 1px solid #ffffff; border-radius: 20px; padding: 3px 10px; font-size: 11px; font-weight: 700; cursor: pointer; align-items: center; gap: 5px; box-shadow: 0 0 8px rgba(239, 68, 68, 0.7); animation: liveJoinPulse 1.5s infinite;">
+                        <span style="width: 6px; height: 6px; background-color: #ffffff; border-radius: 50%; display: inline-block;"></span>
+                        LIVE : JOIN NOW
+                    </button>
                 </div>
+                
                 <div class="pod-three-buttons-row">
-                    <!-- Triggers Firebase Ringing to all 4 test members (Video Mode) -->
                     <button type="button" class="btn-pod-action btn-pod-video" onclick="startCoreCommitteeGroupCall('video')">
                         <i class="fas fa-video"></i> Video Call
                     </button>
-                    
-                    <!-- Triggers Firebase Ringing to all 4 test members (Audio Mode) -->
                     <button type="button" class="btn-pod-action btn-pod-audio" onclick="startCoreCommitteeGroupCall('audio')">
                         <i class="fas fa-phone-alt"></i> Audio Call
                     </button>
-                    
-                    <!-- Manage Committee Attendees List -->
                     <button type="button" class="btn-pod-action btn-pod-manage" onclick="openEditMembersModal('core')">
                         <i class="fas fa-cog"></i> Manage List
                     </button>
@@ -5230,7 +5234,7 @@
 <!-- Firebase Core SDK and Realtime Database -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-<script src="js/script.js?v=147"></script>
+<script src="js/script.js?v=148"></script>
 
 <script>
     // Permanently remove splash screen from DOM so all buttons touch smoothly

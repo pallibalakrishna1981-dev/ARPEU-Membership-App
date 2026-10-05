@@ -11290,3 +11290,32 @@ textarea.mtg-custom-field {
     pointer-events: auto !important;
 }
 
+/* ==========================================================================
+   KILL INVISIBLE OVERLAYS & RESTORE 100% TOUCH CLICKS TO ALL BUTTONS
+   ========================================================================== */
+
+/* 1. Ensure Body & App Container always allow clicks */
+html, body, .app-container, main {
+    pointer-events: auto !important;
+}
+
+/* 2. Completely eliminate the Splash Screen from blocking touches */
+#appSplashScreen {
+    display: none !important;
+    pointer-events: none !important;
+    visibility: hidden !important;
+    z-index: -99999 !important;
+}
+
+/* 3. Inactive Modals must NEVER block touches when closed */
+#arpeuIncomingCallModal:not([style*="display: flex"]),
+#arpeuNativeConferenceModal:not([style*="display: flex"]) {
+    pointer-events: none !important;
+}
+
+/* 4. Force all buttons, links, and navigation items to be fully clickable */
+button, a, .nav-item, .quick-card, [onclick] {
+    pointer-events: auto !important;
+    cursor: pointer !important;
+    touch-action: manipulation !important;
+}

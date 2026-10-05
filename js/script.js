@@ -6436,6 +6436,51 @@ function placeCall(targetMobile, callerName, roomCode, meetingTitle, mode = 'vid
 }
 
 // ==========================================================================
+// ONGOING LIVE MEETING REAL-TIME SIGNALING & ONE-TAP LATECOMER JOIN
+// ==========================================================================
+
+// 1. Host broadcasts active room status to Firebase
+function broadcastLiveMeetingStatus(roomCode, mode, isLive) {
+    if (isLive) {
+        database.ref('liveMeetingSession/core_committee').set({
+            status: 'active',
+            roomCode: roomCode,
+            mode: mode,
+            startedAt: firebase.database.ServerValue.TIMESTAMP
+        });
+        console.log(`Live Meeting Session Published: ${roomCode}`);
+    } else {
+        database.ref('liveMeetingSession/core_committee').remove();
+        console.log("Live Meeting Session Cleared.");
+    }
+}
+
+// 2. Real-time Firebase Listener: Toggles Green Join Button on Hub
+database.ref('liveMeetingSession/core_committee').on('value', (snapshot) => {
+    const session = snapshot.val();
+    const joinBtn = document.getElementById('coreLiveJoinBtn');
+
+    if (session && session.status === 'active') {
+        if (joinBtn) joinBtn.style.display = 'inline-flex';
+    } else {
+        if (joinBtn) joinBtn.style.display = 'none';
+    }
+});
+
+// 3. Latecomer 1-Tap Join Handler
+function joinOngoingCoreMeeting() {
+    database.ref('liveMeetingSession/core_committee').once('value', (snapshot) => {
+        const session = snapshot.val();
+        if (session && session.roomCode) {
+            // Enter room directly as Guest (hostStatus = false)
+            launchInstantConference('Core Committee', session.mode || 'video', session.roomCode, false);
+        } else {
+            alert('Meeting has already concluded or is not currently active.');
+        }
+    });
+}
+
+// ==========================================================================
 // GROUP CALL INITIATOR (RESTORED)
 // ==========================================================================
 function startCoreCommitteeGroupCall(mode = 'video') {
@@ -6451,6 +6496,7 @@ function startCoreCommitteeGroupCall(mode = 'video') {
     });
 
     launchInstantConference('Core Committee', mode, roomCode, true);
+    broadcastLiveMeetingStatus(roomCode, mode, true);
 }
 
 // ==========================================================================
@@ -6630,12 +6676,6 @@ async function setupWebRtcPeerConnection(roomCode, isHost, mainVideoElement) {
 // ==========================================================================
 // BULLETPROOF CONFERENCE LAUNCHER (ZERO REFERENCE ERROR GUARANTEED)
 // ==========================================================================
-const rtcIceServers = {
-    iceServers: [
-        { urls: 'stun:stun.l.google.com:19302' },
-        { urls: 'stun:stun1.l.google.com:19302' }
-    ]
-};
 
 async function launchInstantConference(committeeName = 'Core Committee', mode = 'video', directRoomCode = null, hostStatus = false) {
     isWebrtcHost = hostStatus;
@@ -6711,9 +6751,7 @@ async function launchInstantConference(committeeName = 'Core Committee', mode = 
 // ==========================================================================
 // 2-WAY PEER CONNECTION BRIDGE (EXCHANGES VIDEO BETWEEN HOST & GUEST)
 // ==========================================================================
-const rtcIceServers = {
-    iceServers: [{ urls: 'stun:stun.l.google.com:19302' }, { urls: 'stun:stun1.l.google.com:19302' }]
-};
+
 
 async function setupWebRtcPeerConnection(roomCode, isHost, mainVideoElement) {
     if (peerConnection) {
@@ -7469,8 +7507,13 @@ function leaveArpeuConference() {
         modal.style.cssText = "display: none !important;";
     }
 
+     if (typeof isWebrtcHost !== 'undefined' && isWebrtcHost) {
+        broadcastLiveMeetingStatus(null, null, false);
+    }
+
     document.body.style.overflow = '';
     console.log("[ARPEU Conference] Left meeting and cleaned all streams successfully.");
+
 }
 
 // Splash Screen Auto-Dismiss Failsafe
@@ -10262,3 +10305,4 @@ function selectCoreLeader(index) {
         }
     });
 }
+
