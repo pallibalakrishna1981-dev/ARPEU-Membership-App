@@ -6459,11 +6459,13 @@ function broadcastLiveMeetingStatus(roomCode, mode, isLive) {
 database.ref('liveMeetingSession/core_committee').on('value', (snapshot) => {
     const session = snapshot.val();
     const joinBtn = document.getElementById('coreLiveJoinBtn');
+    const now = Date.now();
 
-    if (session && session.status === 'active') {
-        if (joinBtn) joinBtn.style.display = 'inline-flex';
+    // Show button ONLY if meeting is active AND started within last 90 minutes
+    if (session && session.status === 'active' && session.startedAt && (now - session.startedAt < 5400000)) {
+        if (joinBtn) joinBtn.style.setProperty('display', 'inline-flex', 'important');
     } else {
-        if (joinBtn) joinBtn.style.display = 'none';
+        if (joinBtn) joinBtn.style.setProperty('display', 'none', 'important');
     }
 });
 
@@ -7371,7 +7373,7 @@ function webrtcToggleMic() {
 }
 
 // ==========================================================================
-// TWO-WAY DYNAMIC CAMERA MUTE (DISPLAYS SPECIFIC LEADER'S OFFICIAL PHOTO)
+// DYNAMIC ACTIVE SPEAKER CAMERA MUTE (DISPLAYS ONLY CURRENT SPEAKER'S PHOTO)
 // ==========================================================================
 function webrtcToggleCam() {
     const btn = document.getElementById('btnToggleCam');
@@ -7381,7 +7383,7 @@ function webrtcToggleCam() {
 
     let isVideoEnabled = false;
 
-    // Toggle local hardware camera track
+    // Toggle hardware camera
     if (webrtcLocalStream && webrtcLocalStream.getVideoTracks().length > 0) {
         const videoTrack = webrtcLocalStream.getVideoTracks()[0];
         videoTrack.enabled = !videoTrack.enabled;
@@ -7393,27 +7395,48 @@ function webrtcToggleCam() {
         if (btnIcon) btnIcon.className = isVideoEnabled ? 'fas fa-video' : 'fas fa-video-slash';
     }
 
-    // Determine current user's profile mobile
-    const myMobile = localStorage.getItem('arpeu_my_number') || myProfile.mobile;
-    const currentLeader = coreCommitteeCadreMaster.find(m => m.mobile === myMobile);
-
-    // Sync Camera Mute state to Firebase Room so Remote Peer also sees photo
-    if (currentActiveRoomCode) {
-        database.ref(`conferenceRooms/${currentActiveRoomCode}/camStatus/${myMobile}`).set({
-            camOff: !isVideoEnabled,
-            photo: (currentLeader && currentLeader.photo) ? currentLeader.photo : 'images/arpeu-logo.png',
-            name: currentLeader ? currentLeader.name : 'Leader'
-        });
-    }
-
-    // Display appropriate Photo on Screen
     if (mainVideo && placeholder) {
         if (!isVideoEnabled) {
-            // Apply current leader's photo instead of any hardcoded person
-            placeholder.src = (currentLeader && currentLeader.photo) ? currentLeader.photo : 'images/arpeu-logo.png';
+            // 1. Get Active Speaker's Name from the live ribbon
+            const activeSpeakerName = document.getElementById('mainSpeakerName')?.textContent?.trim() || "";
+            let speakerPhoto = "";
+
+            // 2. Fetch Active Speaker's verified photo from their thumbnail
+            if (activeSpeakerName) {
+                const allCards = document.querySelectorAll('.cadre-thumb-card');
+                allCards.forEach(card => {
+                    if (card.textContent.includes(activeSpeakerName)) {
+                        const img = card.querySelector('img');
+                        if (img && img.src) speakerPhoto = img.src;
+                    }
+                });
+            }
+
+            // 3. If not found in card, fetch from master data by Speaker Name
+            if (!speakerPhoto && activeSpeakerName && typeof coreCommitteeCadreMaster !== 'undefined') {
+                const matched = coreCommitteeCadreMaster.find(m => 
+                    m.name.toLowerCase().includes(activeSpeakerName.toLowerCase()) || 
+                    activeSpeakerName.toLowerCase().includes(m.name.toLowerCase())
+                );
+                if (matched && matched.photo) speakerPhoto = matched.photo;
+            }
+
+            // 4. If current host themselves is speaking
+            if (!speakerPhoto) {
+                const myMobile = localStorage.getItem('arpeu_my_number') || myProfile.mobile;
+                const myLeader = coreCommitteeCadreMaster.find(m => m.mobile === myMobile);
+                if (myLeader && myLeader.photo) speakerPhoto = myLeader.photo;
+            }
+
+            // 5. DIRECTLY APPLY ONLY THE ACTIVE SPEAKER'S OFFICIAL PHOTO
+            placeholder.src = speakerPhoto;
             placeholder.style.display = 'block';
             mainVideo.style.opacity = '0';
+
+            console.log(`Active Speaker Muted: Showing Official Photo for [${activeSpeakerName}] -> ${speakerPhoto}`);
+
         } else {
+            // Restore live video when camera turns back on
             placeholder.style.display = 'none';
             mainVideo.style.opacity = '1';
         }
