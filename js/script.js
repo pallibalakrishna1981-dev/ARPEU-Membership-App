@@ -6527,9 +6527,10 @@ function startCoreCommitteeGroupCall(mode = 'video') {
 }
 
 // ==========================================================================
-// INCOMING CALL LISTENER & HANDLERS
+// REAL-TIME INCOMING CALL LISTENER (WAKES UP LOCK SCREEN & PLAYS LOUD RING)
 // ==========================================================================
 function listenForIncomingCalls(myMobile) {
+    console.log("Listening for calls on Mobile: " + myMobile);
     const callRef = database.ref('calls/' + myMobile);
 
     callRef.on('value', (snapshot) => {
@@ -6546,6 +6547,32 @@ function listenForIncomingCalls(myMobile) {
 
             activeIncomingCallData = callData;
 
+            // 1. WAKE UP PHONE ON LOCK SCREEN (System Service Worker Push Notification)
+            if ('Notification' in window && Notification.permission === 'granted' && navigator.serviceWorker) {
+                navigator.serviceWorker.ready.then(registration => {
+                    registration.showNotification(`📞 ${callData.callerName || 'Leader'} Calling...`, {
+                        body: `🔔 Incoming Executive Video Call.\nTap to Join immediately.`,
+                        icon: 'images/arpeu-logo.png',
+                        badge: 'images/arpeu-logo.png',
+                        vibrate: [1200, 400, 1200, 400, 1200, 400, 1200],
+                        requireInteraction: true,
+                        tag: 'arpeu-incoming-call',
+                        renotify: true,
+                        data: {
+                            url: window.location.origin + window.location.pathname
+                        },
+                        actions: [
+                            { action: 'join', title: '🟢 Join Call' },
+                            { action: 'decline', title: '🔴 Decline' }
+                        ]
+                    });
+                });
+            }
+
+            // 2. Play Continuous Loud Ringtone & Audio Alert
+            startContinuousRingtone();
+
+            // 3. Populate In-App Incoming Modal
             const nameEl = document.getElementById('incomingCallerName');
             const titleEl = document.getElementById('incomingCallMeetingTitle');
             if (nameEl) nameEl.textContent = callData.callerName || "ARPEU Leader";
@@ -6553,8 +6580,6 @@ function listenForIncomingCalls(myMobile) {
 
             const modal = document.getElementById('arpeuIncomingCallModal');
             if (modal) modal.style.display = 'flex';
-
-            startContinuousRingtone();
 
         } else if (!callData || callData.status === 'rejected' || callData.status === 'ended') {
             closeIncomingCallPopup();
@@ -6612,7 +6637,7 @@ const rtcIceServers = {
 };
 
 // ==========================================================================
-// BULLETPROOF TWO-WAY WEBRTC ENGINE (ICE QUEUING & TWO-WAY AUDIO/VIDEO SYNC)
+// TWO-WAY MUTUAL VIDEO & AUDIO STREAMING (BREAKS BLACK SCREEN BARRIER)
 // ==========================================================================
 async function setupWebRtcPeerConnection(roomCode, isHost, mainVideoElement) {
     if (peerConnection) {
@@ -6620,37 +6645,45 @@ async function setupWebRtcPeerConnection(roomCode, isHost, mainVideoElement) {
         peerConnection = null;
     }
 
-    // Initialize WebRTC with Google STUN Servers
     peerConnection = new RTCPeerConnection(rtcIceServers);
     let iceCandidateQueue = [];
 
-    // 1. Add Local Mic and Camera Tracks to the Peer Connection
+    // 1. Force Clear Any Black Overlays from Main Video Stage
+    const placeholder = document.getElementById('videoOffPlaceholder');
+    if (placeholder) {
+        placeholder.style.cssText = "display: none !important;";
+    }
+    if (mainVideoElement) {
+        mainVideoElement.style.opacity = '1';
+        mainVideoElement.setAttribute('playsinline', '');
+        mainVideoElement.setAttribute('autoplay', '');
+    }
+
+    // 2. Push Local Mic & Camera Tracks
     if (webrtcLocalStream) {
         webrtcLocalStream.getTracks().forEach(track => {
             peerConnection.addTrack(track, webrtcLocalStream);
-            console.log(`Local track added: ${track.kind}`);
+            console.log(`Local track streaming: ${track.kind}`);
         });
     }
 
-    // 2. REMOTE STREAM RECEIVED -> RENDER ON MAIN SCREEN WITH AUDIO
+    // 3. REMOTE STREAM ARRIVED -> REMOVE BLACK SCREEN & PLAY LIVE AUDIO/VIDEO
     peerConnection.ontrack = (event) => {
-        console.log("Remote peer video/audio stream ARRIVED successfully!", event.streams);
+        console.log("Remote peer video stream ARRIVED!", event.streams);
         if (mainVideoElement && event.streams && event.streams[0]) {
+            // Remove black overlay completely
+            const ph = document.getElementById('videoOffPlaceholder');
+            if (ph) ph.style.cssText = "display: none !important;";
+
             mainVideoElement.srcObject = event.streams[0];
-            mainVideoElement.muted = false; // Unmute so you can hear the remote speaker!
-            mainVideoElement.setAttribute('playsinline', '');
-            mainVideoElement.setAttribute('autoplay', '');
             mainVideoElement.style.opacity = '1';
+            mainVideoElement.muted = false; // Enable audio so both sides can hear!
 
-            const placeholder = document.getElementById('videoOffPlaceholder');
-            if (placeholder) placeholder.style.display = 'none';
-
-            mainVideoElement.play().catch(err => {
-                console.warn("Autoplay audio blocked, retrying muted first:", err);
+            mainVideoElement.play().catch(e => {
+                console.warn("Video autoplay retry:", e);
                 mainVideoElement.muted = true;
                 mainVideoElement.play().then(() => {
-                    // Unmute immediately after playing
-                    setTimeout(() => { mainVideoElement.muted = false; }, 500);
+                    setTimeout(() => { mainVideoElement.muted = false; }, 400);
                 });
             });
         }
@@ -6659,14 +6692,13 @@ async function setupWebRtcPeerConnection(roomCode, isHost, mainVideoElement) {
     const roomRef = database.ref('conferenceRooms/' + roomCode);
 
     if (isHost) {
-        // ==================== HOST PIPELINE ====================
+        // HOST PIPELINE
         peerConnection.onicecandidate = (event) => {
             if (event.candidate) {
                 roomRef.child('hostCandidates').push(event.candidate.toJSON());
             }
         };
 
-        // Create & Set Local SDP Offer
         const offer = await peerConnection.createOffer({
             offerToReceiveAudio: true,
             offerToReceiveVideo: true
@@ -6678,42 +6710,36 @@ async function setupWebRtcPeerConnection(roomCode, isHost, mainVideoElement) {
             created: firebase.database.ServerValue.TIMESTAMP
         });
 
-        // Listen for Guest's Answer
         roomRef.child('answer').on('value', async (snapshot) => {
             const answer = snapshot.val();
             if (answer && !peerConnection.currentRemoteDescription) {
                 await peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
-                console.log("Host set remote description. Flushing queued ICE candidates...");
-
-                // Flush any queued candidates
+                console.log("Host remote description set. Flushing ICE candidates...");
                 while (iceCandidateQueue.length > 0) {
                     const c = iceCandidateQueue.shift();
-                    await peerConnection.addIceCandidate(new RTCIceCandidate(c)).catch(e => {});
+                    await peerConnection.addIceCandidate(new RTCIceCandidate(c)).catch(() => {});
                 }
             }
         });
 
-        // Listen for Guest's ICE Candidates with Safe Queue
         roomRef.child('guestCandidates').on('child_added', async (snapshot) => {
             const candidate = snapshot.val();
             if (!candidate) return;
-
             if (peerConnection.remoteDescription) {
-                await peerConnection.addIceCandidate(new RTCIceCandidate(candidate)).catch(e => {});
+                await peerConnection.addIceCandidate(new RTCIceCandidate(candidate)).catch(() => {});
             } else {
                 iceCandidateQueue.push(candidate);
             }
         });
 
     } else {
-        // ==================== GUEST PIPELINE ====================
+        // GUEST PIPELINE
         peerConnection.onicecandidate = (event) => {
             if (event.candidate) {
                 roomRef.child('guestCandidates').push(event.candidate.toJSON());
             }
         };
 
-        // Wait for Host's Offer
         roomRef.child('offer').on('value', async (snapshot) => {
             const offer = snapshot.val();
             if (offer && !peerConnection.currentRemoteDescription) {
@@ -6730,23 +6756,19 @@ async function setupWebRtcPeerConnection(roomCode, isHost, mainVideoElement) {
                     sdp: answer.sdp
                 });
 
-                console.log("Guest set local description. Flushing queued ICE candidates...");
-
-                // Flush any queued candidates
+                console.log("Guest local description set. Flushing ICE candidates...");
                 while (iceCandidateQueue.length > 0) {
                     const c = iceCandidateQueue.shift();
-                    await peerConnection.addIceCandidate(new RTCIceCandidate(c)).catch(e => {});
+                    await peerConnection.addIceCandidate(new RTCIceCandidate(c)).catch(() => {});
                 }
             }
         });
 
-        // Listen for Host's ICE Candidates with Safe Queue
         roomRef.child('hostCandidates').on('child_added', async (snapshot) => {
             const candidate = snapshot.val();
             if (!candidate) return;
-
             if (peerConnection.remoteDescription) {
-                await peerConnection.addIceCandidate(new RTCIceCandidate(candidate)).catch(e => {});
+                await peerConnection.addIceCandidate(new RTCIceCandidate(candidate)).catch(() => {});
             } else {
                 iceCandidateQueue.push(candidate);
             }
