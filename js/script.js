@@ -6671,6 +6671,33 @@ async function setupWebRtcPeerConnection(roomCode, isHost, mainVideoElement) {
     peerConnection = new RTCPeerConnection(rtcIceServers);
     let iceCandidateQueue = [];
 
+    // ======================================================================
+    // LIVE ON-SCREEN WEBRTC DIAGNOSTIC MONITOR (SHOWS EXACT FAILURE POINT)
+    // ======================================================================
+    let dbg = document.getElementById('webrtcDebugBanner');
+    if (!dbg) {
+        dbg = document.createElement('div');
+        dbg.id = 'webrtcDebugBanner';
+        dbg.style.cssText = "position:absolute; top:45px; left:10px; z-index:99999; background:rgba(0,0,0,0.85); color:#22c55e; padding:6px 12px; border-radius:6px; font-size:11px; font-family:monospace; border:1px solid #22c55e; pointer-events:none;";
+        document.getElementById('arpeuNativeConferenceModal')?.appendChild(dbg);
+    }
+
+    const updateDbg = (txt) => {
+        if (dbg) dbg.innerHTML = `📡 <b>DEBUG:</b> [Room: ${roomCode}]<br>${txt}`;
+    };
+
+    updateDbg(`Role: ${isHost ? 'HOST' : 'GUEST'} | Initializing...`);
+
+    peerConnection.onconnectionstatechange = () => {
+        console.log("Connection State:", peerConnection.connectionState);
+        updateDbg(`Role: ${isHost ? 'HOST' : 'GUEST'}<br>Connection: <b>${peerConnection.connectionState.toUpperCase()}</b><br>ICE: ${peerConnection.iceConnectionState}`);
+    };
+
+    peerConnection.oniceconnectionstatechange = () => {
+        console.log("ICE State:", peerConnection.iceConnectionState);
+        updateDbg(`Role: ${isHost ? 'HOST' : 'GUEST'}<br>Connection: ${peerConnection.connectionState}<br>ICE: <b>${peerConnection.iceConnectionState.toUpperCase()}</b>`);
+    };
+    
     // Force clear any black overlay on stage
     const placeholder = document.getElementById('videoOffPlaceholder');
     if (placeholder) {
