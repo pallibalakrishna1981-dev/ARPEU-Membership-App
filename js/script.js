@@ -6611,28 +6611,47 @@ const rtcIceServers = {
     ]
 };
 
+// ==========================================================================
+// BULLETPROOF TWO-WAY WEBRTC ENGINE (ICE QUEUING & TWO-WAY AUDIO/VIDEO SYNC)
+// ==========================================================================
 async function setupWebRtcPeerConnection(roomCode, isHost, mainVideoElement) {
     if (peerConnection) {
         peerConnection.close();
         peerConnection = null;
     }
 
+    // Initialize WebRTC with Google STUN Servers
     peerConnection = new RTCPeerConnection(rtcIceServers);
+    let iceCandidateQueue = [];
 
+    // 1. Add Local Mic and Camera Tracks to the Peer Connection
     if (webrtcLocalStream) {
         webrtcLocalStream.getTracks().forEach(track => {
             peerConnection.addTrack(track, webrtcLocalStream);
+            console.log(`Local track added: ${track.kind}`);
         });
     }
 
-    // Remote Video Stream Arrived -> Play on Main Video Screen
+    // 2. REMOTE STREAM RECEIVED -> RENDER ON MAIN SCREEN WITH AUDIO
     peerConnection.ontrack = (event) => {
-        console.log("Remote peer video stream connected successfully!");
+        console.log("Remote peer video/audio stream ARRIVED successfully!", event.streams);
         if (mainVideoElement && event.streams && event.streams[0]) {
             mainVideoElement.srcObject = event.streams[0];
-            mainVideoElement.play().catch(e => {
+            mainVideoElement.muted = false; // Unmute so you can hear the remote speaker!
+            mainVideoElement.setAttribute('playsinline', '');
+            mainVideoElement.setAttribute('autoplay', '');
+            mainVideoElement.style.opacity = '1';
+
+            const placeholder = document.getElementById('videoOffPlaceholder');
+            if (placeholder) placeholder.style.display = 'none';
+
+            mainVideoElement.play().catch(err => {
+                console.warn("Autoplay audio blocked, retrying muted first:", err);
                 mainVideoElement.muted = true;
-                mainVideoElement.play();
+                mainVideoElement.play().then(() => {
+                    // Unmute immediately after playing
+                    setTimeout(() => { mainVideoElement.muted = false; }, 500);
+                });
             });
         }
     };
@@ -6640,13 +6659,18 @@ async function setupWebRtcPeerConnection(roomCode, isHost, mainVideoElement) {
     const roomRef = database.ref('conferenceRooms/' + roomCode);
 
     if (isHost) {
+        // ==================== HOST PIPELINE ====================
         peerConnection.onicecandidate = (event) => {
             if (event.candidate) {
                 roomRef.child('hostCandidates').push(event.candidate.toJSON());
             }
         };
 
-        const offer = await peerConnection.createOffer();
+        // Create & Set Local SDP Offer
+        const offer = await peerConnection.createOffer({
+            offerToReceiveAudio: true,
+            offerToReceiveVideo: true
+        });
         await peerConnection.setLocalDescription(offer);
 
         await roomRef.set({
@@ -6654,46 +6678,77 @@ async function setupWebRtcPeerConnection(roomCode, isHost, mainVideoElement) {
             created: firebase.database.ServerValue.TIMESTAMP
         });
 
+        // Listen for Guest's Answer
         roomRef.child('answer').on('value', async (snapshot) => {
             const answer = snapshot.val();
             if (answer && !peerConnection.currentRemoteDescription) {
                 await peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
+                console.log("Host set remote description. Flushing queued ICE candidates...");
+
+                // Flush any queued candidates
+                while (iceCandidateQueue.length > 0) {
+                    const c = iceCandidateQueue.shift();
+                    await peerConnection.addIceCandidate(new RTCIceCandidate(c)).catch(e => {});
+                }
             }
         });
 
+        // Listen for Guest's ICE Candidates with Safe Queue
         roomRef.child('guestCandidates').on('child_added', async (snapshot) => {
             const candidate = snapshot.val();
-            if (candidate && peerConnection) {
-                await peerConnection.addIceCandidate(new RTCIceCandidate(candidate)).catch(() => {});
+            if (!candidate) return;
+
+            if (peerConnection.remoteDescription) {
+                await peerConnection.addIceCandidate(new RTCIceCandidate(candidate)).catch(e => {});
+            } else {
+                iceCandidateQueue.push(candidate);
             }
         });
 
     } else {
+        // ==================== GUEST PIPELINE ====================
         peerConnection.onicecandidate = (event) => {
             if (event.candidate) {
                 roomRef.child('guestCandidates').push(event.candidate.toJSON());
             }
         };
 
-        roomRef.child('offer').once('value', async (snapshot) => {
+        // Wait for Host's Offer
+        roomRef.child('offer').on('value', async (snapshot) => {
             const offer = snapshot.val();
             if (offer && !peerConnection.currentRemoteDescription) {
                 await peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
-                
-                const answer = await peerConnection.createAnswer();
+
+                const answer = await peerConnection.createAnswer({
+                    offerToReceiveAudio: true,
+                    offerToReceiveVideo: true
+                });
                 await peerConnection.setLocalDescription(answer);
 
                 await roomRef.child('answer').set({
                     type: answer.type,
                     sdp: answer.sdp
                 });
+
+                console.log("Guest set local description. Flushing queued ICE candidates...");
+
+                // Flush any queued candidates
+                while (iceCandidateQueue.length > 0) {
+                    const c = iceCandidateQueue.shift();
+                    await peerConnection.addIceCandidate(new RTCIceCandidate(c)).catch(e => {});
+                }
             }
         });
 
+        // Listen for Host's ICE Candidates with Safe Queue
         roomRef.child('hostCandidates').on('child_added', async (snapshot) => {
             const candidate = snapshot.val();
-            if (candidate && peerConnection) {
-                await peerConnection.addIceCandidate(new RTCIceCandidate(candidate)).catch(() => {});
+            if (!candidate) return;
+
+            if (peerConnection.remoteDescription) {
+                await peerConnection.addIceCandidate(new RTCIceCandidate(candidate)).catch(e => {});
+            } else {
+                iceCandidateQueue.push(candidate);
             }
         });
     }
