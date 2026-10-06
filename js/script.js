@@ -6527,10 +6527,26 @@ function startCoreCommitteeGroupCall(mode = 'video') {
 }
 
 // ==========================================================================
-// REAL-TIME INCOMING CALL LISTENER (WAKES UP LOCK SCREEN & PLAYS LOUD RING)
+// 1. PWA BACKGROUND KEEP-ALIVE & LOCK-SCREEN RINGING ENGINE
 // ==========================================================================
+let pwaKeepAliveAudio = null;
+
+// Keeps Android Network WebSocket 100% Awake even when phone is locked
+function activateBackgroundKeepAlive() {
+    if (!pwaKeepAliveAudio) {
+        pwaKeepAliveAudio = new Audio('https://palli-balakrishna.github.io/ARPEU-Assets/ringtone.mp3');
+        pwaKeepAliveAudio.loop = true;
+        pwaKeepAliveAudio.volume = 0.001; // Silent inaudible loop keeps process awake
+    }
+    pwaKeepAliveAudio.play().catch(() => {});
+}
+
 function listenForIncomingCalls(myMobile) {
     console.log("Listening for calls on Mobile: " + myMobile);
+    
+    // Activate background keep-alive so phone never sleeps on lock screen
+    activateBackgroundKeepAlive();
+
     const callRef = database.ref('calls/' + myMobile);
 
     callRef.on('value', (snapshot) => {
@@ -6547,11 +6563,14 @@ function listenForIncomingCalls(myMobile) {
 
             activeIncomingCallData = callData;
 
-            // 1. WAKE UP PHONE ON LOCK SCREEN (System Service Worker Push Notification)
+            // 1. PLAY LOUD RINGTONE & VIBRATION IMMEDIATELY
+            startContinuousRingtone();
+
+            // 2. WAKE UP LOCK SCREEN NOTIFICATION
             if ('Notification' in window && Notification.permission === 'granted' && navigator.serviceWorker) {
-                navigator.serviceWorker.ready.then(registration => {
-                    registration.showNotification(`📞 ${callData.callerName || 'Leader'} Calling...`, {
-                        body: `🔔 Incoming Executive Video Call.\nTap to Join immediately.`,
+                navigator.serviceWorker.ready.then(reg => {
+                    reg.showNotification(`📞 ${callData.callerName || 'Leader'} Calling...`, {
+                        body: `🔔 Incoming Executive Video Call.\nTap to Join Room: ${callData.roomCode || ''}`,
                         icon: 'images/arpeu-logo.png',
                         badge: 'images/arpeu-logo.png',
                         vibrate: [1200, 400, 1200, 400, 1200, 400, 1200],
@@ -6559,20 +6578,17 @@ function listenForIncomingCalls(myMobile) {
                         tag: 'arpeu-incoming-call',
                         renotify: true,
                         data: {
-                            url: window.location.origin + window.location.pathname
+                            url: window.location.origin + window.location.pathname + '?room=' + (callData.roomCode || '')
                         },
                         actions: [
                             { action: 'join', title: '🟢 Join Call' },
                             { action: 'decline', title: '🔴 Decline' }
                         ]
                     });
-                });
+                }).catch(() => {});
             }
 
-            // 2. Play Continuous Loud Ringtone & Audio Alert
-            startContinuousRingtone();
-
-            // 3. Populate In-App Incoming Modal
+            // 3. Show In-App Incoming Modal
             const nameEl = document.getElementById('incomingCallerName');
             const titleEl = document.getElementById('incomingCallMeetingTitle');
             if (nameEl) nameEl.textContent = callData.callerName || "ARPEU Leader";
@@ -6627,12 +6643,22 @@ let isWebrtcHost = false;
 let currentActiveRoomCode = null;
 
 // ==========================================================================
-// THE GOLDEN WORKING MUTUAL VIDEO & AUDIO ENGINE (EXTRACTED FROM a6c6c87)
+// 2. PRODUCTION WEBRTC MUTUAL VIDEO & AUDIO ENGINE (SAFE CHILD UPDATES + TURN)
 // ==========================================================================
 const rtcIceServers = {
     iceServers: [
         { urls: 'stun:stun.l.google.com:19302' },
-        { urls: 'stun:stun1.l.google.com:19302' }
+        { urls: 'stun:stun1.l.google.com:19302' },
+        {
+            urls: 'turn:openrelay.metered.ca:80',
+            username: 'openrelay',
+            credential: 'openrelay'
+        },
+        {
+            urls: 'turn:openrelay.metered.ca:443',
+            username: 'openrelay',
+            credential: 'openrelay'
+        }
     ]
 };
 
@@ -6643,23 +6669,40 @@ async function setupWebRtcPeerConnection(roomCode, isHost, mainVideoElement) {
     }
 
     peerConnection = new RTCPeerConnection(rtcIceServers);
+    let iceCandidateQueue = [];
 
-    // 1. Add Local Camera & Mic Tracks
+    // Force clear any black overlay on stage
+    const placeholder = document.getElementById('videoOffPlaceholder');
+    if (placeholder) {
+        placeholder.style.cssText = "display: none !important;";
+    }
+    if (mainVideoElement) {
+        mainVideoElement.style.opacity = '1';
+        mainVideoElement.setAttribute('playsinline', '');
+        mainVideoElement.setAttribute('autoplay', '');
+    }
+
+    // Add local camera and mic tracks
     if (webrtcLocalStream) {
         webrtcLocalStream.getTracks().forEach(track => {
             peerConnection.addTrack(track, webrtcLocalStream);
+            console.log(`Local streaming track added: ${track.kind}`);
         });
     }
 
-    // 2. REMOTE VIDEO ARRIVED -> PLAY DIRECTLY (NO BLACK SCREEN OVERLAYS)
+    // REMOTE PEER ARRIVED -> STREAM VIDEO & AUDIO MUTUALLY
     peerConnection.ontrack = (event) => {
-        console.log("Remote peer video stream connected successfully!");
+        console.log("Remote peer video stream ARRIVED successfully!", event.streams);
         if (mainVideoElement && event.streams && event.streams[0]) {
+            const ph = document.getElementById('videoOffPlaceholder');
+            if (ph) ph.style.cssText = "display: none !important;";
+
             mainVideoElement.srcObject = event.streams[0];
-            mainVideoElement.removeAttribute('poster');
-            mainVideoElement.muted = false; // Unmuted audio
+            mainVideoElement.style.opacity = '1';
+            mainVideoElement.muted = false; // Hear remote audio!
+
             mainVideoElement.play().catch(e => {
-                console.warn("Autoplay blocked, playing muted first:", e);
+                console.warn("Video autoplay retry:", e);
                 mainVideoElement.muted = true;
                 mainVideoElement.play().then(() => {
                     setTimeout(() => { mainVideoElement.muted = false; }, 300);
@@ -6671,38 +6714,49 @@ async function setupWebRtcPeerConnection(roomCode, isHost, mainVideoElement) {
     const roomRef = database.ref('conferenceRooms/' + roomCode);
 
     if (isHost) {
-        // ================= HOST PIPELINE =================
+        // ==================== HOST PIPELINE ====================
         peerConnection.onicecandidate = (event) => {
             if (event.candidate) {
                 roomRef.child('hostCandidates').push(event.candidate.toJSON());
             }
         };
 
-        const offer = await peerConnection.createOffer();
+        const offer = await peerConnection.createOffer({
+            offerToReceiveAudio: true,
+            offerToReceiveVideo: true
+        });
         await peerConnection.setLocalDescription(offer);
 
-        await roomRef.set({
-            offer: { type: offer.type, sdp: offer.sdp },
-            created: firebase.database.ServerValue.TIMESTAMP
+        // FIX: Set only the offer child to avoid wiping candidates!
+        await roomRef.child('offer').set({
+            type: offer.type,
+            sdp: offer.sdp
         });
 
         roomRef.child('answer').on('value', async (snapshot) => {
             const answer = snapshot.val();
             if (answer && !peerConnection.currentRemoteDescription) {
                 await peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
-                console.log("Host connected to Guest successfully!");
+                console.log("Host connected to Guest! Flushing queued ICE...");
+                while (iceCandidateQueue.length > 0) {
+                    const c = iceCandidateQueue.shift();
+                    await peerConnection.addIceCandidate(new RTCIceCandidate(c)).catch(() => {});
+                }
             }
         });
 
         roomRef.child('guestCandidates').on('child_added', async (snapshot) => {
             const candidate = snapshot.val();
-            if (candidate && peerConnection) {
-                await peerConnection.addIceCandidate(new RTCIceCandidate(candidate)).catch(e => {});
+            if (!candidate) return;
+            if (peerConnection.remoteDescription) {
+                await peerConnection.addIceCandidate(new RTCIceCandidate(candidate)).catch(() => {});
+            } else {
+                iceCandidateQueue.push(candidate);
             }
         });
 
     } else {
-        // ================= GUEST PIPELINE =================
+        // ==================== GUEST PIPELINE ====================
         peerConnection.onicecandidate = (event) => {
             if (event.candidate) {
                 roomRef.child('guestCandidates').push(event.candidate.toJSON());
@@ -6713,22 +6767,33 @@ async function setupWebRtcPeerConnection(roomCode, isHost, mainVideoElement) {
             const offer = snapshot.val();
             if (offer && !peerConnection.currentRemoteDescription) {
                 await peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
-                
-                const answer = await peerConnection.createAnswer();
+
+                const answer = await peerConnection.createAnswer({
+                    offerToReceiveAudio: true,
+                    offerToReceiveVideo: true
+                });
                 await peerConnection.setLocalDescription(answer);
 
                 await roomRef.child('answer').set({
                     type: answer.type,
                     sdp: answer.sdp
                 });
-                console.log("Guest connected to Host successfully!");
+
+                console.log("Guest connected to Host! Flushing queued ICE...");
+                while (iceCandidateQueue.length > 0) {
+                    const c = iceCandidateQueue.shift();
+                    await peerConnection.addIceCandidate(new RTCIceCandidate(c)).catch(() => {});
+                }
             }
         });
 
         roomRef.child('hostCandidates').on('child_added', async (snapshot) => {
             const candidate = snapshot.val();
-            if (candidate && peerConnection) {
-                await peerConnection.addIceCandidate(new RTCIceCandidate(candidate)).catch(e => {});
+            if (!candidate) return;
+            if (peerConnection.remoteDescription) {
+                await peerConnection.addIceCandidate(new RTCIceCandidate(candidate)).catch(() => {});
+            } else {
+                iceCandidateQueue.push(candidate);
             }
         });
     }
