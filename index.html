@@ -5243,6 +5243,36 @@
     })();
 </script>
 
+<!-- =========================================================
+         ARPEU PWA ONE-TIME PERMISSION ONBOARDING MODAL
+    ========================================================= -->
+    <div id="arpeuPermissionModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(11, 19, 30, 0.95); z-index: 9999999; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; font-family: sans-serif;">
+        <div style="background: #1e293b; border: 2px solid #ff9800; border-radius: 16px; max-width: 360px; width: 100%; padding: 24px; text-align: center; color: #ffffff; box-shadow: 0 10px 30px rgba(0,0,0,0.8);">
+            <img src="images/arpeu-logo.png" style="width: 70px; height: 70px; margin-bottom: 12px; border-radius: 50%; border: 2px solid #ff9800;">
+            <h3 style="margin: 0 0 8px 0; font-size: 18px; color: #ff9800;">ARPEU CONFERENCING SETUP</h3>
+            <p style="font-size: 12px; color: #94a3b8; margin: 0 0 20px 0; line-height: 1.5;">
+                ఫోన్ లాక్‌లో ఉన్నా వాట్సాప్ లాగా వీడియో కాల్స్ రావడానికి దయచేసి క్రింది పర్మిషన్లను ఒక్కసారి ఎనేబుల్ చేయండి.
+            </p>
+
+            <div style="text-align: left; background: #0f172a; padding: 12px; border-radius: 10px; margin-bottom: 20px; font-size: 12px; display: flex; flex-direction: column; gap: 10px;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span style="color: #22c55e; font-size: 16px;">🔔</span>
+                    <span>కాల్ అలర్ట్స్ (ఫోన్ లాక్ లో ఉన్నా రింగ్ అవ్వడానికి)</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span style="color: #38bdf8; font-size: 16px;">📹</span>
+                    <span>కెమెరా & మైక్రోఫోన్ (వీడియో మీటింగ్స్ కోసం)</span>
+                </div>
+            </div>
+
+            <button type="button" onclick="grantAllArpeuPermissions()" style="width: 100%; height: 44px; background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); color: #ffffff; border: none; border-radius: 8px; font-weight: 700; font-size: 14px; cursor: pointer; box-shadow: 0 4px 12px rgba(34, 197, 94, 0.4);">
+                ✅ ALLOW ALL PERMISSIONS
+            </button>
+        </div>
+    </div>
+
+
+
 </body>
 
 </html>

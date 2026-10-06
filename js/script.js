@@ -6799,14 +6799,9 @@ async function launchInstantConference(committeeName = 'Core Committee', mode = 
 }
 
 
-/**
- * Updates Active Speaker Identity Ribbon and handles strict visibility.
- */
 // ==========================================================================
-// 2-WAY PEER CONNECTION BRIDGE (EXCHANGES VIDEO BETWEEN HOST & GUEST)
+// BULLETPROOF TWO-WAY WEBRTC PEER CONNECTION PIPELINE (REAL MUTUAL VIDEO)
 // ==========================================================================
-
-
 async function setupWebRtcPeerConnection(roomCode, isHost, mainVideoElement) {
     if (peerConnection) {
         peerConnection.close();
@@ -6815,19 +6810,21 @@ async function setupWebRtcPeerConnection(roomCode, isHost, mainVideoElement) {
 
     peerConnection = new RTCPeerConnection(rtcIceServers);
 
+    // Push local mic and camera tracks to peer
     if (webrtcLocalStream) {
         webrtcLocalStream.getTracks().forEach(track => {
             peerConnection.addTrack(track, webrtcLocalStream);
         });
     }
 
-    // Remote Video Received -> Show on Main Screen
+    // When remote user's video arrives -> Show immediately on Main Screen
     peerConnection.ontrack = (event) => {
-        console.log("Remote peer video stream connected!");
+        console.log("Remote peer video stream ARRIVED successfully!");
         if (mainVideoElement && event.streams && event.streams[0]) {
             mainVideoElement.srcObject = event.streams[0];
-            mainVideoElement.muted = false;
+            mainVideoElement.removeAttribute('poster');
             mainVideoElement.play().catch(e => {
+                console.warn("Retrying video play:", e);
                 mainVideoElement.muted = true;
                 mainVideoElement.play();
             });
@@ -6837,10 +6834,14 @@ async function setupWebRtcPeerConnection(roomCode, isHost, mainVideoElement) {
     const roomRef = database.ref('conferenceRooms/' + roomCode);
 
     if (isHost) {
-        peerConnection.onicecandidate = (e) => {
-            if (e.candidate) roomRef.child('hostCandidates').push(e.candidate.toJSON());
+        // HOST: Push local ICE candidates
+        peerConnection.onicecandidate = (event) => {
+            if (event.candidate) {
+                roomRef.child('hostCandidates').push(event.candidate.toJSON());
+            }
         };
 
+        // Create & Set Local SDP Offer
         const offer = await peerConnection.createOffer();
         await peerConnection.setLocalDescription(offer);
 
@@ -6849,39 +6850,53 @@ async function setupWebRtcPeerConnection(roomCode, isHost, mainVideoElement) {
             created: firebase.database.ServerValue.TIMESTAMP
         });
 
-        roomRef.child('answer').on('value', async (snap) => {
-            const answer = snap.val();
+        // Listen for Guest's Answer in Real-time
+        roomRef.child('answer').on('value', async (snapshot) => {
+            const answer = snapshot.val();
             if (answer && !peerConnection.currentRemoteDescription) {
                 await peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
+                console.log("Host connected to Guest! Mutual stream live!");
             }
         });
 
-        roomRef.child('guestCandidates').on('child_added', (snap) => {
-            const candidate = snap.val();
+        // Listen for Guest's ICE Candidates
+        roomRef.child('guestCandidates').on('child_added', async (snapshot) => {
+            const candidate = snapshot.val();
             if (candidate && peerConnection) {
-                peerConnection.addIceCandidate(new RTCIceCandidate(candidate)).catch(e => {});
+                await peerConnection.addIceCandidate(new RTCIceCandidate(candidate)).catch(() => {});
             }
         });
 
     } else {
-        peerConnection.onicecandidate = (e) => {
-            if (e.candidate) roomRef.child('guestCandidates').push(e.candidate.toJSON());
+        // GUEST: Push local ICE candidates
+        peerConnection.onicecandidate = (event) => {
+            if (event.candidate) {
+                roomRef.child('guestCandidates').push(event.candidate.toJSON());
+            }
         };
 
-        roomRef.child('offer').once('value', async (snap) => {
-            const offer = snap.val();
+        // GUEST FIX: Use .on('value') to wait until Host's offer arrives safely
+        roomRef.child('offer').on('value', async (snapshot) => {
+            const offer = snapshot.val();
             if (offer && !peerConnection.currentRemoteDescription) {
                 await peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
+                
                 const answer = await peerConnection.createAnswer();
                 await peerConnection.setLocalDescription(answer);
-                await roomRef.child('answer').set({ type: answer.type, sdp: answer.sdp });
+
+                await roomRef.child('answer').set({
+                    type: answer.type,
+                    sdp: answer.sdp
+                });
+                console.log("Guest connected to Host! Mutual stream live!");
             }
         });
 
-        roomRef.child('hostCandidates').on('child_added', (snap) => {
-            const candidate = snap.val();
+        // Listen for Host's ICE Candidates
+        roomRef.child('hostCandidates').on('child_added', async (snapshot) => {
+            const candidate = snapshot.val();
             if (candidate && peerConnection) {
-                peerConnection.addIceCandidate(new RTCIceCandidate(candidate)).catch(e => {});
+                await peerConnection.addIceCandidate(new RTCIceCandidate(candidate)).catch(() => {});
             }
         });
     }
@@ -7425,7 +7440,7 @@ function webrtcToggleMic() {
 }
 
 // ==========================================================================
-// BULLETPROOF CAMERA TOGGLE (SMOOTH ON/OFF TOGGLE & FULLSCREEN SPEAKER PHOTO)
+// BULLETPROOF CAMERA TOGGLE (DISPLAYS CURRENT USER'S EXACT PROFILE PHOTO)
 // ==========================================================================
 function webrtcToggleCam() {
     const btn = document.getElementById('btnToggleCam');
@@ -7433,18 +7448,17 @@ function webrtcToggleCam() {
     const placeholder = document.getElementById('videoOffPlaceholder');
     const btnIcon = btn ? btn.querySelector('i') : null;
 
-    // Determine current state based on button class
     const isCurrentlyMuted = btn ? btn.classList.contains('muted') : false;
-    const shouldTurnCameraOn = isCurrentlyMuted; // Toggle to opposite state
+    const shouldTurnCameraOn = isCurrentlyMuted;
 
-    // 1. Hardware Video Tracks Control
+    // 1. Hardware Tracks Toggle
     if (webrtcLocalStream && webrtcLocalStream.getVideoTracks().length > 0) {
         webrtcLocalStream.getVideoTracks().forEach(track => {
             track.enabled = shouldTurnCameraOn;
         });
     }
 
-    // 2. Update Camera Button UI State (Toggle Green / Red Slash)
+    // 2. Button State Update
     if (btn) {
         btn.classList.toggle('muted', !shouldTurnCameraOn);
         if (btnIcon) {
@@ -7452,58 +7466,36 @@ function webrtcToggleCam() {
         }
     }
 
-    // 3. Toggle Screen Display (Live Video vs Fullscreen Active Speaker Photo)
+    // 3. Display Toggle (Shows ONLY the exact user's own verified photo)
     if (mainVideo && placeholder) {
         if (!shouldTurnCameraOn) {
-            // CAMERA TURNED OFF -> Display Active Speaker's Photo
+            const myMobile = localStorage.getItem('arpeu_my_number') || myProfile.mobile;
             let speakerPhoto = "";
 
-            // A. Try to fetch from current active speaker ribbon name
-            const activeSpeakerName = document.getElementById('mainSpeakerName')?.textContent?.trim() || "";
-            if (activeSpeakerName && typeof coreCommitteeCadreMaster !== 'undefined') {
-                const matched = coreCommitteeCadreMaster.find(m => 
-                    m.name.toLowerCase().includes(activeSpeakerName.toLowerCase()) || 
-                    activeSpeakerName.toLowerCase().includes(m.name.toLowerCase())
-                );
-                if (matched && matched.photo) speakerPhoto = matched.photo;
-            }
-
-            // B. Try to fetch by user's own mobile number
-            if (!speakerPhoto) {
-                const myMobile = localStorage.getItem('arpeu_my_number') || myProfile.mobile;
-                const myLeader = coreCommitteeCadreMaster.find(m => m.mobile === myMobile);
-                if (myLeader && myLeader.photo) speakerPhoto = myLeader.photo;
-            }
-
-            // C. Guaranteed Fallback: Pick directly from bottom verified thumbnail cards
-            if (!speakerPhoto) {
-                const loadedThumb = document.querySelector('.cadre-thumb-card img');
-                if (loadedThumb && loadedThumb.src) speakerPhoto = loadedThumb.src;
-            }
-
-           // 4. Pick user's verified photo directly from their own active green-dot card
-            const myLiveCard = document.querySelector('.cadre-thumb-card.is-online img') || 
-                               document.querySelector('.cadre-thumb-card img');
+            // Strictly find the card belonging to THIS user's mobile number
+            const myExactCardImg = document.querySelector(`[onclick*="${myMobile}"] img`) || 
+                                   document.querySelector(`#card-${myMobile} img`);
             
-            if (myLiveCard && myLiveCard.src) {
-                speakerPhoto = myLiveCard.src;
+            if (myExactCardImg && myExactCardImg.src) {
+                speakerPhoto = myExactCardImg.src;
             }
 
-            // 5. Force Top-Layer Display with High z-index (Guaranteed Full Screen)
+            // Fallback to Cadre Master by mobile number
+            if (!speakerPhoto && typeof coreCommitteeCadreMaster !== 'undefined') {
+                const myProfileData = coreCommitteeCadreMaster.find(m => m.mobile === myMobile);
+                if (myProfileData && myProfileData.photo) {
+                    speakerPhoto = myProfileData.photo;
+                }
+            }
+
             if (speakerPhoto && speakerPhoto.trim() !== "") {
                 placeholder.src = speakerPhoto;
                 placeholder.style.cssText = "display: block !important; width: 100% !important; height: 100% !important; object-fit: contain !important; position: absolute !important; top: 0 !important; left: 0 !important; z-index: 999 !important; background: #0b131e !important;";
                 mainVideo.style.opacity = '0';
-                console.log("Camera Muted: Successfully Displaying Photo -> " + speakerPhoto);
+                console.log(`Camera Muted: Displaying Verified Photo for Mobile [${myMobile}] -> ${speakerPhoto}`);
             }
 
         } else {
-            // CAMERA TURNED BACK ON -> Restore Live Video
-            placeholder.style.setProperty('display', 'none', 'important');
-            mainVideo.style.opacity = '1';
-            console.log("Camera Turned Back ON: Restoring Live Video");
-
-             // Restore live video
             placeholder.style.cssText = "display: none !important;";
             mainVideo.style.opacity = '1';
         }
@@ -7681,6 +7673,50 @@ function dismissPrivateHostDirective() {
     const banner = document.getElementById('privateHostDirectiveBanner');
     if (banner) banner.style.display = 'none';
 }
+
+
+// ==========================================================================
+// PWA ONE-TIME PERMISSION ENGINE (REQUESTS NOTIFICATIONS & MEDIA ONCE)
+// ==========================================================================
+function checkAndPromptPwaPermissions() {
+    const isSetupDone = localStorage.getItem('arpeu_permissions_configured');
+    
+    // Show only if not configured yet
+    if (!isSetupDone) {
+        const modal = document.getElementById('arpeuPermissionModal');
+        if (modal) modal.style.display = 'flex';
+    }
+}
+
+async function grantAllArpeuPermissions() {
+    const modal = document.getElementById('arpeuPermissionModal');
+
+    try {
+        // 1. Request Notification Permission for Background Ringing
+        if ('Notification' in window) {
+            await Notification.requestPermission();
+        }
+
+        // 2. Request Camera & Mic Permission once and immediately stop
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: true });
+        stream.getTracks().forEach(track => track.stop());
+
+        // 3. Mark as Configured so it NEVER asks again
+        localStorage.setItem('arpeu_permissions_configured', 'true');
+
+        if (modal) modal.style.display = 'none';
+        alert('✅ All Permissions Enabled! You can now receive calls even when the phone is locked.');
+    } catch (e) {
+        console.warn('Permissions setup error:', e);
+        if (modal) modal.style.display = 'none';
+        localStorage.setItem('arpeu_permissions_configured', 'true');
+    }
+}
+
+// Auto-check on App Launch
+window.addEventListener('DOMContentLoaded', () => {
+    setTimeout(checkAndPromptPwaPermissions, 1500);
+});
 
 // ==========================================================================
 // 8 & 17 FIXED MASTER DATA & MANAGE COMMITTEE MEMBERS MODAL CONTROLLER

@@ -43,3 +43,65 @@ self.addEventListener('fetch', event => {
       })
   );
 });
+
+/* ==========================================================
+   ARPEU PWA BACKGROUND INCOMING CALL & NOTIFICATION ENGINE
+   (Wakes up device, sounds ringtone & vibrates on Lock Screen)
+   ========================================================== */
+
+/* 1. Receive Background Call Signal while Phone is Locked */
+self.addEventListener('push', event => {
+    const data = event.data ? event.data.json() : {};
+    const callerName = data.callerName || "ARPEU Leader";
+    const roomCode = data.roomCode || "ARPEU-CONF";
+
+    const options = {
+        body: `🔔 Incoming Executive Video Call from ${callerName}\nTap to Join immediately.`,
+        icon: 'images/arpeu-logo.png',
+        badge: 'images/arpeu-logo.png',
+        vibrate: [1200, 400, 1200, 400, 1200, 400, 1200],
+        requireInteraction: true, // Keeps notification active until answered
+        tag: 'arpeu-incoming-call',
+        renotify: true,
+        data: {
+            roomCode: roomCode,
+            url: self.location.origin + '/index.html?room=' + roomCode
+        },
+        actions: [
+            { action: 'join', title: '🟢 Join Call' },
+            { action: 'decline', title: '🔴 Decline' }
+        ]
+    };
+
+    event.waitUntil(
+        self.registration.showNotification(`📞 ${callerName} Calling...`, options)
+    );
+});
+
+/* 2. User Taps [Join Call] on Lock Screen -> Wakes up and Opens Room Directly */
+self.addEventListener('notificationclick', event => {
+    event.notification.close();
+    const action = event.action;
+
+    if (action === 'decline') {
+        return;
+    }
+
+    const targetUrl = event.notification.data.url;
+
+    event.waitUntil(
+        clients.matchAll({ type: 'window', includeUncontrolled: true }).then(windowClients => {
+            // If app is already open in background, bring to front
+            for (let client of windowClients) {
+                if (client.url.includes(self.location.origin) && 'focus' in client) {
+                    client.navigate(targetUrl);
+                    return client.focus();
+                }
+            }
+            // If app is completely closed, open fresh window into room
+            if (clients.openWindow) {
+                return clients.openWindow(targetUrl);
+            }
+        })
+    );
+});
