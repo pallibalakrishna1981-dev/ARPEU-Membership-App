@@ -6903,13 +6903,9 @@ async function launchInstantConference(committeeName = 'Core Committee', mode = 
         }
 
     } catch (hardwareErr) {
-        console.warn("Camera hardware access issue:", hardwareErr);
-        // Fallback to audio if camera is blocked by user
-        try {
-            webrtcLocalStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        } catch (e) {
-            console.error("Microphone also denied:", e);
-        }
+        console.error("Camera access failed:", hardwareErr);
+        // SCREEN ALERT: Tells us the EXACT Android reason why camera failed!
+        alert(`🚨 CAMERA HARDWARE STATUS:\nName: ${hardwareErr.name}\nReason: ${hardwareErr.message}`);
     }
 
     // 3. Initialize Agenda HUD safely
