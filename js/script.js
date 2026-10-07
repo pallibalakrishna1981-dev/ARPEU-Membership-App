@@ -6662,18 +6662,46 @@ const rtcIceServers = {
     ]
 };
 
+/* =========================================================================
+   ARPEU NATIVE WEBRTC ENGINE - 2-WAY MUTUAL AUDIO & VIDEO RESTORATION
+   ========================================================================= */
+
+let webrtcLocalStream = null;
+let peerConnection = null;
+let remoteMediaStream = null;
+let isWebrtcHost = false;
+let currentActiveRoomCode = null;
+
+const rtcIceServers = {
+    iceServers: [
+        { urls: 'stun:stun.l.google.com:19302' },
+        { urls: 'stun:stun1.l.google.com:19302' },
+        { urls: 'stun:stun2.l.google.com:19302' },
+        {
+            urls: 'turn:openrelay.metered.ca:80',
+            username: 'openrelay',
+            credential: 'openrelay'
+        },
+        {
+            urls: 'turn:openrelay.metered.ca:443',
+            username: 'openrelay',
+            credential: 'openrelay'
+        }
+    ],
+    iceCandidatePoolSize: 10
+};
+
 async function setupWebRtcPeerConnection(roomCode, isHost, mainVideoElement) {
     if (peerConnection) {
         peerConnection.close();
         peerConnection = null;
     }
 
+    remoteMediaStream = new MediaStream();
     peerConnection = new RTCPeerConnection(rtcIceServers);
     let iceCandidateQueue = [];
 
-    // ======================================================================
-    // LIVE ON-SCREEN WEBRTC DIAGNOSTIC MONITOR (SHOWS EXACT FAILURE POINT)
-    // ======================================================================
+    // Diagnostic Monitor
     let dbg = document.getElementById('webrtcDebugBanner');
     if (!dbg) {
         dbg = document.createElement('div');
@@ -6686,54 +6714,48 @@ async function setupWebRtcPeerConnection(roomCode, isHost, mainVideoElement) {
         if (dbg) dbg.innerHTML = `📡 <b>DEBUG:</b> [Room: ${roomCode}]<br>${txt}`;
     };
 
-    updateDbg(`Role: ${isHost ? 'HOST' : 'GUEST'} | Initializing...`);
+    updateDbg(`Role: ${isHost ? 'HOST' : 'GUEST'} | Initializing WebRTC...`);
 
     peerConnection.onconnectionstatechange = () => {
-        console.log("Connection State:", peerConnection.connectionState);
+        console.log("[WebRTC Connection State]:", peerConnection.connectionState);
         updateDbg(`Role: ${isHost ? 'HOST' : 'GUEST'}<br>Connection: <b>${peerConnection.connectionState.toUpperCase()}</b><br>ICE: ${peerConnection.iceConnectionState}`);
     };
 
     peerConnection.oniceconnectionstatechange = () => {
-        console.log("ICE State:", peerConnection.iceConnectionState);
+        console.log("[WebRTC ICE State]:", peerConnection.iceConnectionState);
         updateDbg(`Role: ${isHost ? 'HOST' : 'GUEST'}<br>Connection: ${peerConnection.connectionState}<br>ICE: <b>${peerConnection.iceConnectionState.toUpperCase()}</b>`);
     };
-    
-    // Force clear any black overlay on stage
-    const placeholder = document.getElementById('videoOffPlaceholder');
-    if (placeholder) {
-        placeholder.style.cssText = "display: none !important;";
-    }
-    if (mainVideoElement) {
-        mainVideoElement.style.opacity = '1';
-        mainVideoElement.setAttribute('playsinline', '');
-        mainVideoElement.setAttribute('autoplay', '');
-    }
 
-    // Add local camera and mic tracks
+    // Attach local camera & mic tracks
     if (webrtcLocalStream) {
         webrtcLocalStream.getTracks().forEach(track => {
             peerConnection.addTrack(track, webrtcLocalStream);
-            console.log(`Local streaming track added: ${track.kind}`);
+            console.log(`[WebRTC] Attached local track: ${track.kind}`);
         });
     }
 
-    // REMOTE PEER ARRIVED -> STREAM VIDEO & AUDIO MUTUALLY
+    // Attach remote stream reliably to Main Video Stage
     peerConnection.ontrack = (event) => {
-        console.log("Remote peer video stream ARRIVED successfully!", event.streams);
-        if (mainVideoElement && event.streams && event.streams[0]) {
-            const ph = document.getElementById('videoOffPlaceholder');
-            if (ph) ph.style.cssText = "display: none !important;";
+        console.log(`[WebRTC] Inbound track received: ${event.track.kind}`);
+        remoteMediaStream.addTrack(event.track);
 
-            mainVideoElement.srcObject = event.streams[0];
+        if (mainVideoElement) {
+            mainVideoElement.srcObject = remoteMediaStream;
             mainVideoElement.style.opacity = '1';
-            mainVideoElement.muted = false; // Hear remote audio!
+            mainVideoElement.style.display = 'block';
 
-            mainVideoElement.play().catch(e => {
-                console.warn("Video autoplay retry:", e);
+            // Hide placeholder avatar when remote live video streams in
+            const placeholder = document.getElementById('videoOffPlaceholder');
+            if (placeholder) {
+                placeholder.style.setProperty('display', 'none', 'important');
+            }
+
+            mainVideoElement.play().catch(err => {
+                console.warn("[WebRTC] Autoplay retry with momentary mute bypass:", err);
                 mainVideoElement.muted = true;
                 mainVideoElement.play().then(() => {
-                    setTimeout(() => { mainVideoElement.muted = false; }, 300);
-                });
+                    setTimeout(() => { mainVideoElement.muted = false; }, 400);
+                }).catch(e => console.error("Final play error:", e));
             });
         }
     };
@@ -6742,8 +6764,11 @@ async function setupWebRtcPeerConnection(roomCode, isHost, mainVideoElement) {
 
     if (isHost) {
         // ==================== HOST PIPELINE ====================
+        // Clean stale data from previous calls in this room
+        await roomRef.remove();
+
         peerConnection.onicecandidate = (event) => {
-            if (event.candidate) {
+            if (event.candidate && event.candidate.candidate) {
                 roomRef.child('hostCandidates').push(event.candidate.toJSON());
             }
         };
@@ -6754,17 +6779,17 @@ async function setupWebRtcPeerConnection(roomCode, isHost, mainVideoElement) {
         });
         await peerConnection.setLocalDescription(offer);
 
-        // FIX: Set only the offer child to avoid wiping candidates!
         await roomRef.child('offer').set({
             type: offer.type,
             sdp: offer.sdp
         });
 
+        // Listen for Guest's Answer
         roomRef.child('answer').on('value', async (snapshot) => {
             const answer = snapshot.val();
             if (answer && !peerConnection.currentRemoteDescription) {
                 await peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
-                console.log("Host connected to Guest! Flushing queued ICE...");
+                console.log("[Host] Connected to Guest Answer! Draining queued candidates...");
                 while (iceCandidateQueue.length > 0) {
                     const c = iceCandidateQueue.shift();
                     await peerConnection.addIceCandidate(new RTCIceCandidate(c)).catch(() => {});
@@ -6772,10 +6797,11 @@ async function setupWebRtcPeerConnection(roomCode, isHost, mainVideoElement) {
             }
         });
 
+        // Listen for Guest Candidates
         roomRef.child('guestCandidates').on('child_added', async (snapshot) => {
             const candidate = snapshot.val();
             if (!candidate) return;
-            if (peerConnection.remoteDescription) {
+            if (peerConnection.remoteDescription && peerConnection.remoteDescription.type) {
                 await peerConnection.addIceCandidate(new RTCIceCandidate(candidate)).catch(() => {});
             } else {
                 iceCandidateQueue.push(candidate);
@@ -6785,11 +6811,12 @@ async function setupWebRtcPeerConnection(roomCode, isHost, mainVideoElement) {
     } else {
         // ==================== GUEST PIPELINE ====================
         peerConnection.onicecandidate = (event) => {
-            if (event.candidate) {
+            if (event.candidate && event.candidate.candidate) {
                 roomRef.child('guestCandidates').push(event.candidate.toJSON());
             }
         };
 
+        // Listen for Host's Offer
         roomRef.child('offer').on('value', async (snapshot) => {
             const offer = snapshot.val();
             if (offer && !peerConnection.currentRemoteDescription) {
@@ -6806,7 +6833,7 @@ async function setupWebRtcPeerConnection(roomCode, isHost, mainVideoElement) {
                     sdp: answer.sdp
                 });
 
-                console.log("Guest connected to Host! Flushing queued ICE...");
+                console.log("[Guest] Answer created & registered! Draining queued candidates...");
                 while (iceCandidateQueue.length > 0) {
                     const c = iceCandidateQueue.shift();
                     await peerConnection.addIceCandidate(new RTCIceCandidate(c)).catch(() => {});
@@ -6814,10 +6841,11 @@ async function setupWebRtcPeerConnection(roomCode, isHost, mainVideoElement) {
             }
         });
 
+        // Listen for Host Candidates
         roomRef.child('hostCandidates').on('child_added', async (snapshot) => {
             const candidate = snapshot.val();
             if (!candidate) return;
-            if (peerConnection.remoteDescription) {
+            if (peerConnection.remoteDescription && peerConnection.remoteDescription.type) {
                 await peerConnection.addIceCandidate(new RTCIceCandidate(candidate)).catch(() => {});
             } else {
                 iceCandidateQueue.push(candidate);
@@ -6826,15 +6854,16 @@ async function setupWebRtcPeerConnection(roomCode, isHost, mainVideoElement) {
     }
 }
 
-
 // ==========================================================================
-// BULLETPROOF CONFERENCE LAUNCHER (ZERO REFERENCE ERROR GUARANTEED)
+// BULLETPROOF CONFERENCE LAUNCHER (CLEAN HOST/GUEST ROLE SEPARATION)
 // ==========================================================================
-
 async function launchInstantConference(committeeName = 'Core Committee', mode = 'video', directRoomCode = null, hostStatus = false) {
-    isWebrtcHost = hostStatus;
+    // STRICT ROLE FIX: Never override a guest answering a call as host!
+    isWebrtcHost = Boolean(hostStatus);
+    
     const isVideo = (mode === 'video');
     const roomCode = directRoomCode || `ARPEU-${committeeName.replace(/\s+/g, '-').toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`;
+    currentActiveRoomCode = roomCode;
 
     const modal = document.getElementById('arpeuNativeConferenceModal');
     const roomTitle = document.getElementById('webrtcRoomTitle');
@@ -6849,26 +6878,14 @@ async function launchInstantConference(committeeName = 'Core Committee', mode = 
     modal.style.display = 'flex';
     document.body.style.overflow = 'hidden';
 
-    // ======================================================================
-    // RESTORE HOST CONTROLS (TOP MAGIC BALL & BOTTOM TOOLBAR HOST BUTTON)
-    // ======================================================================
-    const myMobile = localStorage.getItem('arpeu_my_number') || myProfile.mobile;
-    
-    // Auto-detect Host identity (Either via hostStatus flag or Host Mobile Number)
-    if (hostStatus === true || myMobile === "9642788786") {
-        isWebrtcHost = true;
-    }
-
-    // 1. Top Screen Host Magic Ball
+    // Host Controls Visibility
     const magicBall = document.getElementById('hostMagicBallWrap');
     if (magicBall) {
         magicBall.style.setProperty('display', isWebrtcHost ? 'flex' : 'none', 'important');
     }
 
-    // 2. Bottom Toolbar Host Controls Buttons (Checks all common Host Button IDs)
     const hostAdminBtn = document.getElementById('btnHostAdminMenu');
     const hostControlsBtn = document.getElementById('btnHostControls');
-    
     if (hostAdminBtn) {
         hostAdminBtn.style.setProperty('display', isWebrtcHost ? 'flex' : 'none', 'important');
     }
@@ -6876,17 +6893,24 @@ async function launchInstantConference(committeeName = 'Core Committee', mode = 
         hostControlsBtn.style.setProperty('display', isWebrtcHost ? 'flex' : 'none', 'important');
     }
 
-    // 1. Force Stop previous camera tracks to unlock hardware safely
+    // Stop and clear any previous local camera stream
     if (webrtcLocalStream) {
         webrtcLocalStream.getTracks().forEach(t => t.stop());
         webrtcLocalStream = null;
     }
 
-    // 2. Safely Request Camera & Microphone
+    // Acquire Local Camera & Mic with Mobile-Safe Constraints
     try {
         const constraints = {
-            audio: true,
-            video: isVideo ? { facingMode: 'user' } : false
+            audio: {
+                echoCancellation: true,
+                noiseSuppression: true
+            },
+            video: isVideo ? {
+                facingMode: 'user',
+                width: { ideal: 640, max: 1280 },
+                height: { ideal: 480, max: 720 }
+            } : false
         };
 
         webrtcLocalStream = await navigator.mediaDevices.getUserMedia(constraints);
@@ -6895,30 +6919,28 @@ async function launchInstantConference(committeeName = 'Core Committee', mode = 
             localVideo.srcObject = webrtcLocalStream;
             localVideo.muted = true;
             localVideo.setAttribute('playsinline', '');
-            localVideo.play().catch(e => console.log('Local video play error:', e));
+            localVideo.setAttribute('webkit-playsinline', '');
+            localVideo.play().catch(e => console.warn('Local preview playback retry:', e));
         }
 
         if (mainVideo) {
             mainVideo.srcObject = null;
+            mainVideo.setAttribute('playsinline', '');
+            mainVideo.setAttribute('webkit-playsinline', '');
         }
 
     } catch (hardwareErr) {
         console.error("Camera access failed:", hardwareErr);
-        // SCREEN ALERT: Tells us the EXACT Android reason why camera failed!
         alert(`🚨 CAMERA HARDWARE STATUS:\nName: ${hardwareErr.name}\nReason: ${hardwareErr.message}`);
     }
 
-    // 3. Initialize Agenda HUD safely
+    // Initialize Agenda HUD if available
     if (typeof initConferenceAgendaHUD === 'function') {
         initConferenceAgendaHUD();
     }
 
-    // 4. Safely Connect WebRTC Pipeline without ReferenceError
-    if (typeof setupWebRtcPeerConnection === 'function') {
-        setupWebRtcPeerConnection(roomCode, isWebrtcHost, mainVideo);
-    } else {
-        console.log("Waiting for setupWebRtcPeerConnection initialization...");
-    }
+    // Launch WebRTC Handshake
+    setupWebRtcPeerConnection(roomCode, isWebrtcHost, mainVideo);
 }
 
 function updateActiveSpeakerIdentity(name, designation, unit) {
