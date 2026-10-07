@@ -6630,38 +6630,6 @@ function closeIncomingCallPopup() {
     if (modal) modal.style.display = 'none';
 }
 
-// ==========================================================================
-// LAUNCH CONFERENCE (CLEAN SEPARATION OF LOCAL & REMOTE VIDEO)
-// ==========================================================================
-
-// ==========================================================================
-// WEBRTC CORE STATE VARIABLES
-// ==========================================================================
-let webrtcLocalStream = null;
-let peerConnection = null;
-let isWebrtcHost = false;
-let currentActiveRoomCode = null;
-
-// ==========================================================================
-// 2. PRODUCTION WEBRTC MUTUAL VIDEO & AUDIO ENGINE (SAFE CHILD UPDATES + TURN)
-// ==========================================================================
-const rtcIceServers = {
-    iceServers: [
-        { urls: 'stun:stun.l.google.com:19302' },
-        { urls: 'stun:stun1.l.google.com:19302' },
-        {
-            urls: 'turn:openrelay.metered.ca:80',
-            username: 'openrelay',
-            credential: 'openrelay'
-        },
-        {
-            urls: 'turn:openrelay.metered.ca:443',
-            username: 'openrelay',
-            credential: 'openrelay'
-        }
-    ]
-};
-
 /* =========================================================================
    ARPEU NATIVE WEBRTC ENGINE - 2-WAY MUTUAL AUDIO & VIDEO RESTORATION
    ========================================================================= */
