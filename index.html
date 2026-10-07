@@ -22,7 +22,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="#0B4EA2">
 <meta name="apple-mobile-web-app-title" content="ARPEU Portal">
 
-<link rel="stylesheet" href="css/style.css?v=2077">
+<link rel="stylesheet" href="css/style.css?v=2078">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
@@ -3869,22 +3869,28 @@
         <div class="arpeu-main-viewport">
             
             <!-- A. ACTIVE SPEAKER STAGE -->
-            <div class="speaker-stage" id="speakerStageContainer">
-                <!-- Main Focus Speaker Stage -->
-                <video id="mainSpeakerVideo" autoplay playsinline muted></video>
-                <!-- Main Stage Active Speaker Photo (Purely Dedicated to Speaker) -->
+            <div class="speaker-stage" id="speakerStageContainer" style="position: relative; width: 100%; height: 100%; overflow: hidden; background: #0b131e;">
+                <!-- 1. Remote Main Focus Speaker Video (Full Stage) -->
+                <video id="mainSpeakerVideo" autoplay playsinline webkit-playsinline style="width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; z-index: 1;"></video>
+
+                <!-- 2. Main Stage Active Speaker Photo (Visible only when remote camera is muted) -->
                 <img id="videoOffPlaceholder" style="display: none; width: 100%; height: 100%; object-fit: contain; background: #0b131e; position: absolute; top: 0; left: 0; z-index: 5;">
+
                 <div id="tappedLeaderPhotoWrap" class="tapped-leader-photo" style="display: none;"></div>
                 <canvas id="virtualBgCanvas" style="display: none;"></canvas>
 
-                <!-- 🌟 SECONDARY SPEAKER PIP OVERLAY (1/4th Screen Corner Window) -->
-                <div class="secondary-speaker-pip" id="secondarySpeakerPip" style="display: none;">
-                    <video id="secondarySpeakerVideo" autoplay playsinline muted></video>
+                <!-- 3. Self Camera Preview PIP (Your Face in Bottom Corner) -->
+                <video id="localUserVideo" autoplay playsinline webkit-playsinline muted style="position: absolute; bottom: 16px; right: 16px; width: 110px; height: 150px; border-radius: 12px; object-fit: cover; z-index: 10; border: 2px solid #22c55e; box-shadow: 0 4px 14px rgba(0,0,0,0.6);"></video>
+
+                <!-- 4. Secondary Speaker PIP Overlay (Dynamic Name Populated via JS) -->
+                <div class="secondary-speaker-pip" id="secondarySpeakerPip" style="display: none; position: absolute; top: 16px; right: 16px; z-index: 10;">
+                    <video id="secondarySpeakerVideo" autoplay playsinline muted style="width: 120px; height: 90px; border-radius: 8px; object-fit: cover;"></video>
                     <div class="pip-speaker-badge">
                         <i class="fas fa-microphone text-success"></i>
-                        <span id="pipSpeakerName">Sri L. Prasadu</span>
+                        <span id="pipSpeakerName"></span>
                     </div>
                 </div>
+            </div>
 
                 <!-- TOP-RIGHT HOST MAGIC BALL -->
                 <div class="host-magic-ball-wrap" id="hostMagicBallWrap" style="display: none;">
@@ -5233,7 +5239,7 @@
 <!-- Firebase Core SDK and Realtime Database -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-<script src="js/script.js?v=161"></script>
+<script src="js/script.js?v=162"></script>
 
 <script>
     // Permanently remove splash screen from DOM so all buttons touch smoothly
