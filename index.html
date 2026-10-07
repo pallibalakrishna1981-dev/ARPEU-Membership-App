@@ -22,7 +22,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="#0B4EA2">
 <meta name="apple-mobile-web-app-title" content="ARPEU Portal">
 
-<link rel="stylesheet" href="css/style.css?v=2078">
+<link rel="stylesheet" href="css/style.css?v=2079">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
@@ -3805,9 +3805,7 @@
     </div>
 </div>
 
-<!-- ==========================================================================
-     ARPEU NATIVE WebRTC CONFERENCING ENGINE MODAL (EXECUTIVE CORE COMMITTEE)
-========================================================================== -->
+
 <!-- ==========================================================================
      LIGHTWEIGHT MANAGE COMMITTEE MEMBERS MODAL (NO HEAVY PHOTOS)
 ========================================================================== -->
@@ -3868,29 +3866,28 @@
         <!-- 2. MAIN VIEWPORT AREA -->
         <div class="arpeu-main-viewport">
             
-            <!-- A. ACTIVE SPEAKER STAGE -->
-            <div class="speaker-stage" id="speakerStageContainer" style="position: relative; width: 100%; height: 100%; overflow: hidden; background: #0b131e;">
-                <!-- 1. Remote Main Focus Speaker Video (Full Stage) -->
+            <!-- A. ACTIVE SPEAKER STAGE (BALANCED FLEX LAYOUT - NEVER OVERFLOWS) -->
+            <div class="speaker-stage" id="speakerStageContainer" style="position: relative; width: 100%; flex: 1; min-height: 0; overflow: hidden; background: #0b131e; display: flex; align-items: center; justify-content: center;">
+                <!-- 1. Remote Main Focus Speaker Video -->
                 <video id="mainSpeakerVideo" autoplay playsinline webkit-playsinline style="width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; z-index: 1;"></video>
 
-                <!-- 2. Main Stage Active Speaker Photo (Visible only when remote camera is muted) -->
+                <!-- 2. Main Stage Active Speaker Photo (Visible only on camera mute) -->
                 <img id="videoOffPlaceholder" style="display: none; width: 100%; height: 100%; object-fit: contain; background: #0b131e; position: absolute; top: 0; left: 0; z-index: 5;">
 
                 <div id="tappedLeaderPhotoWrap" class="tapped-leader-photo" style="display: none;"></div>
                 <canvas id="virtualBgCanvas" style="display: none;"></canvas>
 
-                <!-- 3. Self Camera Preview PIP (Your Face in Bottom Corner) -->
-                <video id="localUserVideo" autoplay playsinline webkit-playsinline muted style="position: absolute; bottom: 16px; right: 16px; width: 110px; height: 150px; border-radius: 12px; object-fit: cover; z-index: 10; border: 2px solid #22c55e; box-shadow: 0 4px 14px rgba(0,0,0,0.6);"></video>
+                <!-- 3. Self Camera Preview PIP (Corner Box - Strictly inside Stage) -->
+                <video id="localUserVideo" autoplay playsinline webkit-playsinline muted style="position: absolute; bottom: 12px; right: 12px; width: 95px; height: 130px; border-radius: 10px; object-fit: cover; z-index: 10; border: 2px solid #22c55e; box-shadow: 0 4px 12px rgba(0,0,0,0.6);"></video>
 
-                <!-- 4. Secondary Speaker PIP Overlay (Dynamic Name Populated via JS) -->
-                <div class="secondary-speaker-pip" id="secondarySpeakerPip" style="display: none; position: absolute; top: 16px; right: 16px; z-index: 10;">
-                    <video id="secondarySpeakerVideo" autoplay playsinline muted style="width: 120px; height: 90px; border-radius: 8px; object-fit: cover;"></video>
+                <!-- 4. Secondary Speaker PIP Overlay -->
+                <div class="secondary-speaker-pip" id="secondarySpeakerPip" style="display: none; position: absolute; top: 12px; right: 12px; z-index: 10;">
+                    <video id="secondarySpeakerVideo" autoplay playsinline muted style="width: 110px; height: 80px; border-radius: 8px; object-fit: cover;"></video>
                     <div class="pip-speaker-badge">
                         <i class="fas fa-microphone text-success"></i>
                         <span id="pipSpeakerName"></span>
                     </div>
                 </div>
-            </div>
 
                 <!-- TOP-RIGHT HOST MAGIC BALL -->
                 <div class="host-magic-ball-wrap" id="hostMagicBallWrap" style="display: none;">
@@ -3926,8 +3923,7 @@
                     <textarea id="liveNotepadTextarea" class="notepad-textarea" placeholder="Type meeting notes here..."></textarea>
                 </div>
 
-                
-                <!-- DYNAMIC ACTIVE SPEAKER RIBBON (HIDDEN BY DEFAULT) -->
+                <!-- DYNAMIC ACTIVE SPEAKER RIBBON -->
                 <div class="speaker-identity-ribbon" id="speakerIdentityRibbon" style="display: none;">
                     <div class="ribbon-text-col">
                         <div class="ribbon-name" id="mainSpeakerName"></div>
@@ -3940,10 +3936,9 @@
                 <div class="stage-hand-alert" id="stageHandAlert" style="display: none;">
                     <i class="fas fa-hand-paper hand-alert-icon"></i> <span id="handAlertCadreName">You Raised Hand</span>
                 </div>
-                
             </div>
 
-            <!-- B. DOCUMENT PROJECTOR STAGE (CLEAN & PROPERLY CLOSED) -->
+            <!-- B. DOCUMENT PROJECTOR STAGE -->
             <div class="doc-projector-stage" id="docProjectorStage" style="display: none;">
                 <div class="projector-floating-controls" id="projectorFloatingControls">
                     <button type="button" class="proj-tool-btn btn-proj-close" onclick="document.getElementById('docProjectorStage').style.cssText='display:none !important'; document.getElementById('privateProjectorFileInput').value='';" title="Close File"><i class="fas fa-times"></i></button>
@@ -3956,7 +3951,6 @@
                     <button type="button" class="proj-tool-btn" onclick="projectorZoom(0.2)" title="Zoom In"><i class="fas fa-plus"></i></button>
                     <button type="button" class="proj-tool-btn" onclick="projectorZoom(-0.2)" title="Zoom Out"><i class="fas fa-minus"></i></button>
 
-                    <!-- Dropdown Panel (Strictly Hidden) -->
                     <div id="projMemberPickerDropdown" class="proj-member-dropdown" style="display: none;">
                         <div class="proj-dropdown-header">
                             <span><i class="fas fa-user-shield text-warning"></i> SELECT VIEWERS</span>
@@ -3992,57 +3986,39 @@
                 </div>
             </div>
 
-        </div>
+        </div> <!-- End of arpeu-main-viewport -->
 
-       <!-- 3. HORIZONTAL CAROUSEL (EXACTLY 8 CORE COMMITTEE LEADERS - NO YOU CARD) -->
+        <!-- 3. HORIZONTAL CAROUSEL (INSIDE CALL CONTAINER) -->
         <div class="horizontal-cadre-carousel" id="horizontalCadreCarousel">
             <div class="cadre-strip-track" id="cadreStripTrack">
-                
-                <!-- Leader 1: T. Raghuram -->
-        <div class="cadre-thumb-card" id="card-0" onclick="handleCadreThumbClick(0, 'T. Raghuram', 'BMS State President', 'BMS Andhra Pradesh', 'images/bms-state-office-bearers/t-raghuram-bms-state-president.jpg')">
-            <img src="images/bms-state-office-bearers/t-raghuram-bms-state-president.jpg" alt="T. Raghuram" onerror="this.src='images/arpeu-logo.png'">
-        </div>
-
-        <!-- Leader 2: M.V.S. Naidu -->
-        <div class="cadre-thumb-card" id="card-1" onclick="handleCadreThumbClick(1, 'M.V.S. Naidu', 'BMS State General Secretary', 'BMS Andhra Pradesh', 'images/bms-state-office-bearers/mvs-naidu-bms-gen-secretary.jpg')">
-            <img src="images/bms-state-office-bearers/mvs-naidu-bms-gen-secretary.jpg" alt="M.V.S. Naidu" onerror="this.src='images/arpeu-logo.png'">
-        </div>
-
-        <!-- Leader 3: K. Lova Reddy -->
-        <div class="cadre-thumb-card" id="card-2" onclick="handleCadreThumbClick(2, 'K. Lova Reddy', 'BMS State Organising Secretary', 'BMS Andhra Pradesh', 'images/bms-state-office-bearers/k-lova-reddy-bms-state-organizing-secretary.jpg')">
-            <img src="images/bms-state-office-bearers/k-lova-reddy-bms-state-organizing-secretary.jpg" alt="K. Lova Reddy" onerror="this.src='images/arpeu-logo.png'">
-        </div>
-
-                <!-- Leader 4 -->
+                <div class="cadre-thumb-card" id="card-0" onclick="handleCadreThumbClick(0, 'T. Raghuram', 'BMS State President', 'BMS Andhra Pradesh', 'images/bms-state-office-bearers/t-raghuram-bms-state-president.jpg')">
+                    <img src="images/bms-state-office-bearers/t-raghuram-bms-state-president.jpg" alt="T. Raghuram" onerror="this.src='images/arpeu-logo.png'">
+                </div>
+                <div class="cadre-thumb-card" id="card-1" onclick="handleCadreThumbClick(1, 'M.V.S. Naidu', 'BMS State General Secretary', 'BMS Andhra Pradesh', 'images/bms-state-office-bearers/mvs-naidu-bms-gen-secretary.jpg')">
+                    <img src="images/bms-state-office-bearers/mvs-naidu-bms-gen-secretary.jpg" alt="M.V.S. Naidu" onerror="this.src='images/arpeu-logo.png'">
+                </div>
+                <div class="cadre-thumb-card" id="card-2" onclick="handleCadreThumbClick(2, 'K. Lova Reddy', 'BMS State Organising Secretary', 'BMS Andhra Pradesh', 'images/bms-state-office-bearers/k-lova-reddy-bms-state-organizing-secretary.jpg')">
+                    <img src="images/bms-state-office-bearers/k-lova-reddy-bms-state-organizing-secretary.jpg" alt="K. Lova Reddy" onerror="this.src='images/arpeu-logo.png'">
+                </div>
                 <div class="cadre-thumb-card" id="card-3" onclick="handleCadreThumbClick(3, 'T. Sambasiva Rao', 'ARPEU State President', 'APCPDCL – Ongole', 'images/state-office-bearers/state-president.jpg', '9393788785')">
                     <img src="images/state-office-bearers/state-president.jpg" alt="T. Sambasiva Rao" onerror="this.src='images/arpeu-logo.png'">
                 </div>
-
-                <!-- Leader 5 -->
                 <div class="cadre-thumb-card" id="card-4" onclick="handleCadreThumbClick(4, 'C. Ramagopal Reddy', 'ARPEU State General Secretary', 'APSPDCL – Tirupati', 'images/state-office-bearers/general-secretary.jpg', '9110771171')">
                     <img src="images/state-office-bearers/general-secretary.jpg" alt="C. Ramagopal Reddy" onerror="this.src='images/arpeu-logo.png'">
                 </div>
-
-                <!-- Leader 6 -->
                 <div class="cadre-thumb-card" id="card-5" onclick="handleCadreThumbClick(5, 'P. Balakrishna', 'ARPEU State Treasurer', 'APGENCO – Dr. NTTPS', 'images/state-office-bearers/state-treasurer.jpg', '9642788786')">
                     <img src="images/state-office-bearers/state-treasurer.jpg" alt="P. Balakrishna" onerror="this.src='images/arpeu-logo.png'">
                 </div>
-
-                <!-- Leader 7 -->
                 <div class="cadre-thumb-card" id="card-6" onclick="handleCadreThumbClick(6, 'K. Jayappa', 'ARPEU Working President', 'APEPDCL – Vizag', 'images/state-office-bearers/jayappa-working-president.jpg', '9985333734')">
                     <img src="images/state-office-bearers/jayappa-working-president.jpg" alt="K. Jayappa" onerror="this.src='images/arpeu-logo.png'">
                 </div>
-
-                <!-- Leader 8 -->
                 <div class="cadre-thumb-card" id="card-7" onclick="handleCadreThumbClick(7, 'A. Koteswara Rao', 'ARPEU Organising Secretary', 'APTRANSCO – Vijayawada', 'images/state-office-bearers/koteswara-rao-organising-secretary.jpg')">
                     <img src="images/state-office-bearers/koteswara-rao-organising-secretary.jpg" alt="A. Koteswara Rao" onerror="this.src='images/arpeu-logo.png'">
                 </div>
-
             </div>
         </div>
-    
 
-        <!-- 4. BOTTOM TOOLBAR -->
+        <!-- 4. BOTTOM TOOLBAR (INSIDE CALL CONTAINER) -->
         <div class="arpeu-call-toolbar">
             <button type="button" class="tool-btn" id="btnToggleMic" onclick="webrtcToggleMic()" title="Mute/Unmute Mic">
                 <i class="fas fa-microphone"></i>
@@ -4084,8 +4060,8 @@
         <!-- Hidden Native File Pickers -->
         <input type="file" id="privateProjectorFileInput" accept="application/pdf,image/png,image/jpeg,image/webp" onchange="handleProjectorFileSelect(event)" style="display: none;">
 
-    </div>
-</div>
+    </div> <!-- End of arpeu-call-container -->
+</div> <!-- End of arpeuNativeConferenceModal -->
 
 
 <!-- =========================================================
@@ -5239,7 +5215,7 @@
 <!-- Firebase Core SDK and Realtime Database -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-<script src="js/script.js?v=162"></script>
+<script src="js/script.js?v=163"></script>
 
 <script>
     // Permanently remove splash screen from DOM so all buttons touch smoothly

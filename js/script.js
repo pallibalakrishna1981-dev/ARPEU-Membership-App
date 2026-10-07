@@ -6425,6 +6425,23 @@ function listenToOnlineLeaders() {
                     dot.style.setProperty('display', 'none', 'important');
                 }
             });
+
+            // 🌟 DYNAMIC PRIORITY SORT: Online Leaders Move to Front (Behind Active Speaker)
+            const track = document.getElementById('cadreStripTrack');
+            if (track) {
+            const activeCard = track.querySelector('#card-0') || track.firstElementChild;
+            const otherCards = Array.from(track.children).filter(c => c !== activeCard);
+
+            // Sort: Online leaders first (1), Offline leaders last (0)
+            otherCards.sort((a, b) => {
+                const aOnline = a.classList.contains('is-online') ? 1 : 0;
+                const bOnline = b.classList.contains('is-online') ? 1 : 0;
+                return bOnline - aOnline;
+            });
+
+            // Re-order in DOM safely behind Active Speaker
+            otherCards.forEach(card => track.appendChild(card));
+            }
         });
     });
 }
@@ -7883,32 +7900,87 @@ let secondarySpeakerTimeout = null;
  * 1. Personal Focus / Local Tap-to-Pin Feature
  * (Runs only on the local device that clicked, does not affect others)
  */
-function handleCadreThumbClick(cadreId, cadreName, cadreRole, cadreUnit, photoSrc, cadreMobile) {
-    console.log("Step 1: Function Started for", cadreName);
+/* =========================================================================
+   ACTIVE SPEAKER FOCUS & LEADER THUMB CLICK (5s AUTO-DISMISS & TAP-TO-CLOSE)
+   ========================================================================= */
+let tappedLeaderDismissTimer = null;
 
-    // 1. Highlight Card
+// Helper function to dismiss the preview cleanly
+function dismissTappedLeaderPiP() {
+    const photoWrap = document.getElementById('tappedLeaderPhotoWrap');
+    if (photoWrap) {
+        photoWrap.style.display = 'none';
+        photoWrap.innerHTML = '';
+    }
+
+    // Remove highlight border from all cards
+    document.querySelectorAll('.cadre-thumb-card').forEach(card => card.classList.remove('selected-leader'));
+
+    if (tappedLeaderDismissTimer) {
+        clearTimeout(tappedLeaderDismissTimer);
+        tappedLeaderDismissTimer = null;
+    }
+}
+
+function handleCadreThumbClick(cadreId, cadreName, cadreRole, cadreUnit, photoSrc, cadreMobile) {
+    console.log("Leader Card Clicked:", cadreName);
+
+    // 🌟 ACTIVE SPEAKER RULE: If clicking 1st sticky card, do NOT open PiP!
+    if (cadreId === 0 || cadreId === '0' || cadreId === 'card-0') {
+        dismissTappedLeaderPiP();
+        updateActiveSpeakerIdentity(cadreName, cadreRole, cadreUnit);
+        return;
+    }
+
+    // 1. Highlight selected leader card
     document.querySelectorAll('.cadre-thumb-card').forEach(card => card.classList.remove('selected-leader'));
     const currentCard = document.getElementById('card-' + cadreId);
     if (currentCard) currentCard.classList.add('selected-leader');
 
-    // 2. Show PiP Photo
+    // 2. Show PiP Photo with Tap-to-Close
     const photoWrap = document.getElementById('tappedLeaderPhotoWrap');
     if (photoWrap) {
-        photoWrap.innerHTML = `<img src="${photoSrc}" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='images/arpeu-logo.png'">`;
+        photoWrap.innerHTML = `
+            <div style="position: relative; width: 100%; height: 100%;">
+                <img src="${photoSrc}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;" onerror="this.src='images/arpeu-logo.png'">
+                <div style="position: absolute; top: 6px; right: 6px; background: rgba(0,0,0,0.6); color: #fff; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; cursor: pointer;">&times;</div>
+            </div>
+        `;
         photoWrap.style.display = 'block';
+
+        // Tap directly on the photo to close immediately
+        photoWrap.onclick = (e) => {
+            e.stopPropagation();
+            dismissTappedLeaderPiP();
+        };
     }
 
-    // 3. Update Ribbon
+    // 3. Update Ribbon info
     updateActiveSpeakerIdentity(cadreName, cadreRole, cadreUnit);
 
-    // 4. Trigger Real Call
-    if (cadreMobile) {
-        placeCall(cadreMobile, myProfile.name);
-        alert(`${cadreName} (${cadreMobile}) కి కాల్ వెళ్తోంది...`);
-    } else {
-        console.error("Mobile number missing for:", cadreName);
+    // 4. Clear previous timer and set 5-Second Auto-Dismiss
+    if (tappedLeaderDismissTimer) {
+        clearTimeout(tappedLeaderDismissTimer);
     }
+    tappedLeaderDismissTimer = setTimeout(() => {
+        dismissTappedLeaderPiP();
+    }, 5000);
 }
+
+// 5. Tap anywhere on Main Video Stage to close preview immediately
+document.addEventListener('DOMContentLoaded', () => {
+    const stage = document.getElementById('speakerStageContainer');
+    if (stage) {
+        stage.addEventListener('click', (e) => {
+            const photoWrap = document.getElementById('tappedLeaderPhotoWrap');
+            if (photoWrap && photoWrap.style.display !== 'none') {
+                if (!e.target.closest('#tappedLeaderPhotoWrap') && !e.target.closest('button')) {
+                    dismissTappedLeaderPiP();
+                }
+            }
+        });
+    }
+});
 
 function resetPersonalFocusView() {
     isPersonallyPinned = false;

@@ -7002,6 +7002,7 @@ NEW QUICK LINKS INTEGRATED CARD STYLES
     display: inline-flex;
     gap: 8px;
     height: 100%;
+    position: relative;
 }
 
 .cadre-thumb-card {
@@ -7014,6 +7015,17 @@ NEW QUICK LINKS INTEGRATED CARD STYLES
     border: 2px solid rgba(255, 255, 255, 0.15);
     cursor: pointer;
     flex-shrink: 0;
+    transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+/* 🌟 ACTIVE SPEAKER: 1st Card Stays Sticky on Left & Others Scroll Underneath */
+.cadre-thumb-card:first-child {
+    position: sticky !important;
+    left: 0 !important;
+    z-index: 10 !important;
+    background: #050e1c !important;
+    border-color: #10b981 !important;
+    box-shadow: 6px 0 12px rgba(0, 0, 0, 0.95) !important;
 }
 
 .cadre-thumb-card.active-speaker {
